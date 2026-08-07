@@ -1,0 +1,9 @@
+USDA PSD world-aggregate series (Beginning Stocks, Domestic Consumption,
+Ending Stocks, Production) for wheat, rice, and maize, 1960-2025 marketing years,
+units 1000 MT.
+
+Sourced from the AgRichter Scale repository (mjpuma/AgRichterScale, USDAdata/,
+refreshed 2026-01-21), which derives them from USDA Foreign Agricultural Service
+Production, Supply & Distribution (PSD) Online. Underlying USDA data are US
+Government public-domain. Vendored here as a small runnable sample for the SHEAF
+validation harness; per-country series are loaded from a local PSD export.
