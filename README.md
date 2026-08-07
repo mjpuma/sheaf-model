@@ -79,7 +79,7 @@ $$b_g = -\,\varepsilon_g\, \frac{D_{0,g}}{p_{0,g}} \;>\;0,
 \qquad
 S_{gh} = \sigma\,\rho_{gh}\,\sqrt{b_g b_h}\ \ (g\neq h),\quad S_{gg}=0,$$
 
-$$M_i = \operatorname{diag}(b) - S \quad\text{(symmetrised)},\qquad
+$$M_i = \mathrm{diag}(b) - S \quad\text{(symmetrised)},\qquad
 a_i = D_{0} + M_i\, p_{0}.$$
 
 Here $\sigma \ge 0$ (`subst_scale`) is a global substitution strength. Off-diagonals
@@ -134,7 +134,7 @@ $s = p^{e}_{i,g}/(1+r) - p^{\mathrm{ref}}_{i,g}$,
 
 $$\Delta^{\mathrm{mkt},g}_i =
 \begin{cases}
-\gamma^g_i\big(s - \theta\,\operatorname{sgn} s\big), & |s|>\theta,\\[2pt]
+\gamma^g_i\big(s - \theta\,\mathrm{sgn} s\big), & |s|>\theta,\\[2pt]
 0, & |s|\le\theta,
 \end{cases}
 \qquad \text{clipped to } [-S^g_i,\ \bar S^g_i - S^g_i].$$
@@ -204,7 +204,7 @@ $\xi^g_i(t)$ and chokepoint disruptions as route multipliers $\psi_{ij}(t)$.
 ### 6. The single-commodity models as a limiting case
 
 > **Proposition.** If $\sigma = 0$ (equivalently $\rho \equiv 0$), then $S = 0$ and
-> each $M_i = \operatorname{diag}(b_i)$ is diagonal. The benefit potential separates,
+> each $M_i = \mathrm{diag}(b_i)$ is diagonal. The benefit potential separates,
 > $W_i(D_i) = \sum_g W^g_i(D^g_i)$, so the market QP of §2 decomposes into $G$
 > **independent** single-commodity spatial price equilibria, and national welfare
 > $\mathcal{W}_i$ decouples across grains so the export game is played independently
