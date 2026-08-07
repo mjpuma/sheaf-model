@@ -1,0 +1,13 @@
+FAOSTAT bilateral trade matrices (E0) and the country conversion table, sourced
+from the FoodTradeNetwork repository (mjpuma/FoodTradeNetwork, inputs_processed/
+and ancillary/). E0[i,j] is the bilateral flow from exporter i to importer j for
+the given crop and year window; rows are exporter names, columns FAOSTAT area
+codes. Absolute magnitudes are treated as unit-agnostic (use for structure;
+rescale to a USDA total for magnitude).
+
+Vendored here as a runnable sample: wheat baseline (2019-2021) and the two crisis
+windows (2006-2007, 2010-2011). Other crops/windows load from a local
+FoodTradeNetwork checkout via the data_dir argument.
+
+NOTE: production (P0) and reserves (R0) are intentionally NOT taken from FAOSTAT
+(its stocks are food-balance residuals); SHEAF sources those from USDA PSD.
