@@ -1,6 +1,18 @@
 # SHEAF
 
-**Substitution, Heterogeneous agents, Equilibrium, And Fragility** — a country-level,
+<p align="center">
+  <img src="assets/SHEAF_Model_logo.png" width="260" alt="SHEAF Model logo — a wheat ear, rice panicle, and corn cob bound together in a green ring">
+</p>
+
+> **sheaf** &nbsp;/ʃiːf/&nbsp;
+> — *(agriculture)* a bundle of cereal stalks bound together after the harvest;
+> — *(mathematics)* a structure that consistently glues locally defined data into a coherent global whole (sheaf theory).
+>
+> Both senses describe the model. It **binds** several grains and heterogeneous agents into one
+> trade network, and it **glues** each country's local supply, demand, and policy into a single,
+> globally consistent market equilibrium.
+
+**S**ubstitution, **H**eterogeneous agents, **E**quilibrium, **A**nd **F**ragility — a country-level,
 multi-commodity, game-theoretic network model of global grain trade.
 
 SHEAF couples three things that existing network trade models (e.g. PIK's TWIST,
