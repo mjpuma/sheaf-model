@@ -1,7 +1,7 @@
 """
-grist.calibration
+sheaf.calibration
 =================
-A prototype calibration for GRIST: three grains (wheat, rice, maize) across a
+A prototype calibration for SHEAF: three grains (wheat, rice, maize) across a
 country set that trades meaningfully in all three, plus a Rest-of-World node that
 closes the global balance. Numbers are order-of-magnitude realistic (MMT, $/t)
 but are illustrative placeholders -- swap in FAOSTAT/USDA PSD production and

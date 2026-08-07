@@ -1,9 +1,9 @@
-# GRIST
+# SHEAF
 
-**Grain Restriction, Interdependence & Strategic Trade** — a country-level,
+**Substitution, Heterogeneous agents, Equilibrium, And Fragility** — a country-level,
 multi-commodity, game-theoretic network model of global grain trade.
 
-GRIST couples three things that existing network trade models (e.g. PIK's TWIST,
+SHEAF couples three things that existing network trade models (e.g. PIK's TWIST,
 Agrimate) treat only partially:
 
 1. a **trade network** cleared by spatial price equilibrium,
@@ -11,9 +11,9 @@ Agrimate) treat only partially:
 3. **cross-commodity substitution** — wheat, rice, and maize markets are linked on
    the demand side, so a shock to one grain spills into the others.
 
-The third point is the reason GRIST exists. Single-commodity strategic-trade
+The third point is the reason SHEAF exists. Single-commodity strategic-trade
 models wall each grain off from the others, and reviewers rightly object that this
-overstates price spikes and misses the substitution margin. In GRIST the
+overstates price spikes and misses the substitution margin. In SHEAF the
 no-substitution case is a *special limit* of the model (set the cross-price terms
 to zero), and the gap between that limit and the full model is itself a result.
 
@@ -50,6 +50,15 @@ by iterated best response over the market layer. A convex food-price penalty tha
 only bites above a tolerated price reproduces the documented pattern: trade is
 open in calm periods and restrictions emerge in spikes (2008, 2010–11, 2022).
 
+*Why states, not firms, are the strategic players.* The strategic instrument here
+is an export restriction — a sovereign policy lever that only a government can
+pull, so the object of study fixes the players. Agribusiness is not absent: the
+competitive market-clearing layer *is* traders arbitraging price differences
+across the network. The state overrides that arbitrage with policy in a crisis;
+the firm optimises within the rules, the state sets them. Oligopolistic traders
+with market power and strategic stockholding are a natural third agent class for
+future work; for the export-ban question the first-order driver is state policy.
+
 **Storage.** Market-responsive (competitive) reserves and strategic government
 buffer stocks adjust available supply each period before the market clears.
 
@@ -61,23 +70,23 @@ python demo.py
 ```
 
 The demo runs a Black Sea wheat shock (Russia −40%, Ukraine −50%) under two
-regimes — substitution on (full GRIST) and off (single-commodity limit) — plus a
-no-shock counterfactual for each, and writes `grist_results.csv` and four figures.
+regimes — substitution on (full SHEAF) and off (single-commodity limit) — plus a
+no-shock counterfactual for each, and writes `sheaf_results.csv` and four figures.
 
 Minimal use in code:
 
 ```python
-from grist import build_countries, GristModel
+from sheaf import build_countries, SheafModel
 
 countries, transport, grains, freight = build_countries(substitution=True)
-model = GristModel(countries, transport, grains, freight_mult=freight)
+model = SheafModel(countries, transport, grains, freight_mult=freight)
 df = model.run(periods=12, shocks={5: shock_matrix, 6: shock_matrix})
 ```
 
 ## Layout
 
 ```
-grist/
+sheaf/
   core.py          # demand system, spatial equilibrium, export game, storage, orchestrator
   calibration.py   # the 3-grain prototype dataset (swap this for real data)
 demo.py            # Black Sea shock scenario + figures

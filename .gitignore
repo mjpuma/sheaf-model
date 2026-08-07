@@ -1,6 +1,6 @@
 __pycache__/
 *.pyc
-grist_results.csv
+sheaf_results.csv
 .ipynb_checkpoints/
 .DS_Store
 *.egg-info/

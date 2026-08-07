@@ -1,10 +1,10 @@
 """
-demo.py -- GRIST prototype demonstration.
+demo.py -- SHEAF prototype demonstration.
 
 Runs a Black Sea wheat shock (Russia -40%, Ukraine -50% wheat) through the
 three-grain model under two regimes:
 
-    * substitution ON  -- the full GRIST model; grain markets couple.
+    * substitution ON  -- the full SHEAF model; grain markets couple.
     * substitution OFF -- cross-price terms zeroed; the markets decouple into
       independent single-commodity problems (the TWIST/Agrimate-style limit).
 
@@ -14,7 +14,7 @@ because buyers can escape into another grain. Without it, the wheat shock stays
 walled off in the wheat market -- which is exactly what reviewers say is wrong
 with single-commodity strategic-trade models.
 
-Outputs: grist_results.csv and four PNG figures.
+Outputs: sheaf_results.csv and four PNG figures.
 """
 import numpy as np
 import pandas as pd
@@ -23,7 +23,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from grist import build_countries, GristModel, GRAINS
+from sheaf import build_countries, SheafModel, GRAINS
 
 PERIODS = 12
 SHOCK_T = (5, 6, 7)
@@ -50,13 +50,13 @@ def run(substitution: bool):
     and isolates the effect of the wheat shock itself.
     """
     c1, transport, grains, fm = build_countries(substitution=substitution)
-    model = GristModel(c1, transport, grains, freight_mult=fm,
+    model = SheafModel(c1, transport, grains, freight_mult=fm,
                        play_game=True, game_grid=7, game_iters=3)
     df = model.run(PERIODS, shocks=wheat_shock(c1))
     df["substitution"] = substitution
 
     c0, transport0, _, _ = build_countries(substitution=substitution)
-    base_model = GristModel(c0, transport0, grains, freight_mult=fm,
+    base_model = SheafModel(c0, transport0, grains, freight_mult=fm,
                             play_game=True, game_grid=7, game_iters=3)
     df0 = base_model.run(PERIODS, shocks={})       # no shock counterfactual
     return df, df0, model
@@ -88,7 +88,7 @@ def fig_coupling(on, off):
         ax.axvspan(*band, color="0.9", label="Black Sea wheat shock")
         ax.plot(x, d_off, "o--", color="#888",
                 label="no substitution (TWIST/Agrimate limit)")
-        ax.plot(x, d_on, "o-", color="#c0392b", label="GRIST (with substitution)")
+        ax.plot(x, d_on, "o-", color="#c0392b", label="SHEAF (with substitution)")
         ax.set_title(f"{grain.capitalize()}")
         ax.set_xlabel("period")
         ax.set_ylabel("shock-induced price change ($/t)")
@@ -105,7 +105,7 @@ def fig_restrictions(df_on, df_off):
     strategic restriction changes."""
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.2), sharey=True)
     for ax, df, title in zip(axes, (df_off, df_on),
-                             ("No substitution", "With substitution (GRIST)")):
+                             ("No substitution", "With substitution (SHEAF)")):
         w = df[(df.grain == "wheat") & (df.period.isin(SHOCK_T))]
         piv = w.pivot_table(index="country", values="export_tax", aggfunc="max")
         piv = piv[piv.export_tax > 0.5].sort_values("export_tax", ascending=True)
@@ -173,7 +173,7 @@ def fig_network(model_on):
 
 
 def main():
-    print("Running GRIST prototype: 3 grains x 17 countries (shock + counterfactual, "
+    print("Running SHEAF prototype: 3 grains x 17 countries (shock + counterfactual, "
           "two regimes)...\n")
     df_on, df0_on, model_on = run(substitution=True)
     df_off, df0_off, model_off = run(substitution=False)
@@ -182,7 +182,7 @@ def main():
                     df0_on.assign(scenario="counterfactual"),
                     df_off.assign(scenario="shock"),
                     df0_off.assign(scenario="counterfactual")], ignore_index=True)
-    df.to_csv("grist_results.csv", index=False)
+    df.to_csv("sheaf_results.csv", index=False)
 
     fig_coupling((df_on, df0_on), (df_off, df0_off))
     fig_restrictions(df_on, df_off)
@@ -197,14 +197,14 @@ def main():
     for grain in GRAINS:
         on = peak_dev(df_on, df0_on, grain)
         off = peak_dev(df_off, df0_off, grain)
-        print(f"  {grain:6s}  GRIST (substitution): {on:+6.1f}    "
+        print(f"  {grain:6s}  SHEAF (substitution): {on:+6.1f}    "
               f"no-substitution: {off:+6.1f}")
     print("\n  -> The wheat shock alone moves rice and maize only under substitution;")
     print("     without it, those markets are walled off (deviation ~ 0).")
 
     nrest = df_on[(df_on.grain == "wheat") & (df_on.period.isin(SHOCK_T))]["n_restricting"].max()
-    print(f"\nWheat exporters restricting during the shock (GRIST): {nrest}")
-    print("\nWrote grist_results.csv, fig1_coupling.png, fig2_restrictions.png, "
+    print(f"\nWheat exporters restricting during the shock (SHEAF): {nrest}")
+    print("\nWrote sheaf_results.csv, fig1_coupling.png, fig2_restrictions.png, "
           "fig3_reserves.png, fig4_network.png")
 
 

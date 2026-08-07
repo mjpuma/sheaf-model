@@ -1,7 +1,7 @@
 """
-grist.core
+sheaf.core
 ==========
-GRIST -- Grain Restriction, Interdependence & Strategic Trade.
+SHEAF -- Substitution, Heterogeneous agents, Equilibrium, And Fragility.
 
 A country-level, multi-commodity network model of global grain trade that couples
 a spatial price equilibrium with strategic government behaviour AND cross-commodity
@@ -18,7 +18,7 @@ Three coupled ideas:
     price; because maize/rice are substitutes, demand shifts and their prices
     move too -- the markets couple. Set the off-diagonals of M to zero and the
     markets decouple into independent single-commodity problems: that limit is
-    exactly the class of models GRIST is meant to improve on.
+    exactly the class of models SHEAF is meant to improve on.
 
   * STRATEGIC layer -- exporters choose export-tax-equivalents tau (a ban ~ high
     tau), per commodity, to maximise national welfare. Nash is approximated by
@@ -365,7 +365,7 @@ class ExportRestrictionGame:
 # ----------------------------------------------------------------------------
 # 6. Dynamic orchestrator
 # ----------------------------------------------------------------------------
-class GristModel:
+class SheafModel:
     """Multi-period simulation coupling storage, the multi-commodity trade
     network, and the strategic export-restriction game.
 
