@@ -11,7 +11,7 @@ there is more than one grain, and buyers substitute between them.
 
 Three coupled ideas:
 
-  * MARKET layer -- a Takayama-Judd / Samuelson spatial price equilibrium solved
+  * MARKET layer -- a Takayama–Judge / Samuelson spatial price equilibrium solved
     as one concave QP that clears ALL commodities jointly. The commodities are
     linked on the demand side by a symmetric, positive-definite cross-price
     demand system  D_i = a_i - M_i p_i . A wheat shortfall raises the wheat
