@@ -1,4 +1,4 @@
-# SHEAF
+# SHEAF Model
 
 <p align="center">
   <img src="assets/SHEAF_Model_logo.png" width="260" alt="SHEAF Model logo — a wheat ear, rice panicle, and corn cob bound together in a green ring">
@@ -12,14 +12,14 @@
 > trade network, and it **glues** each country's local supply, demand, and policy into a single,
 > globally consistent market equilibrium.
 
-**S**ubstitution, **H**eterogeneous agents, **E**quilibrium, **A**nd **F**ragility — a country-level,
+**S**ubstitution, **H**eterogeneous agents, **E**quilibrium, **A**nd **F**ragility Model: a country-level,
 multi-commodity, game-theoretic network model of global grain trade.
 
 SHEAF couples three things that existing network trade models (e.g. PIK's TWIST,
 Agrimate) treat only partially:
 
 1. a **trade network** cleared by spatial price equilibrium,
-2. **strategic government behaviour** — exporters play an export-restriction game,
+2. **strategic government behavior** — exporters play an export-restriction game,
 3. **cross-commodity substitution** — wheat, rice, and maize markets are linked on
    the demand side, so a shock to one grain spills into the others.
 
