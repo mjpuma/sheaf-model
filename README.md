@@ -51,18 +51,22 @@ implementation in `sheaf/core.py` and to serve as a methods reference.
 | $i,j \in \{1,\dots,n\}$ | countries (network nodes) |
 | $g,h \in \{1,\dots,G\}$ | grains (wheat, rice, maize) |
 | $D_i \in \mathbb{R}^{G}_{\ge 0}$ | consumption vector of country $i$ |
+| $a_i \in \mathbb{R}^{G}$ | demand intercept (choke consumption, i.e. demand at zero price) |
 | $p_i \in \mathbb{R}^{G}$ | domestic price vector of country $i$ |
 | $f^g_{ij} \ge 0$ | bilateral flow of grain $g$ from $i$ to $j$ |
 | $Q^g_i$ | baseline production; $\xi^g_i$ production-shock multiplier |
 | $A^g_i$ | available supply after storage |
 | $M_i \in \mathbb{R}^{G\times G}$ | country $i$ demand-slope matrix (symmetric PD) |
+| $D_{0},\ p_{0}$ | baseline consumption and reference prices (calibration anchors) |
 | $\tau^g_i \ge 0$ | export-tax-equivalent (restriction); $m^g_j$ import tariff |
 | $c_{ij},\ \phi_g,\ \psi_{ij}$ | transport cost, grain freight factor, route (chokepoint) multiplier |
-| $S^g_i,\ \bar S^g_i$ | stock level and storage capacity |
+| $R^g_i,\ \bar R^g_i$ | reserve (stock) level and storage capacity |
+| $r,\ t$ | discount rate; time-period index |
 
 ### 1. Demand system (cross-commodity substitution)
 
-Each country has a linear demand system over all grains,
+Each country has a linear demand system over all grains, with **demand intercept**
+$a_i\in\mathbb{R}^{G}$ (choke consumption, the demand at zero price) and slope matrix $M_i$,
 
 $$D_i = a_i - M_i\, p_i, \qquad p_i = M_i^{-1}(a_i - D_i),$$
 
@@ -80,7 +84,7 @@ surplus is the potential net of expenditure,
 $$CS_i(D_i) = W_i(D_i) - p_i^\top D_i,$$
 
 which reduces to the familiar triangle $\tfrac12\sum_g (D^g_i)^2/\beta^g_i$ in the
-one-grain, constant-slope case.
+one-grain, constant-slope case (with $\beta^g_i=b_g$, the own-price slope).
 
 **Construction of $M_i$ from data.** Given baseline consumption $D_{0}$, reference
 prices $p_{0}$, own-price elasticities $\varepsilon_g<0$, and a symmetric
@@ -95,7 +99,7 @@ $$M_i = \mathrm{diag}(b) - S \quad\text{(symmetrised)},\qquad
 a_i = D_{0} + M_i\, p_{0}.$$
 
 Here $\sigma \ge 0$ (`subst_scale`) is a global substitution strength. Off-diagonals
-of $M_i$ are $-S_{gh}\le 0$, i.e. $\partial D^g_i/\partial p^h_i = -M^{-1}_{i,gh} \ge 0$
+of $M_i$ are $-S_{gh}\le 0$, i.e. $\partial D^g_i/\partial p^h_i = -M_{i,gh} \ge 0$
 for substitutes: a higher price of grain $h$ raises demand for grain $g$. Rows of
 $S$ are rescaled if needed to enforce strict diagonal dominance, which guarantees
 $M_i \succ 0$. The intercept calibration ensures $D_i = D_0$ at $p_i = p_0$.
@@ -136,9 +140,9 @@ concavity of $\sum_i W_i$ gives a unique equilibrium consumption/price allocatio
 Two stock types adjust availability before clearing,
 $A^g_i = Q^g_i\,\xi^g_i - \Delta^{\mathrm{mkt},g}_i - \Delta^{\mathrm{gov},g}_i$,
 with $\Delta>0$ a build (removed from supply) and $\Delta<0$ a release. Expectations
-are adaptive/mean-reverting toward a normal price $\bar p_g$,
+are adaptive/mean-reverting toward a normal price $p^{\mathrm{norm}}_g$,
 
-$$p^{e}_{i,g} = p^{\mathrm{prev}}_{i,g} + \kappa\,(\bar p_g - p^{\mathrm{prev}}_{i,g}).$$
+$$p^{e}_{i,g} = p^{\mathrm{prev}}_{i,g} + \kappa\,(p^{\mathrm{norm}}_g - p^{\mathrm{prev}}_{i,g}).$$
 
 **Competitive (market-responsive) storage** follows a Wright–Williams / Deaton–Laroque
 arbitrage rule with a carrying-cost deadband $\theta$: with signal
@@ -149,20 +153,20 @@ $$\Delta^{\mathrm{mkt},g}_i =
 \gamma^g_i\big(s - \theta\,\mathrm{sgn} s\big), & |s|>\theta,\\[2pt]
 0, & |s|\le\theta,
 \end{cases}
-\qquad \text{clipped to } [-S^g_i,\ \bar S^g_i - S^g_i].$$
+\qquad \text{clipped to } [-R^g_i,\ \bar R^g_i - R^g_i].$$
 
 Stocks are built when the discounted expected price exceeds the current price by more
 than the carrying cost, and released in the opposite case.
 
 **Strategic (government) buffer stocks** release in a crisis and rebuild toward a
 target stock-to-use ratio $\vartheta^g_i$ in calm periods. With shortfall
-$\Sigma = C^{\mathrm{base}}_{i,g} - A^{\text{(pre-gov)}}$ and trigger price
+$\Sigma = D^g_{0,i} - A^{\text{(pre-gov)}}$ and trigger price
 $p^{\mathrm{trig}}$,
 
 $$\Delta^{\mathrm{gov},g}_i =
 \begin{cases}
--\,\min\!\big(\eta_{\mathrm{rel}}\,S^g_i,\ \max(\Sigma,0)\big) \ \text{or}\ -\eta_{\mathrm{rel}}S^g_i, & \text{crisis } (p^{\mathrm{ref}}>p^{\mathrm{trig}} \ \text{or}\ \Sigma>0),\\[2pt]
-+\,\eta_{\mathrm{bld}}\big(\vartheta^g_i C^{\mathrm{base}}_{i,g} - S^g_i\big)_+, & \text{calm}.
+-\,\min\!\big(\eta_{\mathrm{rel}}\,R^g_i,\ \max(\Sigma,0)\big) \ \text{or}\ -\eta_{\mathrm{rel}}R^g_i, & \text{crisis } (p^{\mathrm{ref}}>p^{\mathrm{trig}} \ \text{or}\ \Sigma>0),\\[2pt]
++\,\eta_{\mathrm{bld}}\big(\vartheta^g_i D^g_{0,i} - R^g_i\big)_+, & \text{calm}.
 \end{cases}$$
 
 ### 4. Strategic layer: export-restriction game
@@ -173,11 +177,11 @@ welfare, taking other governments' choices as given:
 
 $$\mathcal{W}_i(\tau) = CS_i \;+\; \underbrace{\sum_g p_{i,g} Q_{i,g}}_{\text{producer income } \Pi_i}
 \;-\; \underbrace{\sum_g w_{i,g}\,\big(p_{i,g}-\bar p_{i,g}\big)_+^{2}}_{\text{food-security penalty } \Phi_i}
-\;+\; \lambda \underbrace{\sum_g \tau^g_i X^g_i}_{\text{terms-of-trade } \Psi_i},$$
+\;+\; \zeta \underbrace{\sum_g \tau^g_i X^g_i}_{\text{terms-of-trade } \Psi_i},$$
 
 where $(x)_+ = \max(x,0)$, $X^g_i$ is net exports, $w_{i,g}\ge 0$ weights the political
 cost of high domestic staple prices, $\bar p_{i,g}$ is the tolerated price, and
-$\lambda$ (`revenue_weight`, default $0$) optionally activates a terms-of-trade motive.
+$\zeta$ (`revenue_weight`, default $0$) optionally activates a terms-of-trade motive.
 Crucially every term depends on $\tau$ through the market map $p(\tau), D(\tau), X(\tau)$
 of §2. The one-sided quadratic penalty is flat until the domestic price breaches
 $\bar p_{i,g}$ and convex above it, which reproduces the observed regime switch: trade
@@ -207,9 +211,9 @@ driver is state policy.
 Each period $t$ executes: (i) form expectations $p^e$; (ii) set storage
 $\Delta^{\mathrm{mkt}},\Delta^{\mathrm{gov}}$ and hence availability $A_t$;
 (iii) a **stress gate** solves the market at $\tau=0$ and plays the game only if
-$\max_{i,g} p_{i,g} > \eta\,\bar p_g$ (calm periods have $\tau\approx 0$ regardless,
+$\max_{i,g} p_{i,g} > \mu\,p^{\mathrm{norm}}_g$ (calm periods have $\tau\approx 0$ regardless,
 so this only saves computation); (iv) clear the market / equilibrium game to get
-$p_t, D_t, f_t$; (v) update stocks $S_{t+1} = \max(0,\ S_t + \Delta_t)$ and carry
+$p_t, D_t, f_t$; (v) update reserves $R_{t+1} = \max(0,\ R_t + \Delta_t)$ and carry
 $p^{\mathrm{prev}} \leftarrow p_t$. Shocks enter as production multipliers
 $\xi^g_i(t)$ and chokepoint disruptions as route multipliers $\psi_{ij}(t)$.
 
