@@ -360,7 +360,7 @@ class ExportRestrictionGame:
     """
 
     def __init__(self, market: SpatialEquilibrium, tau_max: float = 120.0,
-                 grid: int = 5, max_iters: int = 3, tol: float = 3.0,
+                 grid: int = 13, max_iters: int = 3, tol: float = 3.0,
                  revenue_weight: float = 0.0):
         self.market = market
         self.tau_max = tau_max
@@ -425,15 +425,17 @@ class SheafModel:
                  grains: tuple[str, ...], freight_mult=None,
                  discount_r: float = 0.05, tau_max: float = 120.0,
                  play_game: bool = True, p_norm=None, kappa: float = 0.5,
-                 game_grid: int = 5, game_iters: int = 3,
-                 stress_trigger: float = 1.12):
+                 game_grid: int = 13, game_iters: int = 3,
+                 stress_trigger: float = 1.12,
+                 tol: float = 3.0, revenue_weight: float = 0.0):
         self.countries = countries
         self.n = len(countries)
         self.grains = tuple(grains)
         self.G = len(grains)
         self.market = SpatialEquilibrium(transport, grains, freight_mult)
         self.game = ExportRestrictionGame(self.market, tau_max=tau_max,
-                                          grid=game_grid, max_iters=game_iters)
+                                          grid=game_grid, max_iters=game_iters,
+                                          tol=tol, revenue_weight=revenue_weight)
         self.r = discount_r
         self.play_game = play_game
         self.kappa = kappa

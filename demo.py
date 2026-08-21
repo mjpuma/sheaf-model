@@ -27,6 +27,10 @@ from sheaf import build_countries, SheafModel, GRAINS
 
 PERIODS = 12
 SHOCK_T = (5, 6, 7)
+# Adjudicated coarse-grid fix: 13-point tax grid (~10 $/t steps to tau_max=120).
+GAME_GRID = 13
+GAME_ITERS = 3
+OUT_DIR = "figures"
 
 
 def wheat_shock(countries):
@@ -51,13 +55,13 @@ def run(substitution: bool):
     """
     c1, transport, grains, fm = build_countries(substitution=substitution)
     model = SheafModel(c1, transport, grains, freight_mult=fm,
-                       play_game=True, game_grid=7, game_iters=3)
+                       play_game=True, game_grid=GAME_GRID, game_iters=GAME_ITERS)
     df = model.run(PERIODS, shocks=wheat_shock(c1))
     df["substitution"] = substitution
 
     c0, transport0, _, _ = build_countries(substitution=substitution)
     base_model = SheafModel(c0, transport0, grains, freight_mult=fm,
-                            play_game=True, game_grid=7, game_iters=3)
+                            play_game=True, game_grid=GAME_GRID, game_iters=GAME_ITERS)
     df0 = base_model.run(PERIODS, shocks={})       # no shock counterfactual
     return df, df0, model
 
@@ -96,7 +100,7 @@ def fig_coupling(on, off):
     fig.suptitle("A wheat shock spills into rice and maize ONLY when buyers can substitute",
                  fontsize=13)
     fig.tight_layout()
-    fig.savefig("fig1_coupling.png", dpi=130)
+    fig.savefig(f"{OUT_DIR}/fig1_coupling.png", dpi=130)
     plt.close(fig)
 
 
@@ -114,7 +118,7 @@ def fig_restrictions(df_on, df_off):
         ax.set_xlabel("peak wheat export-tax equiv. ($/t)")
     fig.suptitle("Wheat export restrictions during the shock", fontsize=13)
     fig.tight_layout()
-    fig.savefig("fig2_restrictions.png", dpi=130)
+    fig.savefig(f"{OUT_DIR}/fig2_restrictions.png", dpi=130)
     plt.close(fig)
 
 
@@ -132,7 +136,7 @@ def fig_reserves(df_on, model_on):
     axes[0].legend(fontsize=8)
     fig.suptitle("Reserves release into the shock", fontsize=13)
     fig.tight_layout()
-    fig.savefig("fig3_reserves.png", dpi=130)
+    fig.savefig(f"{OUT_DIR}/fig3_reserves.png", dpi=130)
     plt.close(fig)
 
 
@@ -168,13 +172,15 @@ def fig_network(model_on):
     fig.suptitle("Wheat trade network: blue = net exporter, red = net importer; "
                  "edge width ~ flow", fontsize=12)
     fig.tight_layout()
-    fig.savefig("fig4_network.png", dpi=130)
+    fig.savefig(f"{OUT_DIR}/fig4_network.png", dpi=130)
     plt.close(fig)
 
 
 def main():
-    print("Running SHEAF prototype: 3 grains x 17 countries (shock + counterfactual, "
-          "two regimes)...\n")
+    import os
+    os.makedirs(OUT_DIR, exist_ok=True)
+    print(f"Running SHEAF prototype: 3 grains × countries "
+          f"(game_grid={GAME_GRID}; shock + counterfactual, two regimes)...\n")
     df_on, df0_on, model_on = run(substitution=True)
     df_off, df0_off, model_off = run(substitution=False)
 
@@ -204,8 +210,9 @@ def main():
 
     nrest = df_on[(df_on.grain == "wheat") & (df_on.period.isin(SHOCK_T))]["n_restricting"].max()
     print(f"\nWheat exporters restricting during the shock (SHEAF): {nrest}")
-    print("\nWrote sheaf_results.csv, fig1_coupling.png, fig2_restrictions.png, "
-          "fig3_reserves.png, fig4_network.png")
+    print(f"\nWrote sheaf_results.csv, {OUT_DIR}/fig1_coupling.png, "
+          f"{OUT_DIR}/fig2_restrictions.png, {OUT_DIR}/fig3_reserves.png, "
+          f"{OUT_DIR}/fig4_network.png")
 
 
 if __name__ == "__main__":

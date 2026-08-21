@@ -49,6 +49,12 @@ DATA = [
          prod=(25, 0, 30), cons=(9, 0.3, 6), export=("wheat", "maize"),
          fs_w=(3.6, 0.0, 2.5), pt=(278, INF, 235),
          mkt=(0.05, 0.0, 0.05)),
+    # Major Black Sea / Central Asian wheat exporter (split out of RoW so Level-2
+    # who-restricts scoring can name Kazakhstan; quantities still illustrative).
+    dict(name="Kazakhstan", region="FSU", lat=48, lon=67,
+         prod=(15, 0.2, 1.5), cons=(6, 0.3, 1.2), export=("wheat",),
+         fs_w=(4.0, 0.0, 0.5), pt=(270, INF, 250),
+         mkt=(0.08, 0.0, 0.0)),
     dict(name="Canada", region="N.America", lat=56, lon=-106,
          prod=(34, 0, 14), cons=(10, 0.4, 15), export=("wheat",),
          fs_w=(0.3, 0.0, 0.3), pt=(340, INF, 300),
@@ -111,20 +117,34 @@ def _haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(a))
 
 
-def build_countries(substitution: bool = True):
+def build_countries(substitution: bool = True, policy_pool: str | None = None):
     """Return (countries, transport, GRAINS, FREIGHT_MULT).
 
     substitution=False zeros the cross-price terms -> independent single-commodity
     markets (the TWIST/Agrimate-style limit).
+
+    policy_pool:
+      None  — use hand-set fs_w / p_target from DATA (default).
+      "archetype" — collapse to ~4 structural food-security archetypes
+        (open exporter, restrictive exporter, rice specialist, non-player)
+        to improve Level-2 identification (audit P7-F4).
     """
     subst_scale = 0.6 if substitution else 0.0
 
     rows = [dict(d) for d in DATA]
+    if policy_pool == "archetype":
+        rows = [_apply_policy_archetype(r) for r in rows]
+    elif policy_pool is not None:
+        raise ValueError(f"unknown policy_pool={policy_pool!r}")
+
     # Rest-of-World closes the global balance
     prod_named = np.sum([r["prod"] for r in rows], axis=0)
     cons_named = np.sum([r["cons"] for r in rows], axis=0)
     row_prod = GLOBAL_PROD - prod_named
     row_cons = GLOBAL_CONS - cons_named
+    if np.any(row_prod < -1e-9) or np.any(row_cons < -1e-9):
+        raise ValueError(
+            f"named nodes exceed GLOBAL_* balance: RoW prod={row_prod}, cons={row_cons}")
     rows.append(dict(name="RestOfWorld", region="RoW", lat=20, lon=20,
                      prod=tuple(row_prod), cons=tuple(row_cons), export=()))
 
@@ -158,3 +178,72 @@ def build_countries(substitution: bool = True):
         )
         countries.append(c)
     return countries, transport, GRAINS, FREIGHT_MULT
+
+
+# Four structural policy archetypes (Level-2 identification; audit P7-F4).
+_ARCHETYPE = {
+    "open": dict(fs_w=(0.3, 0.3, 0.3), pt=(340, 560, 300)),
+    "restrictive": dict(fs_w=(5.0, 0.5, 2.5), pt=(270, 450, 235)),
+    "rice": dict(fs_w=(0.5, 4.5, 0.0), pt=(320, 440, INF)),
+    "none": dict(fs_w=(0.0, 0.0, 0.0), pt=(INF, INF, INF)),
+}
+_ARCHETYPE_OF = {
+    "USA": "open", "EU": "open", "Canada": "open", "Australia": "open",
+    "Russia": "restrictive", "Ukraine": "restrictive", "Kazakhstan": "restrictive",
+    "Argentina": "restrictive", "Brazil": "restrictive",
+    "India": "rice", "Thailand": "rice", "Vietnam": "rice",
+    "China": "none", "Egypt": "none", "Indonesia": "none",
+    "Mexico": "none", "Nigeria": "none", "RestOfWorld": "none",
+}
+
+
+def _apply_policy_archetype(row: dict) -> dict:
+    r = dict(row)
+    key = _ARCHETYPE_OF.get(r["name"], "none")
+    arch = _ARCHETYPE[key]
+    r["fs_w"] = arch["fs_w"]
+    r["pt"] = arch["pt"]
+    return r
+
+
+def subst_scale_band(scales=(0.0, 0.3, 0.6, 0.9)):
+    """Yield (scale, countries, transport, grains, freight) for sensitivity runs."""
+    for s in scales:
+        # build_countries only exposes on/off; rebuild manually at each scale
+        from .core import build_demand_system, Country
+        rows = [dict(d) for d in DATA]
+        prod_named = np.sum([r["prod"] for r in rows], axis=0)
+        cons_named = np.sum([r["cons"] for r in rows], axis=0)
+        rows.append(dict(
+            name="RestOfWorld", region="RoW", lat=20, lon=20,
+            prod=tuple(GLOBAL_PROD - prod_named),
+            cons=tuple(GLOBAL_CONS - cons_named), export=()))
+        lat = np.array([r["lat"] for r in rows], float)
+        lon = np.array([r["lon"] for r in rows], float)
+        n = len(rows)
+        transport = np.zeros((n, n))
+        for i in range(n):
+            for j in range(n):
+                if i != j:
+                    transport[i, j] = (
+                        _haversine(lat[i], lon[i], lat[j], lon[j]) * 0.0025 + 8.0)
+        countries = []
+        for r in rows:
+            D0 = np.array(r["cons"], float)
+            sysd = build_demand_system(GRAINS, D0, P0, OWN_ELAST, RHO, s)
+            gov = r.get("gov")
+            mkt = r.get("mkt")
+            countries.append(Country(
+                name=r["name"], region=r["region"],
+                production=np.array(r["prod"], float), demand=sysd,
+                export_grains=tuple(r.get("export", ())),
+                fs_weight=np.array(r.get("fs_w", (0, 0, 0)), float),
+                p_target=np.array(r.get("pt", (INF, INF, INF)), float),
+                mkt_gamma=(np.array(mkt, float) if mkt else None),
+                mkt_capacity=(np.array(r["prod"], float) * 0.5 if mkt else None),
+                mkt_stock=(np.array(r["prod"], float) * 0.15 if mkt else None),
+                gov_stock=(np.array(gov["stock"], float) if gov else None),
+                gov_target_ratio=(np.array(gov["ratio"], float) if gov else None),
+                gov_price_trigger=(np.array(gov["trig"], float) if gov else None),
+            ))
+        yield s, countries, transport, GRAINS, FREIGHT_MULT

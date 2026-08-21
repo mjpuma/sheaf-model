@@ -212,6 +212,7 @@ EU_ISO3 = ["AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA",
            "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE"]
 SHEAF_NODE_MAP = {
     "USA": ["USA"], "Russia": ["RUS"], "EU": EU_ISO3, "Ukraine": ["UKR"],
+    "Kazakhstan": ["KAZ"],
     "Canada": ["CAN"], "Australia": ["AUS"], "Argentina": ["ARG"],
     "Brazil": ["BRA"], "India": ["IND"], "Thailand": ["THA"], "Vietnam": ["VNM"],
     "China": ["CHN"], "Egypt": ["EGY"], "Indonesia": ["IDN"], "Mexico": ["MEX"],

@@ -106,3 +106,89 @@ def crisis_forcing(crops=("wheat", "rice", "maize"), years=range(2005, 2013),
         an = detrend_anomalies(df["production"], window_years)["anomaly"]
         cols[c] = 1.0 + an.reindex(years)
     return pd.DataFrame(cols, index=list(years))
+
+
+def world_baseline_means(crops=("wheat", "rice", "maize"),
+                         years=(2019, 2020, 2021), data_dir=None) -> pd.DataFrame:
+    """Mean world production/consumption/stocks (MMT) over `years` from vendored PSD."""
+    rows = {}
+    for c in crops:
+        df = load_crop_world(c, data_dir).loc[list(years)]
+        rows[c] = {
+            "production": float(df["production"].mean()),
+            "consumption": float(df["consumption"].mean()),
+            "ending_stocks": float(df["ending_stocks"].mean()),
+            "stock_to_use": float((df["ending_stocks"] / df["consumption"]).mean()),
+        }
+    return pd.DataFrame(rows).T
+
+
+def shock_matrix_from_world_forcing(n_countries: int, grains: tuple[str, ...],
+                                    forcing_row) -> np.ndarray:
+    """Broadcast a single year of `crisis_forcing` to an (n, G) shock matrix.
+
+    Every country gets the same grain multiplier. This is the honest maximum
+    with *world-aggregate* PSD only — Level-1/2 who-restricts work needs
+    per-country PSD (see `load_psd_country`).
+    """
+    G = len(grains)
+    m = np.ones((n_countries, G), float)
+    for g, grain in enumerate(grains):
+        try:
+            m[:, g] = float(forcing_row[grain])
+        except (KeyError, TypeError):
+            pass
+    return m
+
+
+def shocks_dict_from_crisis_forcing(n_countries: int, grains: tuple[str, ...],
+                                    years=range(2007, 2012),
+                                    period_of_year: dict[int, int] | None = None,
+                                    **forcing_kw) -> dict[int, np.ndarray]:
+    """Map crisis years → SheafModel `run(shocks={period: matrix})` entries.
+
+    By default year Y maps to period index (Y - min(years)). Override with
+    period_of_year={2007: 0, 2008: 1, ...}.
+    """
+    years = list(years)
+    forcing = crisis_forcing(crops=grains, years=years, **forcing_kw)
+    mapping = period_of_year or {y: i for i, y in enumerate(years)}
+    out = {}
+    for y in years:
+        out[mapping[y]] = shock_matrix_from_world_forcing(
+            n_countries, grains, forcing.loc[y])
+    return out
+
+
+def load_psd_country(crop: str, country: str, data_dir: Path | str | None = None):
+    """Per-country USDA PSD loader — **not vendored** in this repository.
+
+    Place a local AgRichter-style export under data_dir and extend this function.
+    Until then Level-1/2 country-specific anomalies cannot be built from repo data.
+    """
+    raise NotImplementedError(
+        "Per-country USDA PSD is not shipped with SHEAF (world aggregates only). "
+        "See data/usda_world/PROVENANCE.txt and VALIDATION.md remaining inputs. "
+        f"Requested crop={crop!r} country={country!r} data_dir={data_dir!r}."
+    )
+
+
+def load_amis_restrictions(path: Path | str | None = None):
+    """AMIS export-restriction timeline loader — **external** data, not vendored.
+
+    Needed for Level-1 exogenous-tau forcing and Level-2 restrictor ground truth.
+    """
+    raise NotImplementedError(
+        "AMIS restriction timelines are not shipped with SHEAF. "
+        "See VALIDATION.md remaining inputs. "
+        f"Requested path={path!r}."
+    )
+
+
+def load_price_series(path: Path | str | None = None):
+    """Observed (deflated) world price series — **external**, not vendored."""
+    raise NotImplementedError(
+        "Observed price series are not shipped with SHEAF. "
+        "See VALIDATION.md remaining inputs. "
+        f"Requested path={path!r}."
+    )

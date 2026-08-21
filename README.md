@@ -340,8 +340,8 @@ This is a **prototype**. The calibration numbers are order-of-magnitude realisti
 but illustrative — do not read the magnitudes as estimates. Demand and supply are
 linear (roughly ~15% global glut headroom before inverse-demand prices can go
 negative; no free disposal), production is short-run inelastic within a period, and
-Nash is an iterated-best-response approximation on a **coarse** default tax grid
-(`game_grid=5`). Private storage uses lagged prices by design. It implements the
+Nash is an iterated-best-response approximation on a discrete tax grid
+(`game_grid=13` by default, ~10 $/t steps). Private storage uses lagged prices by design. It implements the
 *architecture*, not a line-for-line replica of any published model's equations, and
 does not yet execute the Level-1/2 crisis hindcasts described in `VALIDATION.md`.
 
