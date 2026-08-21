@@ -20,13 +20,16 @@ core. Honest ceiling: SHEAF is an annual-ish equilibrium model, so it targets
 annual magnitudes, not Agrimate's bi-weekly out-of-equilibrium rationing. Temporal
 resolution is not where SHEAF competes.
 
-**Level 2 — endogenous prediction (SHEAF's unique test).** Drive SHEAF with
-production anomalies *only*, switch the strategic game on, and let it choose
-restrictions. Score against history: did it predict the right restrictors (Russia,
-Ukraine, Kazakhstan, Argentina, ...), roughly the right timing/severity, and the
-right prices? Neither Agrimate (restrictions exogenous) nor a no-strategy model can
-be evaluated on this. Calibrating the food-security weights and price triggers so
-the game reproduces the observed cascade is the scientific contribution.
+**Level 2 — endogenous restriction calibration (SHEAF's unique test).** Drive SHEAF
+with production anomalies *only*, switch the strategic game on, and let it choose
+restrictions. **Fit** food-security weights and price triggers so the model
+reproduces the observed cascade on a declared training window, then score
+restrictors / timing / severity / prices on a **held-out** window (or pooled
+structural parameters — see audit Finding P7-F4). This is a calibration-and-
+identification exercise, not an a-priori prediction claim. Neither Agrimate
+(restrictions exogenous) nor a no-strategy model can be evaluated on the same
+margin. Acquiring AMIS timelines and per-country PSD remains a prerequisite;
+the shipped repo does not yet run this pipeline end-to-end.
 
 **Bonus — multi-commodity.** 2007/08 is the natural substitution test: rice spiked
 on its own export-ban panic (India, Vietnam) partly linked to wheat. Agrimate runs

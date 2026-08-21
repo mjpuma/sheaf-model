@@ -94,25 +94,29 @@ def build_demand_system(grains, D0, p0, own_elast, rho, subst_scale=0.6):
     subst_scale  : global multiplier on substitution strength (0 = no substitution).
 
     Returns a DemandSystem with M = diag(b) - S, where b_g = -own_elast_g D0_g/p0_g
-    (own slope) and S_gh = subst_scale * rho_gh * sqrt(b_g b_h). rho and
-    subst_scale are capped implicitly by requiring diagonal dominance, which
-    guarantees M positive-definite.
+    (own slope) and S_gh = subst_scale * rho_gh * sqrt(b_g b_h). Rows of S are
+    capped for diagonal dominance, then symmetrised by the geometric mean
+    S <- sqrt(S ◦ Sᵀ). That ordering keeps ρ(D^{-1/2} S D^{-1/2}) ≤ 0.95, so M
+    is positive-definite whenever every own slope b_g > 0.
     """
     D0 = np.asarray(D0, float); p0 = np.asarray(p0, float)
     own_elast = np.asarray(own_elast, float); rho = np.asarray(rho, float)
     G = len(grains)
     b = -own_elast * D0 / p0                      # own slopes (>0)
+    if np.any(b <= 0):
+        raise ValueError("build_demand_system requires strictly positive own "
+                         "slopes b_g = -own_elast_g * D0_g / p0_g")
     S = np.zeros((G, G))
     for g in range(G):
         for h in range(G):
             if g != h:
                 S[g, h] = subst_scale * rho[g, h] * np.sqrt(b[g] * b[h])
-    # enforce strict diagonal dominance -> positive definite
+    # enforce strict diagonal dominance on rows, then geometric-mean symmetrise
     for g in range(G):
         off = S[g].sum()
         if off >= 0.95 * b[g]:
             S[g] *= (0.95 * b[g]) / off
-    S = 0.5 * (S + S.T)                            # symmetrise
+    S = np.sqrt(S * S.T)                           # preserves dominance bound
     M = np.diag(b) - S
     Minv = np.linalg.inv(M)
     a = D0 + M @ p0
@@ -196,11 +200,21 @@ def market_responsive_storage(c: Country, g: int, p_ref: float, p_expected: floa
 
 
 def strategic_storage(c: Country, g: int, p_ref: float, cons_baseline: float,
-                      availability_wo_gov: float) -> float:
-    """Government buffer rule for grain g. Returns net accumulation (+build/-release)."""
+                      availability_wo_gov: float,
+                      production0: Optional[float] = None) -> float:
+    """Government buffer rule for grain g. Returns net accumulation (+build/-release).
+
+    Quantity-leg shortfall is the gap after normal baseline trade (G2):
+        Σ = D0 - A_pre - max(D0 - Q0, 0)
+    so structural importers are calm at ξ=1, and exporters enter crisis only when
+    pre-gov availability falls below domestic baseline consumption. Pass
+    production0=Q0 (unshocked); if omitted, Q0 defaults to availability_wo_gov
+    (legacy autarky behaviour — not used by SheafModel).
+    """
     if c.gov_target_ratio[g] <= 0 and c.gov_stock[g] <= 0:
         return 0.0
-    shortfall = cons_baseline - availability_wo_gov
+    q0 = float(availability_wo_gov if production0 is None else production0)
+    shortfall = cons_baseline - availability_wo_gov - max(cons_baseline - q0, 0.0)
     crisis = (p_ref > c.gov_price_trigger[g]) or (shortfall > 0)
     if crisis and c.gov_stock[g] > 0:
         if p_ref > c.gov_price_trigger[g] and shortfall <= 0:
@@ -208,7 +222,7 @@ def strategic_storage(c: Country, g: int, p_ref: float, cons_baseline: float,
         else:
             release = min(c.gov_stock[g] * c.gov_release_frac, max(shortfall, 0.0))
         return -float(release)
-    if p_ref <= c.gov_price_trigger[g]:
+    if (not crisis) and p_ref <= c.gov_price_trigger[g]:
         target = c.gov_target_ratio[g] * cons_baseline
         gap = target - c.gov_stock[g]
         if gap > 0:
@@ -227,6 +241,10 @@ class MarketResult:
     net_exports: np.ndarray     # (n, G)
     availability: np.ndarray    # (n, G)
     grains: tuple[str, ...] = ()
+
+
+class SpatialEquilibriumError(RuntimeError):
+    """Raised when the spatial-equilibrium QP is not accepted as solved."""
 
 
 class SpatialEquilibrium:
@@ -256,6 +274,14 @@ class SpatialEquilibrium:
               export_tax: np.ndarray, tariff: np.ndarray,
               route_multiplier: Optional[np.ndarray] = None) -> MarketResult:
         n, G = self.n, self.G
+        availability = np.asarray(availability, float)
+        world = availability.sum(axis=0)
+        if np.any(world < -1e-9):
+            bad = [self.grains[g] for g in range(G) if world[g] < -1e-9]
+            raise SpatialEquilibriumError(
+                f"globally infeasible availability (sum A < 0) for {bad}; "
+                f"world sums={world}")
+
         D = cp.Variable((n, G), nonneg=True)
         fg = [cp.Variable((n, n), nonneg=True) for _ in range(G)]
 
@@ -278,13 +304,35 @@ class SpatialEquilibrium:
                             cp.diag(fg[g]) == 0]
 
         prob = cp.Problem(cp.Maximize(benefit - cost), constraints)
+        # Prefer a proven optimal solve. Retry the next solver on inaccurate /
+        # failed statuses rather than accepting a numeric-but-untrusted value.
+        accept = {"optimal"}
+        retry = {"optimal_inaccurate", "user_limit", "infeasible_inaccurate",
+                 "unbounded_inaccurate"}
+        statuses: list[str] = []
+        last_err: Optional[BaseException] = None
         for solver in (cp.CLARABEL, cp.SCS, cp.OSQP):
             try:
                 prob.solve(solver=solver, verbose=False)
-                if D.value is not None:
+                status = str(prob.status)
+                statuses.append(f"{solver}:{status}")
+                if status in accept and D.value is not None:
                     break
-            except Exception:
+                if status in retry:
+                    continue
+                # infeasible / unbounded / other — try next solver, then error
                 continue
+            except Exception as exc:
+                last_err = exc
+                statuses.append(f"{solver}:EXC:{type(exc).__name__}")
+                continue
+        else:
+            hint = ("check demand PD / DCP, or world availability sums"
+                    if last_err is not None else
+                    "check feasibility (world availability) and solver install")
+            raise SpatialEquilibriumError(
+                f"spatial equilibrium not solved; attempted={statuses}; hint={hint}"
+            ) from last_err
 
         Dv = np.clip(np.asarray(D.value), 0.0, None)
         flows = np.stack([np.clip(np.asarray(fg[g].value), 0.0, None)
@@ -411,7 +459,10 @@ class SheafModel:
         return [c.demand for c in self.countries]
 
     def _expectation(self, p_ref, g):
-        return p_ref + self.kappa * (self.p_norm[g] - p_ref)
+        # Mean-revert toward a level whose storage rest point equals p_norm[g]
+        # (typically mean p0): p* = κ/(κ+r)·target ⇒ target = p_norm·(κ+r)/κ.
+        target = self.p_norm[g] * (self.kappa + self.r) / self.kappa
+        return p_ref + self.kappa * (target - p_ref)
 
     def step(self, t, production_shock=None, route_multiplier=None):
         n, G = self.n, self.G
@@ -426,7 +477,8 @@ class SheafModel:
                 p_ref = c.p_prev[g]
                 p_exp = self._expectation(p_ref, g)
                 dm = market_responsive_storage(c, g, p_ref, p_exp, self.r)
-                dg = strategic_storage(c, g, p_ref, self.cons_baseline[i, g], prod - dm)
+                dg = strategic_storage(c, g, p_ref, self.cons_baseline[i, g],
+                                       prod - dm, production0=c.production[g])
                 mkt_change[i, g], gov_change[i, g] = dm, dg
                 availability[i, g] = prod - dm - dg
 

@@ -146,7 +146,11 @@ $$p^{e}_{i,g} = p^{\mathrm{prev}}_{i,g} + \kappa\,(p^{\mathrm{norm}}_g - p^{\mat
 
 **Competitive (market-responsive) storage** follows a Wright–Williams / Deaton–Laroque
 arbitrage rule with a carrying-cost deadband $\theta$: with signal
-$s = p^{e}_{i,g}/(1+r) - p^{\mathrm{ref}}_{i,g}$,
+$s = p^{e}_{i,g}/(1+r) - p^{\mathrm{ref}}_{i,g}$, where the reference price
+$p^{\mathrm{ref}}$ is the **previous period's** realised domestic price
+$p^{\mathrm{prev}}$ (so private storage responds to a contemporaneous harvest
+shock with a one-period lag — a disclosed prototype timing choice, not a
+simultaneous TWIST/Agrimate-style rule),
 
 $$\Delta^{\mathrm{mkt},g}_i =
 \begin{cases}
@@ -156,17 +160,22 @@ $$\Delta^{\mathrm{mkt},g}_i =
 \qquad \text{clipped to } [-R^g_i,\ \bar R^g_i - R^g_i].$$
 
 Stocks are built when the discounted expected price exceeds the current price by more
-than the carrying cost, and released in the opposite case.
+than the carrying cost, and released in the opposite case. Expectations mean-revert
+toward a target chosen so the storage rule's rest point equals mean $p_0$
+(not raw $p^{\mathrm{norm}}$).
 
 **Strategic (government) buffer stocks** release in a crisis and rebuild toward a
-target stock-to-use ratio $\vartheta^g_i$ in calm periods. With shortfall
-$\Sigma = D^g_{0,i} - A^{\text{(pre-gov)}}$ and trigger price
+target stock-to-use ratio $\vartheta^g_i$ in calm periods. The quantity-leg shortfall
+is the **gap after normal baseline trade**
+$\Sigma = D^g_{0,i} - A^{\text{(pre-gov)}} - \max(D^g_{0,i}-Q^g_i,\,0)$
+(so structural importers are calm at $\xi=1$, and exporters enter crisis only when
+pre-gov availability falls below domestic baseline needs), with trigger price
 $p^{\mathrm{trig}}$,
 
 $$\Delta^{\mathrm{gov},g}_i =
 \begin{cases}
 -\,\min\!\big(\eta_{\mathrm{rel}}\,R^g_i,\ \max(\Sigma,0)\big) \ \text{or}\ -\eta_{\mathrm{rel}}R^g_i, & \text{crisis } (p^{\mathrm{ref}}>p^{\mathrm{trig}} \ \text{or}\ \Sigma>0),\\[2pt]
-+\,\eta_{\mathrm{bld}}\big(\vartheta^g_i D^g_{0,i} - R^g_i\big)_+, & \text{calm}.
++\,\eta_{\mathrm{bld}}\big(\vartheta^g_i D^g_{0,i} - R^g_i\big)_+, & \text{calm (and not crisis)}.
 \end{cases}$$
 
 ### 4. Strategic layer: export-restriction game
@@ -182,6 +191,8 @@ $$\mathcal{W}_i(\tau) = CS_i \;+\; \underbrace{\sum_g p_{i,g} Q_{i,g}}_{\text{pr
 where $(x)_+ = \max(x,0)$, $X^g_i$ is net exports, $w_{i,g}\ge 0$ weights the political
 cost of high domestic staple prices, $\bar p_{i,g}$ is the tolerated price, and
 $\zeta$ (`revenue_weight`, default $0$) optionally activates a terms-of-trade motive.
+Producer income uses **baseline** production $Q$ (not shocked or post-storage sales) as a
+fixed policy weight in $\Pi_i$ — intentional in this prototype, not realised farm receipts.
 Crucially every term depends on $\tau$ through the market map $p(\tau), D(\tau), X(\tau)$
 of §2. The one-sided quadratic penalty is flat until the domestic price breaches
 $\bar p_{i,g}$ and convex above it, which reproduces the observed regime switch: trade
@@ -233,14 +244,20 @@ substitution contribution is precisely the deviation from that boundary — the 
 
 ### 7. From data to parameters
 
-Production $Q$, baseline consumption $D_0$, and stocks $S_0$ come from USDA PSD
-(`sheaf/data_usda.py`); reserves are taken from USDA, not FAOSTAT, because FAOSTAT
-stocks are food-balance residuals. The baseline network (transport structure $c_{ij}$
-and baseline flows) is built from the FAOSTAT bilateral matrices
-(`sheaf/data_faostat.py`). Own- and cross-price elasticities $(\varepsilon_g,\rho_{gh})$
-come from the demand-system literature. The policy parameters $(w_{i,g}, \bar p_{i,g})$
-are calibrated so the game endogenously reproduces the historical restriction cascade —
-the Level-2 test in `VALIDATION.md`.
+**Intended production path** (VALIDATION.md): production $Q$, baseline consumption
+$D_0$, and stocks $S_0$ from USDA PSD (`sheaf/data_usda.py`); reserves from USDA, not
+FAOSTAT (FAOSTAT stocks are food-balance residuals); baseline network structure from
+FAOSTAT bilateral matrices (`sheaf/data_faostat.py`).
+
+**Current runnable prototype:** `demo.py` and `SheafModel` use the illustrative
+hand-entered table in `sheaf/calibration.py`. The USDA/FAOSTAT adapters feed
+diagnostic scripts (`scripts/validate_forcing.py`, `scripts/build_network.py`) and
+are **not** yet wired into the live country list. Treat magnitudes as order-of-magnitude
+illustrations, not estimates. Own- and cross-price elasticities
+$(\varepsilon_g,\rho_{gh})$ are illustrative / literature-flavoured placeholders.
+Policy parameters $(w_{i,g}, \bar p_{i,g})$ are hand-set for the prototype; fitting
+them to historical restriction cascades is a **calibration** exercise (see
+`VALIDATION.md` Level 2), not a completed out-of-sample prediction.
 
 ### References
 
@@ -321,9 +338,12 @@ figures/           # generated example figures
 
 This is a **prototype**. The calibration numbers are order-of-magnitude realistic
 but illustrative — do not read the magnitudes as estimates. Demand and supply are
-linear, production is short-run inelastic within a period, and Nash is an
-iterated-best-response approximation on a coarse tax grid. It implements the
-*architecture*, not a line-for-line replica of any published model's equations.
+linear (roughly ~15% global glut headroom before inverse-demand prices can go
+negative; no free disposal), production is short-run inelastic within a period, and
+Nash is an iterated-best-response approximation on a **coarse** default tax grid
+(`game_grid=5`). Private storage uses lagged prices by design. It implements the
+*architecture*, not a line-for-line replica of any published model's equations, and
+does not yet execute the Level-1/2 crisis hindcasts described in `VALIDATION.md`.
 
 ## License
 
