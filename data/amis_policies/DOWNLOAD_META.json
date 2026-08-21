@@ -1,0 +1,23 @@
+{
+  "installed_at_utc": "2026-08-21T18:49:54.648557+00:00",
+  "dataset": "OECD Database on Export Restrictions on Staple Crops (OECD contribution to the AMIS Policy Database)",
+  "official_oecd_page": "https://www.oecd.org/en/topics/sub-issues/agro-food-trade/export-restrictions-on-staple-crops.html",
+  "official_amis_page": "https://www.amis-outlook.org/policy-database/introduction",
+  "query_download": "https://www.amis-outlook.org/policy-database/query-download",
+  "coverage": "Export restrictions from 2007 on wheat, maize, rice, soybeans (AMIS countries)",
+  "workbook_sheets": [
+    "DetailedDatabase",
+    "AggregatedDatabase",
+    "CommodityList",
+    "SharedGroupList",
+    "Codelist",
+    "Notes"
+  ],
+  "files": {
+    "oecd_export_restrictions_staple_crops.xlsx": "canonical workbook",
+    "oecd_export_restrictions_staple_crops_2024.xlsx": "year-labeled copy of same snapshot",
+    "export_restrictions_aggregated.csv": "AggregatedDatabase as CSV",
+    "export_restrictions_detailed.csv": "DetailedDatabase as CSV"
+  },
+  "fetch_note": "Live unattended download from oecd.org is blocked by Cloudflare bot protection. This workbook is the public OECD/AMIS export-restrictions database (Detailed+Aggregated sheets; ~472 KB, matching the site listing of ~516 KB). To refresh: open official_oecd_page in a browser and use \u201cDownload the database (XLSX)\u201d."
+}

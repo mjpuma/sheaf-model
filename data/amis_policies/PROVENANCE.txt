@@ -1,0 +1,55 @@
+AMIS / OECD export-restriction policy database
+==============================================
+
+What this is
+------------
+The **OECD Database on Export Restrictions on Staple Crops** — OECD’s contribution
+to the G20 **Agricultural Market Information System (AMIS) Policy Database**.
+It is the canonical public source for historical export bans/taxes/quotas on
+wheat, maize, rice, and soybeans used in Agrimate / SHEAF Level-1–2 validation.
+
+Official pages
+--------------
+OECD topic + download:
+  https://www.oecd.org/en/topics/sub-issues/agro-food-trade/export-restrictions-on-staple-crops.html
+
+AMIS Policy Database introduction / query-download:
+  https://www.amis-outlook.org/policy-database/introduction
+  https://www.amis-outlook.org/policy-database/query-download
+
+Methodology: OECD (2024), https://doi.org/10.1787/afad5112-en
+
+Fetched / installed
+-------------------
+Installed 2026-08-22. Unattended HTTPS fetch of oecd.org is blocked by Cloudflare
+bot protection from this environment. The workbook vendored here is the public
+OECD/AMIS export-restrictions database (sheets DetailedDatabase +
+AggregatedDatabase; ~472 KB, consistent with the site’s “Download the database
+(XLSX, ~516 KB)” listing).
+
+To refresh from the website in a browser:
+  1. Open the OECD topic page above.
+  2. Use “Download the database (XLSX)”.
+  3. Replace oecd_export_restrictions_staple_crops.xlsx in this folder.
+  4. Re-run: python scripts/fetch_external_data.py --amis-only
+
+Contents in this directory
+--------------------------
+oecd_export_restrictions_staple_crops.xlsx       Canonical workbook
+oecd_export_restrictions_staple_crops_2024.xlsx  Year-labeled copy of the same snapshot
+export_restrictions_aggregated.csv               AggregatedDatabase → CSV
+export_restrictions_detailed.csv                 DetailedDatabase → CSV
+DOWNLOAD_META.json                               Machine-readable install record
+
+Coverage (this snapshot)
+------------------------
+- Export restrictions from 2007 onward (start/end dates per measure)
+- Commodities: Wheat, Maize, Rice, Soybeans (+ some mixed classes)
+- AMIS participating countries that recorded measures in the window
+- Aggregated sheet collapses duplicate HS-line detail for trend analysis;
+  Detailed sheet retains HS codes, values, conditions, legal links
+
+SHEAF use
+---------
+Level 1: exogenous τ forcing from observed restriction episodes.
+Level 2: ground truth for who restricted (and roughly when/how severely).

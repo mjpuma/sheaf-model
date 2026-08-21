@@ -1,0 +1,11 @@
+{
+  "downloaded_at_utc": "2026-08-21T18:32:35.182189+00:00",
+  "source_url": "https://apps.fas.usda.gov/psdonline/downloads/psd_alldata_csv.zip",
+  "source": "USDA FAS PSD Online \u2014 Downloadable Data Sets (all commodities, all countries, all years)",
+  "files": {
+    "psd_alldata_csv.zip": "official bulk zip",
+    "psd_alldata.csv": "unzipped full PSD",
+    "psd_grains_long.csv": "wheat / rice(milled) / corn filtered long",
+    "psd_grains_country_year.csv": "wide attributes by country-year-grain"
+  }
+}

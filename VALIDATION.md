@@ -73,21 +73,19 @@ PSD series, loaded from a local export in the same schema.
 
 ## Remaining external inputs
 
-1. **Per-country PSD** (production, consumption, stocks) — local export, same schema
-   as the world files; drives the node-level calibration and the Level-2 anomalies.
-   *(source identified: USDA PSD, local)* — API stub: `sheaf.data_usda.load_psd_country`
-   (raises until files are provided).
-2. **AMIS export-restriction timeline** — forcing for Level 1, ground truth for
-   Level 2. Available through the Agrimate collaboration.
-   — API stub: `sheaf.data_usda.load_amis_restrictions`.
+1. ~~**Per-country PSD**~~ — **done** (2026-08-22). Official FAS bulk ZIP under
+   `data/usda_psd/` (`psd_grains_country_year.csv`; loader
+   `sheaf.data_usda.load_psd_country`). See `data/usda_psd/PROVENANCE.txt`.
+2. ~~**AMIS export-restriction timeline**~~ — **done** (2026-08-22). OECD/AMIS
+   export-restrictions workbook under `data/amis_policies/` (loader
+   `sheaf.data_usda.load_amis_restrictions`). See `data/amis_policies/PROVENANCE.txt`.
+   Refresh the XLSX from the OECD page in a browser if a newer release appears
+   (unattended fetch is Cloudflare-blocked).
 3. ~~Baseline bilateral trade network~~ — **done**, via FAOSTAT `E0` matrices
    (`sheaf/data_faostat.py`), including the crisis-year windows.
-   **Kazakhstan** is now a named SHEAF node (`SHEAF_NODE_MAP["Kazakhstan"]=KAZ`);
-   wheat E0 already contains KAZ trade.
+   **Kazakhstan** is a named SHEAF node (`SHEAF_NODE_MAP["Kazakhstan"]=KAZ`).
 4. **Observed world price series** (deflated) — the Level-1 price target.
-   — API stub: `sheaf.data_usda.load_price_series`.
+   — API stub: `sheaf.data_usda.load_price_series` (still outstanding).
 
-**Vendored path available now (world-only):** `crisis_forcing` +
-`shocks_dict_from_crisis_forcing` broadcast the same production multiplier to
-every country — useful for smoke hindcasts, **not** for who-restricts identity.
+Refresh helpers: `python scripts/fetch_external_data.py` (`--psd-only` / `--amis-only`).
 

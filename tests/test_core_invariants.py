@@ -75,10 +75,24 @@ def test_world_forcing_broadcast():
     assert np.allclose(m[:, 0], m[0, 0])
 
 
+def test_psd_country_and_amis_loaders():
+    from sheaf.data_usda import load_psd_country, load_amis_restrictions
+    ru = load_psd_country("wheat", "Russia")
+    assert ru.year.min() <= 2007
+    # 2010 Russian drought / ban year: production well below 2009
+    y09 = float(ru.loc[ru.year == 2009, "production"].iloc[0])
+    y10 = float(ru.loc[ru.year == 2010, "production"].iloc[0])
+    assert y10 < 0.8 * y09
+    kaz = load_psd_country("wheat", "Kazakhstan")
+    assert not kaz.empty
+    amis = load_amis_restrictions()
+    assert {"Country_Name", "Start_Date", "CommodityClass_Name"} <= set(amis.columns)
+    assert (amis["CommodityClass_Name"].str.contains("Wheat", case=False)).any()
+
+
 def test_policy_archetype_pool():
     c_hand, *_ = build_countries(policy_pool=None)
     c_arch, *_ = build_countries(policy_pool="archetype")
-    # fewer unique fs_weight rows under pooling
     hand = {tuple(np.round(c.fs_weight, 6)) for c in c_hand if c.name != "RestOfWorld"}
     arch = {tuple(np.round(c.fs_weight, 6)) for c in c_arch if c.name != "RestOfWorld"}
     assert len(arch) <= len(hand)

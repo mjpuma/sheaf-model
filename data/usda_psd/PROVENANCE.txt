@@ -1,0 +1,49 @@
+USDA FAS Production, Supply & Distribution (PSD) — per-country bulk extract
+==========================================================================
+
+Source
+------
+Official USDA Foreign Agricultural Service PSD Online “Downloadable Data Sets”:
+
+  https://apps.fas.usda.gov/psdonline/downloads/psd_alldata_csv.zip
+
+Portal: https://apps.fas.usda.gov/psdonline/app/index.html#/app/home
+
+USDA PSD data are U.S. Government public-domain statistics.
+
+Fetched
+-------
+2026-08-22 via HTTPS GET of the bulk ZIP above (no API key required).
+See DOWNLOAD_META.json for the UTC timestamp of this install.
+
+Contents in this directory
+--------------------------
+psd_alldata_csv.zip              Official bulk archive (~10 MB)
+psd_alldata.csv                  Unzipped full PSD (all commodities/countries/years;
+                                 ~193 MB — listed in .gitignore; regenerate from the zip)
+psd_grains_long.csv              Wheat / Rice, Milled / Corn rows only (long form)
+psd_grains_country_year.csv      Same grains, pivoted attributes by country–year
+DOWNLOAD_META.json               Machine-readable fetch record
+
+Units
+-----
+Attribute values in the bulk file are in **1000 MT**. Convert to SHEAF’s MMT
+with × 1e-3 (same factor as data/usda_world/).
+
+Commodity mapping used for the grain extracts
+---------------------------------------------
+wheat  ← Commodity_Description == "Wheat"
+rice   ← "Rice, Milled"
+maize  ← "Corn"
+
+Refresh
+-------
+  curl -L -o data/usda_psd/psd_alldata_csv.zip \
+    https://apps.fas.usda.gov/psdonline/downloads/psd_alldata_csv.zip
+  python scripts/fetch_external_data.py --psd-only
+
+Relation to data/usda_world/
+----------------------------
+data/usda_world/ keeps the small *world-aggregate* time series used by the
+existing diagnostic scripts. This directory is the *per-country* series required
+for Level-1/2 crisis forcing and who-restricts identification.

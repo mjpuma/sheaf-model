@@ -31,7 +31,30 @@ import pandas as pd
 
 # world-aggregate CSVs vendored with SHEAF (see data/usda_world/PROVENANCE.txt)
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "usda_world"
+_PSD_COUNTRY_DIR = Path(__file__).resolve().parent.parent / "data" / "usda_psd"
+_AMIS_DIR = Path(__file__).resolve().parent.parent / "data" / "amis_policies"
 _KT_TO_MMT = 1e-3  # 1000 MT -> million tonnes
+
+# PSD bulk Country_Name → SHEAF calibration node name
+_PSD_COUNTRY_TO_SHEAF = {
+    "United States": "USA",
+    "Russia": "Russia",
+    "European Union": "EU",
+    "Ukraine": "Ukraine",
+    "Kazakhstan": "Kazakhstan",
+    "Canada": "Canada",
+    "Australia": "Australia",
+    "Argentina": "Argentina",
+    "Brazil": "Brazil",
+    "India": "India",
+    "Thailand": "Thailand",
+    "Vietnam": "Vietnam",
+    "China": "China",
+    "Egypt": "Egypt",
+    "Indonesia": "Indonesia",
+    "Mexico": "Mexico",
+    "Nigeria": "Nigeria",
+}
 
 
 def load_crop_world(crop: str, data_dir: Path | str | None = None) -> pd.DataFrame:
@@ -160,29 +183,77 @@ def shocks_dict_from_crisis_forcing(n_countries: int, grains: tuple[str, ...],
     return out
 
 
-def load_psd_country(crop: str, country: str, data_dir: Path | str | None = None):
-    """Per-country USDA PSD loader — **not vendored** in this repository.
+def load_psd_country(crop: str, country: str | None = None,
+                     data_dir: Path | str | None = None) -> pd.DataFrame:
+    """Load per-country USDA PSD for one grain (or all grains if crop='all').
 
-    Place a local AgRichter-style export under data_dir and extend this function.
-    Until then Level-1/2 country-specific anomalies cannot be built from repo data.
+    Reads data/usda_psd/psd_grains_country_year.csv (from the official FAS bulk
+    ZIP). Values are returned in **MMT**. `country` may be a SHEAF node name
+    (e.g. 'USA') or a PSD Country_Name (e.g. 'United States').
     """
-    raise NotImplementedError(
-        "Per-country USDA PSD is not shipped with SHEAF (world aggregates only). "
-        "See data/usda_world/PROVENANCE.txt and VALIDATION.md remaining inputs. "
-        f"Requested crop={crop!r} country={country!r} data_dir={data_dir!r}."
-    )
+    ddir = Path(data_dir) if data_dir else _PSD_COUNTRY_DIR
+    path = ddir / "psd_grains_country_year.csv"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"{path} missing — run: python scripts/fetch_external_data.py --psd-only")
+    df = pd.read_csv(path)
+    if crop != "all":
+        crop_l = crop.lower()
+        if crop_l not in {"wheat", "rice", "maize"}:
+            raise ValueError(f"crop must be wheat|rice|maize|all, got {crop!r}")
+        df = df[df["grain"] == crop_l]
+    if country is not None:
+        # accept SHEAF name or PSD name
+        rev = {v: k for k, v in _PSD_COUNTRY_TO_SHEAF.items()}
+        psd_name = rev.get(country, country)
+        df = df[(df["Country_Name"] == psd_name) | (df["Country_Name"] == country)]
+        if df.empty:
+            raise KeyError(f"no PSD rows for country={country!r} crop={crop!r}")
+    # rename + convert 1000 MT → MMT
+    rename = {
+        "Production": "production",
+        "Domestic Consumption": "consumption",
+        "Beginning Stocks": "beginning_stocks",
+        "Ending Stocks": "ending_stocks",
+        "Imports": "imports",
+        "Exports": "exports",
+        "Market_Year": "year",
+        "Country_Name": "country_psd",
+        "Country_Code": "country_code",
+    }
+    out = df.rename(columns=rename).copy()
+    for col in ("production", "consumption", "beginning_stocks", "ending_stocks",
+                "imports", "exports"):
+        if col in out.columns:
+            out[col] = out[col].astype(float) * _KT_TO_MMT
+    out["country"] = out["country_psd"].map(
+        lambda n: _PSD_COUNTRY_TO_SHEAF.get(n, n))
+    return out.sort_values(["country", "grain", "year"]).reset_index(drop=True)
 
 
-def load_amis_restrictions(path: Path | str | None = None):
-    """AMIS export-restriction timeline loader — **external** data, not vendored.
+def load_amis_restrictions(path: Path | str | None = None,
+                           aggregated: bool = True) -> pd.DataFrame:
+    """Load OECD/AMIS export-restriction timelines from data/amis_policies/.
 
-    Needed for Level-1 exogenous-tau forcing and Level-2 restrictor ground truth.
+    Default reads the aggregated CSV (one row per country–measure–commodity–
+    start/end). Pass aggregated=False for the detailed HS-level table.
     """
-    raise NotImplementedError(
-        "AMIS restriction timelines are not shipped with SHEAF. "
-        "See VALIDATION.md remaining inputs. "
-        f"Requested path={path!r}."
-    )
+    if path is not None:
+        p = Path(path)
+    else:
+        name = ("export_restrictions_aggregated.csv" if aggregated
+                else "export_restrictions_detailed.csv")
+        p = _AMIS_DIR / name
+    if not p.exists():
+        raise FileNotFoundError(
+            f"{p} missing — see data/amis_policies/PROVENANCE.txt and run "
+            "python scripts/fetch_external_data.py --amis-only after placing the "
+            "OECD XLSX in data/amis_policies/.")
+    df = pd.read_csv(p)
+    for col in ("Start_Date", "End_Date"):
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col], errors="coerce")
+    return df
 
 
 def load_price_series(path: Path | str | None = None):

@@ -5,3 +5,5 @@ sheaf_results.csv
 .DS_Store
 *.egg-info/
 .venv/
+# Full PSD dump is regenerable from the vendored zip (~193 MB)
+data/usda_psd/psd_alldata.csv

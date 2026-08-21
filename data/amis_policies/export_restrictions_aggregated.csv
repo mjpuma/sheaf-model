@@ -1,0 +1,487 @@
+Country_Name,PolicyMeasure_Name,CommodityClass_Name,Start_Date,End_Date
+Argentina,Export prohibition,Maize,2020-02-26,2020-03-04
+Argentina,Export prohibition,Maize,2020-12-30,2021-01-10
+Argentina,Export prohibition,Maize,2023-12-11,2023-12-14
+Argentina,Export prohibition,Rice,2020-02-26,2020-03-04
+Argentina,Export prohibition,Soybeans,2007-11-06,2007-11-11
+Argentina,Export prohibition,Soybeans,2020-02-26,2020-03-04
+Argentina,Export prohibition,Soybeans,2022-03-13,2022-03-21
+Argentina,Export prohibition,Wheat,2007-05-31,2007-11-11
+Argentina,Export prohibition,Wheat,2020-02-26,2020-03-04
+Argentina,Export prohibition,Wheat,2023-12-11,2023-12-14
+Argentina,Export quota,Maize,2007-05-04,2008-01-31
+Argentina,Export quota,Maize,2020-03-01,2021-02-28
+Argentina,Export quota,Maize,2021-03-01,2022-02-28
+Argentina,Export quota,Maize,2022-03-01,2023-02-28
+Argentina,Export quota,Maize,2023-03-01,2024-02-28
+Argentina,Export quota,Wheat,2007-05-31,2008-05-27
+Argentina,Export quota,Wheat,2007-05-31,2007-12-20
+Argentina,Export quota,Wheat,2007-12-21,2008-05-27
+Argentina,Export quota,Wheat,2008-01-29,2008-05-27
+Argentina,Export quota,Wheat,2008-05-19,2008-05-27
+Argentina,Export quota,Wheat,2011-02-11,2011-05-18
+Argentina,Export quota,Wheat,2011-05-19,2012-05-18
+Argentina,Export quota,Wheat,2021-12-01,2022-11-30
+Argentina,Export quota,Wheat,2022-12-01,2023-11-30
+Argentina,Export tax,Maize,2007-05-15,2008-12-21
+Argentina,Export tax,Maize,2007-05-15,2007-11-06
+Argentina,Export tax,Maize,2007-11-07,2008-03-09
+Argentina,Export tax,Maize,2008-03-10,2008-05-29
+Argentina,Export tax,Maize,2008-05-30,2008-07-17
+Argentina,Export tax,Maize,2008-07-18,2008-12-21
+Argentina,Export tax,Maize,2008-12-22,2015-12-15
+Argentina,Export tax,Maize,2018-09-04,2019-12-13
+Argentina,Export tax,Maize,2018-09-04,2019-07-10
+Argentina,Export tax,Maize,2019-07-11,2020-03-04
+Argentina,Export tax,Maize,2019-12-14,2020-03-04
+Argentina,Export tax,Maize,2019-12-14,2020-12-31
+Argentina,Export tax,Maize,2020-03-05,
+Argentina,Export tax,Maize,2021-01-01,
+Argentina,Export tax,Rice,2007-05-15,2015-12-15
+Argentina,Export tax,Rice,2018-09-04,2019-07-10
+Argentina,Export tax,Rice,2018-09-04,2019-12-13
+Argentina,Export tax,Rice,2019-07-11,2019-12-13
+Argentina,Export tax,Rice,2019-12-14,2020-03-04
+Argentina,Export tax,Rice,2019-12-14,2020-12-31
+Argentina,Export tax,Rice,2020-03-05,2023-08-31
+Argentina,Export tax,Rice,2021-01-01,2021-06-27
+Argentina,Export tax,Rice,2023-09-01,
+Argentina,Export tax,Soybeans,2007-01-11,2007-05-14
+Argentina,Export tax,Soybeans,2007-05-15,2007-11-06
+Argentina,Export tax,Soybeans,2007-05-15,2008-03-09
+Argentina,Export tax,Soybeans,2007-11-07,2008-03-09
+Argentina,Export tax,Soybeans,2008-03-10,2008-03-12
+Argentina,Export tax,Soybeans,2008-03-10,2008-05-29
+Argentina,Export tax,Soybeans,2008-03-13,2008-05-29
+Argentina,Export tax,Soybeans,2008-05-30,2008-07-17
+Argentina,Export tax,Soybeans,2008-07-18,2015-12-15
+Argentina,Export tax,Soybeans,2008-07-18,2008-07-24
+Argentina,Export tax,Soybeans,2008-07-25,2015-12-15
+Argentina,Export tax,Soybeans,2015-12-16,2017-12-31
+Argentina,Export tax,Soybeans,2018-01-01,2018-01-31
+Argentina,Export tax,Soybeans,2018-01-01,2018-01-02
+Argentina,Export tax,Soybeans,2018-01-03,2018-08-14
+Argentina,Export tax,Soybeans,2018-01-03,2018-09-03
+Argentina,Export tax,Soybeans,2018-02-01,2018-02-28
+Argentina,Export tax,Soybeans,2018-03-01,2018-03-31
+Argentina,Export tax,Soybeans,2018-04-01,2018-04-30
+Argentina,Export tax,Soybeans,2018-05-01,2018-05-31
+Argentina,Export tax,Soybeans,2018-06-01,2018-06-30
+Argentina,Export tax,Soybeans,2018-07-01,2018-07-31
+Argentina,Export tax,Soybeans,2018-08-01,2018-08-31
+Argentina,Export tax,Soybeans,2018-08-01,2018-08-14
+Argentina,Export tax,Soybeans,2018-08-15,2018-09-03
+Argentina,Export tax,Soybeans,2018-09-01,2018-09-03
+Argentina,Export tax,Soybeans,2018-09-04,2020-12-31
+Argentina,Export tax,Soybeans,2018-09-04,2020-03-04
+Argentina,Export tax,Soybeans,2018-09-04,2019-12-13
+Argentina,Export tax,Soybeans,2019-12-14,2020-12-31
+Argentina,Export tax,Soybeans,2019-12-14,2020-03-04
+Argentina,Export tax,Soybeans,2020-03-05,2020-10-05
+Argentina,Export tax,Soybeans,2020-10-06,2020-10-31
+Argentina,Export tax,Soybeans,2020-11-01,2020-11-30
+Argentina,Export tax,Soybeans,2020-12-01,2020-12-31
+Argentina,Export tax,Soybeans,2021-01-01,2022-03-18
+Argentina,Export tax,Soybeans,2021-01-01,2021-12-31
+Argentina,Export tax,Soybeans,2021-01-01,
+Argentina,Export tax,Soybeans,2022-01-01,
+Argentina,Export tax,Soybeans,2022-03-19,2022-12-31
+Argentina,Export tax,Wheat,2007-05-15,2008-03-09
+Argentina,Export tax,Wheat,2007-05-15,2015-12-15
+Argentina,Export tax,Wheat,2007-05-15,2007-11-06
+Argentina,Export tax,Wheat,2007-05-15,2008-12-21
+Argentina,Export tax,Wheat,2007-11-07,2008-03-09
+Argentina,Export tax,Wheat,2008-03-10,2008-05-29
+Argentina,Export tax,Wheat,2008-03-10,2008-03-12
+Argentina,Export tax,Wheat,2008-03-13,2008-05-29
+Argentina,Export tax,Wheat,2008-05-30,2008-07-17
+Argentina,Export tax,Wheat,2008-07-18,2008-07-24
+Argentina,Export tax,Wheat,2008-07-18,2008-12-21
+Argentina,Export tax,Wheat,2008-07-25,2008-12-21
+Argentina,Export tax,Wheat,2008-12-22,2015-12-15
+Argentina,Export tax,Wheat,2018-09-04,2019-12-13
+Argentina,Export tax,Wheat,2019-12-14,2020-03-04
+Argentina,Export tax,Wheat,2019-12-14,2020-12-31
+Argentina,Export tax,Wheat,2020-03-05,
+Argentina,Export tax,Wheat,2021-01-01,
+Argentina,Licensing requirement,Maize,2008-05-28,2015-12-28
+Argentina,Licensing requirement,Rice,2008-05-28,2015-12-28
+Argentina,Licensing requirement,Soybeans,2008-05-28,2015-12-28
+Argentina,Licensing requirement,Wheat,2008-05-28,2015-12-28
+Australia,Licensing requirement,Wheat,2008-06-30,2012-12-09
+Australia,Licensing requirement,Wheat,2012-12-10,2014-09-30
+China,Export prohibition,Maize,2022-07-01,
+China,Export quota,Maize + Wheat,2008-01-01,2008-06-30
+China,Export quota,Maize + Wheat,2008-07-01,2008-12-31
+China,Export quota,Maize + Wheat,2009-01-01,2009-06-30
+China,Export quota,Maize + Wheat,2009-07-01,2009-12-31
+China,Export quota,Maize + Wheat,2010-01-01,2010-06-30
+China,Export quota,Maize + Wheat,2010-07-01,2010-12-31
+China,Export quota,Maize + Wheat,2011-01-01,2011-06-30
+China,Export quota,Maize + Wheat,2011-07-01,2011-12-31
+China,Export quota,Maize + Wheat,2012-01-01,2012-06-30
+China,Export quota,Maize + Wheat,2012-07-01,2012-12-31
+China,Export quota,Maize + Wheat,2013-01-01,2013-06-30
+China,Export quota,Maize + Wheat,2013-07-01,2013-12-31
+China,Export quota,Maize + Wheat,2014-01-01,2014-06-30
+China,Export quota,Maize + Wheat,2014-07-01,2014-12-31
+China,Export quota,Maize + Wheat,2015-01-01,2015-06-30
+China,Export quota,Rice,2008-01-01,2008-06-30
+China,Export quota,Rice,2008-07-01,2008-12-31
+China,Export quota,Rice,2009-01-01,2009-06-30
+China,Export quota,Rice,2009-07-01,2009-12-31
+China,Export quota,Rice,2010-01-01,2010-06-30
+China,Export quota,Rice,2010-07-01,2010-12-31
+China,Export quota,Rice,2011-01-01,2011-06-30
+China,Export quota,Rice,2011-07-01,2011-12-31
+China,Export quota,Rice,2012-01-01,2012-06-30
+China,Export quota,Rice,2012-07-01,2012-12-31
+China,Export quota,Rice,2013-01-01,2013-06-30
+China,Export quota,Rice,2013-07-01,2013-12-31
+China,Export quota,Rice,2014-01-01,2014-06-30
+China,Export quota,Rice,2014-07-01,2014-12-31
+China,Export quota,Rice,2015-01-01,2015-06-30
+China,Export tax,Maize,2008-01-01,2008-11-30
+China,Export tax,Rice,2008-01-01,2008-11-30
+China,Export tax,Rice,2008-12-01,2009-06-30
+China,Export tax,Soybeans,2008-01-01,2008-11-30
+China,Export tax,Soybeans,2008-12-01,2009-06-30
+China,Export tax,Wheat,2008-01-01,2008-11-30
+China,Export tax,Wheat,2008-12-01,2009-06-30
+China,Licensing requirement,Maize,2008-07-01,
+China,Licensing requirement,Rice,2008-07-01,2018-12-31
+China,Licensing requirement,Rice,2019-01-01,
+China,Licensing requirement,Wheat,2008-07-01,2011-12-31
+China,Licensing requirement,Wheat,2008-07-01,
+China,Licensing requirement,Wheat,2012-01-01,
+Egypt,Export prohibition,Maize,2022-03-11,2022-06-11
+Egypt,Export prohibition,Maize,2022-03-12,2022-06-12
+Egypt,Export prohibition,Maize,2022-06-12,2022-09-06
+Egypt,Export prohibition,Maize,2022-06-13,2022-09-06
+Egypt,Export prohibition,Rice,2008-04-01,2008-05-24
+Egypt,Export prohibition,Rice,2008-05-25,2009-04-01
+Egypt,Export prohibition,Rice,2009-09-17,2010-09-20
+Egypt,Export prohibition,Rice,2010-09-21,2011-09-16
+Egypt,Export prohibition,Rice,2011-09-17,2012-10-01
+Egypt,Export prohibition,Rice,2013-05-01,2013-10-31
+Egypt,Export prohibition,Rice,2013-11-21,2014-10-15
+Egypt,Export prohibition,Rice,2015-08-25,2015-10-03
+Egypt,Export prohibition,Rice,2015-08-25,2016-08-10
+Egypt,Export prohibition,Rice,2016-08-11,
+Egypt,Export prohibition,Wheat,2022-03-11,2022-06-11
+Egypt,Export prohibition,Wheat,2022-03-11,2022-05-31
+Egypt,Export prohibition,Wheat,2022-06-12,2022-09-06
+Egypt,Export quota,Rice,2009-10-22,2012-09-30
+Egypt,Export quota,Rice,2010-01-05,2010-02-28
+Egypt,Export quota,Rice,2012-10-01,2012-10-14
+Egypt,Export quota,Rice,2012-10-15,2012-11-30
+Egypt,Export quota,Rice,2012-12-01,2013-01-31
+Egypt,Export quota,Rice,2013-03-07,2013-04-15
+Egypt,Export quota,Rice,2013-11-01,2014-01-15
+Egypt,Export tax,Maize,2008-06-30,2016-12-21
+Egypt,Export tax,Maize,2016-12-22,2017-12-22
+Egypt,Export tax,Maize,2017-12-23,2021-12-31
+Egypt,Export tax,Rice,2008-03-06,2009-02-03
+Egypt,Export tax,Rice,2009-02-04,2009-07-01
+Egypt,Export tax,Rice,2009-07-02,2014-10-15
+Egypt,Export tax,Rice,2009-07-02,2009-11-30
+Egypt,Export tax,Rice,2009-12-01,2012-09-30
+Egypt,Export tax,Rice,2012-10-01,2014-10-15
+Egypt,Export tax,Rice,2014-10-16,2015-08-24
+Egypt,Export tax,Rice,2015-08-25,2016-08-10
+Egypt,Export tax,Rice,2015-10-04,2016-04-04
+Egypt,Export tax,Wheat,2008-06-30,2016-12-21
+Egypt,Export tax,Wheat,2016-12-22,2017-12-22
+Egypt,Export tax,Wheat,2017-12-23,2021-12-31
+Egypt,Licensing requirement,Rice,2009-10-22,2010-09-20
+Egypt,Licensing requirement,Rice,2012-10-01,2015-08-24
+India,Export prohibition,Maize,2008-03-17,2012-10-18
+India,Export prohibition,Maize,2008-07-03,2008-08-18
+India,Export prohibition,Maize,2012-10-19,2013-02-04
+India,Export prohibition,Maize,2013-02-05,2013-03-24
+India,Export prohibition,Maize,2013-03-25,2014-06-12
+India,Export prohibition,Maize,2014-06-13,2015-08-05
+India,Export prohibition,Maize,2015-08-06,2017-03-26
+India,Export prohibition,Maize,2017-03-27,2018-04-05
+India,Export prohibition,Rice,2007-10-09,2007-12-11
+India,Export prohibition,Rice,2007-12-12,2008-03-31
+India,Export prohibition,Rice,2008-04-01,2008-08-18
+India,Export prohibition,Rice,2008-04-01,2008-10-14
+India,Export prohibition,Rice,2008-10-15,2011-09-08
+India,Export prohibition,Rice,2022-09-09,2022-11-28
+India,Export prohibition,Rice,2022-11-29,2023-05-23
+India,Export prohibition,Rice,2023-05-24,
+India,Export prohibition,Rice,2023-07-20,
+India,Export prohibition,Soybeans,2008-03-17,2012-10-18
+India,Export prohibition,Soybeans,2012-10-19,2013-02-04
+India,Export prohibition,Soybeans,2013-02-05,2013-03-24
+India,Export prohibition,Soybeans,2013-03-25,2014-06-12
+India,Export prohibition,Soybeans,2014-06-13,2015-08-05
+India,Export prohibition,Soybeans,2015-08-06,2017-03-26
+India,Export prohibition,Soybeans,2017-03-27,2018-04-05
+India,Export prohibition,Wheat,2007-02-09,2007-10-07
+India,Export prohibition,Wheat,2007-10-08,2010-05-11
+India,Export prohibition,Wheat,2010-05-12,2011-09-08
+India,Export prohibition,Wheat,2022-05-13,
+India,Export prohibition,Wheat,2022-08-27,
+India,Export quota,Maize + Soybeans,2008-11-20,2009-10-31
+India,Export quota,Maize + Soybeans,2009-11-01,2010-10-31
+India,Export quota,Maize + Soybeans,2010-11-01,2011-10-31
+India,Export quota,Maize + Soybeans,2011-11-01,2012-10-18
+India,Export quota,Maize + Soybeans,2012-10-19,2013-09-30
+India,Export quota,Rice,2007-10-08,2008-02-14
+India,Export quota,Rice,2007-11-26,2008-01-23
+India,Export quota,Rice,2008-01-24,2011-09-08
+India,Export quota,Rice,2008-02-15,2008-02-17
+India,Export quota,Rice,2008-02-18,2008-02-28
+India,Export quota,Rice,2008-02-29,2011-09-08
+India,Export quota,Rice,2008-03-26,2009-05-05
+India,Export quota,Rice,2008-09-01,2008-10-30
+India,Export quota,Rice,2008-09-01,2008-10-31
+India,Export quota,Rice,2008-12-05,2009-05-31
+India,Export quota,Rice,2009-01-16,2009-04-30
+India,Export quota,Rice,2009-05-01,2009-07-31
+India,Export quota,Rice,2009-06-01,2009-10-31
+India,Export quota,Rice,2009-06-01,2010-05-31
+India,Export quota,Rice,2009-12-07,2011-09-08
+India,Export quota,Rice,2010-05-18,2010-08-05
+India,Export quota,Rice,2010-06-01,2011-06-30
+India,Export quota,Rice,2010-06-01,2011-10-30
+India,Export quota,Rice,2010-08-06,2011-09-08
+India,Export quota,Rice,2012-01-01,2012-12-31
+India,Export quota,Rice,2022-10-12,2023-03-31
+India,Export quota,Rice,2023-07-28,2024-03-31
+India,Export quota,Rice,2023-08-30,
+India,Export quota,Rice,2023-09-25,
+India,Export quota,Rice,2023-10-18,2023-12-06
+India,Export quota,Rice,2023-10-18,
+India,Export quota,Rice,2023-12-07,
+India,Export quota,Rice,2024-03-01,
+India,Export quota,Rice,2024-04-02,
+India,Export quota,Wheat,2008-01-07,2008-02-04
+India,Export quota,Wheat,2008-02-05,2008-12-31
+India,Export quota,Wheat,2008-02-15,2011-09-08
+India,Export quota,Wheat,2009-01-01,2010-12-31
+India,Export quota,Wheat,2009-07-03,2010-03-31
+India,Export quota,Wheat,2009-07-03,2013-03-31
+India,Export quota,Wheat,2009-12-07,2011-09-08
+India,Export quota,Wheat,2010-02-09,2011-09-08
+India,Export quota,Wheat,2010-05-12,2011-09-08
+India,Export quota,Wheat,2011-01-01,2011-12-31
+India,Export quota,Wheat,2011-02-28,2011-03-31
+India,Export quota,Wheat,2011-04-20,2012-03-31
+India,Export quota,Wheat,2011-05-02,2012-03-31
+India,Export quota,Wheat,2023-07-28,2024-03-31
+India,Export tax,Rice,2022-09-09,
+India,Export tax,Rice,2023-08-25,
+India,Licensing requirement,Rice,2008-08-19,2015-10-06
+India,Licensing requirement,Rice,2015-10-07,
+India,Licensing requirement,Rice,2023-08-27,
+India,Licensing requirement,Wheat,2022-07-12,
+India,Minimum export price,Maize,2013-02-05,2013-10-08
+India,Minimum export price,Maize,2013-10-09,2014-04-29
+India,Minimum export price,Maize,2014-04-30,2015-02-05
+India,Minimum export price,Maize,2015-02-06,2015-08-05
+India,Minimum export price,Maize,2015-08-06,2017-03-26
+India,Minimum export price,Maize,2017-03-27,2018-04-05
+India,Minimum export price,Rice,2007-12-12,2007-12-26
+India,Minimum export price,Rice,2007-12-27,2008-03-04
+India,Minimum export price,Rice,2008-03-05,2008-03-24
+India,Minimum export price,Rice,2008-03-25,2008-03-30
+India,Minimum export price,Rice,2008-03-31,2009-01-26
+India,Minimum export price,Rice,2008-05-03,2008-08-18
+India,Minimum export price,Rice,2008-05-03,2008-08-31
+India,Minimum export price,Rice,2008-09-01,2009-08-31
+India,Minimum export price,Rice,2009-01-27,2009-09-06
+India,Minimum export price,Rice,2009-09-07,2012-07-03
+India,Minimum export price,Rice,2023-08-27,2023-10-25
+India,Minimum export price,Rice,2023-10-26,
+India,Minimum export price,Soybeans,2013-02-05,2013-10-08
+India,Minimum export price,Soybeans,2013-10-09,2014-04-29
+India,Minimum export price,Soybeans,2014-04-30,2015-02-05
+India,Minimum export price,Soybeans,2015-02-06,2015-08-05
+India,Minimum export price,Soybeans,2015-08-06,2017-03-26
+India,Minimum export price,Soybeans,2017-03-27,2018-04-05
+India,Restriction on customs clearance point for exports,Maize,2008-08-19,2008-09-16
+India,Restriction on customs clearance point for exports,Maize,2008-10-17,
+India,Restriction on customs clearance point for exports,Rice,2007-10-09,2008-03-04
+India,Restriction on customs clearance point for exports,Rice,2008-03-05,2011-09-08
+India,Restriction on customs clearance point for exports,Rice,2008-03-05,2008-03-31
+India,Restriction on customs clearance point for exports,Rice,2008-03-05,2008-08-18
+India,Restriction on customs clearance point for exports,Rice,2008-04-01,2008-11-04
+India,Restriction on customs clearance point for exports,Rice,2008-11-05,2010-08-16
+India,Restriction on customs clearance point for exports,Rice,2010-08-17,2016-09-30
+India,Restriction on customs clearance point for exports,Rice,2011-09-09,2012-02-22
+India,Restriction on customs clearance point for exports,Rice,2012-02-23,2015-10-06
+India,Restriction on customs clearance point for exports,Rice,2015-10-07,
+India,Restriction on customs clearance point for exports,Rice,2016-10-01,
+India,Restriction on customs clearance point for exports,Wheat,2011-09-09,2012-02-22
+India,Restriction on customs clearance point for exports,Wheat,2012-02-23,
+Indonesia,Licensing requirement,Rice,2008-04-11,2009-03-31
+Indonesia,Licensing requirement,Rice,2009-04-01,2009-08-10
+Indonesia,Licensing requirement,Rice,2009-08-11,2014-03-27
+Indonesia,Licensing requirement,Rice,2014-03-28,2015-12-31
+Indonesia,Licensing requirement,Rice,2016-01-01,2017-09-27
+Indonesia,Licensing requirement,Rice,2017-09-28,2018-01-02
+Indonesia,Licensing requirement,Rice,2018-01-03,2021-11-14
+Indonesia,Licensing requirement,Rice,2021-11-15,
+Kazakhstan,Export prohibition,Maize,2020-04-14,2020-06-30
+Kazakhstan,Export prohibition,Soybeans,2010-10-17,2011-04-17
+Kazakhstan,Export prohibition,Soybeans,2020-04-14,2020-04-30
+Kazakhstan,Export prohibition,Wheat,2008-04-15,2008-08-31
+Kazakhstan,Export prohibition,Wheat,2020-03-22,2020-04-01
+Kazakhstan,Export prohibition,Wheat,2020-04-14,2020-06-30
+Kazakhstan,Export quota,Soybeans,2020-05-01,2020-06-01
+Kazakhstan,Export quota,Wheat,2020-04-02,2020-05-31
+Kazakhstan,Export quota,Wheat,2022-04-15,2022-09-12
+Kazakhstan,Export tax,Soybeans,2012-12-08,2020-04-13
+Mexico,Export tax,Maize,2023-01-13,2023-06-30
+Mexico,Export tax,Maize,2023-07-01,2023-12-31
+Russian Federation,Export prohibition,Maize,2010-08-15,2010-12-31
+Russian Federation,Export prohibition,Maize,2011-01-02,2011-06-30
+Russian Federation,Export prohibition,Maize,2020-04-14,2020-06-30
+Russian Federation,Export prohibition,Maize,2022-03-15,2022-06-30
+Russian Federation,Export prohibition,Maize,2022-03-15,2022-03-30
+Russian Federation,Export prohibition,Rice,2020-03-20,2020-03-24
+Russian Federation,Export prohibition,Rice,2020-04-14,2020-06-30
+Russian Federation,Export prohibition,Rice,2022-07-01,2022-12-31
+Russian Federation,Export prohibition,Rice,2023-01-01,2023-06-30
+Russian Federation,Export prohibition,Rice,2023-07-28,2023-12-31
+Russian Federation,Export prohibition,Rice,2024-01-01,2024-06-30
+Russian Federation,Export prohibition,Soybeans,2020-04-14,2020-06-30
+Russian Federation,Export prohibition,Wheat,2010-08-01,2010-12-01
+Russian Federation,Export prohibition,Wheat,2010-08-15,2010-12-31
+Russian Federation,Export prohibition,Wheat,2011-01-02,2011-06-30
+Russian Federation,Export prohibition,Wheat,2020-04-14,2020-06-30
+Russian Federation,Export prohibition,Wheat,2022-03-15,2022-03-30
+Russian Federation,Export prohibition,Wheat,2022-03-15,2022-06-30
+Russian Federation,Export prohibition,Wheat,2023-12-11,2024-05-31
+Russian Federation,Export quota,Maize,2022-02-15,2022-06-30
+Russian Federation,Export quota,Maize + Wheat,2020-04-01,2020-06-30
+Russian Federation,Export quota,Maize + Wheat,2021-02-15,2021-06-30
+Russian Federation,Export quota,Maize + Wheat,2023-02-15,2023-06-30
+Russian Federation,Export quota,Maize + Wheat,2024-02-15,2024-06-30
+Russian Federation,Export quota,Wheat,2022-02-15,2022-06-30
+Russian Federation,Export quota,Wheat,2023-12-11,2024-05-31
+Russian Federation,Export tax,Maize,2021-02-15,2021-06-30
+Russian Federation,Export tax,Maize,2021-02-15,2021-03-14
+Russian Federation,Export tax,Maize,2021-03-15,2021-06-30
+Russian Federation,Export tax,Maize,2021-06-02,2022-02-14
+Russian Federation,Export tax,Maize,2022-02-15,2022-06-30
+Russian Federation,Export tax,Maize,2022-07-01,2023-05-31
+Russian Federation,Export tax,Maize,2023-06-01,2023-09-30
+Russian Federation,Export tax,Maize,2023-10-01,2024-12-31
+Russian Federation,Export tax,Rice,2023-10-01,2024-12-31
+Russian Federation,Export tax,Soybeans,2007-01-01,2011-12-31
+Russian Federation,Export tax,Soybeans,2012-01-01,2012-06-01
+Russian Federation,Export tax,Soybeans,2012-06-04,2012-08-31
+Russian Federation,Export tax,Soybeans,2012-09-01,2013-10-01
+Russian Federation,Export tax,Soybeans,2013-10-02,2014-08-31
+Russian Federation,Export tax,Soybeans,2014-09-01,2015-08-31
+Russian Federation,Export tax,Soybeans,2021-02-01,2021-06-30
+Russian Federation,Export tax,Soybeans,2021-07-01,2022-08-29
+Russian Federation,Export tax,Soybeans,2022-08-30,2023-09-30
+Russian Federation,Export tax,Soybeans,2023-10-01,2024-12-31
+Russian Federation,Export tax,Wheat,2007-11-10,2008-01-31
+Russian Federation,Export tax,Wheat,2008-02-01,2008-04-30
+Russian Federation,Export tax,Wheat,2008-05-01,2008-06-30
+Russian Federation,Export tax,Wheat,2015-02-01,2015-05-14
+Russian Federation,Export tax,Wheat,2015-07-01,2015-09-30
+Russian Federation,Export tax,Wheat,2015-10-01,2016-09-22
+Russian Federation,Export tax,Wheat,2021-02-15,2021-02-28
+Russian Federation,Export tax,Wheat,2021-02-15,2021-06-30
+Russian Federation,Export tax,Wheat,2021-03-01,2021-06-30
+Russian Federation,Export tax,Wheat,2021-06-02,2022-02-14
+Russian Federation,Export tax,Wheat,2022-02-15,2022-06-30
+Russian Federation,Export tax,Wheat,2022-07-01,2023-05-31
+Russian Federation,Export tax,Wheat,2023-06-01,2023-09-30
+Russian Federation,Export tax,Wheat,2023-10-01,2024-12-31
+Russian Federation,Restriction on customs clearance point for exports,Soybeans,2022-04-01,2022-08-31
+Ukraine,Export quota,Maize,2010-10-19,2010-12-30
+Ukraine,Export quota,Maize,2010-12-31,2011-03-30
+Ukraine,Export quota,Maize,2011-03-31,2011-06-29
+Ukraine,Export quota,Maize,2011-10-10,2012-07-01
+Ukraine,Export quota,Maize,2012-11-08,2013-07-01
+Ukraine,Export quota,Maize,2015-01-27,2015-07-01
+Ukraine,Export quota,Maize,2015-11-19,2016-07-01
+Ukraine,Export quota,Maize,2020-07-01,2021-06-30
+Ukraine,Export quota,Wheat,2007-10-01,2008-04-30
+Ukraine,Export quota,Wheat,2010-10-19,2010-12-30
+Ukraine,Export quota,Wheat,2010-12-31,2011-03-30
+Ukraine,Export quota,Wheat,2011-03-31,2011-06-29
+Ukraine,Export quota,Wheat,2011-10-10,2012-07-01
+Ukraine,Export quota,Wheat,2012-11-08,2013-07-01
+Ukraine,Export quota,Wheat,2015-01-27,2015-07-01
+Ukraine,Export quota,Wheat,2015-11-19,2016-07-01
+Ukraine,Export quota,Wheat,2016-07-12,2017-07-01
+Ukraine,Export quota,Wheat,2019-07-01,2020-06-30
+Ukraine,Export quota,Wheat,2020-07-01,2021-06-30
+Ukraine,Export quota,Wheat,2021-07-01,2022-06-30
+Ukraine,Export tax,Maize,2011-07-01,2011-07-10
+Ukraine,Export tax,Wheat,2011-07-01,2011-07-10
+Ukraine,Licensing requirement,Maize,2010-10-19,2010-12-30
+Ukraine,Licensing requirement,Maize,2010-12-31,2011-02-28
+Ukraine,Licensing requirement,Maize,2011-03-31,2011-06-29
+Ukraine,Licensing requirement,Maize,2022-03-05,2022-03-23
+Ukraine,Licensing requirement,Wheat,2010-10-19,2010-12-30
+Ukraine,Licensing requirement,Wheat,2010-12-31,2011-02-28
+Ukraine,Licensing requirement,Wheat,2011-03-31,2011-06-29
+Ukraine,Licensing requirement,Wheat,2022-03-05,2022-08-06
+Viet Nam,Export prohibition,Rice,2007-07-22,2008-01-15
+Viet Nam,Export prohibition,Rice,2008-02-05,2008-06-30
+Viet Nam,Export prohibition,Rice,2020-03-25,2020-04-10
+Viet Nam,Export quota,Rice,2007-01-01,2007-07-21
+Viet Nam,Export quota,Rice,2020-04-11,2020-04-20
+Viet Nam,Export tax,Maize,2008-01-01,2008-12-31
+Viet Nam,Export tax,Maize,2009-01-01,
+Viet Nam,Export tax,Rice,2008-01-01,2008-06-30
+Viet Nam,Export tax,Rice,2008-07-01,2008-12-19
+Viet Nam,Export tax,Rice,2009-01-01,2020-03-24
+Viet Nam,Licensing requirement,Rice,2011-01-01,2018-09-30
+Viet Nam,Licensing requirement,Rice,2011-02-14,2017-12-31
+Viet Nam,Licensing requirement,Rice,2013-08-28,2017-01-03
+Viet Nam,Licensing requirement,Rice,2018-01-01,2018-11-14
+Viet Nam,Licensing requirement,Rice,2018-10-01,
+Viet Nam,Licensing requirement,Rice,2018-11-15,
+Viet Nam,Minimum export price,Rice,2008-01-01,2010-04-07
+Viet Nam,Minimum export price,Rice,2008-01-01,2008-03-31
+Viet Nam,Minimum export price,Rice,2008-04-01,2008-05-31
+Viet Nam,Minimum export price,Rice,2008-06-01,2010-07-31
+Viet Nam,Minimum export price,Rice,2010-04-08,2010-07-11
+Viet Nam,Minimum export price,Rice,2010-07-12,2010-07-31
+Viet Nam,Minimum export price,Rice,2010-08-01,2010-08-31
+Viet Nam,Minimum export price,Rice,2010-09-01,2010-11-30
+Viet Nam,Minimum export price,Rice,2010-12-01,2011-01-31
+Viet Nam,Minimum export price,Rice,2011-02-01,2011-02-28
+Viet Nam,Minimum export price,Rice,2011-03-01,2011-03-14
+Viet Nam,Minimum export price,Rice,2011-03-15,2011-03-29
+Viet Nam,Minimum export price,Rice,2011-03-30,2011-11-30
+Viet Nam,Minimum export price,Rice,2011-12-01,2011-12-31
+Viet Nam,Minimum export price,Rice,2012-01-01,2012-01-14
+Viet Nam,Minimum export price,Rice,2012-01-15,2012-02-29
+Viet Nam,Minimum export price,Rice,2012-03-01,2012-03-31
+Viet Nam,Minimum export price,Rice,2012-04-01,2012-09-30
+Viet Nam,Minimum export price,Rice,2012-10-01,2013-05-31
+Viet Nam,Minimum export price,Rice,2012-10-01,2013-02-05
+Viet Nam,Minimum export price,Rice,2012-12-27,2013-02-05
+Viet Nam,Minimum export price,Rice,2013-02-06,2013-02-28
+Viet Nam,Minimum export price,Rice,2013-03-01,2013-03-31
+Viet Nam,Minimum export price,Rice,2013-04-01,2013-05-31
+Viet Nam,Minimum export price,Rice,2013-06-01,
+Viet Nam,Minimum export price,Rice,2013-06-01,2013-06-30
+Viet Nam,Minimum export price,Rice,2013-07-01,2013-08-31
+Viet Nam,Minimum export price,Rice,2013-09-01,2013-10-24
+Viet Nam,Minimum export price,Rice,2013-10-25,2014-03-09
+Viet Nam,Minimum export price,Rice,2014-03-10,2014-04-17
+Viet Nam,Minimum export price,Rice,2014-04-18,2014-07-27
+Viet Nam,Minimum export price,Rice,2014-07-28,2014-11-24
+Viet Nam,Minimum export price,Rice,2014-11-25,2015-01-11
+Viet Nam,Minimum export price,Rice,2015-01-01,
+Viet Nam,Minimum export price,Rice,2015-01-12,2015-03-01
+Viet Nam,Minimum export price,Rice,2015-03-02,2015-04-29
+Viet Nam,Minimum export price,Rice,2015-04-30,2015-05-31
+Viet Nam,Minimum export price,Rice,2015-06-01,2015-06-07
+Viet Nam,Minimum export price,Rice,2015-06-08,2015-08-11
+Viet Nam,Minimum export price,Rice,2015-08-12,2015-09-24
+Viet Nam,Minimum export price,Rice,2015-09-25,2016-10-13
+Viet Nam,Minimum export price,Rice,2016-10-14,
