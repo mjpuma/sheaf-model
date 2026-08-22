@@ -466,7 +466,8 @@ class SheafModel:
         target = self.p_norm[g] * (self.kappa + self.r) / self.kappa
         return p_ref + self.kappa * (target - p_ref)
 
-    def step(self, t, production_shock=None, route_multiplier=None):
+    def step(self, t, production_shock=None, route_multiplier=None,
+             tau_forced=None):
         n, G = self.n, self.G
         shock = np.ones((n, G)) if production_shock is None else np.asarray(production_shock, float)
         availability = np.zeros((n, G))
@@ -484,22 +485,29 @@ class SheafModel:
                 mkt_change[i, g], gov_change[i, g] = dm, dg
                 availability[i, g] = prod - dm - dg
 
-        # decide whether to run the strategic game this period (stress gate)
-        tau0 = self.last_tau
-        probe = self.market.solve(self._systems(), availability, np.zeros((n, G)),
-                                  self.tariff, route_multiplier)
-        stressed = np.any(probe.prices.max(axis=0) > self.stress_trigger * self.p_norm)
-
-        if self.play_game and self.exporters and stressed:
-            tau, res = self.game.solve(self._systems(), availability, self.production0,
-                                       self.tariff, self.exporters, self.export_grain_idx,
-                                       self.fs_weight, self.p_target, route_multiplier,
-                                       tau_init=tau0)
+        # Level-1 path: impose historical export restrictions (skip the game).
+        if tau_forced is not None:
+            tau = np.asarray(tau_forced, float)
+            res = self.market.solve(self._systems(), availability, tau,
+                                    self.tariff, route_multiplier)
             self.last_tau = tau.copy()
         else:
-            tau = np.zeros((n, G))
-            res = probe
-            self.last_tau = np.zeros((n, G))
+            # decide whether to run the strategic game this period (stress gate)
+            tau0 = self.last_tau
+            probe = self.market.solve(self._systems(), availability, np.zeros((n, G)),
+                                      self.tariff, route_multiplier)
+            stressed = np.any(probe.prices.max(axis=0) > self.stress_trigger * self.p_norm)
+
+            if self.play_game and self.exporters and stressed:
+                tau, res = self.game.solve(self._systems(), availability, self.production0,
+                                           self.tariff, self.exporters, self.export_grain_idx,
+                                           self.fs_weight, self.p_target, route_multiplier,
+                                           tau_init=tau0)
+                self.last_tau = tau.copy()
+            else:
+                tau = np.zeros((n, G))
+                res = probe
+                self.last_tau = np.zeros((n, G))
 
         for i, c in enumerate(self.countries):
             c.mkt_stock = np.maximum(0.0, c.mkt_stock + mkt_change[i])
@@ -510,11 +518,13 @@ class SheafModel:
         self.flow_history.append(res.flows)
         return res
 
-    def run(self, periods, shocks=None, route_multipliers=None):
+    def run(self, periods, shocks=None, route_multipliers=None, tau_schedule=None):
         shocks = shocks or {}
         route_multipliers = route_multipliers or {}
+        tau_schedule = tau_schedule or {}
         for t in range(periods):
-            self.step(t, shocks.get(t), route_multipliers.get(t))
+            self.step(t, shocks.get(t), route_multipliers.get(t),
+                      tau_forced=tau_schedule.get(t))
         return self.results_frame()
 
     def _record(self, t, res, tau, mkt_change, gov_change, shock):

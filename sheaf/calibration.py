@@ -117,7 +117,9 @@ def _haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(a))
 
 
-def build_countries(substitution: bool = True, policy_pool: str | None = None):
+def build_countries(substitution: bool = True, policy_pool: str | None = None,
+                    quantities: str = "illustrative",
+                    baseline_years=(2019, 2020, 2021)):
     """Return (countries, transport, GRAINS, FREIGHT_MULT).
 
     substitution=False zeros the cross-price terms -> independent single-commodity
@@ -128,6 +130,12 @@ def build_countries(substitution: bool = True, policy_pool: str | None = None):
       "archetype" — collapse to ~4 structural food-security archetypes
         (open exporter, restrictive exporter, rice specialist, non-player)
         to improve Level-2 identification (audit P7-F4).
+
+    quantities:
+      "illustrative" — hand-entered DATA prod/cons (default; demo path).
+      "usda" — overlay USDA PSD country means over `baseline_years` for Q/D0,
+        set private/gov opening stocks from ending_stocks where available, and
+        set GLOBAL_* from world PSD so RoW closes on the same vintage.
     """
     subst_scale = 0.6 if substitution else 0.0
 
@@ -137,11 +145,19 @@ def build_countries(substitution: bool = True, policy_pool: str | None = None):
     elif policy_pool is not None:
         raise ValueError(f"unknown policy_pool={policy_pool!r}")
 
+    global_prod = GLOBAL_PROD.copy()
+    global_cons = GLOBAL_CONS.copy()
+    if quantities == "usda":
+        rows, global_prod, global_cons = _overlay_usda_quantities(
+            rows, baseline_years=baseline_years)
+    elif quantities != "illustrative":
+        raise ValueError(f"unknown quantities={quantities!r}")
+
     # Rest-of-World closes the global balance
     prod_named = np.sum([r["prod"] for r in rows], axis=0)
     cons_named = np.sum([r["cons"] for r in rows], axis=0)
-    row_prod = GLOBAL_PROD - prod_named
-    row_cons = GLOBAL_CONS - cons_named
+    row_prod = global_prod - prod_named
+    row_cons = global_cons - cons_named
     if np.any(row_prod < -1e-9) or np.any(row_cons < -1e-9):
         raise ValueError(
             f"named nodes exceed GLOBAL_* balance: RoW prod={row_prod}, cons={row_cons}")
@@ -163,22 +179,86 @@ def build_countries(substitution: bool = True, policy_pool: str | None = None):
         sysd = build_demand_system(GRAINS, D0, P0, OWN_ELAST, RHO, subst_scale)
         gov = r.get("gov")
         mkt = r.get("mkt")
+        prod = np.array(r["prod"], float)
+        # Prefer USDA ending-stocks overlays when present; else prototype rules.
+        mkt_stock = r.get("mkt_stock")
+        gov_stock = (np.array(gov["stock"], float) if gov else None)
+        if mkt_stock is None and mkt is not None:
+            mkt_stock = prod * 0.15
         c = Country(
             name=r["name"], region=r["region"],
-            production=np.array(r["prod"], float), demand=sysd,
+            production=prod, demand=sysd,
             export_grains=tuple(r.get("export", ())),
             fs_weight=np.array(r.get("fs_w", (0, 0, 0)), float),
             p_target=np.array(r.get("pt", (INF, INF, INF)), float),
             mkt_gamma=(np.array(mkt, float) if mkt else None),
-            mkt_capacity=(np.array(r["prod"], float) * 0.5 if mkt else None),
-            mkt_stock=(np.array(r["prod"], float) * 0.15 if mkt else None),
-            gov_stock=(np.array(gov["stock"], float) if gov else None),
+            mkt_capacity=(prod * 0.5 if mkt else None),
+            mkt_stock=(np.array(mkt_stock, float) if mkt_stock is not None else None),
+            gov_stock=gov_stock,
             gov_target_ratio=(np.array(gov["ratio"], float) if gov else None),
             gov_price_trigger=(np.array(gov["trig"], float) if gov else None),
         )
         countries.append(c)
     return countries, transport, GRAINS, FREIGHT_MULT
 
+
+def _overlay_usda_quantities(rows: list[dict], baseline_years=(2019, 2020, 2021)):
+    """Replace prod/cons (and stock seeds) with USDA PSD means; return new globals."""
+    from .data_usda import load_psd_country
+
+    psd = load_psd_country("all")
+    years = list(baseline_years)
+    base = (psd[psd["year"].isin(years)]
+            .groupby(["country", "grain"], as_index=False)
+            [["production", "consumption", "ending_stocks"]].mean())
+
+    out = []
+    for r in rows:
+        rr = dict(r)
+        prod, cons, stocks = [], [], []
+        for g in GRAINS:
+            hit = base[(base.country == r["name"]) & (base.grain == g)]
+            if hit.empty:
+                # keep illustrative fallback for that grain
+                gi = GRAINS.index(g)
+                prod.append(float(r["prod"][gi]))
+                cons.append(float(r["cons"][gi]))
+                stocks.append(np.nan)
+            else:
+                prod.append(float(hit.production.iloc[0]))
+                cons.append(float(max(hit.consumption.iloc[0], 1e-6)))
+                stocks.append(float(hit.ending_stocks.iloc[0]))
+        rr["prod"] = tuple(prod)
+        rr["cons"] = tuple(cons)
+        # Seed storage from PSD ending stocks: private gets the bulk; keep any
+        # gov target ratios from DATA but reset gov opening stock to a share.
+        stock_arr = np.array(stocks, float)
+        stock_arr = np.where(np.isfinite(stock_arr), np.maximum(stock_arr, 0.0), 0.0)
+        if r.get("mkt") is not None:
+            rr["mkt_stock"] = tuple(0.7 * stock_arr)
+        if r.get("gov") is not None:
+            gov = dict(r["gov"])
+            # Keep ratio/trigger; overwrite opening stock with residual 30%.
+            gov["stock"] = tuple(0.3 * stock_arr)
+            rr["gov"] = gov
+        out.append(rr)
+
+    # World totals from the *same* PSD country extract (sum over all countries).
+    # Do not use load_crop_world here: that series is a different USDA aggregate
+    # and can sit below the named-node sum, making RoW negative.
+    world = (psd[psd["year"].isin(years)]
+             .groupby(["year", "grain"], as_index=False)
+             [["production", "consumption"]].sum()
+             .groupby("grain", as_index=False)
+             [["production", "consumption"]].mean())
+    g_prod, g_cons = [], []
+    for g in GRAINS:
+        hit = world[world.grain == g]
+        if hit.empty:
+            raise ValueError(f"no PSD world total for grain={g!r}")
+        g_prod.append(float(hit.production.iloc[0]))
+        g_cons.append(float(hit.consumption.iloc[0]))
+    return out, np.array(g_prod), np.array(g_cons)
 
 # Four structural policy archetypes (Level-2 identification; audit P7-F4).
 _ARCHETYPE = {

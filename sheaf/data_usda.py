@@ -263,3 +263,101 @@ def load_price_series(path: Path | str | None = None):
         "See VALIDATION.md remaining inputs. "
         f"Requested path={path!r}."
     )
+
+# AMIS Country_Name → SHEAF node
+_AMIS_COUNTRY_TO_SHEAF = {
+    "Argentina": "Argentina",
+    "Australia": "Australia",
+    "China": "China",
+    "Egypt": "Egypt",
+    "India": "India",
+    "Indonesia": "Indonesia",
+    "Kazakhstan": "Kazakhstan",
+    "Mexico": "Mexico",
+    "Russian Federation": "Russia",
+    "Ukraine": "Ukraine",
+    "Viet Nam": "Vietnam",
+}
+
+# Agrimate-style severity → SHEAF export-tax-equivalent ($/t).
+_AMIS_TAU = {
+    "Export prohibition": 120.0,
+    "Export quota": 72.0,
+    "Export tax": 60.0,
+    "Minimum export price": 48.0,
+    "Licensing requirement": 36.0,
+    "Restriction on customs clearance point for exports": 24.0,
+}
+
+_AMIS_GRAIN = {
+    "Wheat": "wheat",
+    "Maize": "maize",
+    "Rice": "rice",
+}
+
+
+def country_production_shocks(countries: list, grains: tuple[str, ...],
+                              years: list[int],
+                              window_years: int = 10) -> dict[int, np.ndarray]:
+    """Per-country PSD production anomalies → SheafModel shock matrices.
+
+    Returns {period_index: (n,G) multipliers} with period 0 = years[0].
+    Missing country–grain series default to 1.0 (no shock).
+    """
+    n, G = len(countries), len(grains)
+    name_to_i = {c.name: i for i, c in enumerate(countries)}
+    out = {t: np.ones((n, G)) for t in range(len(years))}
+    for g, grain in enumerate(grains):
+        try:
+            psd = load_psd_country(grain)
+        except FileNotFoundError:
+            continue
+        for cname, i in name_to_i.items():
+            if cname == "RestOfWorld":
+                continue
+            sub = psd[psd["country"] == cname].set_index("year")["production"]
+            if sub.empty or len(sub.dropna()) < 5:
+                continue
+            an = detrend_anomalies(sub, window_years=window_years)["anomaly"]
+            for t, y in enumerate(years):
+                if y in an.index and np.isfinite(an.loc[y]):
+                    out[t][i, g] = float(1.0 + an.loc[y])
+    return out
+
+
+def amis_tau_schedule(countries: list, grains: tuple[str, ...],
+                      years: list[int],
+                      tau_max: float = 120.0) -> dict[int, np.ndarray]:
+    """Map OECD/AMIS restriction episodes to annual (n,G) tau matrices.
+
+    If several measures overlap in a year for the same country–grain, the
+    **strongest** (highest tau) is kept. Unmapped AMIS countries are ignored.
+    """
+    n, G = len(countries), len(grains)
+    name_to_i = {c.name: i for i, c in enumerate(countries)}
+    gi = {g: k for k, g in enumerate(grains)}
+    scale = tau_max / 120.0
+    schedule = {t: np.zeros((n, G)) for t in range(len(years))}
+
+    amis = load_amis_restrictions(aggregated=True)
+    for _, row in amis.iterrows():
+        sheaf = _AMIS_COUNTRY_TO_SHEAF.get(row["Country_Name"])
+        if sheaf is None or sheaf not in name_to_i:
+            continue
+        grain = _AMIS_GRAIN.get(str(row["CommodityClass_Name"]))
+        if grain is None or grain not in gi:
+            continue
+        tau = _AMIS_TAU.get(str(row["PolicyMeasure_Name"]), 0.0) * scale
+        if tau <= 0:
+            continue
+        start = row["Start_Date"]
+        end = row["End_Date"]
+        if pd.isna(start):
+            continue
+        y0 = int(start.year)
+        y1 = int(end.year) if pd.notna(end) else y0
+        i, g = name_to_i[sheaf], gi[grain]
+        for t, y in enumerate(years):
+            if y0 <= y <= y1:
+                schedule[t][i, g] = max(schedule[t][i, g], tau)
+    return schedule

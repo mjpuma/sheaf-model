@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 sheaf_results.csv
+level1_hindcast.csv
 .ipynb_checkpoints/
 .DS_Store
 *.egg-info/
