@@ -8,20 +8,25 @@ correctly from files alone.
 ## Audit status
 
 - **Current phase:** Final adjudication — **COMPLETE** (2026-08-22). Authorized IMPLEMENT NOW patches applied. Deferred items remain.
+- **Architecture pivot (2026-08-23):** Gate 0 locked to **Agrimate-aligned 24 steps/year**
+  out-of-equilibrium dynamics. Annual SPE demoted. See `ARCHITECTURE.md` (includes
+  why 24 not 26) and rewritten Gate 0 in `VALIDATION.md`.
 - **Phases completed:**
   - Phase 0 — repository mapping / preparation of `CLAUDE.md`. Complete.
   - Phase 1 — specialist audits + cross-agent section. Complete; adjudicated.
   - Phase 2 — Agents 4–7 + `phase2_cross_agent_summary.md`. Complete; adjudicated.
   - Final adjudication — `audit_reports/FINAL_ADJUDICATION.md`. Complete; patches applied.
-- **Phases not yet started:** Deferred post-adjudication work (game-grid rebaseline, KAZ node, USDA/AMIS wire-up, B2 storage timing, identification pooling). No Phase 3 formally defined.
+- **Phases not yet started / next engineering:** Sub-annual calendar + dynamic core
+  (ARCHITECTURE.md implementation order). No Level-2 until monthly Gate 0 Hard is green.
 - **Phase 2 detail:** All four agents + cross-register complete (see prior checkpoint).
-- **Checkpoint date:** 2026-08-22 (final adjudication + authorized patches).
+- **Checkpoint date:** 2026-08-23 (architecture lock). Prior: 2026-08-22 adjudication.
 - **Orchestration:** Cursor parent + Task subagents for Phase 2; parent lead-reviewer for adjudication.
 - **Source code modification status:** **AUTHORIZED PATCHES APPLIED 2026-08-22** per `FINAL_ADJUDICATION.md` §4 IMPLEMENT NOW:
   - `sheaf/core.py` — PD geometric-mean; solver status protocol; G2 shortfall; S8 guard; S5 expectation recentre
   - `sheaf/__init__.py` — export `SpatialEquilibriumError`
   - `README.md`, `VALIDATION.md` — honesty / formula sync
   - Audit artifacts remain under `audit_reports/`, `audit_prompts/`, `SHEAF_AUDIT_STATE.md`
+  - 2026-08-23 docs: `ARCHITECTURE.md`, Gate 0 rewrite (code clock not yet migrated)
 
 ## Governing documents
 

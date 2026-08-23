@@ -1,0 +1,199 @@
+year,grain,price_nominal_usd_mt,price_real_2010_usd_mt,source_series
+1960,maize,44.5,232.5,Maize
+1961,maize,45.0,230.4,Maize
+1962,maize,48.7,244.7,Maize
+1963,maize,53.8,275.5,Maize
+1964,maize,54.6,276.1,Maize
+1965,maize,55.7,278.7,Maize
+1966,maize,58.3,281.4,Maize
+1967,maize,54.1,258.9,Maize
+1968,maize,48.0,231.5,Maize
+1969,maize,52.3,239.6,Maize
+1970,maize,58.4,251.6,Maize
+1971,maize,58.4,239.2,Maize
+1972,maize,55.8,209.3,Maize
+1973,maize,97.8,316.7,Maize
+1974,maize,131.2,348.6,Maize
+1975,maize,119.6,286.2,Maize
+1976,maize,112.4,265.6,Maize
+1977,maize,95.4,208.5,Maize
+1978,maize,100.7,189.5,Maize
+1979,maize,115.5,194.8,Maize
+1980,maize,125.3,192.0,Maize
+1981,maize,130.8,200.3,Maize
+1982,maize,109.3,172.5,Maize
+1983,maize,136.0,220.5,Maize
+1984,maize,135.9,225.4,Maize
+1985,maize,112.2,188.0,Maize
+1986,maize,87.6,127.5,Maize
+1987,maize,75.7,100.6,Maize
+1988,maize,106.9,133.4,Maize
+1989,maize,111.5,140.0,Maize
+1990,maize,109.3,132.2,Maize
+1991,maize,107.4,131.1,Maize
+1992,maize,104.2,124.9,Maize
+1993,maize,102.1,118.3,Maize
+1994,maize,107.6,128.4,Maize
+1995,maize,123.5,134.3,Maize
+1996,maize,165.8,183.9,Maize
+1997,maize,117.1,136.3,Maize
+1998,maize,102.0,124.1,Maize
+1999,maize,90.2,111.9,Maize
+2000,maize,88.5,111.3,Maize
+2001,maize,89.6,117.1,Maize
+2002,maize,99.3,131.2,Maize
+2003,maize,105.4,132.3,Maize
+2004,maize,111.8,131.5,Maize
+2005,maize,98.7,112.5,Maize
+2006,maize,121.9,135.5,Maize
+2007,maize,163.7,171.5,Maize
+2008,maize,223.1,217.0,Maize
+2009,maize,165.5,171.6,Maize
+2010,maize,185.9,185.9,Maize
+2011,maize,291.7,262.7,Maize
+2012,maize,298.4,270.7,Maize
+2013,maize,259.4,236.3,Maize
+2014,maize,192.9,178.2,Maize
+2015,maize,169.8,173.4,Maize
+2016,maize,159.2,169.3,Maize
+2017,maize,154.5,158.8,Maize
+2018,maize,164.4,161.4,Maize
+2019,maize,170.1,171.0,Maize
+2020,maize,165.5,169.0,Maize
+2021,maize,259.5,237.2,Maize
+2022,maize,318.8,271.4,Maize
+2023,maize,252.7,221.4,Maize
+2024,maize,190.6,165.6,Maize
+2025,maize,203.2,175.0,Maize
+1960,rice,107.3,560.8,"Rice, Thai 5%"
+1961,rice,119.0,609.5,"Rice, Thai 5%"
+1962,rice,134.9,678.7,"Rice, Thai 5%"
+1963,rice,125.7,643.9,"Rice, Thai 5%"
+1964,rice,120.1,607.2,"Rice, Thai 5%"
+1965,rice,118.8,594.6,"Rice, Thai 5%"
+1966,rice,145.2,700.9,"Rice, Thai 5%"
+1967,rice,189.4,906.2,"Rice, Thai 5%"
+1968,rice,182.9,883.0,"Rice, Thai 5%"
+1969,rice,168.4,771.5,"Rice, Thai 5%"
+1970,rice,126.3,544.1,"Rice, Thai 5%"
+1971,rice,111.5,456.8,"Rice, Thai 5%"
+1972,rice,129.4,486.1,"Rice, Thai 5%"
+1973,rice,289.6,937.6,"Rice, Thai 5%"
+1974,rice,517.2,1374.0,"Rice, Thai 5%"
+1975,rice,341.4,816.8,"Rice, Thai 5%"
+1976,rice,234.7,554.6,"Rice, Thai 5%"
+1977,rice,252.2,551.4,"Rice, Thai 5%"
+1978,rice,345.7,650.2,"Rice, Thai 5%"
+1979,rice,313.1,528.0,"Rice, Thai 5%"
+1980,rice,410.7,629.7,"Rice, Thai 5%"
+1981,rice,459.0,702.9,"Rice, Thai 5%"
+1982,rice,272.5,430.1,"Rice, Thai 5%"
+1983,rice,256.8,416.4,"Rice, Thai 5%"
+1984,rice,232.5,385.5,"Rice, Thai 5%"
+1985,rice,196.9,329.9,"Rice, Thai 5%"
+1986,rice,186.2,271.3,"Rice, Thai 5%"
+1987,rice,214.6,285.3,"Rice, Thai 5%"
+1988,rice,277.5,346.3,"Rice, Thai 5%"
+1989,rice,299.2,375.7,"Rice, Thai 5%"
+1990,rice,270.9,327.6,"Rice, Thai 5%"
+1991,rice,293.3,358.0,"Rice, Thai 5%"
+1992,rice,268.2,321.4,"Rice, Thai 5%"
+1993,rice,235.4,272.7,"Rice, Thai 5%"
+1994,rice,267.6,319.6,"Rice, Thai 5%"
+1995,rice,321.0,349.2,"Rice, Thai 5%"
+1996,rice,338.9,375.8,"Rice, Thai 5%"
+1997,rice,303.5,353.2,"Rice, Thai 5%"
+1998,rice,304.2,370.2,"Rice, Thai 5%"
+1999,rice,248.4,308.2,"Rice, Thai 5%"
+2000,rice,202.4,254.4,"Rice, Thai 5%"
+2001,rice,172.8,225.7,"Rice, Thai 5%"
+2002,rice,191.9,253.5,"Rice, Thai 5%"
+2003,rice,197.6,248.2,"Rice, Thai 5%"
+2004,rice,237.7,279.5,"Rice, Thai 5%"
+2005,rice,286.3,326.4,"Rice, Thai 5%"
+2006,rice,304.9,339.0,"Rice, Thai 5%"
+2007,rice,326.4,342.1,"Rice, Thai 5%"
+2008,rice,650.2,632.3,"Rice, Thai 5%"
+2009,rice,555.0,575.4,"Rice, Thai 5%"
+2010,rice,488.9,488.9,"Rice, Thai 5%"
+2011,rice,543.0,489.0,"Rice, Thai 5%"
+2012,rice,563.0,510.7,"Rice, Thai 5%"
+2013,rice,505.9,460.9,"Rice, Thai 5%"
+2014,rice,422.8,390.6,"Rice, Thai 5%"
+2015,rice,386.0,394.4,"Rice, Thai 5%"
+2016,rice,396.2,421.3,"Rice, Thai 5%"
+2017,rice,398.9,410.0,"Rice, Thai 5%"
+2018,rice,420.7,413.0,"Rice, Thai 5%"
+2019,rice,418.0,420.2,"Rice, Thai 5%"
+2020,rice,496.8,507.4,"Rice, Thai 5%"
+2021,rice,458.3,418.9,"Rice, Thai 5%"
+2022,rice,436.8,371.9,"Rice, Thai 5%"
+2023,rice,553.7,485.2,"Rice, Thai 5%"
+2024,rice,588.4,511.2,"Rice, Thai 5%"
+2025,rice,407.8,351.3,"Rice, Thai 5%"
+1960,wheat,58.0,303.0,"Wheat, US HRW"
+1961,wheat,58.6,300.3,"Wheat, US HRW"
+1962,wheat,64.3,323.6,"Wheat, US HRW"
+1963,wheat,64.5,330.4,"Wheat, US HRW"
+1964,wheat,67.5,341.2,"Wheat, US HRW"
+1965,wheat,59.5,297.6,"Wheat, US HRW"
+1966,wheat,63.0,303.9,"Wheat, US HRW"
+1967,wheat,65.7,314.4,"Wheat, US HRW"
+1968,wheat,62.8,303.0,"Wheat, US HRW"
+1969,wheat,58.4,267.6,"Wheat, US HRW"
+1970,wheat,54.9,236.5,"Wheat, US HRW"
+1971,wheat,61.7,252.8,"Wheat, US HRW"
+1972,wheat,69.8,262.1,"Wheat, US HRW"
+1973,wheat,139.8,452.7,"Wheat, US HRW"
+1974,wheat,179.7,477.4,"Wheat, US HRW"
+1975,wheat,149.1,356.6,"Wheat, US HRW"
+1976,wheat,132.9,314.1,"Wheat, US HRW"
+1977,wheat,103.2,225.7,"Wheat, US HRW"
+1978,wheat,127.7,240.3,"Wheat, US HRW"
+1979,wheat,160.3,270.3,"Wheat, US HRW"
+1980,wheat,172.7,264.8,"Wheat, US HRW"
+1981,wheat,175.0,267.9,"Wheat, US HRW"
+1982,wheat,160.4,253.1,"Wheat, US HRW"
+1983,wheat,157.4,255.2,"Wheat, US HRW"
+1984,wheat,152.3,252.6,"Wheat, US HRW"
+1985,wheat,135.8,227.6,"Wheat, US HRW"
+1986,wheat,114.9,167.4,"Wheat, US HRW"
+1987,wheat,112.9,150.1,"Wheat, US HRW"
+1988,wheat,145.2,181.2,"Wheat, US HRW"
+1989,wheat,169.2,212.5,"Wheat, US HRW"
+1990,wheat,135.5,163.9,"Wheat, US HRW"
+1991,wheat,128.7,157.1,"Wheat, US HRW"
+1992,wheat,151.2,181.2,"Wheat, US HRW"
+1993,wheat,140.2,162.5,"Wheat, US HRW"
+1994,wheat,149.7,178.8,"Wheat, US HRW"
+1995,wheat,177.0,192.5,"Wheat, US HRW"
+1996,wheat,207.6,230.2,"Wheat, US HRW"
+1997,wheat,159.5,185.6,"Wheat, US HRW"
+1998,wheat,126.1,153.5,"Wheat, US HRW"
+1999,wheat,112.0,139.0,"Wheat, US HRW"
+2000,wheat,114.1,143.4,"Wheat, US HRW"
+2001,wheat,126.8,165.6,"Wheat, US HRW"
+2002,wheat,148.1,195.7,"Wheat, US HRW"
+2003,wheat,146.1,183.6,"Wheat, US HRW"
+2004,wheat,156.9,184.5,"Wheat, US HRW"
+2005,wheat,152.4,173.7,"Wheat, US HRW"
+2006,wheat,192.0,213.5,"Wheat, US HRW"
+2007,wheat,255.2,267.4,"Wheat, US HRW"
+2008,wheat,326.0,317.1,"Wheat, US HRW"
+2009,wheat,224.1,232.3,"Wheat, US HRW"
+2010,wheat,223.6,223.6,"Wheat, US HRW"
+2011,wheat,316.3,284.8,"Wheat, US HRW"
+2012,wheat,313.2,284.2,"Wheat, US HRW"
+2013,wheat,312.2,284.5,"Wheat, US HRW"
+2014,wheat,284.9,263.2,"Wheat, US HRW"
+2015,wheat,204.4,208.9,"Wheat, US HRW"
+2016,wheat,166.6,177.2,"Wheat, US HRW"
+2017,wheat,174.2,179.0,"Wheat, US HRW"
+2018,wheat,209.9,206.1,"Wheat, US HRW"
+2019,wheat,201.7,202.7,"Wheat, US HRW"
+2020,wheat,231.6,236.5,"Wheat, US HRW"
+2021,wheat,315.2,288.2,"Wheat, US HRW"
+2022,wheat,430.0,366.1,"Wheat, US HRW"
+2023,wheat,340.4,298.4,"Wheat, US HRW"
+2024,wheat,268.7,233.4,"Wheat, US HRW"
+2025,wheat,243.3,209.6,"Wheat, US HRW"

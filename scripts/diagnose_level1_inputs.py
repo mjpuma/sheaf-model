@@ -12,9 +12,11 @@ Writes:
   diagnostics/level1_psd_anomalies.csv
   diagnostics/level1_amis_tau.csv
   diagnostics/level1_baseline_quantities.csv
+  diagnostics/level1_observed_prices.csv
   figures/fig7_psd_country_anomalies.png
   figures/fig8_amis_tau_schedule.png
   figures/fig9_usda_baseline_quantities.png
+  figures/fig11_observed_world_prices.png
 
 Example:
   python scripts/diagnose_level1_inputs.py
@@ -36,6 +38,7 @@ from sheaf.data_usda import (
     amis_tau_schedule,
     country_production_shocks,
     detrend_anomalies,
+    load_price_series,
     load_psd_country,
 )
 
@@ -253,6 +256,43 @@ def plot_baseline(df: pd.DataFrame, out: Path):
     plt.close(fig)
 
 
+def build_observed_prices_table(years: list[int]) -> pd.DataFrame:
+    """Pink Sheet nominal + real prices for the diagnostic window."""
+    real = load_price_series(deflated=True).loc[years[0]:years[-1]]
+    nom = load_price_series(deflated=False).loc[years[0]:years[-1]]
+    rows = []
+    for y in real.index:
+        for g in GRAINS:
+            rows.append(dict(
+                year=int(y), grain=g,
+                price_real_2010_usd_mt=float(real.loc[y, g]),
+                price_nominal_usd_mt=float(nom.loc[y, g]),
+            ))
+    return pd.DataFrame(rows)
+
+
+def plot_observed_prices(df: pd.DataFrame, out: Path):
+    """3 panels: real Pink Sheet prices with crisis shading + YoY %."""
+    fig, axes = plt.subplots(1, 3, figsize=(13, 4.2))
+    for ax, grain in zip(axes, GRAINS):
+        sub = df[df.grain == grain].sort_values("year")
+        ax.plot(sub.year, sub.price_real_2010_usd_mt, "o-", color=COL[grain],
+                label="real 2010$", lw=1.5)
+        ax.plot(sub.year, sub.price_nominal_usd_mt, "--", color="0.45",
+                label="nominal", lw=1)
+        for a, b in CRISES:
+            ax.axvspan(a, b, color="0.9", zorder=0)
+        ax.set_title(grain)
+        ax.set_xlabel("year")
+        ax.set_ylabel("$/t")
+        ax.legend(fontsize=7)
+    fig.suptitle("Observed world prices (World Bank Pink Sheet) — Level-1 target",
+                 fontsize=12)
+    fig.tight_layout()
+    fig.savefig(out, dpi=130)
+    plt.close(fig)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -281,21 +321,30 @@ def main():
     base_path = DIAG / "level1_baseline_quantities.csv"
     base.to_csv(base_path, index=False)
 
+    print("building observed price table…")
+    prices = build_observed_prices_table(years)
+    price_path = DIAG / "level1_observed_prices.csv"
+    prices.to_csv(price_path, index=False)
+
     fig7 = FIGS / "fig7_psd_country_anomalies.png"
     fig8 = FIGS / "fig8_amis_tau_schedule.png"
     fig9 = FIGS / "fig9_usda_baseline_quantities.png"
+    fig11 = FIGS / "fig11_observed_world_prices.png"
     print("plotting…")
     plot_psd_anomalies(anom, fig7)
     plot_amis_tau(tau, years, fig8)
     plot_baseline(base, fig9)
+    plot_observed_prices(prices, fig11)
 
     # Quick console checksums for regular eyeballing
     print(f"\nwrote {anom_path}  ({len(anom)} rows)")
     print(f"wrote {tau_path}  ({len(tau)} rows)")
     print(f"wrote {base_path}  ({len(base)} rows)")
+    print(f"wrote {price_path}  ({len(prices)} rows)")
     print(f"wrote {fig7}")
     print(f"wrote {fig8}")
     print(f"wrote {fig9}")
+    print(f"wrote {fig11}")
 
     # Sanity: Russia wheat 2010 should be a large negative anomaly; AMIS τ > 0
     ru = anom[(anom.country == "Russia") & (anom.grain == "wheat") & (anom.year == 2010)]

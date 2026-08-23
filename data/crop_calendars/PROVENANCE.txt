@@ -1,0 +1,37 @@
+Wheat harvest calendars for SHEAF nodes (Gate 0 prototype)
+==========================================================
+
+Purpose
+-------
+Spread annual USDA PSD wheat production into the Agrimate-aligned 24-step
+year (2 equal half-months per calendar month). Used by sheaf.seasonal.
+
+Source / method
+---------------
+Hand-curated **peak harvest month windows** from publicly documented USDA FAS
+crop-calendar charts and standard northern/southern hemisphere patterns
+(Sacks et al. / SAGE lineage as used by Agrimate). This is a **node-level
+prototype**, not a digitised SAGE grid extract.
+
+  USDA FAS crop calendars: https://ipad.fas.usda.gov/ogamaps/cropcalendar.aspx
+  SAGE crop calendar dataset: https://sage.nelson.wisc.edu/data-and-models/datasets/crop-calendar-dataset/
+  Agrimate (Kuhla et al. 2025) §4.2 — harvest calendars → per-step harvest.
+
+Columns
+-------
+country                 SHEAF node name (matches calibration.DATA)
+harvest_start_month     1–12 inclusive start of harvest window
+harvest_end_month       1–12 inclusive end (may be < start if wraps year,
+                        e.g. Australia 10→1)
+notes                   short provenance hint
+
+Allocation rule (sheaf.seasonal)
+--------------------------------
+Uniform mass over every **month** in the inclusive window; each month’s share
+is split equally across its two 24-step halves. Windows that wrap the calendar
+year (start > end) include months start..12 and 1..end.
+
+Refresh / upgrade path
+----------------------
+Replace this CSV with a SAGE- or FAO-derived extract aggregated to SHEAF nodes
+when a reproducible bulk download is vendored; keep the same column schema.

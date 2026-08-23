@@ -9,6 +9,32 @@ forcing (read from the AMIS policy database, bans ≈ 95% and taxes ≈ 50% quan
 cuts) and leaves endogenous restriction dynamics to future work. That is the gap
 SHEAF fills.
 
+## Gate 0 — Agrimate-aligned reproduction first
+
+**Nothing in Level-2 (endogenous game) proceeds until Gate 0 is green.**
+
+**Clock (locked):** **24 time steps per year** (~15.2 days), matching Agrimate
+(Kuhla et al. 2025 §4.1). Not annual. Not 26 fortnights by default — see
+[ARCHITECTURE.md](ARCHITECTURE.md) for why 24 (month tiling + harvest calendars
++ monthly Pink Sheet targets) and when 26 would be considered.
+
+**Dynamics (locked):** sub-annual, out-of-equilibrium stock–trade adjustment
+(Agrimate/acclimate-style). Annual spatial price equilibrium is demoted to a
+reference/diagnostic, not the heartbeat. We are validating **crisis shock
+paths**, not annual equilibrium magnitudes alone.
+
+| Gate | Criterion | Notes |
+|---|---|---|
+| Hard | Monthly wheat world price signs/timing for 2007/08 and 2010/11 vs Pink Sheet | Agrimate’s published bar |
+| Soft | Annual regional supply & stock-to-use signs | Agrimate Fig. 4 style |
+| Soft | Attribution: 2007 production/stock-led vs 2010 restriction-led | shocks vs AMIS legs |
+| Block | No Level-2 fitting until Hard is green | |
+
+Provisional annual Level-1 scripts (`score_level1.py`, crisis-era annual SPE)
+remain useful for **data plumbing** only; they are not Gate 0. Full
+interrogation of the annual wrong-sign episode:
+`diagnostics/LEVEL1_INTERROGATION.md`.
+
 ## Two levels
 
 **Level 1 — reproduction (matched to Agrimate).** Drive SHEAF with observed
@@ -16,9 +42,9 @@ production anomalies *plus* the observed restrictions as exogenous `tau`, and ma
 the published targets: the annual world-price hike, the sign of regional supply and
 stock anomalies, and the production-vs-restriction attribution (Agrimate finds
 2007 production-led, 2010/11 restriction-led). This checks the market + storage
-core. Honest ceiling: SHEAF is an annual-ish equilibrium model, so it targets
-annual magnitudes, not Agrimate's bi-weekly out-of-equilibrium rationing. Temporal
-resolution is not where SHEAF competes.
+core. Honest ceiling under the *old* annual SPE clock: annual magnitudes only,
+not Agrimate's bi-weekly dynamics — **that clock is retired for Gate 0**; see
+ARCHITECTURE.md (24 steps/yr). Temporal resolution is where SHEAF now competes.
 
 **Level 2 — endogenous restriction calibration (SHEAF's unique test).** Drive SHEAF
 with production anomalies *only*, switch the strategic game on, and let it choose
@@ -84,8 +110,13 @@ PSD series, loaded from a local export in the same schema.
 3. ~~Baseline bilateral trade network~~ — **done**, via FAOSTAT `E0` matrices
    (`sheaf/data_faostat.py`), including the crisis-year windows.
    **Kazakhstan** is a named SHEAF node (`SHEAF_NODE_MAP["Kazakhstan"]=KAZ`).
-4. **Observed world price series** (deflated) — the Level-1 price target.
-   — API stub: `sheaf.data_usda.load_price_series` (still outstanding).
+4. ~~**Observed world price series** (deflated)~~ — **done** (2026-08-22).
+   World Bank Pink Sheet annual prices under `data/world_prices/`
+   (`pink_sheet_grains_annual.csv`; loader `sheaf.data_usda.load_price_series`,
+   MUV-deflated 2010 USD by default). See `data/world_prices/PROVENANCE.txt`.
+   Score the Level-1 hindcast with `python scripts/score_level1.py`
+   (`diagnostics/level1_price_score.csv`, `figures/fig10_level1_price_score.png`).
 
-Refresh helpers: `python scripts/fetch_external_data.py` (`--psd-only` / `--amis-only`).
+Refresh helpers: `python scripts/fetch_external_data.py`
+(`--psd-only` / `--amis-only` / `--prices-only`).
 

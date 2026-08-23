@@ -1,0 +1,50 @@
+World Bank Pink Sheet — annual grain prices (Level-1 target)
+============================================================
+
+Source
+------
+World Bank Commodity Markets “Pink Sheet” historical annual workbook:
+
+  https://www.worldbank.org/en/research/commodity-markets
+
+Current workbook URL is discovered from that page (hash changes monthly):
+
+  …/related/CMO-Historical-Data-Annual.xlsx
+
+License: World Bank open data terms (see Commodity Markets page).
+
+Fetched
+-------
+See DOWNLOAD_META.json for the UTC timestamp of this install.
+
+Contents in this directory
+--------------------------
+CMO-Historical-Data-Annual.xlsx     Official annual Pink Sheet workbook
+pink_sheet_grains_annual.csv        Wheat / rice / maize annual extract
+pink_sheet_grains_monthly.csv       Monthly extract (nominal → real via annual
+                                    real/nominal ratio within each year; Pink
+                                    Sheet monthly workbook is nominal-only)
+CMO-Historical-Data-Monthly.xlsx    Official monthly Pink Sheet workbook
+DOWNLOAD_META.json                  Machine-readable fetch record
+PROVENANCE.txt                      This file
+
+Series mapping (Pink Sheet → SHEAF grain)
+-----------------------------------------
+wheat  ← “Wheat, US HRW”     ($/mt, U.S. hard red winter, Gulf)
+rice   ← “Rice, Thai 5%”     ($/mt, Thailand 5% broken, f.o.b. Bangkok)
+maize  ← “Maize”             ($/mt)
+
+Units / deflation
+-----------------
+price_nominal_usd_mt     — nominal USD per metric tonne
+price_real_2010_usd_mt   — constant 2010 USD, deflated by the World Bank
+                           Manufacturers’ Unit Value (MUV) index
+                           (sheet “Annual Prices (Real)” in the workbook)
+
+Level-1 validation uses the **real** series as the observed world-price target.
+**Gate 0** scores **monthly** wheat (`pink_sheet_grains_monthly.csv`,
+`load_price_series_monthly`) against the 24-step spine.
+
+Refresh
+-------
+  python scripts/fetch_external_data.py --prices-only

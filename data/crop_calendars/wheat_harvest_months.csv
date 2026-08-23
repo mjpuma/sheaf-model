@@ -1,0 +1,19 @@
+country,harvest_start_month,harvest_end_month,notes
+USA,6,9,Winter Jun-Jul + spring Aug-Sep (USDA FAS)
+Russia,7,9,Main harvest Jul-Sep
+EU,7,8,Northern summer harvest
+Ukraine,7,8,Jul-Aug
+Kazakhstan,8,9,Aug-Sep
+Canada,8,9,Prairie harvest Aug-Sep
+Australia,10,1,Southern spring/summer (Oct-Jan wraps year)
+Argentina,11,1,Nov-Jan wraps year
+Brazil,9,11,Wheat Sep-Nov
+India,3,5,Rabi harvest Mar-May
+Thailand,1,1,Minimal wheat; placeholder Jan
+Vietnam,1,1,Minimal wheat; placeholder Jan
+China,5,7,Winter wheat May-Jun + spring
+Egypt,4,6,Apr-Jun
+Indonesia,1,1,Minimal wheat; placeholder Jan
+Mexico,4,6,Apr-Jun
+Nigeria,1,1,Minimal wheat; placeholder Jan
+RestOfWorld,7,9,Northern-hemisphere default Jul-Sep

@@ -3,3 +3,4 @@ pandas>=2.0
 cvxpy>=1.4
 networkx>=3.0
 matplotlib>=3.7
+openpyxl>=3.1

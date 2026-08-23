@@ -256,13 +256,52 @@ def load_amis_restrictions(path: Path | str | None = None,
     return df
 
 
-def load_price_series(path: Path | str | None = None):
-    """Observed (deflated) world price series — **external**, not vendored."""
-    raise NotImplementedError(
-        "Observed price series are not shipped with SHEAF. "
-        "See VALIDATION.md remaining inputs. "
-        f"Requested path={path!r}."
-    )
+_PRICE_DIR = Path(__file__).resolve().parents[1] / "data" / "world_prices"
+
+
+def load_price_series(path: Path | str | None = None,
+                      deflated: bool = True) -> pd.DataFrame:
+    """Observed **annual** world grain prices (Pink Sheet).
+
+    Returns a DataFrame indexed by year with columns wheat / rice / maize
+    ($/mt). Default `deflated=True` uses constant-2010 USD (MUV-deflated).
+    For Gate 0 monthly targets use `load_price_series_monthly`.
+    """
+    p = Path(path) if path else (_PRICE_DIR / "pink_sheet_grains_annual.csv")
+    if not p.exists():
+        raise FileNotFoundError(
+            f"{p} missing — run: python scripts/fetch_external_data.py --prices-only")
+    df = pd.read_csv(p)
+    col = "price_real_2010_usd_mt" if deflated else "price_nominal_usd_mt"
+    if col not in df.columns:
+        raise ValueError(f"{p} missing column {col!r}")
+    wide = (df.pivot(index="year", columns="grain", values=col)
+              .sort_index())
+    for g in ("wheat", "rice", "maize"):
+        if g not in wide.columns:
+            wide[g] = np.nan
+    return wide[["wheat", "rice", "maize"]]
+
+
+def load_price_series_monthly(path: Path | str | None = None,
+                              deflated: bool = True) -> pd.DataFrame:
+    """Observed **monthly** world grain prices (Pink Sheet) — Gate 0 target.
+
+    Returns DataFrame with columns year, month, wheat, rice, maize ($/mt).
+    """
+    p = Path(path) if path else (_PRICE_DIR / "pink_sheet_grains_monthly.csv")
+    if not p.exists():
+        raise FileNotFoundError(
+            f"{p} missing — run: python scripts/fetch_external_data.py --prices-only")
+    df = pd.read_csv(p)
+    col = "price_real_2010_usd_mt" if deflated else "price_nominal_usd_mt"
+    wide = (df.pivot(index=["year", "month"], columns="grain", values=col)
+              .reset_index()
+              .sort_values(["year", "month"]))
+    for g in ("wheat", "rice", "maize"):
+        if g not in wide.columns:
+            wide[g] = np.nan
+    return wide[["year", "month", "wheat", "rice", "maize"]]
 
 # AMIS Country_Name → SHEAF node
 _AMIS_COUNTRY_TO_SHEAF = {
@@ -279,8 +318,8 @@ _AMIS_COUNTRY_TO_SHEAF = {
     "Viet Nam": "Vietnam",
 }
 
-# Agrimate-style severity → SHEAF export-tax-equivalent ($/t).
-_AMIS_TAU = {
+# Prototype $/t mapping (legacy). Too weak to move world prices much.
+_AMIS_TAU_PROTOTYPE = {
     "Export prohibition": 120.0,
     "Export quota": 72.0,
     "Export tax": 60.0,
@@ -288,6 +327,20 @@ _AMIS_TAU = {
     "Licensing requirement": 36.0,
     "Restriction on customs clearance point for exports": 24.0,
 }
+
+# Agrimate-aligned severity: bans ≈ shut export edges; taxes ≈ large wedge.
+# Calibrated so *restrictions-only* Level-1 recovers crisis price SIGNS vs Pink Sheet
+# (see diagnostics/LEVEL1_INTERROGATION.md). Quantity-cut mapping still TODO.
+_AMIS_TAU_AGRIMATE = {
+    "Export prohibition": 500.0,
+    "Export quota": 250.0,
+    "Export tax": 150.0,
+    "Minimum export price": 100.0,
+    "Licensing requirement": 80.0,
+    "Restriction on customs clearance point for exports": 50.0,
+}
+
+_AMIS_TAU = _AMIS_TAU_AGRIMATE  # default for Level-1
 
 _AMIS_GRAIN = {
     "Wheat": "wheat",
@@ -301,11 +354,16 @@ def country_production_shocks(countries: list, grains: tuple[str, ...],
                               window_years: int = 10) -> dict[int, np.ndarray]:
     """Per-country PSD production anomalies → SheafModel shock matrices.
 
+    Named nodes: ξ = 1 + LOWESS anomaly on that country's production.
+    RestOfWorld: ξ = 1 + LOWESS anomaly on the **world residual**
+    (world production − sum of named nodes), so RoW is not frozen at 1.0.
+
     Returns {period_index: (n,G) multipliers} with period 0 = years[0].
     Missing country–grain series default to 1.0 (no shock).
     """
     n, G = len(countries), len(grains)
     name_to_i = {c.name: i for i, c in enumerate(countries)}
+    named = [c.name for c in countries if c.name != "RestOfWorld"]
     out = {t: np.ones((n, G)) for t in range(len(years))}
     for g, grain in enumerate(grains):
         try:
@@ -322,21 +380,47 @@ def country_production_shocks(countries: list, grains: tuple[str, ...],
             for t, y in enumerate(years):
                 if y in an.index and np.isfinite(an.loc[y]):
                     out[t][i, g] = float(1.0 + an.loc[y])
+        # RoW residual anomaly
+        if "RestOfWorld" in name_to_i:
+            world = psd.groupby("year")["production"].sum()
+            named_sum = (psd[psd["country"].isin(named)]
+                         .groupby("year")["production"].sum())
+            resid = (world - named_sum).dropna()
+            if len(resid) >= 5:
+                an = detrend_anomalies(resid, window_years=window_years)["anomaly"]
+                i = name_to_i["RestOfWorld"]
+                for t, y in enumerate(years):
+                    if y in an.index and np.isfinite(an.loc[y]):
+                        out[t][i, g] = float(1.0 + an.loc[y])
     return out
 
 
 def amis_tau_schedule(countries: list, grains: tuple[str, ...],
                       years: list[int],
-                      tau_max: float = 120.0) -> dict[int, np.ndarray]:
+                      tau_max: float | None = None,
+                      severity: str = "agrimate") -> dict[int, np.ndarray]:
     """Map OECD/AMIS restriction episodes to annual (n,G) tau matrices.
+
+    severity:
+      "agrimate" — strong wedges (default); bans effectively shut exports.
+      "prototype" — legacy mild $/t ladder (max 120).
 
     If several measures overlap in a year for the same country–grain, the
     **strongest** (highest tau) is kept. Unmapped AMIS countries are ignored.
     """
+    if severity == "agrimate":
+        table = dict(_AMIS_TAU_AGRIMATE)
+    elif severity == "prototype":
+        table = dict(_AMIS_TAU_PROTOTYPE)
+    else:
+        raise ValueError(f"unknown severity={severity!r}")
+    if tau_max is not None:
+        scale = tau_max / max(table.values())
+        table = {k: v * scale for k, v in table.items()}
+
     n, G = len(countries), len(grains)
     name_to_i = {c.name: i for i, c in enumerate(countries)}
     gi = {g: k for k, g in enumerate(grains)}
-    scale = tau_max / 120.0
     schedule = {t: np.zeros((n, G)) for t in range(len(years))}
 
     amis = load_amis_restrictions(aggregated=True)
@@ -347,7 +431,7 @@ def amis_tau_schedule(countries: list, grains: tuple[str, ...],
         grain = _AMIS_GRAIN.get(str(row["CommodityClass_Name"]))
         if grain is None or grain not in gi:
             continue
-        tau = _AMIS_TAU.get(str(row["PolicyMeasure_Name"]), 0.0) * scale
+        tau = table.get(str(row["PolicyMeasure_Name"]), 0.0)
         if tau <= 0:
             continue
         start = row["Start_Date"]
@@ -361,3 +445,53 @@ def amis_tau_schedule(countries: list, grains: tuple[str, ...],
             if y0 <= y <= y1:
                 schedule[t][i, g] = max(schedule[t][i, g], tau)
     return schedule
+
+
+def seed_stocks_from_psd(countries: list, year: int) -> None:
+    """Overwrite private/gov opening stocks from PSD ending stocks in `year`."""
+    try:
+        psd = load_psd_country("all")
+    except FileNotFoundError:
+        return
+    grains = ("wheat", "rice", "maize")
+    named = [c.name for c in countries if c.name != "RestOfWorld"]
+    for c in countries:
+        if c.name == "RestOfWorld":
+            continue
+        for gi, g in enumerate(grains):
+            hit = psd[(psd["country"] == c.name) & (psd["grain"] == g)
+                      & (psd["year"] == year)]
+            if hit.empty:
+                continue
+            es = float(max(hit["ending_stocks"].iloc[0], 0.0))
+            if c.mkt_stock is not None:
+                c.mkt_stock[gi] = 0.7 * es
+                if c.mkt_capacity is not None:
+                    c.mkt_capacity[gi] = max(
+                        float(c.mkt_capacity[gi]), c.mkt_stock[gi] * 1.5, 1.0)
+            if c.gov_stock is not None:
+                c.gov_stock[gi] = 0.3 * es
+    # RoW residual stocks
+    row = next((c for c in countries if c.name == "RestOfWorld"), None)
+    if row is None:
+        return
+    for gi, g in enumerate(grains):
+        world_s = float(psd[psd["grain"] == g].groupby("year")["ending_stocks"]
+                        .sum().loc[year])
+        named_s = 0.0
+        for c in countries:
+            if c.name == "RestOfWorld":
+                continue
+            if c.mkt_stock is not None:
+                named_s += float(c.mkt_stock[gi])
+            if c.gov_stock is not None:
+                named_s += float(c.gov_stock[gi])
+        rem = max(world_s - named_s, 0.0)
+        if row.mkt_stock is None:
+            row.mkt_stock = np.zeros(len(grains))
+            row.mkt_gamma = np.full(len(grains), 0.05)
+            row.mkt_capacity = np.full(len(grains), max(rem, 1.0) * 2.0)
+            row.mkt_cost = 5.0
+        row.mkt_stock[gi] = rem
+        if row.mkt_capacity is not None:
+            row.mkt_capacity[gi] = max(float(row.mkt_capacity[gi]), rem * 1.5, 1.0)

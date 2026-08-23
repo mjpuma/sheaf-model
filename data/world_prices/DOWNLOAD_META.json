@@ -1,0 +1,14 @@
+{
+  "downloaded_at_utc": "2026-08-23T11:37:45.087309+00:00",
+  "source_page": "https://www.worldbank.org/en/research/commodity-markets",
+  "source_url_annual": "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Annual.xlsx",
+  "source_url_monthly": "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx",
+  "real_deflator": "World Bank MUV, constant 2010 USD",
+  "series": {
+    "wheat": "Wheat, US HRW",
+    "maize": "Maize",
+    "rice": "Rice, Thai 5%"
+  },
+  "n_rows_annual": 198,
+  "n_rows_monthly": 2397
+}
