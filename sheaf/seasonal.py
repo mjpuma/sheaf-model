@@ -28,15 +28,26 @@ def load_wheat_harvest_calendar(
     return df
 
 
-def harvest_month_weights(start: int, end: int) -> np.ndarray:
-    """Length-12 weights (months 1–12) summing to 1 over the harvest window."""
+def harvest_month_weights(start: int, end: int,
+                          peak_month: int | None = None) -> np.ndarray:
+    """Length-12 weights summing to 1; triangular peak inside the window.
+
+    If peak_month is None, peak at the middle of the window. This matches
+    Agrimate-style concentration of harvest mass mid-season rather than a
+    flat uniform slab.
+    """
     w = np.zeros(12)
     months = _months_in_window(int(start), int(end))
     if not months:
         w[:] = 1.0 / 12.0
         return w
-    for m in months:
-        w[m - 1] += 1.0
+    if peak_month is None or peak_month not in months:
+        peak_month = months[len(months) // 2]
+    # Triangular weights by circular distance along the window sequence
+    peak_idx = months.index(int(peak_month))
+    for i, m in enumerate(months):
+        dist = abs(i - peak_idx)
+        w[m - 1] += max(len(months) - dist, 1)
     w /= w.sum()
     return w
 
@@ -63,8 +74,11 @@ def country_step_weights(calendar: pd.DataFrame | None = None) -> dict[str, np.n
     cal = load_wheat_harvest_calendar() if calendar is None else calendar
     out = {}
     for _, row in cal.iterrows():
+        peak = int(row["peak_month"]) if "peak_month" in cal.columns and pd.notna(
+            row.get("peak_month")) else None
         mw = harvest_month_weights(row["harvest_start_month"],
-                                   row["harvest_end_month"])
+                                   row["harvest_end_month"],
+                                   peak_month=peak)
         out[str(row["country"])] = step_weights_from_months(mw)
     return out
 
@@ -101,3 +115,62 @@ def harvest_path(countries: list[str],
             H[i, yi * STEPS_PER_YEAR:(yi + 1) * STEPS_PER_YEAR] = (
                 allocate_annual_to_steps(ann, w))
     return H
+
+
+def rolling_ahead(arr: np.ndarray, horizon: int) -> np.ndarray:
+    """For each t, sum arr[t+1 : t+1+horizon] with zero beyond the end.
+
+    arr shape (n, T) → (n, T). Used for foresight of remaining harvest/demand.
+    """
+    n, T = arr.shape
+    out = np.zeros((n, T))
+    csum = np.concatenate([np.zeros((n, 1)), np.cumsum(arr, axis=1)], axis=1)
+    for t in range(T):
+        t1 = min(t + 1 + horizon, T)
+        # sum of arr[t+1:t1] = csum[t1] - csum[t+1]
+        out[:, t] = csum[:, t1] - csum[:, t + 1]
+    return out
+
+
+def rolling_ahead_variable(arr: np.ndarray, horizons: np.ndarray) -> np.ndarray:
+    """Like rolling_ahead but horizon[t] may differ per time index.
+
+    arr (n, T), horizons (T,) of non-negative ints → (n, T).
+    """
+    n, T = arr.shape
+    out = np.zeros((n, T))
+    csum = np.concatenate([np.zeros((n, 1)), np.cumsum(arr, axis=1)], axis=1)
+    for t in range(T):
+        h = int(max(0, horizons[t]))
+        t1 = min(t + 1 + h, T)
+        out[:, t] = csum[:, t1] - csum[:, t + 1]
+    return out
+
+
+def steps_to_harvest_pulse(H: np.ndarray, frac: float = 0.12,
+                           max_horizon: int = STEPS_PER_YEAR) -> np.ndarray:
+    """Steps ahead until cumulative future harvest ≥ frac of mean annual H.
+
+    H is (n, T). Uses the **world** harvest path (sum over countries) so all
+    agents share the same lean-season clock (NH summer pulse). Returns (T,).
+    If the pulse never arrives within max_horizon, returns max_horizon.
+    """
+    world = H.sum(axis=0)
+    T = world.shape[0]
+    # Mean annual harvest over complete years in the window
+    n_years = max(T // STEPS_PER_YEAR, 1)
+    ann = float(world[: n_years * STEPS_PER_YEAR].sum()) / n_years
+    thresh = max(frac * ann, 1e-6)
+    csum = np.concatenate([[0.0], np.cumsum(world)])
+    out = np.full(T, max_horizon, dtype=int)
+    for t in range(T):
+        # search smallest h≥1 with sum world[t+1:t+1+h] ≥ thresh
+        for h in range(1, max_horizon + 1):
+            t1 = min(t + 1 + h, T)
+            if csum[t1] - csum[t + 1] >= thresh:
+                out[t] = h
+                break
+            if t1 >= T:
+                out[t] = max(t1 - t - 1, 1)
+                break
+    return out

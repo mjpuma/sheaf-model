@@ -30,6 +30,14 @@ paths**, not annual equilibrium magnitudes alone.
 | Soft | Attribution: 2007 production/stock-led vs 2010 restriction-led | shocks vs AMIS legs |
 | Block | No Level-2 fitting until Hard is green | |
 
+**Within-year timing (required for Hard):** harvest calendars with peak months +
+lean-horizon foresight + seasonal-baseline free-stock pricing
+(`sheaf/dynamic_wheat.py`). Fake Mar–Apr lean-season spikes from myopic STU
+pricing are treated as a Gate 0 failure. Score with
+`python scripts/score_subannual_wheat.py` (reports within-year demeaned corr and
+spring/autumn ratio). Hike *magnitudes* remain open; signs and crisis peak months
+are the Hard bar.
+
 Provisional annual Level-1 scripts (`score_level1.py`, crisis-era annual SPE)
 remain useful for **data plumbing** only; they are not Gate 0. Full
 interrogation of the annual wrong-sign episode:

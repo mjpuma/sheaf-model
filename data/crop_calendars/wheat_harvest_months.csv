@@ -1,19 +1,19 @@
-country,harvest_start_month,harvest_end_month,notes
-USA,6,9,Winter Jun-Jul + spring Aug-Sep (USDA FAS)
-Russia,7,9,Main harvest Jul-Sep
-EU,7,8,Northern summer harvest
-Ukraine,7,8,Jul-Aug
-Kazakhstan,8,9,Aug-Sep
-Canada,8,9,Prairie harvest Aug-Sep
-Australia,10,1,Southern spring/summer (Oct-Jan wraps year)
-Argentina,11,1,Nov-Jan wraps year
-Brazil,9,11,Wheat Sep-Nov
-India,3,5,Rabi harvest Mar-May
-Thailand,1,1,Minimal wheat; placeholder Jan
-Vietnam,1,1,Minimal wheat; placeholder Jan
-China,5,7,Winter wheat May-Jun + spring
-Egypt,4,6,Apr-Jun
-Indonesia,1,1,Minimal wheat; placeholder Jan
-Mexico,4,6,Apr-Jun
-Nigeria,1,1,Minimal wheat; placeholder Jan
-RestOfWorld,7,9,Northern-hemisphere default Jul-Sep
+country,harvest_start_month,harvest_end_month,peak_month,notes
+USA,6,9,7,Winter Jun-Jul peak Jul; spring continues Aug-Sep (USDA FAS)
+Russia,7,9,8,Main Black Sea harvest Aug peak
+EU,7,8,7,Northern summer; Jul peak
+Ukraine,7,8,7,Jul-Aug peak Jul
+Kazakhstan,8,9,8,Aug-Sep
+Canada,8,9,8,Prairie Aug peak
+Australia,10,1,12,Southern spring/summer; Dec peak (wraps year)
+Argentina,11,1,12,Nov-Jan; Dec peak
+Brazil,9,11,10,Wheat Sep-Nov
+India,3,5,4,Rabi Mar-May; Apr peak
+China,5,7,6,Winter wheat May-Jun peak Jun
+Egypt,4,6,5,Apr-Jun
+Mexico,4,6,5,Apr-Jun
+Thailand,1,1,1,Minimal wheat; placeholder
+Vietnam,1,1,1,Minimal wheat; placeholder
+Indonesia,1,1,1,Minimal wheat; placeholder
+Nigeria,11,1,12,Small wheat; SH-aligned placeholder
+RestOfWorld,6,9,8,"Blend NH mass (Jun-Sep peak Aug); SH residual in Australia/Argentina nodes"

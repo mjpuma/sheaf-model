@@ -137,6 +137,21 @@ def main():
         s = score[score.leg == leg]
         print(f"  {leg:7s}  corr={_corr(s.model_price, s.obs_price):+.3f}")
 
+    # Within-year timing diagnostics (Gate 0 hard: foresight / calendars).
+    full = score[score.leg == "full"].copy()
+    full["model_d"] = full.groupby("year")["model_price"].transform(
+        lambda s: s - s.mean())
+    full["obs_d"] = full.groupby("year")["obs_price"].transform(
+        lambda s: s - s.mean())
+    mp = full.groupby("month")[["model_price", "obs_price"]].mean()
+    spring = float(full[full.month.isin([3, 4])]["model_price"].mean())
+    autumn = float(full[full.month.isin([9, 10])]["model_price"].mean())
+    print("\nWithin-year timing (full leg):")
+    print(f"  within-year demeaned corr={_corr(full.model_d, full.obs_d):+.3f}")
+    print(f"  month-profile corr={_corr(mp.model_price, mp.obs_price):+.3f}")
+    print(f"  spring/autumn mean ratio={spring / max(autumn, 1e-9):.3f} "
+          f"(obs≈0.96; >1.5 = fake lean-season spike)")
+
     print("\nCrisis window hike ratios (3-mo mean peak/base):")
     windows = [
         ("2007/08", 2006, 6, 2008, 3),

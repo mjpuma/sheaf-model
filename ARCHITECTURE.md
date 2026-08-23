@@ -112,11 +112,14 @@ Annual hike-ratio scoring (`scripts/score_level1.py` as of 2026-08-22) is
 2. Sub-annual calendar helper (step ↔ date ↔ month; agricultural year) — **done**
    (`sheaf/calendar24.py`).
 3. Seasonal production allocation from harvest calendars + PSD annual totals —
-   **done** (`sheaf/seasonal.py`, `data/crop_calendars/`).
+   **done** (`sheaf/seasonal.py`, `data/crop_calendars/`; triangular peak months).
 4. Minimal dynamic core: stocks + trade + exogenous AMIS cuts (wheat first) —
-   **prototype done** (`sheaf/dynamic_wheat.py`). Not yet Agrimate-parity agents.
-5. Score monthly prices vs Pink Sheet — **plumbing done**
-   (`scripts/score_subannual_wheat.py`, `fig12_…`); magnitudes still open.
+   **done with within-year foresight** (`sheaf/dynamic_wheat.py`): lean-horizon
+   storage targets, warehouse carry, seasonal-baseline free-stock pricing,
+   structural (surplus-weighted) AMIS pressure. Removes the fake Mar–Apr
+   lean-season price spike.
+5. Score monthly prices vs Pink Sheet — **Gate 0 timing largely green**
+   (`scripts/score_subannual_wheat.py`, `fig12_…`); hike *magnitudes* still open.
 6. Add multi-commodity substitution.
 7. Add endogenous restriction game (Level 2).
 
