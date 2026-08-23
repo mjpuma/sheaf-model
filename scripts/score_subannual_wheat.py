@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Score sub-annual wheat Gate 0 vs monthly Pink Sheet.
 
-Legs (24 steps/yr, play_game N/A — exogenous AMIS quantity cuts):
-  full    — seasonal PSD harvest + AMIS export cuts
-  shocks  — seasonal PSD harvest, no AMIS
-  tau     — mean-year seasonal harvest (no interannual anomaly) + AMIS
+Legs (24 steps/yr):
+  full    — interannual PSD harvest + AMIS export cuts
+  shocks  — interannual PSD harvest, no AMIS
+  tau     — mean-year seasonal harvest + AMIS
 
 Writes:
   diagnostics/subannual_wheat_score.csv
@@ -21,18 +21,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from sheaf.calendar24 import STEPS_PER_YEAR, n_steps
-from sheaf.calibration import DATA
 from sheaf.data_usda import load_price_series_monthly
-from sheaf.dynamic_wheat import (
-    WheatSimResult,
-    _ending_stocks,
-    _psd_wheat_annual,
-    amis_export_cuts,
-    result_to_monthly,
-    run_wheat_dynamics,
-)
-from sheaf.seasonal import harvest_path, load_wheat_harvest_calendar
+from sheaf.dynamic_wheat import result_to_monthly, run_wheat_dynamics
 
 ROOT = Path(__file__).resolve().parents[1]
 DIAG = ROOT / "diagnostics"
@@ -47,53 +37,24 @@ def _corr(a, b) -> float:
     return float(np.corrcoef(a[mask], b[mask])[0, 1])
 
 
-def _run_with_harvest(countries, H, cuts, start, end, stock_year=2005,
-                      p0=250.0, elast=-0.25, kappa=0.08, buffer_frac=0.08):
-    """Core loop shared by legs (harvest + cuts injected)."""
-    n, T = len(countries), n_steps(start, end)
-    years = list(range(start, end + 1))
-    _, cons = _psd_wheat_annual(countries, years)
-    C_ann = np.zeros(n)
-    for i, c in enumerate(countries):
-        sub = cons[cons.country == c]
-        C_ann[i] = float(sub.consumption.mean()) if len(sub) else 0.0
-    C_step = C_ann / STEPS_PER_YEAR
-    stock = _ending_stocks(countries, stock_year)
-    buffer = buffer_frac * C_ann
-    price = np.zeros(T)
-    stock_path = np.zeros((n, T))
-    cons_path = np.zeros((n, T))
-    exp_path = np.zeros((n, T))
-    p = float(p0)
-    stu_target = 6.0
-    for t in range(T):
-        avail = stock + H[:, t]
-        desired = np.maximum(C_step * (p / p0) ** elast, 0.0)
-        exportable = np.maximum(0.0, avail - desired - buffer) * (1.0 - cuts[:, t])
-        need = np.maximum(0.0, desired - avail)
-        total_need, total_exp = float(need.sum()), float(exportable.sum())
-        shipped = np.zeros(n)
-        received = np.zeros(n)
-        if total_exp > 1e-12 and total_need > 1e-12:
-            fill = min(1.0, total_exp / total_need)
-            received = need * fill
-            shipped = exportable * (received.sum() / total_exp)
-        consumption = np.minimum(desired, avail - shipped + received)
-        stock = np.maximum(0.0, avail - shipped - consumption + received)
-        stu_steps = float(stock.sum()) / max(float(C_step.sum()), 1e-9)
-        unmet = float(np.maximum(0.0, desired - consumption).sum())
-        unmet_frac = unmet / max(float(desired.sum()), 1e-9)
-        stu_gap = (stu_target - stu_steps) / stu_target
-        signal = float(np.clip(0.5 * stu_gap + 0.5 * unmet_frac, -0.5, 0.5))
-        p = float(np.clip(p * np.exp(kappa * signal), 80.0, 800.0))
-        price[t] = p
-        stock_path[:, t] = stock
-        cons_path[:, t] = consumption
-        exp_path[:, t] = shipped
-    return WheatSimResult(
-        countries=countries, start_year=start, end_year=end,
-        price=price, stock=stock_path, harvest=H, consumption=cons_path,
-        exports=exp_path, export_cut=cuts)
+def _hike(df: pd.DataFrame, col: str, y0: int, m0: int, y1: int, m1: int) -> float:
+    """Peak/base using mean of a 3-month window around (y, m)."""
+    def win(y, m):
+        vals = []
+        for dm in (-1, 0, 1):
+            mm, yy = m + dm, y
+            if mm < 1:
+                mm += 12
+                yy -= 1
+            if mm > 12:
+                mm -= 12
+                yy += 1
+            hit = df[(df.year == yy) & (df.month == mm)][col]
+            if len(hit):
+                vals.append(float(hit.iloc[0]))
+        return float(np.mean(vals)) if vals else float("nan")
+    b, p = win(y0, m0), win(y1, m1)
+    return p / b if b and np.isfinite(b) and np.isfinite(p) else float("nan")
 
 
 def main():
@@ -105,24 +66,16 @@ def main():
     DIAG.mkdir(parents=True, exist_ok=True)
     FIGS.mkdir(parents=True, exist_ok=True)
 
-    countries = [d["name"] for d in DATA] + ["RestOfWorld"]
-    years = list(range(args.start, args.end + 1))
-    prod, _ = _psd_wheat_annual(countries, years)
-    cal = load_wheat_harvest_calendar()
-    H_full = harvest_path(countries, prod, args.start, args.end, calendar=cal)
-
-    mean_prod = prod.groupby("country", as_index=False)["production"].mean()
-    tiled = pd.concat(
-        [mean_prod.assign(year=y) for y in years], ignore_index=True)
-    H_base = harvest_path(countries, tiled, args.start, args.end, calendar=cal)
-
-    cuts = amis_export_cuts(countries, args.start, args.end)
-    zero = np.zeros_like(cuts)
-
     legs = {
-        "full": _run_with_harvest(countries, H_full, cuts, args.start, args.end),
-        "shocks": _run_with_harvest(countries, H_full, zero, args.start, args.end),
-        "tau": _run_with_harvest(countries, H_base, cuts, args.start, args.end),
+        "full": run_wheat_dynamics(
+            start_year=args.start, end_year=args.end,
+            use_amis=True, use_shocks=True),
+        "shocks": run_wheat_dynamics(
+            start_year=args.start, end_year=args.end,
+            use_amis=False, use_shocks=True),
+        "tau": run_wheat_dynamics(
+            start_year=args.start, end_year=args.end,
+            use_amis=True, use_shocks=False),
     }
 
     obs = load_price_series_monthly(deflated=True)
@@ -183,6 +136,20 @@ def main():
     for leg in ("full", "shocks", "tau"):
         s = score[score.leg == leg]
         print(f"  {leg:7s}  corr={_corr(s.model_price, s.obs_price):+.3f}")
+
+    print("\nCrisis window hike ratios (3-mo mean peak/base):")
+    windows = [
+        ("2007/08", 2006, 6, 2008, 3),
+        ("2010/11", 2009, 6, 2011, 2),
+    ]
+    for label, y0, m0, y1, m1 in windows:
+        print(f"  {label}: obs×{_hike(obs, 'obs_price', y0, m0, y1, m1):.2f}  ",
+              end="")
+        for leg in ("full", "shocks", "tau"):
+            s = score[score.leg == leg]
+            print(f"{leg}×{_hike(s, 'model_price', y0, m0, y1, m1):.2f}  ",
+                  end="")
+        print()
 
 
 if __name__ == "__main__":
