@@ -22,7 +22,13 @@ import numpy as np
 import pandas as pd
 
 from sheaf.data_usda import load_price_series_monthly
-from sheaf.dynamic_wheat import result_to_monthly, run_wheat_dynamics
+from sheaf.dynamic_wheat import (
+    assert_amis_raises_price,
+    assert_no_spring_spike,
+    assert_twin_identity,
+    result_to_monthly,
+    run_wheat_dynamics,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 DIAG = ROOT / "diagnostics"
@@ -61,7 +67,18 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--start", type=int, default=2006)
     ap.add_argument("--end", type=int, default=2011)
+    ap.add_argument("--skip-asserts", action="store_true",
+                    help="Skip robustness asserts (twin identity / AMIS / spring)")
     args = ap.parse_args()
+
+    if not args.skip_asserts:
+        print("Robustness asserts:")
+        assert_twin_identity()
+        print("  PASS twin identity (no shocks/AMIS ⇒ flat at p0)")
+        assert_amis_raises_price()
+        print("  PASS AMIS raises price in 2010 ban window")
+        assert_no_spring_spike()
+        print("  PASS no fake spring lean-season spike")
 
     DIAG.mkdir(parents=True, exist_ok=True)
     FIGS.mkdir(parents=True, exist_ok=True)

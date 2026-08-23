@@ -2,19 +2,18 @@
 
 24 steps/year. Out-of-equilibrium stock–trade with exogenous AMIS export cuts.
 
-Within-year timing (Gate 0 hard requirement)
---------------------------------------------
-1. **Harvest calendars** — triangular peak-month weights
-   (`sheaf.seasonal`, `data/crop_calendars/wheat_harvest_months.csv`).
-2. **Lean-horizon foresight** — agents look ahead to the next global harvest
-   pulse; target stocks = max(0, C_lean − H_lean) + safety. Grain is carried
-   in warehouses (not dumped after harvest).
-3. **Seasonal-baseline pricing** — free stocks (= inventory − lean need) are
-   scored against a mean-year / no-AMIS twin path by calendar step, so the
-   expected spring lean is not a crisis.
-4. **Structural AMIS pressure** — export cuts weighted by each node's mean
-   annual surplus (not by the seasonally varying exportable pile), so harvest
-   months do not mechanically inflate restriction pressure.
+Within-year timing (robustness rules)
+-------------------------------------
+1. **Harvest calendars** — triangular peak-month weights (`sheaf.seasonal`).
+2. **Lean-horizon foresight** — targets = max(0, C_lean − H_lean) + safety;
+   warehouses carry grain (no binding dump of harvest).
+3. **Path-matched twin pricing** — every run has a twin with the same
+   year-by-year demand, mean harvest, and no AMIS. Price responds only to
+   *liquid* free-stock anomalies (inventory behind export cuts is not
+   world-available) and to unmet demand after trade rationing.
+   ⇒ no additive AMIS wedge; ⇒ (no shocks, no AMIS) ≈ flat at p0.
+4. **AMIS quantity cuts** affect the physical exportable set; price feels
+   them via trapped stocks + unmet imports, not a reduced-form surcharge.
 """
 from __future__ import annotations
 
@@ -49,7 +48,7 @@ _AMIS_COUNTRY = {
 }
 
 MAX_LEAN_STEPS = STEPS_PER_YEAR
-HARVEST_PULSE_FRAC = 0.12  # ~12% of annual world H ≈ one NH peak month
+HARVEST_PULSE_FRAC = 0.12
 
 
 @dataclass
@@ -64,6 +63,10 @@ class WheatSimResult:
     exports: np.ndarray
     export_cut: np.ndarray
     spin_up_years: int = 0
+    # Diagnostics for robustness checks
+    free_liquid: np.ndarray | None = None
+    free_twin: np.ndarray | None = None
+    unmet_frac: np.ndarray | None = None
 
 
 def _psd_wheat_annual(countries: list[str],
@@ -153,13 +156,19 @@ def _anchor_p0(default: float = 250.0, year: int = 2006) -> float:
     return default
 
 
-def _structural_surplus(H: np.ndarray, C_ann: np.ndarray) -> np.ndarray:
-    """Mean annual production − consumption, floored at 0 (MMT/year)."""
-    n, T = H.shape
-    n_years = max(T // STEPS_PER_YEAR, 1)
-    H_ann = H[:, : n_years * STEPS_PER_YEAR].reshape(
-        n, n_years, STEPS_PER_YEAR).sum(axis=2).mean(axis=1)
-    return np.maximum(H_ann - C_ann, 0.0)
+def _consumption_path(countries: list[str], cons_score: pd.DataFrame,
+                      C_ann: np.ndarray, years: list[int],
+                      T: int) -> np.ndarray:
+    """Year-specific demand, flat within year (MMT per step)."""
+    n = len(countries)
+    out = np.zeros((n, T))
+    for yi, y in enumerate(years):
+        for i, c in enumerate(countries):
+            hit = cons_score[(cons_score.country == c) & (cons_score.year == y)]
+            ann = float(hit.consumption.iloc[0]) if len(hit) else C_ann[i]
+            out[i, yi * STEPS_PER_YEAR:(yi + 1) * STEPS_PER_YEAR] = (
+                ann / STEPS_PER_YEAR)
+    return out
 
 
 def _simulate_window(
@@ -173,28 +182,29 @@ def _simulate_window(
         inv_eta: float,
         smooth: float,
         C_ann: np.ndarray,
-        surplus: np.ndarray,
-        seasonal_free: np.ndarray | None = None,
-        pulse_frac: float = HARVEST_PULSE_FRAC,
-        record_free: bool = False,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray | None]:
-    """Core loop with lean foresight + optional seasonal-baseline pricing.
+        free_twin: np.ndarray | None = None,
+        pulse_frac: float | None = None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray,
+           np.ndarray, np.ndarray]:
+    """Physical stock–trade loop; price from liquid free vs path-matched twin.
 
-    If ``seasonal_free`` is None, prices stay near ``p0`` (baseline twin pass).
-    If provided (length 24), free-stock anomalies vs that calendar profile
-    drive the scarcity term.
+    ``free_twin`` is length T from the mean-H / no-AMIS twin. If None, this
+    pass *is* the twin: prices stay near p0 and liquid free is recorded.
     """
+    if pulse_frac is None:
+        pulse_frac = HARVEST_PULSE_FRAC
     n, T = H.shape
     stock = stock0.copy()
     price = np.zeros(T)
     stock_path = np.zeros((n, T))
     cons_path = np.zeros((n, T))
     exp_path = np.zeros((n, T))
-    free_path = np.zeros(T) if record_free else None
+    free_path = np.zeros(T)
+    unmet_path = np.zeros(T)
     p = float(p0)
-    safety_w = float(safety.sum())
-    surplus_w = float(max(surplus.sum(), 1e-9))
-    warehouse = np.maximum(1.5 * C_ann, 3.0 * safety)
+    safety_w = float(max(safety.sum(), 1.0))
+    # Soft capacity only — large enough not to destroy ordinary harvest carry.
+    warehouse = np.maximum(4.0 * C_ann, 8.0 * safety)
 
     lean_h = steps_to_harvest_pulse(H, frac=pulse_frac,
                                     max_horizon=MAX_LEAN_STEPS)
@@ -227,30 +237,32 @@ def _simulate_window(
 
         consumption = np.minimum(desired, avail - shipped + received)
         stock = np.maximum(0.0, avail - shipped - consumption + received)
-        stock = np.minimum(stock, warehouse)
+        # Soft warehouse: only trim extreme overflow (should rarely bind).
+        overflow = np.maximum(0.0, stock - warehouse)
+        stock = stock - overflow
 
         lean_need = float(lean_gap.sum())
-        free = float(stock.sum()) - lean_need
-        if free_path is not None:
-            free_path[t] = free
+        # Liquid stocks: grain behind export cuts is not available to the
+        # world market (Agrimate-style trade friction).
+        liquid = float((stock * (1.0 - cuts[:, t])).sum())
+        free = liquid - lean_need
+        free_path[t] = free
 
-        # Structural AMIS: surplus-weighted mean cut (seasonally flat for a
-        # given policy set; jumps when Russia/Ukraine bans turn on).
-        amis_pressure = float((cuts[:, t] * surplus).sum()) / surplus_w
         unmet = float(np.maximum(0.0, desired - consumption).sum())
         unmet_frac = unmet / max(float(desired.sum()), 1e-9)
+        unmet_path[t] = unmet_frac
 
-        if seasonal_free is None:
-            # Baseline twin: hold near p0 (only mild unmet feedback).
-            p_star = p0 * (1.0 + 0.25 * unmet_frac)
+        if free_twin is None:
+            # Twin pass: hold p0 so free_twin is a pure physical baseline.
+            p_star = p0
         else:
-            base = float(seasonal_free[t % STEPS_PER_YEAR])
-            level = free + safety_w
-            base_level = base + safety_w
-            # ratio > 1 when free is below the seasonal normal.
-            ratio = base_level / max(level, 0.08 * safety_w)
-            p_star = (p0 * (ratio ** inv_eta)
-                      * (1.0 + 1.6 * amis_pressure + 1.1 * unmet_frac))
+            twin = float(free_twin[t])
+            # Small floor only — do NOT add full safety_w to both sides
+            # (that compressed scarcity ratios toward 1 and killed AMIS signal).
+            floor = 0.05 * safety_w
+            ratio = (twin + floor) / max(free + floor, floor)
+            # Physical channels only: free anomaly + unmet after rationing.
+            p_star = p0 * (ratio ** inv_eta) * (1.0 + 3.0 * unmet_frac)
 
         p = float(smooth * p + (1.0 - smooth) * p_star)
         p = float(np.clip(p, 80.0, 900.0))
@@ -260,7 +272,7 @@ def _simulate_window(
         cons_path[:, t] = consumption
         exp_path[:, t] = shipped
 
-    return price, stock_path, cons_path, exp_path, free_path
+    return price, stock_path, cons_path, exp_path, free_path, unmet_path
 
 
 def run_wheat_dynamics(
@@ -269,15 +281,15 @@ def run_wheat_dynamics(
         end_year: int = 2011,
         p0: float | None = None,
         elast: float = -0.12,
-        inv_eta: float = 0.50,
-        smooth: float = 0.55,
+        inv_eta: float = 0.85,
+        smooth: float = 0.70,
         stu_target: float = 0.18,
         use_amis: bool = True,
         use_shocks: bool = True,
         stock_seed_year: int = 2005,
         spin_up_years: int = 2,
 ) -> WheatSimResult:
-    """Run the Gate 0 wheat spine with lean foresight + seasonal baseline."""
+    """Run Gate 0 wheat spine with path-matched twin pricing."""
     if countries is None:
         from .calibration import DATA
         countries = [d["name"] for d in DATA] + ["RestOfWorld"]
@@ -298,73 +310,103 @@ def run_wheat_dynamics(
 
     mean_prod = (prod_score.groupby("country", as_index=False)["production"]
                  .mean())
+    tiled_mean = pd.concat([mean_prod.assign(year=y) for y in years],
+                           ignore_index=True)
 
-    def _C_for(H: np.ndarray, cons_df: pd.DataFrame,
-               yrs: list[int]) -> np.ndarray:
-        T = H.shape[1]
-        out = np.zeros((n, T))
-        for yi, y in enumerate(yrs):
-            for i, c in enumerate(countries):
-                hit = cons_df[(cons_df.country == c) & (cons_df.year == y)]
-                ann = float(hit.consumption.iloc[0]) if len(hit) else C_ann[i]
-                out[i, yi * STEPS_PER_YEAR:(yi + 1) * STEPS_PER_YEAR] = (
-                    ann / STEPS_PER_YEAR)
-        return out
-
-    # --- spin-up on mean harvest, no AMIS ---
+    # --- spin-up: mean harvest, mean-year demand rate, no AMIS ---
     spin_stock = _ending_stocks(countries, stock_seed_year)
     if spin_up_years > 0:
         spin_years = list(range(start_year - spin_up_years, start_year))
-        tiled = pd.concat([mean_prod.assign(year=y) for y in spin_years],
-                          ignore_index=True)
-        H_spin = harvest_path(countries, tiled, spin_years[0], spin_years[-1],
-                              calendar=cal)
+        tiled_spin = pd.concat([mean_prod.assign(year=y) for y in spin_years],
+                               ignore_index=True)
+        H_spin = harvest_path(countries, tiled_spin, spin_years[0],
+                              spin_years[-1], calendar=cal)
         C_spin = np.tile((C_ann / STEPS_PER_YEAR)[:, None],
                          (1, H_spin.shape[1]))
-        surplus_spin = _structural_surplus(H_spin, C_ann)
-        _, stock_path_s, _, _, _ = _simulate_window(
+        _, stock_path_s, _, _, _, _ = _simulate_window(
             H_spin, C_spin, np.zeros_like(H_spin), spin_stock, safety,
-            p0, elast, inv_eta, smooth, C_ann, surplus_spin,
-            seasonal_free=None)
+            p0, elast, inv_eta, smooth, C_ann, free_twin=None)
         spin_stock = stock_path_s[:, -1]
 
-    # --- seasonal free-stock baseline (mean harvest, no AMIS) ---
-    tiled_base = pd.concat([mean_prod.assign(year=y) for y in years],
-                           ignore_index=True)
-    H_base = harvest_path(countries, tiled_base, start_year, end_year,
+    # Shared year-by-year demand for twin and treatment.
+    T = len(years) * STEPS_PER_YEAR
+    C_step = _consumption_path(countries, cons_score, C_ann, years, T)
+
+    # Twin: mean harvest, same C_step, no AMIS.
+    H_twin = harvest_path(countries, tiled_mean, start_year, end_year,
                           calendar=cal)
-    C_base = np.tile((C_ann / STEPS_PER_YEAR)[:, None], (1, H_base.shape[1]))
-    surplus_base = _structural_surplus(H_base, C_ann)
-    _, _, _, _, free_base = _simulate_window(
-        H_base, C_base, np.zeros_like(H_base), spin_stock.copy(), safety,
-        p0, elast, inv_eta, smooth, C_ann, surplus_base,
-        seasonal_free=None, record_free=True)
-    seasonal_free = np.array([
-        float(free_base[s::STEPS_PER_YEAR].mean())
-        for s in range(STEPS_PER_YEAR)
-    ])
+    _, _, _, _, free_twin, _ = _simulate_window(
+        H_twin, C_step, np.zeros_like(H_twin), spin_stock.copy(), safety,
+        p0, elast, inv_eta, smooth, C_ann, free_twin=None)
 
-    # --- crisis / counterfactual path ---
+    # Treatment harvest / cuts.
     if use_shocks:
-        prod_use = prod_score
+        H = harvest_path(countries, prod_score, start_year, end_year,
+                         calendar=cal)
     else:
-        prod_use = tiled_base
-    H = harvest_path(countries, prod_use, start_year, end_year, calendar=cal)
-    C_step = _C_for(H, cons_score, years)
-    surplus = _structural_surplus(H, C_ann)
+        H = H_twin.copy()
     cuts = (amis_export_cuts(countries, start_year, end_year)
-            if use_amis else np.zeros_like(H))
+            if use_amis else np.zeros((n, T)))
 
-    price, stock_path, cons_path, exp_path, _ = _simulate_window(
-        H, C_step, cuts, spin_stock, safety,
-        p0, elast, inv_eta, smooth, C_ann, surplus,
-        seasonal_free=seasonal_free)
+    # Identity check path: when H==H_twin and cuts==0, free must match twin
+    # and prices stay near p0 (enforced by using free_twin in pricing).
+    price, stock_path, cons_path, exp_path, free_liq, unmet = _simulate_window(
+        H, C_step, cuts, spin_stock.copy(), safety,
+        p0, elast, inv_eta, smooth, C_ann, free_twin=free_twin)
 
     return WheatSimResult(
         countries=countries, start_year=start_year, end_year=end_year,
         price=price, stock=stock_path, harvest=H, consumption=cons_path,
         exports=exp_path, export_cut=cuts, spin_up_years=spin_up_years,
+        free_liquid=free_liq, free_twin=free_twin, unmet_frac=unmet,
     )
+
+
+def assert_twin_identity(tol_price: float = 0.02,
+                         tol_free: float = 1.0) -> None:
+    """Hard robustness check: no shocks + no AMIS ⇒ ≈ twin ⇒ flat near p0."""
+    res = run_wheat_dynamics(use_amis=False, use_shocks=False)
+    p0 = float(res.price[0])
+    # After short burn-in, prices should hug p0.
+    tail = res.price[STEPS_PER_YEAR:]
+    rel = np.max(np.abs(tail - p0)) / max(p0, 1.0)
+    if rel > tol_price:
+        raise AssertionError(
+            f"neither-path price drift {rel:.3%} > {tol_price:.3%} "
+            f"(p0={p0:.1f}, range=[{tail.min():.1f},{tail.max():.1f}])")
+    if res.free_liquid is None or res.free_twin is None:
+        raise AssertionError("free paths not recorded")
+    free_err = float(np.max(np.abs(res.free_liquid - res.free_twin)))
+    if free_err > tol_free:
+        raise AssertionError(
+            f"neither-path free≠twin max|Δ|={free_err:.3f} > {tol_free}")
+
+
+def assert_amis_raises_price(min_lift: float = 0.08) -> None:
+    """Tau-only: Russia-ban window must lift prices vs pre-ban baseline."""
+    res = run_wheat_dynamics(use_amis=True, use_shocks=False)
+    # Jun 2010 (pre ban) vs Oct 2010 (ban on)
+    t_pre = (2010 - res.start_year) * STEPS_PER_YEAR + (6 - 1) * 2
+    t_ban = (2010 - res.start_year) * STEPS_PER_YEAR + (10 - 1) * 2
+    pre = float(np.mean(res.price[t_pre:t_pre + 2]))
+    ban = float(np.mean(res.price[t_ban:t_ban + 2]))
+    lift = ban / max(pre, 1e-9) - 1.0
+    if lift < min_lift:
+        raise AssertionError(
+            f"AMIS ban-window lift {lift:.3%} < {min_lift:.3%} "
+            f"(pre={pre:.1f}, ban={ban:.1f})")
+
+
+def assert_no_spring_spike(max_ratio: float = 1.25) -> None:
+    """Mean Mar–Apr price must not dwarf Sep–Oct (fake lean-season spike)."""
+    res = run_wheat_dynamics(use_amis=True, use_shocks=True)
+    m = result_to_monthly(res)
+    spring = float(m[m.month.isin([3, 4])]["model_price"].mean())
+    autumn = float(m[m.month.isin([9, 10])]["model_price"].mean())
+    ratio = spring / max(autumn, 1e-9)
+    if ratio > max_ratio:
+        raise AssertionError(
+            f"spring/autumn={ratio:.3f} > {max_ratio} (lean-season artifact)")
 
 
 def result_to_monthly(res: WheatSimResult) -> pd.DataFrame:

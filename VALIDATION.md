@@ -31,12 +31,12 @@ paths**, not annual equilibrium magnitudes alone.
 | Block | No Level-2 fitting until Hard is green | |
 
 **Within-year timing (required for Hard):** harvest calendars with peak months +
-lean-horizon foresight + seasonal-baseline free-stock pricing
-(`sheaf/dynamic_wheat.py`). Fake Mar–Apr lean-season spikes from myopic STU
-pricing are treated as a Gate 0 failure. Score with
-`python scripts/score_subannual_wheat.py` (reports within-year demeaned corr and
-spring/autumn ratio). Hike *magnitudes* remain open; signs and crisis peak months
-are the Hard bar.
+lean-horizon foresight + **path-matched twin** liquid-free pricing
+(`sheaf/dynamic_wheat.py`). Fake Mar–Apr lean-season spikes and drifting
+no-force baselines are Gate 0 failures (see `assert_twin_identity`,
+`assert_no_spring_spike`, `assert_amis_raises_price`). Score with
+`python scripts/score_subannual_wheat.py`. Hike *signs* and crisis peak months
+(± a few months) are the Hard bar; absolute hike magnitudes remain open.
 
 Provisional annual Level-1 scripts (`score_level1.py`, crisis-era annual SPE)
 remain useful for **data plumbing** only; they are not Gate 0. Full

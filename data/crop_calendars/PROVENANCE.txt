@@ -37,10 +37,10 @@ calendar year (start > end) include months start..12 and 1..end.
 Agent foresight (sheaf.dynamic_wheat)
 ------------------------------------
 Storage targets use a lean horizon to the next global harvest pulse
-(``steps_to_harvest_pulse``), not a myopic annual stock-to-use ratio.
-Pricing compares free stocks (inventory − lean need) to a mean-year /
-no-AMIS seasonal baseline so the expected pre-harvest lean is not treated
-as a crisis.
+(``steps_to_harvest_pulse``). Pricing compares **liquid** free stocks
+(inventory × (1 − export cut) − lean need) to a **path-matched twin** with the
+same year-by-year demand, mean harvest, and no AMIS — so the expected
+pre-harvest lean is not a crisis, and a no-shock/no-AMIS run stays flat at p0.
 
 Refresh / upgrade path
 ----------------------
