@@ -23,6 +23,7 @@ import pandas as pd
 
 from sheaf.data_usda import load_price_series_monthly
 from sheaf.dynamic_wheat import (
+    assert_amis_cuts_exports,
     assert_amis_raises_price,
     assert_no_spring_spike,
     assert_twin_identity,
@@ -77,6 +78,8 @@ def main():
         print("  PASS twin identity (no shocks/AMIS ⇒ flat at p0)")
         assert_amis_raises_price()
         print("  PASS AMIS raises price in 2010 ban window")
+        assert_amis_cuts_exports()
+        print("  PASS AMIS cuts Russia exports in ban window")
         assert_no_spring_spike()
         print("  PASS no fake spring lean-season spike")
 

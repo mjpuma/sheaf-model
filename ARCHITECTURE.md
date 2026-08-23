@@ -114,14 +114,13 @@ Annual hike-ratio scoring (`scripts/score_level1.py` as of 2026-08-22) is
 3. Seasonal production allocation from harvest calendars + PSD annual totals —
    **done** (`sheaf/seasonal.py`, `data/crop_calendars/`; triangular peak months).
 4. Minimal dynamic core: stocks + trade + exogenous AMIS cuts (wheat first) —
-   **robust Gate 0 spine** (`sheaf/dynamic_wheat.py`):
-   - lean-horizon foresight + warehouse carry (no harvest dump)
-   - **path-matched twin** pricing (same year-by-year demand, mean H, no AMIS)
-   - **liquid** free stocks (inventory behind export cuts is not world-available)
-   - price from free anomaly + unmet only — **no additive AMIS wedge**
-   - hard asserts: twin identity, AMIS ban lift, no spring spike
-5. Score monthly prices vs Pink Sheet — timing + hike *signs* green on full leg;
-   2010/11 peak month still ~1–2 quarters early vs Pink Sheet; magnitudes open.
+   **bilateral Gate 0 spine** (`sheaf/dynamic_wheat.py`):
+   - lean-horizon foresight + gradual stock rebuild
+   - FAOSTAT Armington clear (destination + source shares; limited substitution)
+   - path-matched twin pricing; preferred-source blockage from AMIS cuts
+   - hard asserts: twin identity, AMIS price lift, Russia export cut, no spring spike
+5. Score monthly prices vs Pink Sheet — hike signs + peak months improved;
+   magnitudes / full Agrimate agent offer-price dynamics still open.
 6. Add multi-commodity substitution.
 7. Add endogenous restriction game (Level 2).
 

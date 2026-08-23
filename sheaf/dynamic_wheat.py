@@ -1,19 +1,37 @@
-"""Minimal Agrimate-aligned wheat dynamics (Gate 0).
+"""Agrimate-aligned wheat dynamics (Gate 0) — bilateral offers + lean foresight.
 
 24 steps/year. Out-of-equilibrium stock–trade with exogenous AMIS export cuts.
 
-Within-year timing (robustness rules)
--------------------------------------
-1. **Harvest calendars** — triangular peak-month weights (`sheaf.seasonal`).
-2. **Lean-horizon foresight** — targets = max(0, C_lean − H_lean) + safety;
-   warehouses carry grain (no binding dump of harvest).
-3. **Path-matched twin pricing** — every run has a twin with the same
-   year-by-year demand, mean harvest, and no AMIS. Price responds only to
-   *liquid* free-stock anomalies (inventory behind export cuts is not
-   world-available) and to unmet demand after trade rationing.
-   ⇒ no additive AMIS wedge; ⇒ (no shocks, no AMIS) ≈ flat at p0.
-4. **AMIS quantity cuts** affect the physical exportable set; price feels
-   them via trapped stocks + unmet imports, not a reduced-form surcharge.
+Equations (Gate 0 spine)
+------------------------
+Per country i, step t (quantities MMT):
+
+  avail_i = S_{i,t} + H_{i,t}
+  desired_i = C_{i,t} (p_t / p0)^ε          # isoelastic food demand
+  lean_i = max(0, C^ahead_i − H^ahead_i)    # foresight to next harvest pulse
+  target_i = lean_i + safety_i
+
+  # Purchase demand covers food + stock rebuild (Agrimate-like importers)
+  D_i = max(0, desired_i + target_i − avail_i)
+
+  # Export offers: surplus above food + target, cut by AMIS τ_i ∈ [0,1]
+  O_i = max(0, avail_i − desired_i − target_i) · (1 − τ_i)
+
+Bilateral clear with FAOSTAT destination shares A_{ij} and source shares
+S_{ij} (Armington preferred-source matching, limited residual substitution).
+
+World price (path-matched twin; no flat AMIS surcharge):
+
+  free_t = Σ_i S_{i,t+1} − Σ_i lean_i
+  u_t    = unmet purchase demand fraction after bilateral clear
+  b_t    = share of demand whose preferred source is AMIS-restricted
+           (Σ_{i,j} S_{ij} τ_i D_j) / Σ D
+
+  p*_t = p0 · free_term(F^twin_t, free_t) · (1 + κ_u Δu_t + κ_b b_t)
+  p_t  = ρ p_{t−1} + (1−ρ) p*_t
+
+AMIS bites by cutting offers and blocking preferred import links (e.g.
+Egypt←Russia), not by a reduced-form world-price wedge.
 """
 from __future__ import annotations
 
@@ -23,6 +41,12 @@ import numpy as np
 import pandas as pd
 
 from .calendar24 import STEPS_PER_YEAR, n_steps
+from .data_faostat import (
+    SHEAF_NODE_MAP,
+    aggregate_to_nodes,
+    bilateral_shares,
+    load_trade_matrix,
+)
 from .data_usda import load_amis_restrictions, load_psd_country
 from .seasonal import (
     harvest_path,
@@ -49,6 +73,12 @@ _AMIS_COUNTRY = {
 
 MAX_LEAN_STEPS = STEPS_PER_YEAR
 HARVEST_PULSE_FRAC = 0.12
+# Price response to *anomalous* unmet vs path-matched twin (not raw seasonal unmet)
+# Price response to anomalous unmet vs twin + preferred-source blockage
+UNMET_KAPPA = 5.0
+BLOCK_KAPPA = 3.5
+# Partial stock-gap closure per step (Agrimate-like gradual orders)
+REBUILD_LAMBDA = 0.20
 
 
 @dataclass
@@ -63,10 +93,11 @@ class WheatSimResult:
     exports: np.ndarray
     export_cut: np.ndarray
     spin_up_years: int = 0
-    # Diagnostics for robustness checks
-    free_liquid: np.ndarray | None = None
+    free_liquid: np.ndarray | None = None  # physical free (name kept for score API)
     free_twin: np.ndarray | None = None
     unmet_frac: np.ndarray | None = None
+    offers: np.ndarray | None = None
+    purchase_demand: np.ndarray | None = None
 
 
 def _psd_wheat_annual(countries: list[str],
@@ -159,7 +190,6 @@ def _anchor_p0(default: float = 250.0, year: int = 2006) -> float:
 def _consumption_path(countries: list[str], cons_score: pd.DataFrame,
                       C_ann: np.ndarray, years: list[int],
                       T: int) -> np.ndarray:
-    """Year-specific demand, flat within year (MMT per step)."""
     n = len(countries)
     out = np.zeros((n, T))
     for yi, y in enumerate(years):
@@ -169,6 +199,64 @@ def _consumption_path(countries: list[str], cons_score: pd.DataFrame,
             out[i, yi * STEPS_PER_YEAR:(yi + 1) * STEPS_PER_YEAR] = (
                 ann / STEPS_PER_YEAR)
     return out
+
+
+def load_trade_shares(countries: list[str],
+                      window: tuple[int, int] = (2006, 2007),
+                      ) -> tuple[np.ndarray, np.ndarray]:
+    """Return (A_dest, S_src) share matrices with zero diagonal.
+
+    A[i,j] = share of exporter i's offers destined to j (rows sum to 1).
+    S[i,j] = share of importer j's purchases sourced from i (cols sum to 1).
+    """
+    E = aggregate_to_nodes(
+        load_trade_matrix("wheat", window=window), SHEAF_NODE_MAP)
+    E = E.reindex(index=countries, columns=countries, fill_value=0.0)
+    A = bilateral_shares(E, by="destination").to_numpy(dtype=float)
+    S = bilateral_shares(E, by="source").to_numpy(dtype=float)
+    np.fill_diagonal(A, 0.0)
+    np.fill_diagonal(S, 0.0)
+    row = A.sum(axis=1, keepdims=True)
+    np.divide(A, row, out=A, where=row > 0)
+    col = S.sum(axis=0, keepdims=True)
+    np.divide(S, col, out=S, where=col > 0)
+    return A, S
+
+
+def _bilateral_clear(offers: np.ndarray, demand: np.ndarray,
+                     A: np.ndarray, S: np.ndarray,
+                     subst: float = 0.15,
+                     ) -> tuple[np.ndarray, np.ndarray]:
+    """Armington-style clear: preferred sources first, limited substitution.
+
+    Round 1: ship_ij = min(offer_i·A_ij, demand_j·S_ij).
+    Round 2: residual demand draws residual offers in a pool, capped at
+    ``subst`` × leftover demand (imperfect redirection after a ban).
+    """
+    O = offers[:, None] * A
+    D = S * demand[None, :]
+    ship = np.minimum(O, D)
+
+    offer_left = np.maximum(0.0, offers - ship.sum(axis=1))
+    demand_left = np.maximum(0.0, demand - ship.sum(axis=0))
+    take = subst * demand_left
+    tot_o = float(offer_left.sum())
+    tot_t = float(take.sum())
+    if tot_o > 1e-15 and tot_t > 1e-15:
+        fill = min(1.0, tot_o / tot_t)
+        recv2 = take * fill
+        # Split each exporter's residual offers across importers by recv2 weights
+        w = recv2 / max(float(recv2.sum()), 1e-15)
+        ship2 = offer_left[:, None] * w[None, :]
+        # Cap by remaining importer need
+        col = ship2.sum(axis=0)
+        scale = np.ones_like(recv2)
+        mask = col > recv2 + 1e-15
+        scale[mask] = recv2[mask] / col[mask]
+        ship2 *= scale[None, :]
+        ship = ship + ship2
+
+    return ship.sum(axis=1), ship.sum(axis=0)
 
 
 def _simulate_window(
@@ -182,15 +270,16 @@ def _simulate_window(
         inv_eta: float,
         smooth: float,
         C_ann: np.ndarray,
+        A: np.ndarray,
+        S: np.ndarray,
         free_twin: np.ndarray | None = None,
+        unmet_twin: np.ndarray | None = None,
         pulse_frac: float | None = None,
+        unmet_kappa: float = UNMET_KAPPA,
+        block_kappa: float = BLOCK_KAPPA,
+        rebuild_lambda: float = REBUILD_LAMBDA,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray,
-           np.ndarray, np.ndarray]:
-    """Physical stock–trade loop; price from liquid free vs path-matched twin.
-
-    ``free_twin`` is length T from the mean-H / no-AMIS twin. If None, this
-    pass *is* the twin: prices stay near p0 and liquid free is recorded.
-    """
+           np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     if pulse_frac is None:
         pulse_frac = HARVEST_PULSE_FRAC
     n, T = H.shape
@@ -201,9 +290,10 @@ def _simulate_window(
     exp_path = np.zeros((n, T))
     free_path = np.zeros(T)
     unmet_path = np.zeros(T)
+    offer_path = np.zeros((n, T))
+    demand_path = np.zeros((n, T))
     p = float(p0)
     safety_w = float(max(safety.sum(), 1.0))
-    # Soft capacity only — large enough not to destroy ordinary harvest carry.
     warehouse = np.maximum(4.0 * C_ann, 8.0 * safety)
 
     lean_h = steps_to_harvest_pulse(H, frac=pulse_frac,
@@ -221,48 +311,49 @@ def _simulate_window(
         )
         target = lean_gap + safety
 
-        after_food = np.maximum(0.0, avail - desired)
-        exportable_raw = np.maximum(0.0, after_food - target)
-        need = np.maximum(0.0, desired - avail)
-        exportable = exportable_raw * (1.0 - cuts[:, t])
+        after_food_stock = np.maximum(0.0, avail - desired)
+        food_need = np.maximum(0.0, desired - avail)
+        rebuild = rebuild_lambda * np.maximum(0.0, target - after_food_stock)
+        demand = food_need + rebuild
+        offers = np.maximum(0.0, avail - desired - target) * (1.0 - cuts[:, t])
+        offer_path[:, t] = offers
+        demand_path[:, t] = demand
 
-        total_need = float(need.sum())
-        total_exp = float(exportable.sum())
-        shipped = np.zeros(n)
-        received = np.zeros(n)
-        if total_exp > 1e-12 and total_need > 1e-12:
-            fill = min(1.0, total_exp / total_need)
-            received = need * fill
-            shipped = exportable * (received.sum() / max(total_exp, 1e-12))
+        shipped, received = _bilateral_clear(offers, demand, A, S)
 
-        consumption = np.minimum(desired, avail - shipped + received)
+        consumption = np.minimum(
+            desired, np.maximum(0.0, avail - shipped + received))
         stock = np.maximum(0.0, avail - shipped - consumption + received)
-        # Soft warehouse: only trim extreme overflow (should rarely bind).
-        overflow = np.maximum(0.0, stock - warehouse)
-        stock = stock - overflow
+        stock = stock - np.maximum(0.0, stock - warehouse)
 
         lean_need = float(lean_gap.sum())
-        # Liquid stocks: grain behind export cuts is not available to the
-        # world market (Agrimate-style trade friction).
-        liquid = float((stock * (1.0 - cuts[:, t])).sum())
-        free = liquid - lean_need
+        free = float(stock.sum()) - lean_need
         free_path[t] = free
 
-        unmet = float(np.maximum(0.0, desired - consumption).sum())
-        unmet_frac = unmet / max(float(desired.sum()), 1e-9)
+        total_d = float(demand.sum())
+        unmet = max(0.0, total_d - float(received.sum()))
+        unmet_frac = unmet / max(total_d, 1e-9)
         unmet_path[t] = unmet_frac
 
+        # Share of purchase demand whose preferred source is AMIS-restricted.
+        # Endogenous: scales with who is buying, not a flat policy surcharge.
+        preferred_block = float((S * cuts[:, t][:, None] * demand[None, :]).sum())
+        block_frac = preferred_block / max(total_d, 1e-9)
+
         if free_twin is None:
-            # Twin pass: hold p0 so free_twin is a pure physical baseline.
             p_star = p0
         else:
             twin = float(free_twin[t])
-            # Small floor only — do NOT add full safety_w to both sides
-            # (that compressed scarcity ratios toward 1 and killed AMIS signal).
             floor = 0.05 * safety_w
             ratio = (twin + floor) / max(free + floor, floor)
-            # Physical channels only: free anomaly + unmet after rationing.
-            p_star = p0 * (ratio ** inv_eta) * (1.0 + 3.0 * unmet_frac)
+            if ratio >= 1.0:
+                free_term = ratio ** inv_eta
+            else:
+                free_term = ratio ** (0.20 * inv_eta)
+            u0 = float(unmet_twin[t]) if unmet_twin is not None else 0.0
+            u_anom = max(0.0, unmet_frac - u0)
+            p_star = (p0 * free_term
+                      * (1.0 + unmet_kappa * u_anom + block_kappa * block_frac))
 
         p = float(smooth * p + (1.0 - smooth) * p_star)
         p = float(np.clip(p, 80.0, 900.0))
@@ -272,7 +363,8 @@ def _simulate_window(
         cons_path[:, t] = consumption
         exp_path[:, t] = shipped
 
-    return price, stock_path, cons_path, exp_path, free_path, unmet_path
+    return (price, stock_path, cons_path, exp_path,
+            free_path, unmet_path, offer_path, demand_path)
 
 
 def run_wheat_dynamics(
@@ -288,8 +380,9 @@ def run_wheat_dynamics(
         use_shocks: bool = True,
         stock_seed_year: int = 2005,
         spin_up_years: int = 2,
+        trade_window: tuple[int, int] = (2006, 2007),
 ) -> WheatSimResult:
-    """Run Gate 0 wheat spine with path-matched twin pricing."""
+    """Run Gate 0 wheat spine: bilateral offers + path-matched twin pricing."""
     if countries is None:
         from .calibration import DATA
         countries = [d["name"] for d in DATA] + ["RestOfWorld"]
@@ -300,6 +393,7 @@ def run_wheat_dynamics(
     years = list(range(start_year, end_year + 1))
     n = len(countries)
     cal = load_wheat_harvest_calendar()
+    A, S = load_trade_shares(countries, window=trade_window)
 
     prod_score, cons_score = _psd_wheat_annual(countries, years)
     C_ann = np.zeros(n)
@@ -313,7 +407,6 @@ def run_wheat_dynamics(
     tiled_mean = pd.concat([mean_prod.assign(year=y) for y in years],
                            ignore_index=True)
 
-    # --- spin-up: mean harvest, mean-year demand rate, no AMIS ---
     spin_stock = _ending_stocks(countries, stock_seed_year)
     if spin_up_years > 0:
         spin_years = list(range(start_year - spin_up_years, start_year))
@@ -323,23 +416,20 @@ def run_wheat_dynamics(
                               spin_years[-1], calendar=cal)
         C_spin = np.tile((C_ann / STEPS_PER_YEAR)[:, None],
                          (1, H_spin.shape[1]))
-        _, stock_path_s, _, _, _, _ = _simulate_window(
+        _, stock_path_s, _, _, _, _, _, _ = _simulate_window(
             H_spin, C_spin, np.zeros_like(H_spin), spin_stock, safety,
-            p0, elast, inv_eta, smooth, C_ann, free_twin=None)
+            p0, elast, inv_eta, smooth, C_ann, A, S, free_twin=None)
         spin_stock = stock_path_s[:, -1]
 
-    # Shared year-by-year demand for twin and treatment.
     T = len(years) * STEPS_PER_YEAR
     C_step = _consumption_path(countries, cons_score, C_ann, years, T)
 
-    # Twin: mean harvest, same C_step, no AMIS.
     H_twin = harvest_path(countries, tiled_mean, start_year, end_year,
                           calendar=cal)
-    _, _, _, _, free_twin, _ = _simulate_window(
+    _, _, _, _, free_twin, unmet_twin, _, _ = _simulate_window(
         H_twin, C_step, np.zeros_like(H_twin), spin_stock.copy(), safety,
-        p0, elast, inv_eta, smooth, C_ann, free_twin=None)
+        p0, elast, inv_eta, smooth, C_ann, A, S, free_twin=None)
 
-    # Treatment harvest / cuts.
     if use_shocks:
         H = harvest_path(countries, prod_score, start_year, end_year,
                          calendar=cal)
@@ -348,26 +438,26 @@ def run_wheat_dynamics(
     cuts = (amis_export_cuts(countries, start_year, end_year)
             if use_amis else np.zeros((n, T)))
 
-    # Identity check path: when H==H_twin and cuts==0, free must match twin
-    # and prices stay near p0 (enforced by using free_twin in pricing).
-    price, stock_path, cons_path, exp_path, free_liq, unmet = _simulate_window(
+    (price, stock_path, cons_path, exp_path,
+     free_liq, unmet, offers, demand) = _simulate_window(
         H, C_step, cuts, spin_stock.copy(), safety,
-        p0, elast, inv_eta, smooth, C_ann, free_twin=free_twin)
+        p0, elast, inv_eta, smooth, C_ann, A, S,
+        free_twin=free_twin, unmet_twin=unmet_twin)
 
     return WheatSimResult(
         countries=countries, start_year=start_year, end_year=end_year,
         price=price, stock=stock_path, harvest=H, consumption=cons_path,
         exports=exp_path, export_cut=cuts, spin_up_years=spin_up_years,
         free_liquid=free_liq, free_twin=free_twin, unmet_frac=unmet,
+        offers=offers, purchase_demand=demand,
     )
 
 
 def assert_twin_identity(tol_price: float = 0.02,
                          tol_free: float = 1.0) -> None:
-    """Hard robustness check: no shocks + no AMIS ⇒ ≈ twin ⇒ flat near p0."""
+    """No shocks + no AMIS ⇒ flat at p0; free ≡ twin."""
     res = run_wheat_dynamics(use_amis=False, use_shocks=False)
     p0 = float(res.price[0])
-    # After short burn-in, prices should hug p0.
     tail = res.price[STEPS_PER_YEAR:]
     rel = np.max(np.abs(tail - p0)) / max(p0, 1.0)
     if rel > tol_price:
@@ -385,7 +475,6 @@ def assert_twin_identity(tol_price: float = 0.02,
 def assert_amis_raises_price(min_lift: float = 0.08) -> None:
     """Tau-only: Russia-ban window must lift prices vs pre-ban baseline."""
     res = run_wheat_dynamics(use_amis=True, use_shocks=False)
-    # Jun 2010 (pre ban) vs Oct 2010 (ban on)
     t_pre = (2010 - res.start_year) * STEPS_PER_YEAR + (6 - 1) * 2
     t_ban = (2010 - res.start_year) * STEPS_PER_YEAR + (10 - 1) * 2
     pre = float(np.mean(res.price[t_pre:t_pre + 2]))
@@ -398,7 +487,7 @@ def assert_amis_raises_price(min_lift: float = 0.08) -> None:
 
 
 def assert_no_spring_spike(max_ratio: float = 1.25) -> None:
-    """Mean Mar–Apr price must not dwarf Sep–Oct (fake lean-season spike)."""
+    """Mean Mar–Apr price must not dwarf Sep–Oct."""
     res = run_wheat_dynamics(use_amis=True, use_shocks=True)
     m = result_to_monthly(res)
     spring = float(m[m.month.isin([3, 4])]["model_price"].mean())
@@ -407,6 +496,30 @@ def assert_no_spring_spike(max_ratio: float = 1.25) -> None:
     if ratio > max_ratio:
         raise AssertionError(
             f"spring/autumn={ratio:.3f} > {max_ratio} (lean-season artifact)")
+
+
+def assert_amis_cuts_exports(max_offer_ratio: float = 0.20,
+                             max_ship_ratio: float = 0.85) -> None:
+    """Russia offers (and shipments) fall in the 2010 ban window vs no-AMIS."""
+    tau = run_wheat_dynamics(use_amis=True, use_shocks=False)
+    base = run_wheat_dynamics(use_amis=False, use_shocks=False)
+    i = tau.countries.index("Russia")
+    t0 = (2010 - tau.start_year) * STEPS_PER_YEAR + (8 - 1) * 2
+    t1 = (2010 - tau.start_year) * STEPS_PER_YEAR + (12 - 1) * 2 + 2
+    if tau.offers is None or base.offers is None:
+        raise AssertionError("offers not recorded")
+    off_tau = float(np.mean(tau.offers[i, t0:t1]))
+    off_base = float(np.mean(base.offers[i, t0:t1]))
+    off_ratio = off_tau / max(off_base, 1e-9)
+    if off_ratio > max_offer_ratio:
+        raise AssertionError(
+            f"Russia ban-window offer ratio={off_ratio:.3f} > {max_offer_ratio}")
+    exp_tau = float(np.mean(tau.exports[i, t0:t1]))
+    exp_base = float(np.mean(base.exports[i, t0:t1]))
+    exp_ratio = exp_tau / max(exp_base, 1e-9)
+    if exp_ratio > max_ship_ratio:
+        raise AssertionError(
+            f"Russia ban-window export ratio={exp_ratio:.3f} > {max_ship_ratio}")
 
 
 def result_to_monthly(res: WheatSimResult) -> pd.DataFrame:
