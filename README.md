@@ -42,12 +42,12 @@ SHEAF has two related formulations:
 
 1. **Annual multi-commodity SPE + export game** (`sheaf/core.py`, §§1–6) — the
    original market / strategic / storage layers.
-2. **Gate 0 sub-annual wheat spine** (`sheaf/dynamic_wheat.py`, §8) — Agrimate-aligned
-   24-step/year bilateral stock–trade dynamics used for crisis hindcasts.
-3. **Multi-grain sub-annual spine** (`sheaf/dynamic_grains.py`) — same 24-step clock
-   for wheat/rice/maize with isoelastic cross-price demand (`subst_scale`); pool
-   trade until rice/maize bilateral E0 is vendored. Spillover diagnostic:
-   `scripts/score_subannual_spillover.py`.
+2. **Gate 0 per-crop sub-annual spine** (`sheaf/dynamic_crop.py`, §8) — Agrimate-aligned
+   24-step/year bilateral stock–trade dynamics with **ask-dominated** world prices.
+   Run wheat, maize, and rice **separately** first
+   (`scripts/score_subannual_crop.py --crop …`). Cross-grain substitution and
+   Level 2 are blocked until all three single-crop Gate 0 reports are green
+   (`diagnostics/GATE0_PER_CROP_PLAN.md`).
 
 Crisis validation (Gate 0) uses §8. The annual SPE remains a reference / outer
 diagnostic and the multi-commodity / Level-2 host. Symbols are defined in the
@@ -266,11 +266,13 @@ cross-price elasticities $(\varepsilon_g,\rho_{gh})$ and policy weights
 $(w_{i,g}, \bar p_{i,g})$ remain illustrative pending Level-2 calibration
 (`VALIDATION.md`).
 
-### 8. Gate 0 sub-annual wheat spine (Agrimate-aligned)
+### 8. Gate 0 sub-annual crop spine (Agrimate-aligned)
 
-Implementation: `sheaf/dynamic_wheat.py`. Clock: $T_y=24$ steps per year
+Implementation: `sheaf/dynamic_crop.py` (wheat wrap: `sheaf/dynamic_wheat.py`).
+Clock: $T_y=24$ steps per year
 ($\Delta t \approx 15.2$ days). Quantities in million tonnes (MMT); prices in
-real \$/tonne (Pink Sheet deflator).
+real \$/tonne (Pink Sheet deflator). **One crop at a time** until Gate 0 is green
+for wheat, maize, and rice (`diagnostics/GATE0_PER_CROP_PLAN.md`).
 
 #### Notation
 
@@ -296,7 +298,7 @@ real \$/tonne (Pink Sheet deflator).
 | $\kappa_u,\kappa_b$ | unmet-anomaly and preferred-block weights | $5.0$, $4.5$ |
 | $\alpha,\theta$ | ask-adjustment speed and target fill | $0.15$, $0.70$ |
 | $\gamma$ | ask competitiveness exponent | $1.25$ |
-| $\omega$ | weight on trade-weighted ask in $p^\star$ | $0.35$ |
+| $\omega$ | weight on trade-weighted ask in $p^\star$ | $0.80$ (ask-dominated) |
 | $\beta$ | ask mean-reversion weight toward $p_t$ | $0.18$ |
 | $\nu$ | residual-substitution share after Armington | $0.15$ |
 | $s_i$ | safety stock | $\mathtt{stu\_target}\cdot C_i^{\mathrm{ann}}$ ($0.18$) |

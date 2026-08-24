@@ -1,12 +1,10 @@
-"""Multi-grain sub-annual spine with cross-price substitution (Gate 0+).
+"""Multi-grain sub-annual spine with cross-price substitution (PAUSED).
 
-Extends the wheat Gate 0 idea to wheat / rice / maize on the same 24-step clock.
-Each grain has its own stocks, harvest calendar, AMIS cuts, and (pool) trade.
-World prices are coupled each step by an isoelastic cross-price demand system
-using ``calibration.OWN_ELAST`` and ``calibration.RHO``.
-
-Wheat Gate 0 scoring remains in ``dynamic_wheat`` / ``score_subannual_wheat.py``.
-This module supports substitution on/off attribution and spillover diagnostics.
+**Paused (2026-08-24):** do not treat this module as Gate 0 complete.
+Prove wheat / maize / rice **separately** via ``sheaf.dynamic_crop`` and
+``scripts/score_subannual_crop.py`` first — see
+``diagnostics/GATE0_PER_CROP_PLAN.md``. This file remains a prototype for
+substitution tests after per-crop Gate 0 soft bars are green.
 """
 from __future__ import annotations
 

@@ -31,15 +31,21 @@ paths**, not annual equilibrium magnitudes alone.
 | Block | No Level-2 fitting until Hard is green | |
 
 **Within-year timing (required for Hard):** harvest calendars + lean foresight +
-FAOSTAT bilateral (Armington) trade + path-matched twin pricing
-(`sheaf/dynamic_wheat.py`). Asserts: twin identity, AMIS price lift, Russia
-export cut under ban, no spring spike. Score with
-`python scripts/score_subannual_wheat.py`.
+FAOSTAT bilateral (Armington) trade + **ask-dominated** world prices each step
+(`sheaf/dynamic_crop.py`). Twin path is an identity diagnostic, not the main
+price law. Asserts: twin identity, AMIS price lift, key exporter cut under ban,
+no spring spike.
+
+**Per-crop first (locked 2026-08-24):** prove wheat, maize, and rice **separately**
+before substitution or Level 2. Plan:
+[`diagnostics/GATE0_PER_CROP_PLAN.md`](diagnostics/GATE0_PER_CROP_PLAN.md).
+Score with `python scripts/score_subannual_crop.py --crop {wheat,maize,rice}`.
 
 Provisional annual Level-1 scripts (`score_level1.py`, crisis-era annual SPE)
 remain useful for **data plumbing** only; they are not Gate 0. Full
 interrogation of the annual wrong-sign episode:
-`diagnostics/LEVEL1_INTERROGATION.md`.
+`diagnostics/LEVEL1_INTERROGATION.md`. Multi-grain spillover scripts are demoted
+until all three single-crop Gate 0 reports are green.
 
 ## Two levels
 

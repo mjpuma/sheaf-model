@@ -108,33 +108,35 @@ Annual hike-ratio scoring (`scripts/score_level1.py` as of 2026-08-22) is
 
 ## Implementation order (do not skip)
 
+**Locked reorder (2026-08-24):** finish **per-crop Agrimate-style markets** and
+detailed diagnostics **before** substitution or Level 2. See
+[`diagnostics/GATE0_PER_CROP_PLAN.md`](diagnostics/GATE0_PER_CROP_PLAN.md).
+
 1. Document + freeze clock (`STEPS_PER_YEAR=24`, 24-vs-26 note) — **done**.
 2. Sub-annual calendar helper (step ↔ date ↔ month; agricultural year) — **done**
    (`sheaf/calendar24.py`).
 3. Seasonal production allocation from harvest calendars + PSD annual totals —
    **done** (`sheaf/seasonal.py`, `data/crop_calendars/`; triangular peak months).
-4. Minimal dynamic core: stocks + trade + exogenous AMIS cuts (wheat first) —
-   **bilateral Gate 0 spine with adaptive asks** (`sheaf/dynamic_wheat.py`):
-   - lean foresight (seasonal/realized blend) + gradual stock rebuild
-   - FAOSTAT Armington clear; ask prices adapt to fill rates
-   - world $p$ blends trade-weighted asks with twin scarcity / preferred-block
-   - hard asserts: twin identity, AMIS price lift, Russia offer cut, no spring spike
-   - equations: README §8
-5. Score monthly prices vs Pink Sheet — hike signs + peak months on full leg;
-   multi-commodity / Level-2 still open. Wheat Gate 0: `score_subannual_wheat.py`.
-6. Add multi-commodity substitution on the sub-annual spine — **done (pool trade)**:
-   `sheaf/dynamic_grains.py` + rice/maize calendars; cross-price via
-   `OWN_ELAST`/`RHO`/`subst_scale`; per-grain AMIS; twin free identity.
-   Spillover score: `scripts/score_subannual_spillover.py` (subst on vs off).
-   Bilateral E0 for rice/maize and Level-2 game still open.
-7. Add endogenous restriction game (Level 2).
+4. **Per-crop dynamic core** (wheat → maize → rice), each alone:
+   stocks + bilateral trade + adaptive ask prices + exogenous AMIS —
+   world $p$ **ask-dominated** (`sheaf/dynamic_crop.py`; wheat wrap in
+   `dynamic_wheat.py`). Twin path = identity diagnostic only.
+5. **Detailed per-crop Gate 0 diagnostics** (`scripts/score_subannual_crop.py`)
+   — price legs, stocks/STU, exporter AMIS bite, attribution, markdown report.
+   Wheat also keeps `score_subannual_wheat.py` as a thin entry point.
+6. Multi-commodity substitution on the sub-annual spine — **paused** until
+   step 5 is green for wheat, maize, and rice. (`dynamic_grains` / spillover
+   remain a prototype only.)
+7. Endogenous restriction game (Level 2) — **blocked** until per-crop Gate 0 hard
+   bars are green.
 
 Commands:
 ```bash
-python scripts/fetch_external_data.py --prices-only   # annual + monthly Pink Sheet
-python scripts/run_subannual_wheat.py
-python scripts/score_subannual_wheat.py               # Gate 0 monthly wheat score
-python scripts/score_subannual_spillover.py           # W/R/M subst on vs off
+python scripts/fetch_external_data.py --prices-only
+python scripts/score_subannual_crop.py --crop wheat
+python scripts/score_subannual_crop.py --crop maize
+python scripts/score_subannual_crop.py --crop rice
+# (legacy) python scripts/score_subannual_wheat.py
 ```
 
 ## References
