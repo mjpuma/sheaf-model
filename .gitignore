@@ -8,3 +8,5 @@ level1_hindcast.csv
 .venv/
 # Full PSD dump is regenerable from the vendored zip (~193 MB)
 data/usda_psd/psd_alldata.csv
+# Local copies of Kuhla et al. 2025 (copyrighted; do not commit)
+agrimate/

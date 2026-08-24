@@ -79,8 +79,35 @@ Must write and print:
 Industrial/ethanol: USA maize FSI excess vs 2000–04, inelastic. Substitution /
 Level 2 still paused until this per-crop bar is accepted.
 
+## Official P1 scoring split (Agrimate-matched)
+
+Headline series: `use_demand=False`, `use_industrial=True` when
+`industrial_nodes` is nonempty (mean flex; USA maize RFS residual still on).
+Twin / climatology baseline pass `use_industrial=False`.
+Year-by-year world food/feed is a sensitivity. Also score consumption vs PSD
+and AMIS exporter shipment signs — not Pink Sheet alone.
+
+Long-term papers P2–P5 and the calibration plan:
+[`PAPER_STACK.md`](PAPER_STACK.md).
+
+## Multi-agent Gate 0 (diagnosis vs implementation)
+
+**Parallel (independent, no inherited conclusions):** (A) ask/τ world-price
+composition; (B) warehouse / lean-season dump; (C) demand default; (D) rice
+2008 matched peak. Verification protocol per `CLAUDE.md`.
+
+**Serial:** one writer on `sheaf/dynamic_crop.py`. Then parallel crop scores.
+
+**Pass (matched split):** wheat 2007/08 hike ≳ ×1.4 and no 2006/07 spike > 2008;
+wheat 2010 hike > 1.0 and restriction > harvest-only; maize 2008 matched ≳ ×1.4
+and matched > harvest-only (isolated τ must not cut world price); maize 2011
+harvest-only > τ; rice 2008 ≳ ×1.5 restriction-led, 2010 not a false spike;
+corr wheat/rice ≳ +0.5, maize > 0; MY-end STU ~0.15–0.35.
+
 ## Explicit non-goals until Gate 0 per crop is green
 
-- Fitting substitution scales on joint W/R/M crises.
-- Endogenous restriction Nash / IBR on the sub-annual clock (Level 2).
+- Fitting substitution scales on joint W/R/M crises (P3).
+- Endogenous restriction Nash / IBR, cooperative club, or tipping (Level 2 / P4–P5).
+- Endogenous trade network without FAOSTAT E0 (P2).
 - Replacing Pink Sheet with Agrimate’s private series (use published Pink Sheet).
+- Crisis-specific knobs (e.g. boost κ only in 2008).

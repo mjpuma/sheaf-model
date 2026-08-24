@@ -75,6 +75,23 @@ each grain separately and does not model cross-commodity substitution; SHEAF run
 them jointly, so the cross-grain linkage is a signal the separate runs cannot
 produce.
 
+## Paper stack (long-term; collaborator feedback 2026-08-24)
+
+Full write-up: [`diagnostics/PAPER_STACK.md`](diagnostics/PAPER_STACK.md).
+
+| ID | Question | When |
+|---|---|---|
+| **P1** | Hindcast price, **consumption**, and **trade** (crises, later decades) | Gate 0 **now**. Network is **prescribed** FAOSTAT E0. |
+| **P3** | Empirical wheat–maize–rice substitution | After P1 per crop |
+| **Cal** | Constrain reduced-form + game parameters (train/hold-out) | Alongside; not crisis-by-crisis fitting |
+| **P4** | Cooperative export restrictions / club of the willing | After P1; illustrative knobs OK if labeled |
+| **P5** | Cooperation vs protectionism tipping | After P4 setup |
+| **P2** | Endogenous trade network (no prescribed E0) | Later optional paper — **not** Gate 0 |
+
+Level 2 in this file is the **positive** game (“who restricted?”). P4/P5 are
+**normative / comparative-static** variants of the same layer. Do not treat
+them as Gate 0.
+
 ## Data alignment
 
 Each input is drawn from the source that reports it as a genuine measured

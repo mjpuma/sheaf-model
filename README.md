@@ -44,6 +44,8 @@ SHEAF has two related formulations:
    original market / strategic / storage layers.
 2. **Gate 0 per-crop sub-annual spine** (`sheaf/dynamic_crop.py`, §8) — Agrimate-aligned
    24-step/year bilateral stock–trade dynamics with **ask-dominated** world prices.
+   Harvest forcing is climatology × **LOWESS anomaly** (not raw PSD year totals;
+   in-sample means turn post-2008 yield growth into a fake 2006 crash — §8).
    Run wheat, maize, and rice **separately** first
    (`scripts/score_subannual_crop.py --crop …`). Cross-grain substitution and
    Level 2 are blocked until all three single-crop Gate 0 reports are green
@@ -280,7 +282,7 @@ for wheat, maize, and rice (`diagnostics/GATE0_PER_CROP_PLAN.md`).
 |---|---|---|
 | $i,j$ | SHEAF nodes (17 named + Rest-of-World) | `calibration.DATA` |
 | $t$ | sub-annual step index | $24$ per calendar year |
-| $H_{i,t}$ | harvest inflow (MMT/step) | PSD annual × calendar weights |
+| $H_{i,t}$ | harvest inflow (MMT/step) | climatology × LOWESS anomaly × calendar |
 | $C_{i,t}$ | baseline food use (MMT/step) | PSD consumption $/24$ |
 | $S_{i,t}$ | end-of-step stocks (MMT) | state variable |
 | $\mathrm{avail}_{i,t}$ | $S_{i,t}+H_{i,t}$ | — |
@@ -297,6 +299,7 @@ for wheat, maize, and rice (`diagnostics/GATE0_PER_CROP_PLAN.md`).
 | $\rho$ | price smoothing toward $p^\star$ | $0.65$ |
 | $\kappa_u,\kappa_b$ | unmet-anomaly and preferred-block weights | crop-specific |
 | $\alpha,\theta$ | ask-adjustment speed and target fill | $0.15$, $0.70$ |
+| $\alpha_r$ | rival-block ask markup | $0.80$ |
 | $\gamma$ | ask competitiveness exponent | $1.25$ |
 | $\omega$ | weight on trade-weighted ask in $p^\star$ | $\approx 0.65$–$0.72$ |
 | $\beta$ | ask mean-reversion weight toward $p_t$ | $0.18$ |
@@ -308,11 +311,34 @@ Full parameterization, classes (structural / literature / reduced-form), and
 economic defensibility: [`diagnostics/GATE0_PARAMETERIZATION.md`](diagnostics/GATE0_PARAMETERIZATION.md).
 Defaults live in `sheaf.dynamic_crop.default_crop_params`.
 
-#### Harvest calendars
+#### Harvest calendars and why we detrend
 
-Annual PSD production for country $i$ and year $y$ is spread over the $24$ steps
-with triangular month weights peaking at the country's `peak_month`
-(`sheaf/seasonal.py`).
+The twin / climatology path is the score-window **mean** seasonal harvest
+(country calendar weights in `sheaf/seasonal.py`). Treatment harvest is **not**
+raw PSD year totals laid on that calendar. It is
+$$
+H_{i,y}^{\mathrm{ann}}=\overline{H}_i\cdot(1+a_{i,y}),
+\qquad
+a_{i,y}=\frac{Y_{i,y}-\hat Y_{i,y}}{\hat Y_{i,y}},
+$$
+where \(\hat Y\) is a per-country LOWESS trend on a padded PSD history
+(`detrend_anomalies` in `sheaf/data_usda.py`, Agrimate's method) and the
+annual total is then spread with triangular month weights.
+
+**Why this matters.** An in-sample 2006–11 *mean* is contaminated by post-2008
+trend growth. World wheat 2006 is about **−9% vs that mean** but only **−4% vs
+LOWESS**. The model then treats 2006/07 as a crash (false May spike) and
+under-weights 2010 (Russia drought sits near a boom-inflated mean). The same
+bias made 2008 maize look scarce when it is on-trend, and dumped 2008–11 rice
+growth into stocks. Signed anomalies vs trend keep the twin balanced with mean
+flex demand and isolate *shocks*, not secular yield growth.
+
+Official P1 still uses year-by-year AMIS and (for USA maize) industrial use;
+only the harvest *level* is climatology × anomaly. `shock_mode=full` keeps
+surpluses as well as shortfalls.
+
+Rice calendars are multi-crop (kharif + rabi / early + late) except Vietnam,
+whose autumn pulse is kept so the 2008 ban still hits offers.
 
 #### Lean foresight and targets
 
@@ -341,11 +367,14 @@ O_{i,t}=\max(0,\mathrm{avail}_{i,t}-d_{i,t}-T_{i,t})\,(1-\tau_{i,t}).
 $$
 Carry capacity is
 $$
-W_{i,t}=\max(\mathtt{max\_stu}\,C_i^{\mathrm{ann}},1.5 s_i)
+W_{i,t}=\mathtt{max\_stu}\,C_i^{\mathrm{ann}}
 +\mathtt{pipeline\_max\_steps}\cdot C_i^{\mathrm{ann}}/24
-+H_{i,t}.
++\mathbf{1}_{\{\mathtt{pipeline}>0\}}H_{i,t}.
 $$
-(Rice: \(\mathtt{pipeline\_max\_steps}=0\), year-round harvest.) Excess above \(W\) is dropped.
+Pulse crops (wheat/maize, `pipeline_max_steps=12`) pad \(W\) with same-step
+harvest so a pulse is not incinerated on intake. Rice (`pipeline=0`) clips
+toward carry: padding \(W\) with every monsoon step stored harvest as silos.
+Overflow is soft-clipped at `warehouse_lambda` (default = rebuild \(\lambda\)).
 
 #### Adaptive ask prices and Armington clear
 
@@ -357,12 +386,15 @@ with a residual pool that can fill at most fraction $\nu$ of leftover demand.
 Fill rates update asks (sold-out $\Rightarrow$ raise ask; leftover $\Rightarrow$ cut):
 $$
 q_{i,t+1}
-=\bigl[(1-\beta)\,q_{i,t}\exp\bigl(\alpha(\mathrm{fill}_{i,t}-\theta)\bigr)
+=\bigl[(1-\beta)\,q_{i,t}\exp\bigl(\alpha(\mathrm{fill}_{i,t}-\theta)
++\alpha_r b_t\cdot\mathbf{1}_{O_{i,t}>0}\bigr)
 +\beta\,p_t\bigr],
 \qquad
 \mathrm{fill}_{i,t}=\frac{\sum_j\mathrm{ship}_{ij}}{\max(O_{i,t},\epsilon)},
 $$
-with mean-reversion weight $\beta=0.18$, clipped to $[0.45\,p_0,\,2.8\,p_0]$.
+with mean-reversion weight $\beta=0.18$, rival markup \(\alpha_r=0.80\),
+clipped to $[0.45\,p_0,\,2.8\,p_0]$. \(b_t\) is the preferred-source block
+fraction; \(\alpha_r=0\) recovers the own-fill law.
 
 #### World price
 
@@ -371,7 +403,7 @@ sitting behind an export cut is not world-market accessible:
 \(\mathrm{locked}_t=\sum_i \tau_{i,t}\max(0,S_{i,t+1}-T_{i,t})\),
 \(\mathrm{free}_t=\sum_i S_{i,t+1}-\sum_i L_{i,t}-\mathrm{locked}_t\).
 Let $F^{\mathrm{twin}}_t$ and $u^{\mathrm{twin}}_t$ be free stocks and unmet fractions
-from a **path-matched twin** (same $C_{i,t}$, mean-year $H$, $\tau\equiv 0$). Define
+from a **path-matched twin** (mean flex $C$, mean-year $H$, no industrial, $\tau\equiv 0$). Define
 $$
 u_t=1-\frac{\sum_i\mathrm{received}_{i,t}}{\max(\sum_i D_{i,t},\epsilon)},
 \quad
@@ -398,7 +430,9 @@ If the path matches the twin (calm), $p^\star_t=p_0$ by construction
 #### Robustness asserts
 
 `assert_twin_identity`, `assert_amis_raises_price`, `assert_amis_cuts_exports`,
-`assert_no_spring_spike` — run by `scripts/score_subannual_wheat.py`.
+`assert_no_spring_spike` — run by `scripts/score_subannual_crop.py --crop …`.
+Paper stack (P1 now; substitution / game later): `diagnostics/PAPER_STACK.md`.
+Agrimate-style figures: `python scripts/make_agrimate_comparison.py`.
 
 ### References
 

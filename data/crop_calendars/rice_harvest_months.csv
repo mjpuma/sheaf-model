@@ -8,12 +8,12 @@ Canada,9,10,9,Minimal; placeholder
 Australia,3,5,4,Northern Australia autumn
 Argentina,3,5,4,SH autumn
 Brazil,2,5,3,SH late summer/autumn
-India,10,12,11,Kharif peak Oct-Dec (main); rabi secondary ignored in prototype
-Thailand,10,12,11,Main crop Oct-Dec
-Vietnam,8,10,9,Autumn harvest peak (multi-crop simplified)
-China,8,10,9,Single/late rice Aug-Oct peak (prototype)
+India,4,12,11,Kharif peak Nov plus rabi (Apr-Jun); multi-crop not a single pulse
+Thailand,6,12,11,Main wet-season peak Nov; dry-season crop in H1
+Vietnam,8,10,9,Autumn harvest (2008 ban window); winter-spring not in prototype
+China,6,10,9,Early + late rice (Jun-Oct); not a single pulse
 Egypt,8,10,9,Aug-Oct
-Indonesia,3,5,4,Main wet-season harvest (prototype)
+Indonesia,3,9,4,Main wet-season peak Apr; second crop through Sep
 Mexico,10,12,11,Autumn
 Nigeria,10,12,11,Autumn
-RestOfWorld,9,11,10,Blend tropical NH mass Sep-Nov
+RestOfWorld,4,11,10,Tropical multi-crop blend Apr-Nov

@@ -109,15 +109,10 @@ def main():
         assert_twin_identity(crop)
         print("  PASS twin identity")
         lines.append("- PASS twin identity (no harvest/demand/AMIS ⇒ flat at p0)")
-        if crop == "maize":
-            print("  SKIP isolated-tau AMIS price lift (other exporters fill; "
-                  "offer-cut assert binds)")
-            lines.append("- SKIP isolated-tau world-price lift for maize "
-                         "(other exporters fill; offer-cut assert binds)")
-        else:
-            assert_amis_raises_price(crop)
-            print("  PASS AMIS raises price")
-            lines.append("- PASS AMIS raises price in primary ban window")
+        assert_amis_raises_price(crop)
+        print("  PASS AMIS raises price")
+        lines.append("- PASS AMIS raises price in primary ban window "
+                     "(maize: must not cut world price)")
         assert_amis_cuts_exports(crop)
         country = _EXPORTER_WINDOWS[crop][0]
         print(f"  PASS AMIS cuts {country} exports")
@@ -128,18 +123,21 @@ def main():
         lines.append("")
 
     legs = {
+        # Official P1 matched: harvest + AMIS + mean flex; USA maize industrial on.
         "full": run_crop_dynamics(
             crop, start_year=args.start, end_year=args.end,
-            use_amis=True, use_shocks=True, use_demand=True),
+            use_amis=True, use_shocks=True, use_demand=False),
         "shocks": run_crop_dynamics(
             crop, start_year=args.start, end_year=args.end,
             use_amis=False, use_shocks=True, use_demand=False),
+        # Year-by-year food/feed (and industrial) — sensitivity, not headline.
         "demand": run_crop_dynamics(
             crop, start_year=args.start, end_year=args.end,
             use_amis=False, use_shocks=False, use_demand=True),
         "tau": run_crop_dynamics(
             crop, start_year=args.start, end_year=args.end,
-            use_amis=True, use_shocks=False, use_demand=False),
+            use_amis=True, use_shocks=False, use_demand=False,
+            use_industrial=False),
     }
     if legs["full"].params is not None:
         lines.append("## Parameters (`CropParams`)")
