@@ -302,6 +302,7 @@ for wheat, maize, and rice (`diagnostics/GATE0_PER_CROP_PLAN.md`).
 | $\beta$ | ask mean-reversion weight toward $p_t$ | $0.18$ |
 | $\nu$ | residual-substitution share after Armington | $0.15$ |
 | $s_i$ | safety stock | $\mathtt{stu\_target}\cdot C_i^{\mathrm{ann}}$ |
+| $C^{\mathrm{flex}},C^{\mathrm{ind}}$ | price-elastic use vs inelastic industrial | USA maize: FSI excess vs 2000–04 |
 
 Full parameterization, classes (structural / literature / reduced-form), and
 economic defensibility: [`diagnostics/GATE0_PARAMETERIZATION.md`](diagnostics/GATE0_PARAMETERIZATION.md).
@@ -329,7 +330,7 @@ $$
 #### Demand, offers, and AMIS
 
 $$
-d_{i,t}=C_{i,t}\,(p_t/p_0)^{\varepsilon},
+d_{i,t}=C^{\mathrm{flex}}_{i,t}\,(p_t/p_0)^{\varepsilon}+C^{\mathrm{ind}}_{i,t},
 $$
 $$
 D_{i,t}=\max(0,d_{i,t}-\mathrm{avail}_{i,t})

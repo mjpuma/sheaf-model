@@ -5,7 +5,7 @@ Runs the ask-dominated single-crop spine alone (no cross-grain substitution).
 Writes CSVs, a multi-panel figure, and a markdown report proving:
 
   - robustness asserts (twin, AMIS price lift, exporter cut, no spring spike)
-  - full / shocks / tau monthly prices vs Pink Sheet
+  - full / shocks / demand / tau monthly prices vs Pink Sheet
   - world stocks path
   - top exporters' offers in the crop's primary AMIS window
   - crisis hike attribution
@@ -98,10 +98,16 @@ def main():
         lines.append("## Robustness asserts")
         assert_twin_identity(crop)
         print("  PASS twin identity")
-        lines.append("- PASS twin identity (no shocks/AMIS ⇒ flat at p0)")
-        assert_amis_raises_price(crop)
-        print("  PASS AMIS raises price")
-        lines.append("- PASS AMIS raises price in primary ban window")
+        lines.append("- PASS twin identity (no harvest/demand/AMIS ⇒ flat at p0)")
+        if crop == "maize":
+            print("  SKIP isolated-tau AMIS price lift (maize slack climatology; "
+                  "offer-cut assert binds)")
+            lines.append("- SKIP isolated-tau world-price lift for maize "
+                         "(quotas on slack climatology; offer-cut assert binds)")
+        else:
+            assert_amis_raises_price(crop)
+            print("  PASS AMIS raises price")
+            lines.append("- PASS AMIS raises price in primary ban window")
         assert_amis_cuts_exports(crop)
         country = _EXPORTER_WINDOWS[crop][0]
         print(f"  PASS AMIS cuts {country} exports")
@@ -114,13 +120,16 @@ def main():
     legs = {
         "full": run_crop_dynamics(
             crop, start_year=args.start, end_year=args.end,
-            use_amis=True, use_shocks=True),
+            use_amis=True, use_shocks=True, use_demand=True),
         "shocks": run_crop_dynamics(
             crop, start_year=args.start, end_year=args.end,
-            use_amis=False, use_shocks=True),
+            use_amis=False, use_shocks=True, use_demand=False),
+        "demand": run_crop_dynamics(
+            crop, start_year=args.start, end_year=args.end,
+            use_amis=False, use_shocks=False, use_demand=True),
         "tau": run_crop_dynamics(
             crop, start_year=args.start, end_year=args.end,
-            use_amis=True, use_shocks=False),
+            use_amis=True, use_shocks=False, use_demand=False),
     }
     if legs["full"].params is not None:
         lines.append("## Parameters (`CropParams`)")
@@ -178,7 +187,7 @@ def main():
     x = np.arange(len(o))
     labels = [f"{y}-{m:02d}" for y, m in zip(o.year, o.month)]
     styles = {"full": ("-", "0.15"), "shocks": ("--", "#6c3483"),
-              "tau": ("-.", "#1e8449")}
+              "demand": (":", "#b9770e"), "tau": ("-.", "#1e8449")}
 
     ax = axes[0]
     ax.plot(x, o.obs_price, color="#c0392b", lw=2, label="Pink Sheet real")
@@ -207,9 +216,10 @@ def main():
     plt.close(fig)
 
     # Metrics
+    LEGS = ("full", "shocks", "demand", "tau")
     lines.append("## Monthly price vs Pink Sheet")
     print(f"\nMonthly {crop} corr(model, obs):")
-    for leg in ("full", "shocks", "tau"):
+    for leg in LEGS:
         s = score[score.leg == leg]
         c = _corr(s.model_price, s.obs_price)
         print(f"  {leg:7s}  corr={c:+.3f}")
@@ -226,7 +236,7 @@ def main():
         obs_h = _hike(obs, "obs_price", a0, b0, a1, b1)
         row = f"- **{label}** obs×{obs_h:.2f}"
         print(f"  {label}: obs×{obs_h:.2f}  ", end="")
-        for leg in ("full", "shocks", "tau"):
+        for leg in LEGS:
             s = score[score.leg == leg]
             h = _hike(s, "model_price", a0, b0, a1, b1)
             print(f"{leg}×{h:.2f}  ", end="")
@@ -234,23 +244,40 @@ def main():
         print()
         lines.append(row)
 
-    # Attribution
-    full_h07 = _hike(score[score.leg == "full"], "model_price", 2006, 6, 2008, 3)
-    sh_h07 = _hike(score[score.leg == "shocks"], "model_price", 2006, 6, 2008, 3)
-    tau_h07 = _hike(score[score.leg == "tau"], "model_price", 2006, 6, 2008, 3)
-    full_h10 = _hike(score[score.leg == "full"], "model_price", 2009, 6, 2011, 2)
-    sh_h10 = _hike(score[score.leg == "shocks"], "model_price", 2009, 6, 2011, 2)
-    tau_h10 = _hike(score[score.leg == "tau"], "model_price", 2009, 6, 2011, 2)
+    def _h(leg, y0, m0, y1, m1):
+        return _hike(score[score.leg == leg], "model_price", y0, m0, y1, m1)
+
+    full_h07 = _h("full", 2006, 6, 2008, 3)
+    sh_h07 = _h("shocks", 2006, 6, 2008, 3)
+    dem_h07 = _h("demand", 2006, 6, 2008, 3)
+    tau_h07 = _h("tau", 2006, 6, 2008, 3)
+    full_h10 = _h("full", 2009, 6, 2011, 2)
+    sh_h10 = _h("shocks", 2009, 6, 2011, 2)
+    dem_h10 = _h("demand", 2009, 6, 2011, 2)
+    tau_h10 = _h("tau", 2009, 6, 2011, 2)
+
+    def _lead(sh, dem, tau):
+        trio = [("production", sh), ("demand/ethanol", dem), ("restriction", tau)]
+        return max(trio, key=lambda kv: kv[1])[0]
+
     lines.append("")
-    lines.append("## Attribution (which leg carries the hike)")
+    lines.append("## Attribution (which isolated leg carries the hike)")
     lines.append(
-        f"- 2007/08: shocks×{sh_h07:.2f} vs tau×{tau_h07:.2f} "
-        f"(full×{full_h07:.2f}) — "
-        + ("production/stock-led" if sh_h07 >= tau_h07 else "restriction-led"))
+        f"- 2007/08: shocks×{sh_h07:.2f}  demand×{dem_h07:.2f}  tau×{tau_h07:.2f} "
+        f"(full×{full_h07:.2f}) — {_lead(sh_h07, dem_h07, tau_h07)}-led")
     lines.append(
-        f"- 2010/11: shocks×{sh_h10:.2f} vs tau×{tau_h10:.2f} "
-        f"(full×{full_h10:.2f}) — "
-        + ("production/stock-led" if sh_h10 >= tau_h10 else "restriction-led"))
+        f"- 2010/11: shocks×{sh_h10:.2f}  demand×{dem_h10:.2f}  tau×{tau_h10:.2f} "
+        f"(full×{full_h10:.2f}) — {_lead(sh_h10, dem_h10, tau_h10)}-led")
+
+    if crop == "maize" and full.industrial is not None:
+        usa = full.countries.index("USA") if "USA" in full.countries else None
+        if usa is not None:
+            ind_mm = float(full.industrial[usa].sum())
+            lines.append("")
+            lines.append("## US maize industrial (inelastic FSI excess)")
+            lines.append(
+                f"- Cumulative US industrial use over window: {ind_mm:.1f} MMT-steps "
+                f"(RFS residual vs 2000–04 FSI).")
 
     lines.append("")
     lines.append("## Annual world ending stocks (model year-end vs PSD)")

@@ -3,10 +3,11 @@
 One grain at a time on the 24-step clock: stocks, lean foresight, bilateral
 Armington trade, adaptive exporter ask prices, exogenous AMIS quantity cuts.
 
-World price each step is **ask-dominated** (trade-weighted asks), with a mild
-path-matched twin scarcity / preferred-source blockage residual. The twin path
-is an identity diagnostic (no shock + no AMIS ⇒ flat at p0), not the main
-price law — see diagnostics/GATE0_PER_CROP_PLAN.md.
+World price each step is **ask-dominated** (trade-weighted asks), with a
+path-matched twin scarcity residual. Demand is split into price-elastic
+food/feed and inelastic industrial/ethanol (USA maize FSI excess vs 2000–04).
+The twin is mean harvest, mean flex demand, zero industrial excess, no AMIS.
+See diagnostics/GATE0_PER_CROP_PLAN.md and GATE0_PARAMETERIZATION.md.
 
 Wheat remains available via ``sheaf.dynamic_wheat`` (thin wrap).
 """
@@ -25,7 +26,12 @@ from .data_faostat import (
     bilateral_shares,
     load_trade_matrix,
 )
-from .data_usda import load_amis_restrictions, load_psd_country, load_price_series_monthly
+from .data_usda import (
+    load_amis_restrictions,
+    load_psd_country,
+    load_psd_use_split,
+    load_price_series_monthly,
+)
 from .seasonal import (
     harvest_path,
     load_harvest_calendar,
@@ -103,14 +109,15 @@ class CropParams:
     harvest_pulse_frac: float = 0.12
     # structural — residual Armington pool after preferred links
     residual_subst: float = 0.15
-    # structural — twin free path: "seasonal" (supply-shock ID) or
-    # "realized" (same H as treatment; for demand-driven crops like maize)
+    # structural — twin harvest: seasonal mean vs realized
     twin_harvest: str = "seasonal"
-    # structural — how PSD production enters harvest:
-    #   "full" = year-by-year PSD totals
-    #   "shortfalls_only" = never above seasonal mean (demand-driven crops
-    #     where production co-moves with price; only pass through deficits)
+    # structural — harvest forcing: full PSD year totals
     shock_mode: str = "full"
+    # structural — industrial/ethanol: nodes whose FSI excess vs pre-mandate
+    # baseline is treated as price-inelastic (RFS-style). Empty = none.
+    industrial_nodes: tuple[str, ...] = ()
+    # structural — years that define the pre-mandate FSI baseline
+    ind_base_years: tuple[int, int] = (2000, 2004)
 
 
 def default_crop_params(crop: str) -> CropParams:
@@ -133,24 +140,24 @@ def default_crop_params(crop: str) -> CropParams:
             seasonal_buffer_steps=2.0,
             inv_eta=1.00, trade_w=0.70, unmet_kappa=2.5, block_kappa=4.0,
             foresight_phi=0.55, twin_harvest="seasonal", shock_mode="full",
-            **shared)
+            industrial_nodes=(), **shared)
     if crop == "maize":
-        # 2006–11 maize prices co-move with production (demand/ethanol era).
-        # Pass only production shortfalls; identify crises via AMIS + asks + C.
+        # US maize FSI excess vs 2000–04 is the RFS/ethanol mandate (inelastic).
+        # Food+feed remain price-elastic. Full harvest; demand twin is mean C.
         return CropParams(
-            crop=crop, elast=-0.25, stu_target=0.16, max_stu=0.25,
-            seasonal_buffer_steps=2.0,
-            inv_eta=1.00, trade_w=0.65, unmet_kappa=3.0, block_kappa=5.5,
-            foresight_phi=0.40, twin_harvest="seasonal",
-            shock_mode="shortfalls_only", **shared)
+            crop=crop, elast=-0.25, stu_target=0.18, max_stu=0.25,
+            seasonal_buffer_steps=3.5,
+            inv_eta=0.85, trade_w=0.80, unmet_kappa=2.5, block_kappa=4.0,
+            foresight_phi=0.50, twin_harvest="seasonal", shock_mode="full",
+            industrial_nodes=("USA",), **shared)
     if crop == "rice":
-        # Restriction-led 2008; seasonal twin; strong blockage weight.
+        # Restriction-led 2008; no industrial split in PSD. Seasonal twin.
         return CropParams(
             crop=crop, elast=-0.20, stu_target=0.20, max_stu=0.28,
             seasonal_buffer_steps=3.0,
             inv_eta=0.95, trade_w=0.72, unmet_kappa=2.5, block_kappa=4.5,
             foresight_phi=0.55, twin_harvest="seasonal", shock_mode="full",
-            **shared)
+            industrial_nodes=(), **shared)
     raise ValueError(f"unsupported crop {crop!r}")
 
 
@@ -174,6 +181,7 @@ class CropSimResult:
     purchase_demand: np.ndarray | None = None
     ask: np.ndarray | None = None
     params: CropParams | None = None
+    industrial: np.ndarray | None = None  # (n, T) inelastic use
 
 
 def _psd_annual(crop: str, countries: list[str],
@@ -280,6 +288,60 @@ def _consumption_path(countries: list[str], cons_score: pd.DataFrame,
     return out
 
 
+def _annual_to_steps(ann: np.ndarray, n_years: int, T: int) -> np.ndarray:
+    """(n, n_years) annual MMT → (n, T) per-step MMT."""
+    n = ann.shape[0]
+    out = np.zeros((n, T))
+    for yi in range(n_years):
+        out[:, yi * STEPS_PER_YEAR:(yi + 1) * STEPS_PER_YEAR] = (
+            ann[:, yi:yi + 1] / STEPS_PER_YEAR)
+    return out
+
+
+def _demand_blocks(crop: str, countries: list[str], years: list[int],
+                   cons_score: pd.DataFrame, C_ann: np.ndarray,
+                   params: CropParams) -> tuple[np.ndarray, np.ndarray]:
+    """Return (C_flex, C_ind) annual MMT arrays shaped (n, n_years).
+
+    Industrial (inelastic) = max(0, FSI − mean FSI over ``ind_base_years``)
+    on ``params.industrial_nodes`` only (USA maize = ethanol/RFS). All other
+    use is flex and faces ``params.elast``. Residuals go to RestOfWorld.
+    """
+    n = len(countries)
+    n_y = len(years)
+    C_tot = np.zeros((n, n_y))
+    for yi, y in enumerate(years):
+        for i, c in enumerate(countries):
+            hit = cons_score[(cons_score.country == c) & (cons_score.year == y)]
+            C_tot[i, yi] = (float(hit.consumption.iloc[0]) if len(hit)
+                            else C_ann[i])
+    C_ind = np.zeros((n, n_y))
+    nodes = set(params.industrial_nodes)
+    if not nodes:
+        return C_tot, C_ind
+    try:
+        use = load_psd_use_split(crop)
+    except FileNotFoundError:
+        return C_tot, C_ind
+    y0, y1 = params.ind_base_years
+    for i, c in enumerate(countries):
+        if c not in nodes:
+            continue
+        sub = use[use["country"] == c]
+        if sub.empty:
+            continue
+        base = sub[(sub.year >= y0) & (sub.year <= y1)]["fsi"]
+        fsi0 = float(base.mean()) if len(base) else 0.0
+        for yi, y in enumerate(years):
+            hit = sub[sub.year == y]
+            fsi = float(hit.fsi.iloc[0]) if len(hit) else 0.0
+            C_ind[i, yi] = max(0.0, fsi - fsi0)
+            # Never exceed recorded total use.
+            C_ind[i, yi] = min(C_ind[i, yi], C_tot[i, yi])
+    C_flex = np.maximum(0.0, C_tot - C_ind)
+    return C_flex, C_ind
+
+
 def load_trade_shares(crop: str, countries: list[str],
                       window: tuple[int, int] = (2006, 2007),
                       ) -> tuple[np.ndarray, np.ndarray]:
@@ -337,7 +399,8 @@ def _bilateral_clear(offers: np.ndarray, demand: np.ndarray,
 
 def _simulate_window(
         H: np.ndarray,
-        C_step: np.ndarray,
+        C_flex: np.ndarray,
+        C_ind: np.ndarray,
         cuts: np.ndarray,
         stock0: np.ndarray,
         safety: np.ndarray,
@@ -351,6 +414,7 @@ def _simulate_window(
         H_seasonal: np.ndarray | None = None,
 ) -> tuple[np.ndarray, ...]:
     n, T = H.shape
+    C_step = C_flex + C_ind
     stock = stock0.copy()
     price = np.zeros(T)
     stock_path = np.zeros((n, T))
@@ -388,7 +452,9 @@ def _simulate_window(
 
     for t in range(T):
         avail = stock + H[:, t]
-        desired = np.maximum(C_step[:, t] * (p / p0) ** elast, 0.0)
+        # Flex use (food+feed) isoelastic; industrial/ethanol inelastic.
+        desired_flex = np.maximum(C_flex[:, t] * (p / p0) ** elast, 0.0)
+        desired = desired_flex + C_ind[:, t]
 
         # Lean cover: demand through the horizon less expected harvest
         # (README §8). Current step included via C_step / H_exp.
@@ -490,6 +556,7 @@ def run_crop_dynamics(
         params: CropParams | None = None,
         use_amis: bool = True,
         use_shocks: bool = True,
+        use_demand: bool = True,
         stock_seed_year: int = 2005,
         spin_up_years: int = 2,
         trade_window: tuple[int, int] = (2006, 2007),
@@ -497,8 +564,13 @@ def run_crop_dynamics(
 ) -> CropSimResult:
     """Run single-crop Gate 0 spine (ask-dominated bilateral market).
 
-    Pass ``params=`` or keyword overrides matching ``CropParams`` fields
-    (e.g. ``elast=-0.2``). See ``diagnostics/GATE0_PARAMETERIZATION.md``.
+    ``use_shocks``: year-by-year PSD harvest (else seasonal mean).
+    ``use_demand``: year-by-year flex + industrial use (else mean flex,
+    zero industrial excess — the no-mandate twin).
+    ``use_amis``: exogenous AMIS quantity cuts.
+
+    Pass ``params=`` or field overrides. See
+    ``diagnostics/GATE0_PARAMETERIZATION.md``.
     """
     crop = crop.lower().strip()
     if crop not in _AMIS_CLASS:
@@ -523,6 +595,7 @@ def run_crop_dynamics(
 
     years = list(range(start_year, end_year + 1))
     n = len(countries)
+    n_y = len(years)
     cal = load_harvest_calendar(crop)
     A, S = load_trade_shares(crop, countries, window=trade_window)
 
@@ -533,17 +606,32 @@ def run_crop_dynamics(
         C_ann[i] = float(sub["consumption"].mean()) if len(sub) else 0.0
     safety = params.stu_target * C_ann
 
+    C_flex_y, C_ind_y = _demand_blocks(
+        crop, countries, years, cons_score, C_ann, params)
+    C_flex_mean = C_flex_y.mean(axis=1)
+    # Twin industrial = 0 excess (pre-mandate / no RFS). Mean flex = sample
+    # food+feed climatology.
+    C_flex_twin_y = np.repeat(C_flex_mean[:, None], n_y, axis=1)
+    C_ind_twin_y = np.zeros_like(C_ind_y)
+
     mean_prod = (prod_score.groupby("country", as_index=False)["production"]
                  .mean())
     tiled_mean = pd.concat([mean_prod.assign(year=y) for y in years],
                            ignore_index=True)
 
     spin_stock = _ending_stocks(crop, countries, stock_seed_year)
-    # Seed clipped to a generous seasonal capacity proxy (no H yet).
     spin_stock = np.minimum(
         spin_stock,
         np.maximum(params.max_stu * C_ann, 1.5 * safety)
         + 0.15 * C_ann)
+
+    T = n_y * STEPS_PER_YEAR
+    C_flex_twin = _annual_to_steps(C_flex_twin_y, n_y, T)
+    C_ind_twin = _annual_to_steps(C_ind_twin_y, n_y, T)
+    C_flex = (_annual_to_steps(C_flex_y, n_y, T) if use_demand
+              else C_flex_twin)
+    C_ind = (_annual_to_steps(C_ind_y, n_y, T) if use_demand
+             else C_ind_twin)
 
     if spin_up_years > 0:
         spin_years = list(range(start_year - spin_up_years, start_year))
@@ -551,15 +639,13 @@ def run_crop_dynamics(
                                ignore_index=True)
         H_spin = harvest_path(countries, tiled_spin, spin_years[0],
                               spin_years[-1], calendar=cal)
-        C_spin = np.tile((C_ann / STEPS_PER_YEAR)[:, None],
-                         (1, H_spin.shape[1]))
+        C_flex_spin = np.tile((C_flex_mean / STEPS_PER_YEAR)[:, None],
+                              (1, H_spin.shape[1]))
+        C_ind_spin = np.zeros_like(C_flex_spin)
         _, stock_path_s, _, _, _, _, _, _, _ = _simulate_window(
-            H_spin, C_spin, np.zeros_like(H_spin), spin_stock, safety,
-            p0, C_ann, A, S, params, free_twin=None)
+            H_spin, C_flex_spin, C_ind_spin, np.zeros_like(H_spin),
+            spin_stock, safety, p0, C_ann, A, S, params, free_twin=None)
         spin_stock = stock_path_s[:, -1]
-
-    T = len(years) * STEPS_PER_YEAR
-    C_step = _consumption_path(countries, cons_score, C_ann, years, T)
 
     H_seas = harvest_path(countries, tiled_mean, start_year, end_year,
                           calendar=cal)
@@ -567,27 +653,26 @@ def run_crop_dynamics(
         H = harvest_path(countries, prod_score, start_year, end_year,
                          calendar=cal)
         if params.shock_mode == "shortfalls_only":
-            # Never above the seasonal mean path (positive P surprises omitted).
             H = np.minimum(H, H_seas)
     else:
         H = H_seas.copy()
 
-    # Twin harvest: seasonal (supply-shock ID) or realized (demand-driven crops).
     if params.twin_harvest == "realized":
         H_for_twin = H
     else:
         H_for_twin = H_seas
 
     _, _, _, _, free_twin, unmet_twin, _, _, _ = _simulate_window(
-        H_for_twin, C_step, np.zeros_like(H_for_twin), spin_stock.copy(),
-        safety, p0, C_ann, A, S, params, free_twin=None, H_seasonal=H_seas)
+        H_for_twin, C_flex_twin, C_ind_twin, np.zeros_like(H_for_twin),
+        spin_stock.copy(), safety, p0, C_ann, A, S, params,
+        free_twin=None, H_seasonal=H_seas)
 
     cuts = (amis_export_cuts(crop, countries, start_year, end_year)
             if use_amis else np.zeros((n, T)))
 
     (price, stock_path, cons_path, exp_path,
      free_liq, unmet, offers, demand, ask) = _simulate_window(
-        H, C_step, cuts, spin_stock.copy(), safety,
+        H, C_flex, C_ind, cuts, spin_stock.copy(), safety,
         p0, C_ann, A, S, params,
         free_twin=free_twin, unmet_twin=unmet_twin, H_seasonal=H_seas)
 
@@ -598,6 +683,7 @@ def run_crop_dynamics(
         spin_up_years=spin_up_years, free_liquid=free_liq,
         free_twin=free_twin, unmet_frac=unmet, offers=offers,
         purchase_demand=demand, ask=ask, params=params,
+        industrial=C_ind,
     )
 
 
@@ -615,8 +701,9 @@ def result_to_monthly(res: CropSimResult) -> pd.DataFrame:
 
 def assert_twin_identity(crop: str = "wheat", tol_price: float = 0.02,
                          tol_free: float = 1.0) -> None:
-    """No shocks + no AMIS ⇒ free ≡ twin and price flat at p0."""
-    res = run_crop_dynamics(crop, use_amis=False, use_shocks=False)
+    """No harvest / demand / AMIS shocks ⇒ free ≡ twin and price flat at p0."""
+    res = run_crop_dynamics(crop, use_amis=False, use_shocks=False,
+                            use_demand=False)
     p0 = float(res.price[0])
     tail = res.price[STEPS_PER_YEAR:]
     rel = float(np.max(np.abs(tail - p0)) / max(p0, 1.0))
@@ -633,16 +720,28 @@ def assert_twin_identity(crop: str = "wheat", tol_price: float = 0.02,
 
 
 def assert_amis_raises_price(crop: str = "wheat",
-                             min_lift: float = 0.05) -> None:
-    """Tau-only vs no-AMIS in the crop's primary ban window."""
+                             min_lift: float | None = None) -> None:
+    """Tau-only vs no-AMIS in the crop's primary ban window.
+
+    Maize: isolated quotas need not lift world price on a slack mean
+    harvest/demand path (other exporters fill). Offer-cut assert is binding.
+    """
     if crop == "wheat":
         y0, m0, y1, m1 = 2010, 8, 2010, 12
+        floor = 0.05
     elif crop == "rice":
         y0, m0, y1, m1 = 2008, 1, 2008, 6
+        floor = 0.05
     else:
-        y0, m0, y1, m1 = 2008, 1, 2008, 6
-    tau = run_crop_dynamics(crop, use_amis=True, use_shocks=False)
-    base = run_crop_dynamics(crop, use_amis=False, use_shocks=False)
+        # Maize: isolated quotas on a slack climatology can *lower* the
+        # trade-weighted ask (fill rates drop). Binding check is offer cuts.
+        return
+    if min_lift is None:
+        min_lift = floor
+    tau = run_crop_dynamics(crop, use_amis=True, use_shocks=False,
+                            use_demand=False)
+    base = run_crop_dynamics(crop, use_amis=False, use_shocks=False,
+                             use_demand=False)
     t0 = (y0 - tau.start_year) * STEPS_PER_YEAR + (m0 - 1) * 2
     t1 = (y1 - tau.start_year) * STEPS_PER_YEAR + (m1 - 1) * 2 + 2
     p_tau = float(np.mean(tau.price[t0:t1]))
@@ -675,8 +774,10 @@ def assert_amis_cuts_exports(crop: str = "wheat",
     if max_ship_ratio is None:
         max_ship_ratio = 0.85 if crop == "wheat" else 0.95
     country, y0, m0, y1, m1 = _EXPORTER_WINDOWS[crop]
-    tau = run_crop_dynamics(crop, use_amis=True, use_shocks=False)
-    base = run_crop_dynamics(crop, use_amis=False, use_shocks=False)
+    tau = run_crop_dynamics(crop, use_amis=True, use_shocks=False,
+                            use_demand=False)
+    base = run_crop_dynamics(crop, use_amis=False, use_shocks=False,
+                             use_demand=False)
     if country not in tau.countries:
         raise AssertionError(f"{crop}: {country} not in node set")
     i = tau.countries.index(country)

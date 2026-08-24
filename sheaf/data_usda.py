@@ -231,6 +231,36 @@ def load_psd_country(crop: str, country: str | None = None,
     return out.sort_values(["country", "grain", "year"]).reset_index(drop=True)
 
 
+def load_psd_use_split(crop: str, data_dir: Path | str | None = None) -> pd.DataFrame:
+    """Per-country PSD use split: consumption, feed, FSI (MMT).
+
+    Source: ``psd_grains_use_split.csv`` (Feed Dom. Consumption + FSI Consumption
+    from the FAS bulk). Rice has no FSI/feed attributes in PSD — those columns
+    are zero and all use is treated as food. Values in **MMT**.
+    """
+    ddir = Path(data_dir) if data_dir else _PSD_COUNTRY_DIR
+    path = ddir / "psd_grains_use_split.csv"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"{path} missing — rebuild from psd_alldata.csv (Feed/FSI attributes).")
+    df = pd.read_csv(path)
+    crop_l = crop.lower()
+    if crop_l not in {"wheat", "rice", "maize"}:
+        raise ValueError(f"crop must be wheat|rice|maize, got {crop!r}")
+    df = df[df["grain"] == crop_l].copy()
+    df = df.rename(columns={
+        "Country_Name": "country_psd",
+        "Country_Code": "country_code",
+    })
+    for col in ("consumption", "feed", "fsi"):
+        if col not in df.columns:
+            df[col] = 0.0
+        df[col] = df[col].astype(float) * _KT_TO_MMT
+    df["country"] = df["country_psd"].map(
+        lambda n: _PSD_COUNTRY_TO_SHEAF.get(n, n))
+    return df.sort_values(["country", "year"]).reset_index(drop=True)
+
+
 def load_amis_restrictions(path: Path | str | None = None,
                            aggregated: bool = True) -> pd.DataFrame:
     """Load OECD/AMIS export-restriction timelines from data/amis_policies/.

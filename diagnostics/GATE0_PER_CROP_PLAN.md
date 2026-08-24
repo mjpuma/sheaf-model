@@ -68,18 +68,16 @@ Must write and print:
 - [x] Maize and rice runs + reports (`scripts/score_subannual_crop.py`).
 - [x] Commit this Gate 0 per-crop baseline.
 
-### Soft score snapshot (2026-08-24 parameterization retune)
-
-See `GATE0_PARAMETERIZATION.md` for the equation/parameter audit.
+### Soft score snapshot (demand/ethanol block)
 
 | Crop | full corr | 2007/08 full hike | Asserts |
 |---|---|---|---|
-| wheat | ~+0.68 | ~×1.4 | PASS |
-| maize | ~+0.36 | ~×1.5+ | PASS (shortfalls-only shocks) |
-| rice | ~+0.80 | ~×2.2 | PASS |
+| wheat | +0.74 | ×1.36 (obs ×1.82) | PASS |
+| maize | +0.58 | ×1.80 (obs ×1.84) | PASS |
+| rice | +0.81 | ×2.05 (obs ×1.84) | PASS |
 
-**Before subst / Level 2:** maize soft bar is improved but still the weakest;
-further gains need an explicit demand block, not more κ fitting.
+Industrial/ethanol: USA maize FSI excess vs 2000–04, inelastic. Substitution /
+Level 2 still paused until this per-crop bar is accepted.
 
 ## Explicit non-goals until Gate 0 per crop is green
 

@@ -23,6 +23,8 @@ psd_alldata.csv                  Unzipped full PSD (all commodities/countries/ye
                                  ~193 MB — listed in .gitignore; regenerate from the zip)
 psd_grains_long.csv              Wheat / Rice, Milled / Corn rows only (long form)
 psd_grains_country_year.csv      Same grains, pivoted attributes by country–year
+psd_grains_use_split.csv         Consumption + Feed Dom. + FSI (1000 MT) for the
+                                 industrial/ethanol demand block
 DOWNLOAD_META.json               Machine-readable fetch record
 
 Units

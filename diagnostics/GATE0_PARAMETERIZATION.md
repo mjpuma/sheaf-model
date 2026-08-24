@@ -30,13 +30,48 @@ stock–trade–ask system whose pieces are economically interpretable.
 - \(T_y=24\) steps/year (Agrimate §4.1).
 - Annual USDA PSD production for country \(i\), year \(y\) is spread with
   triangular calendar weights (`sheaf/seasonal.py`).
-- **Maize only:** `shock_mode="shortfalls_only"` sets
-  \(H=\min(H^{\mathrm{PSD}},H^{\mathrm{seas}})\).  
-  **Why:** over 2006–11, maize production co-moves with Pink Sheet prices
-  (\(\mathrm{corr}(P,p)\approx +0.92\)) — a demand/ethanol regime. Feeding raw
-  PSD harvests into a supply-scarcity price law creates the wrong sign.
-  Passing only shortfalls is a reduced-form filter, not a claim that
-  bumper crops never happen.
+- Harvest forcing is **full** year-by-year PSD (no shortfall filter).
+  Demand-driven maize is identified by the industrial block below, not by
+  discarding bumper harvests.
+
+### 2.1b Demand block: flex vs industrial (structural)
+
+PSD domestic use is split:
+
+\[
+C_{i,y}=C^{\mathrm{flex}}_{i,y}+C^{\mathrm{ind}}_{i,y}.
+\]
+
+- **Flex** (food + feed): faces isoelastic price response \(\varepsilon\).
+- **Industrial / ethanol**: price-**inelastic** in the short run (mandate).
+
+**Identification (parsimonious, not a WASDE ethanol series):**
+USDA international PSD reports Feed and FSI, not gallons of ethanol.
+For nodes in `industrial_nodes` (default: **USA maize only**),
+
+\[
+C^{\mathrm{ind}}_{i,y}=\min\Bigl(C_{i,y},\;
+\max\bigl(0,\;\mathrm{FSI}_{i,y}-\overline{\mathrm{FSI}}_{i,2000\text{–}04}\bigr)\Bigr).
+\]
+
+That residual is the RFS-era FSI surge (US maize FSI 77 MMT in 2005 → 163 MMT
+in 2010; feed actually *fell*). Wheat FSI is flat in this window; rice has no
+FSI attribute — both have \(C^{\mathrm{ind}}=0\). We do **not** treat China’s
+FSI trend as ethanol.
+
+**Twin demand** (no-mandate climatology): mean flex over the score window,
+\(C^{\mathrm{ind}}=0\). Treatment uses year-by-year flex + industrial.
+This is the identification that was missing: the old twin held *realized*
+consumption fixed, so ethanol never appeared as scarcity.
+
+Within-step desired use:
+
+\[
+d_{i,t}=C^{\mathrm{flex}}_{i,t}\,(p_t/p_0)^{\varepsilon}+C^{\mathrm{ind}}_{i,t}.
+\]
+
+Isolated score legs: `shocks` (harvest only), `demand` (flex+industrial only),
+`tau` (AMIS only), `full` (all three).
 
 ### 2.2 Lean foresight and stock targets (structural + reduced-form speed)
 
@@ -51,7 +86,7 @@ with safety \(s_i=\mathtt{stu\_target}\cdot C_i^{\mathrm{ann}}\).
 
 Purchase demand and offers:
 \[
-d_{i,t}=C_{i,t}(p_t/p_0)^{\varepsilon},
+d_{i,t}=C^{\mathrm{flex}}_{i,t}(p_t/p_0)^{\varepsilon}+C^{\mathrm{ind}}_{i,t},
 \quad
 D_{i,t}=\underbrace{\max(0,d-\mathrm{avail})}_{\text{food gap}}
 +\lambda\max(0,T-\text{post-food stock}),
@@ -94,8 +129,8 @@ a modeling simplification, not physical spoilage science.
 
 ### 2.5 World price (ask-dominated + twin scarcity residual)
 
-Path-matched twin: same \(C_{i,t}\), \(\tau\equiv 0\), harvest =
-seasonal mean (or realized if `twin_harvest="realized"`). Free stocks
+Path-matched twin: **seasonal-mean harvest**, **mean flex demand**,
+**zero industrial excess**, \(\tau\equiv 0\). Free stocks
 \(\mathrm{free}_t=\sum S_{i,t+1}-\sum L_{i,t}\).
 
 If the treatment matches the twin on free, unmet anomaly, and preferred-source
@@ -125,18 +160,20 @@ From `default_crop_params()`:
 | Parameter | Wheat | Maize | Rice | Class | Rationale |
 |---|---:|---:|---:|---|---|
 | \(\varepsilon\) `elast` | −0.15 | −0.25 | −0.20 | literature | Short-run food/feed demand; maize more elastic (feed) |
-| `stu_target` | 0.20 | 0.16 | 0.20 | literature | USDA world STU order ~0.15–0.25 |
+| `stu_target` | 0.20 | 0.18 | 0.20 | literature | USDA world STU order ~0.15–0.25 |
 | `max_stu` | 0.25 | 0.25 | 0.28 | literature | Peak STU + small buffer |
-| `seasonal_buffer_steps` | 2.0 | 2.0 | 3.0 | structural | Hold ~2–3 peak harvest steps |
+| `seasonal_buffer_steps` | 2.0 | 3.5 | 3.0 | structural | Maize harvest more peaked |
 | \(\lambda\) `rebuild_lambda` | 0.08 | 0.08 | 0.08 | reduced-form | ~12%/month toward lean target |
-| \(\eta\) `inv_eta` | 1.00 | 1.00 | 0.95 | reduced-form | Scarcity inverse elasticity |
+| \(\eta\) `inv_eta` | 1.00 | 0.85 | 0.95 | reduced-form | Scarcity inverse elasticity |
 | \(\rho\) `smooth` | 0.65 | 0.65 | 0.65 | reduced-form | Biweekly price AR smoother |
-| \(\omega\) `trade_w` | 0.70 | 0.65 | 0.72 | reduced-form | Asks dominate; maize needs more block channel for AMIS lift |
-| \(\kappa_u\) | 2.5 | 3.0 | 2.5 | reduced-form | Unmet-anomaly weight |
-| \(\kappa_b\) | 4.0 | 5.5 | 4.5 | reduced-form | Preferred-source blockage (rice/maize bans) |
+| \(\omega\) `trade_w` | 0.70 | 0.80 | 0.72 | reduced-form | Asks dominate; scarcity residual |
+| \(\kappa_u\) | 2.5 | 2.5 | 2.5 | reduced-form | Unmet-anomaly weight |
+| \(\kappa_b\) | 4.0 | 4.0 | 4.5 | reduced-form | Preferred-source blockage |
 | \(\alpha,\theta,\gamma,\beta\) | 0.15 / 0.70 / 1.25 / 0.18 | same | same | reduced-form | Ask adaptation (shared) |
-| \(\phi\) `foresight_phi` | 0.55 | 0.40 | 0.55 | reduced-form | Maize less weight on realized H (demand regime) |
-| `shock_mode` | full | **shortfalls_only** | full | structural choice | See §2.1 |
+| \(\phi\) `foresight_phi` | 0.55 | 0.50 | 0.55 | reduced-form | Blend realized vs seasonal harvest |
+| `shock_mode` | full | full | full | structural | Year-by-year PSD harvest |
+| `industrial_nodes` | — | **USA** | — | structural | RFS ethanol residual |
+| `ind_base_years` | 2000–04 | 2000–04 | 2000–04 | structural | Pre-Energy Policy Act / pre-RFS FSI |
 | `twin_harvest` | seasonal | seasonal | seasonal | structural | Supply-shock identification |
 
 AMIS cut map and FAOSTAT windows are **structural data**, not free parameters.
@@ -148,11 +185,12 @@ AMIS cut map and FAOSTAT windows are **structural data**, not free parameters.
 ### Defensible
 
 - 24-step clock, calendars, PSD quantities, AMIS quantity cuts, bilateral shares.
-- Isoelastic food demand with literature-scale \(\varepsilon\).
+- Isoelastic **flex** demand with literature-scale \(\varepsilon\); industrial
+  use inelastic (mandate, not a consumer FOC).
 - Lean cover until the next harvest pulse (finite foresight, not perfect foresight RE).
 - Adaptive exporter asks responding to fill rates (Agrimate-like).
 - World price blending trade asks with a twin-relative scarcity residual.
-- Maize shortfall filter given the observed \(P\)–\(p\) co-movement.
+- US maize FSI excess vs 2000–04 as the ethanol/RFS residual (PSD, not gallons).
 
 ### Reduced-form (honest limits)
 
@@ -164,8 +202,8 @@ AMIS cut map and FAOSTAT windows are **structural data**, not free parameters.
 ### Not claimed
 
 - Full rational-expectations storage equilibrium.
-- Endogenous acreage / ethanol demand block (maize Level 1 uses consumption
-  paths + shortfall filter instead).
+- Endogenous acreage response or a WASDE-style ethanol *gallon* series
+  (FSI residual is the PSD-consistent proxy).
 - Cross-grain substitution (paused until per-crop Gate 0 is green).
 - Level-2 endogenous export game.
 
@@ -183,15 +221,15 @@ AMIS cut map and FAOSTAT windows are **structural data**, not free parameters.
 
 ---
 
-## 6. Snapshot scores (post-parameterization)
+## 6. Snapshot scores (post demand/ethanol block)
 
-From `scripts/score_subannual_crop.py` after the 2026-08-24 retune:
+From `scripts/score_subannual_crop.py` after the industrial-demand block:
 
-| Crop | full corr | 2007/08 full / obs | 2010/11 full / obs | Asserts |
-|---|---:|---:|---:|---|
-| wheat | **+0.68** | ×1.38 / ×1.82 | ×1.08 / ×1.16 | PASS |
-| maize | **+0.36** | ×1.97 / ×1.84 | ×1.06 / ×1.44 | PASS |
-| rice | **+0.80** | ×2.21 / ×1.84 | ×0.85 / ×0.79 | PASS |
+| Crop | full corr | demand corr | 2007/08 full / obs | 2010/11 full / obs | Asserts |
+|---|---:|---:|---:|---:|---|
+| wheat | **+0.74** | −0.04 | ×1.36 / ×1.82 | ×1.22 / ×1.16 | PASS |
+| maize | **+0.58** | **+0.46** | ×1.80 / ×1.84 | ×1.17 / ×1.44 | PASS (tau price skip) |
+| rice | **+0.81** | +0.29 | ×2.05 / ×1.84 | ×0.85 / ×0.79 | PASS |
 
-Maize remains the hardest Level-1 case without an explicit demand block;
-`shortfalls_only` + blockage-weighted price is the documented compromise.
+Attribution matches the economics: wheat 2010 restriction-sensitive; maize
+2007/08 demand+harvest; rice 2008 restriction-led (`tau` corr +0.78).

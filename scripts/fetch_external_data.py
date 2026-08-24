@@ -43,6 +43,9 @@ ATTRS = {
     "Beginning Stocks", "Domestic Consumption", "Ending Stocks", "Production",
     "Imports", "Exports", "Total Supply", "Total Distribution",
 }
+USE_ATTRS = {
+    "Domestic Consumption", "FSI Consumption", "Feed Dom. Consumption",
+}
 
 
 def fetch_psd() -> None:
@@ -83,6 +86,36 @@ def _build_grain_extracts(csv_path: Path) -> None:
     print(f"  grains extract: {len(sub)} rows, "
           f"{sub.Country_Name.nunique()} countries, "
           f"{int(sub.Market_Year.min())}-{int(sub.Market_Year.max())}")
+    _build_use_split(csv_path)
+
+
+def _build_use_split(csv_path: Path) -> None:
+    chunks = []
+    for chunk in pd.read_csv(csv_path, chunksize=200_000):
+        m = (chunk["Commodity_Description"].isin(GRAIN_MAP)
+             & chunk["Attribute_Description"].isin(USE_ATTRS))
+        if m.any():
+            chunks.append(chunk.loc[m])
+    sub = pd.concat(chunks, ignore_index=True)
+    sub["grain"] = sub["Commodity_Description"].map(GRAIN_MAP)
+    piv = (sub.pivot_table(
+        index=["Country_Code", "Country_Name", "Market_Year", "grain"],
+        columns="Attribute_Description", values="Value", aggfunc="sum")
+        .reset_index())
+    piv.columns.name = None
+    piv = piv.rename(columns={
+        "Market_Year": "year",
+        "Domestic Consumption": "consumption",
+        "FSI Consumption": "fsi",
+        "Feed Dom. Consumption": "feed",
+    })
+    for c in ("consumption", "fsi", "feed"):
+        if c not in piv.columns:
+            piv[c] = 0.0
+        piv[c] = piv[c].fillna(0.0)
+    out = PSD_DIR / "psd_grains_use_split.csv"
+    piv.to_csv(out, index=False)
+    print(f"  use-split extract: {len(piv)} rows → {out.name}")
 
 
 def refresh_amis_csvs(xlsx: Path | None = None) -> None:
