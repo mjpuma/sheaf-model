@@ -15,26 +15,32 @@
 **S**ubstitution, **H**eterogeneous agents, **E**quilibrium, **A**nd **F**ragility Model: a country-level,
 multi-commodity, game-theoretic network model of global grain trade.
 
-SHEAF couples three things that existing network trade models (e.g. PIK's TWIST,
-Agrimate) treat only partially:
+It sits in the TWIST → Agrimate lineage. Those models already do storage (and Agrimate
+already does a trade network). SHEAF exists because two first-order pieces of crisis
+dynamics are still missing:
 
-1. a **trade network** cleared by spatial price equilibrium,
-2. **strategic government behavior** — exporters play an export-restriction game,
-3. **cross-commodity substitution** — wheat, rice, and maize markets are linked on
-   the demand side, so a shock to one grain spills into the others.
+1. **Strategy.** Exporters restrict in a crisis, and those restrictions move world
+   prices. Agrimate takes the restriction schedule as given (AMIS). SHEAF's destination
+   is an *endogenous* export-restriction game among governments — who restricts, how
+   much, and whether cooperation changes the outcome. Gate 0 first isolates that
+   contribution with AMIS prescribed, one crop at a time.
+2. **Substitution.** Wheat, rice, and maize are linked on the demand side, so a shock
+   to one grain spills into the others. Single-commodity models wall each grain off;
+   that overstates own-grain spikes and misses the other markets. In SHEAF the
+   no-substitution case is a *special limit* (`σ = 0`), not the model.
 
-The third point is the reason SHEAF exists. Single-commodity strategic-trade
-models wall each grain off from the others, and reviewers rightly object that this
-overstates price spikes and misses the substitution margin. In SHEAF the
-no-substitution case is a *special limit* of the model (set the cross-price terms
-to zero), and the gap between that limit and the full model is itself a result.
+Both sit on a **trade network** cleared each period. Cross-grain substitution and the
+endogenous game stay blocked until the per-crop Gate 0 spine is green
+(`diagnostics/PAPER_STACK.md`).
 
-![wheat shock spills into rice and maize only under substitution](figures/fig1_coupling.png)
+![harvest shocks versus export restrictions, 2006–11](figures/fig1_gate0_prices.png)
 
-*A Black Sea wheat shock, shown as the shock-induced price change (shocked minus a
-no-shock counterfactual). Wheat jumps in both regimes. Rice and maize move **only**
-when buyers can substitute; with substitution switched off they sit flat at zero —
-the decoupled, single-commodity limit.*
+*Gate 0, 2006–11, one crop at a time (Pink Sheet in real 2010 \$). Harvest anomalies
+alone miss the 2008 rice spike and understate 2007/08 wheat; adding observed export
+restrictions (AMIS) produces both. That is why SHEAF has a strategic layer —
+restrictions are first-order, not a residual. Agrimate takes those restrictions as
+given; SHEAF's next step is to let exporters choose them. Substitution is the other
+missing piece, and is still off in this figure.*
 
 ## Mathematical formulation
 
@@ -460,7 +466,7 @@ Agrimate-style figures: `python scripts/make_agrimate_comparison.py`.
 - Falkendal, T., Otto, C., Schewe, J., Jägermeyr, J., Konar, M., Kummu, M., Watkins, B., & Puma, M. J. (2021). Grain export restrictions during COVID-19 risk food insecurity in many low- and middle-income countries. *Nature Food*, 2(1), 11–14. https://doi.org/10.1038/s43016-020-00211-7
 - Kuhla, K., Kubiczek, P., & Otto, C. (2025). Understanding agricultural market dynamics in times of crisis: the dynamic agent-based network model Agrimate. *Ecological Economics*, 231, 108546. https://doi.org/10.1016/j.ecolecon.2025.108546
 
-*Note on the TWIST/Agrimate lineage.* TWIST (Trade With Storage; Schewe et al. 2017, applied in Falkendal et al. 2021) reproduces annual world wheat prices from a stylised price–supply curve but does not resolve the trade network; Agrimate (Kuhla et al. 2025) adds a dynamic agent-based network with commercial and strategic stockholding, hindcasting 2007/08 and 2010/11 for wheat. Both are single-commodity; SHEAF is the multi-commodity, substitution-aware generalisation with an endogenous export-restriction game (see §6, the zero-substitution limit).
+*Note on the TWIST/Agrimate lineage.* TWIST (Trade With Storage; Schewe et al. 2017, applied in Falkendal et al. 2021) reproduces annual world wheat prices from a stylised price–supply curve but does not resolve the trade network or export restrictions. Agrimate (Kuhla et al. 2025) adds a dynamic agent-based network with commercial and strategic stockholding and hindcasts 2007/08 and 2010/11, taking export restrictions as an exogenous AMIS schedule. Both are single-commodity. SHEAF exists to put **endogenous strategy** (governments choose restrictions) and **cross-grain substitution** on that network — see Gate 0 above for why restrictions are first-order, and §6 for the zero-substitution limit.
 
 ## Quick start
 
@@ -470,8 +476,10 @@ python demo.py
 ```
 
 The demo runs a Black Sea wheat shock (Russia −40%, Ukraine −50%) under two
-regimes — substitution on (full SHEAF) and off (single-commodity limit) — plus a
-no-shock counterfactual for each, and writes `sheaf_results.csv` and four figures.
+regimes — substitution on (full annual SPE) and off (single-commodity limit) — plus a
+no-shock counterfactual for each, and writes `sheaf_results.csv` and four figures
+(including `figures/fig1_coupling.png`, the substitution spillover illustration).
+Crisis hindcasts use the Gate 0 spine, not this demo: `scripts/score_subannual_crop.py`.
 
 Minimal use in code:
 
@@ -511,14 +519,15 @@ figures/           # generated example figures
 
 ## Caveats
 
-This is a **prototype**. The calibration numbers are order-of-magnitude realistic
-but illustrative — do not read the magnitudes as estimates. Demand and supply are
-linear (roughly ~15% global glut headroom before inverse-demand prices can go
-negative; no free disposal), production is short-run inelastic within a period, and
-Nash is an iterated-best-response approximation on a discrete tax grid
-(`game_grid=13` by default, ~10 $/t steps). Private storage uses lagged prices by design. It implements the
-*architecture*, not a line-for-line replica of any published model's equations, and
-does not yet execute the Level-1/2 crisis hindcasts described in `VALIDATION.md`.
+This is a **prototype**. Gate 0 (`sheaf/dynamic_crop.py`) now runs 2006–11
+per-crop hindcasts against Pink Sheet with AMIS restrictions prescribed; that is
+P1, not an estimated game. The annual SPE calibration in `sheaf/calibration.py`
+is order-of-magnitude realistic but illustrative — do not read the magnitudes as
+estimates. Demand and supply there are linear, production is short-run inelastic
+within a period, and Nash is an iterated-best-response approximation on a discrete
+tax grid (`game_grid=13` by default, ~10 $/t steps). Private storage uses lagged
+prices by design. Cross-grain substitution and the endogenous restriction game
+remain blocked until Gate 0 is green (`diagnostics/PAPER_STACK.md`).
 
 ## License
 
