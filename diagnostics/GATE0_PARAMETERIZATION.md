@@ -101,20 +101,20 @@ O_{i,t}=\max(0,\mathrm{avail}-d-T)\,(1-\tau_{i,t}).
 - \(\tau\): **structural map** from AMIS policy labels → quantity cuts
   (Agrimate-style: ban \(\approx 0.95\), tax \(\approx 0.50\), …).
 
-### 2.3 Capacity (structural fix; was previously indefensible)
+### 2.3 Capacity (structural: carry + harvest-pipeline)
 
-Warehouse (carry capacity) is
+Warehouse at step \(t\) is
 \[
-W_i=\max(\mathtt{max\_stu}\,C_i^{\mathrm{ann}},\,1.5 s_i)
-+\mathtt{seasonal\_buffer\_steps}\cdot\max_t H_{i,t}.
+W_{i,t}=\max(\mathtt{max\_stu}\,C_i^{\mathrm{ann}},\,1.5 s_i)
++\mathtt{pipeline\_max\_steps}\cdot C_i^{\mathrm{ann}}/24
++H_{i,t}.
 \]
-
-**Why:** the old \(W_i=4\,C_i^{\mathrm{ann}}\) allowed multi-year stock
-gluts (model stocks \(2\)–\(4\times\) PSD) and killed scarcity signals. The
-new form matches observed STU order for the floor and adds a **seasonal
-intake buffer** so harvest pulses are not destroyed at the peak month.
-Excess above \(W_i\) is dropped (capacity / unmodelled residual use) —
-a modeling simplification, not physical spoilage science.
+The working-stock term is a **constant** cap (not shrunk as the next harvest
+approaches — that dumped grain into the lean month). `pipeline_max_steps=12`
+is 6 months of use (wheat/maize, one main pulse); rice uses 0 (year-round
+tropical harvest, no extra working buffer). `seasonal_buffer_steps` is unused
+(peak-harvest multiples stored gluts as if they were carry). Excess above
+\(W_{i,t}\) is dropped.
 
 ### 2.4 Bilateral clear and asks (Agrimate-aligned)
 
@@ -130,8 +130,11 @@ a modeling simplification, not physical spoilage science.
 ### 2.5 World price (ask-dominated + twin scarcity residual)
 
 Path-matched twin: **seasonal-mean harvest**, **mean flex demand**,
-**zero industrial excess**, \(\tau\equiv 0\). Free stocks
-\(\mathrm{free}_t=\sum S_{i,t+1}-\sum L_{i,t}\).
+**zero industrial excess**, \(\tau\equiv 0\). Free stocks are
+**world-accessible**:
+\(\mathrm{free}_t=\sum S_{i,t+1}-\sum L_{i,t}-\sum\tau_{i,t}\max(0,S_{i,t+1}-T_{i,t})\).
+Grain withheld by an export cut does not count as market free (otherwise a
+ban looks like abundance once \(\eta\) is symmetric).
 
 If the treatment matches the twin on free, unmet anomaly, and preferred-source
 blockage (**calm**), \(p^\star=p_0\) (identity). Otherwise
@@ -143,8 +146,8 @@ p^\star=\omega\,p^{\mathrm{tr}}+(1-\omega)\,p^{\mathrm{scar}},
 p\leftarrow \rho p+(1-\rho)p^\star,
 \]
 with \(r=(\mathrm{free}^{\mathrm{twin}}+f)/(\mathrm{free}+f)\),
-\(\eta_{\mathrm{eff}}=\eta\) if \(r\ge 1\) else \(0.2\eta\) (asymmetric
-abundance — convenience-yield style muted response).
+\(\eta_{\mathrm{eff}}=\eta\) always (symmetric surplus/shortage). Muting
+abundance had stored gluts: flex demand never cheapened enough to eat them.
 
 - \(\omega\): **reduced-form** weight on trade-weighted asks (market outcome).
 - \(\eta,\kappa_u,\kappa_b\): **reduced-form**, sign-constrained multipliers on
@@ -160,9 +163,10 @@ From `default_crop_params()`:
 | Parameter | Wheat | Maize | Rice | Class | Rationale |
 |---|---:|---:|---:|---|---|
 | \(\varepsilon\) `elast` | −0.15 | −0.25 | −0.20 | literature | Short-run food/feed demand; maize more elastic (feed) |
-| `stu_target` | 0.20 | 0.18 | 0.20 | literature | USDA world STU order ~0.15–0.25 |
-| `max_stu` | 0.25 | 0.25 | 0.28 | literature | Peak STU + small buffer |
-| `seasonal_buffer_steps` | 2.0 | 3.5 | 3.0 | structural | Maize harvest more peaked |
+| `stu_target` | 0.20 | 0.16 | 0.18 | literature | USDA world STU order ~0.15–0.25 |
+| `max_stu` | 0.28 | 0.18 | 0.22 | literature | Carry ceiling ≈ PSD STU |
+| `pipeline_max_steps` | 12 | 12 | 0 | structural | 6 mo working stocks wheat/maize; rice year-round harvest |
+| `seasonal_buffer_steps` | 0 | 0 | 0 | unused | Replaced by harvest-pipeline |
 | \(\lambda\) `rebuild_lambda` | 0.08 | 0.08 | 0.08 | reduced-form | ~12%/month toward lean target |
 | \(\eta\) `inv_eta` | 1.00 | 0.85 | 0.95 | reduced-form | Scarcity inverse elasticity |
 | \(\rho\) `smooth` | 0.65 | 0.65 | 0.65 | reduced-form | Biweekly price AR smoother |
@@ -221,15 +225,43 @@ AMIS cut map and FAOSTAT windows are **structural data**, not free parameters.
 
 ---
 
-## 6. Snapshot scores (post demand/ethanol block)
+## 6. Snapshot scores (post stock-identity pass)
 
-From `scripts/score_subannual_crop.py` after the industrial-demand block:
+From `scripts/score_subannual_crop.py` after carry+pipeline warehouse,
+symmetric \(\eta\), and accessible free stocks:
 
-| Crop | full corr | demand corr | 2007/08 full / obs | 2010/11 full / obs | Asserts |
+| Crop | full corr | 2007/08 full / obs | 2010/11 full / obs | MY-end stocks vs PSD | Asserts |
 |---|---:|---:|---:|---:|---|
-| wheat | **+0.74** | −0.04 | ×1.36 / ×1.82 | ×1.22 / ×1.16 | PASS |
-| maize | **+0.58** | **+0.46** | ×1.80 / ×1.84 | ×1.17 / ×1.44 | PASS (tau price skip) |
-| rice | **+0.81** | +0.29 | ×2.05 / ×1.84 | ×0.85 / ×0.79 | PASS |
+| wheat | +0.49 | ×1.44 / ×1.82 | ×1.04 / ×1.16 | ×0.72 (May) | PASS |
+| maize | +0.45 | ×1.75 / ×1.84 | ×1.81 / ×1.44 | ×0.52 (Aug) | PASS (tau price skip) |
+| rice | +0.37 | ×1.58 / ×1.84 | ×1.90 / ×0.79 | ×1.10 (Dec) | PASS |
 
-Attribution matches the economics: wheat 2010 restriction-sensitive; maize
-2007/08 demand+harvest; rice 2008 restriction-led (`tau` corr +0.78).
+Wheat 2007/08 hike moved toward obs (was ×1.36). Attribution labels are
+`production` / `demand` / `restriction` (ethanol only exists as maize
+industrial use, not as a wheat/rice label).
+
+### Closed vs leftover
+
+**Closed**
+- Peak-harvest warehouse multiples that stored gluts as carry (maize was ~5×
+  PSD on calendar Dec, which is post-harvest not MY-end).
+- Abundance mute \(0.2\eta\) that prevented flex demand from eating surplus.
+- Export-ban grain counted as world-free (ban looked like abundance).
+- Wheat 2010 hike labeled “demand/ethanol”.
+- Rice Dec STU now ×1.10 vs PSD (was ~3×). Wheat May STU ×0.72 (order-of-magnitude OK).
+
+**Leftover (structural, not hidden knobs)**
+- **Calendar Dec ≠ PSD marketing-year end.** Maize Dec is still ~3.7× Aug PSD
+  because Dec is post-harvest peak; comparable month is Aug (×0.52, thin).
+- **No convenience-yield / futures smoothing:** model May wheat prices spike
+  vs a nearly flat Pink Sheet seasonality → monthly corr fell (0.74 → 0.49).
+- **Wheat 2010 isolated restriction** does not carry the hike (`tau`×0.87);
+  isolated demand with growing C and tight stocks does. Full-path 2010 hike
+  ratio is OK (×1.04 vs ×1.16) but the attribution is not restriction-led.
+- **Isolated maize \(\tau\)** can cut the trade-weighted ask (other exporters
+  fill; ask-composition). Offer-cut assert binds; world-price lift is skipped.
+- **Rice 2010** model hike ×1.90 vs obs ×0.79 (false tightness). Demand twin
+  with year-by-year C and a tight cap over-states scarcity after 2008.
+- **2007 stock-draw sign** (wheat MY-end rose; PSD fell) — not closed.
+
+Substitution and Level 2 stay blocked.

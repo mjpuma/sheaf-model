@@ -24,7 +24,9 @@ import numpy as np
 import pandas as pd
 
 from sheaf.calendar24 import STEPS_PER_YEAR
-from sheaf.data_usda import load_price_series_monthly, load_psd_country
+from sheaf.data_usda import (
+    load_crop_world, load_price_series_monthly, load_psd_country,
+)
 from sheaf.dynamic_crop import (
     _EXPORTER_WINDOWS,
     assert_amis_cuts_exports,
@@ -69,10 +71,18 @@ def _hike(df: pd.DataFrame, col: str, y0: int, m0: int, y1: int, m1: int) -> flo
 
 def _psd_world_ending(crop: str, years: list[int]) -> pd.DataFrame:
     psd = load_psd_country(crop)
+    world = load_crop_world(crop)
     rows = []
     for y in years:
         sub = psd[psd.year == y]
-        rows.append(dict(year=y, psd_ending_stocks=float(sub.ending_stocks.sum())))
+        ending = float(sub.ending_stocks.sum())
+        cons = float(world.loc[y, "consumption"]) if y in world.index else float("nan")
+        rows.append(dict(
+            year=y,
+            psd_ending_stocks=ending,
+            psd_consumption=cons,
+            psd_stu=ending / cons if cons else float("nan"),
+        ))
     return pd.DataFrame(rows)
 
 
@@ -100,10 +110,10 @@ def main():
         print("  PASS twin identity")
         lines.append("- PASS twin identity (no harvest/demand/AMIS ⇒ flat at p0)")
         if crop == "maize":
-            print("  SKIP isolated-tau AMIS price lift (maize slack climatology; "
+            print("  SKIP isolated-tau AMIS price lift (other exporters fill; "
                   "offer-cut assert binds)")
             lines.append("- SKIP isolated-tau world-price lift for maize "
-                         "(quotas on slack climatology; offer-cut assert binds)")
+                         "(other exporters fill; offer-cut assert binds)")
         else:
             assert_amis_raises_price(crop)
             print("  PASS AMIS raises price")
@@ -114,7 +124,7 @@ def main():
         lines.append(f"- PASS AMIS cuts {country} offers/exports in ban window")
         assert_no_spring_spike(crop)
         print("  PASS no fake spring spike")
-        lines.append("- PASS no fake spring lean-season spike")
+        lines.append("- PASS no fake spring lean-season spike (climatology path)")
         lines.append("")
 
     legs = {
@@ -169,15 +179,22 @@ def main():
     exp_df.to_csv(exp_path, index=False)
 
     psd_end = _psd_world_ending(crop, list(range(args.start, args.end + 1)))
-    # Model year-end stock ≈ mean of last 2 steps of each calendar year
+    # Calendar December (score month) and crop marketing-year end (PSD-like).
+    my_month = {"wheat": 5, "maize": 8, "rice": 12}[crop]
     yr_stocks = []
     for y in range(args.start, args.end + 1):
-        t_end = (y - full.start_year + 1) * STEPS_PER_YEAR - 1
+        t_dec = (y - full.start_year + 1) * STEPS_PER_YEAR - 1
+        t_my = (y - full.start_year) * STEPS_PER_YEAR + (my_month - 1) * 2 + 1
         yr_stocks.append(dict(
             year=y,
-            model_ending_stock=float(full.stock[:, t_end].sum()),
+            model_ending_stock=float(full.stock[:, t_dec].sum()),
+            model_my_end_stock=float(full.stock[:, t_my].sum()),
         ))
     stock_cmp = pd.DataFrame(yr_stocks).merge(psd_end, on="year")
+    stock_cmp["model_stu"] = (
+        stock_cmp.model_ending_stock / stock_cmp.psd_consumption)
+    stock_cmp["model_my_stu"] = (
+        stock_cmp.model_my_end_stock / stock_cmp.psd_consumption)
     stock_path = DIAG / f"gate0_{crop}_stocks.csv"
     stock_cmp.to_csv(stock_path, index=False)
 
@@ -257,7 +274,7 @@ def main():
     tau_h10 = _h("tau", 2009, 6, 2011, 2)
 
     def _lead(sh, dem, tau):
-        trio = [("production", sh), ("demand/ethanol", dem), ("restriction", tau)]
+        trio = [("production", sh), ("demand", dem), ("restriction", tau)]
         return max(trio, key=lambda kv: kv[1])[0]
 
     lines.append("")
@@ -280,11 +297,22 @@ def main():
                 f"(RFS residual vs 2000–04 FSI).")
 
     lines.append("")
-    lines.append("## Annual world ending stocks (model year-end vs PSD)")
+    lines.append(
+        f"## Annual world ending stocks (calendar Dec vs PSD; "
+        f"MY-end month={my_month})")
     for _, r in stock_cmp.iterrows():
         lines.append(
-            f"- {int(r.year)}: model {r.model_ending_stock:.1f} MMT vs "
-            f"PSD {r.psd_ending_stocks:.1f} MMT")
+            f"- {int(r.year)}: Dec {r.model_ending_stock:.1f} MMT "
+            f"(STU {r.model_stu:.2f}); MY-end {r.model_my_end_stock:.1f} MMT "
+            f"(STU {r.model_my_stu:.2f}) vs PSD {r.psd_ending_stocks:.1f} MMT "
+            f"(STU {r.psd_stu:.2f})")
+    ratio_dec = float(
+        (stock_cmp.model_ending_stock / stock_cmp.psd_ending_stocks).mean())
+    ratio_my = float(
+        (stock_cmp.model_my_end_stock / stock_cmp.psd_ending_stocks).mean())
+    lines.append(
+        f"- Mean model/PSD: Dec ×{ratio_dec:.2f}, MY-end ×{ratio_my:.2f} "
+        f"(target ~1; >2 still fat warehouse)")
 
     lines.append("")
     lines.append(f"## Artifacts")

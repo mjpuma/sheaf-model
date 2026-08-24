@@ -339,6 +339,13 @@ $$
 $$
 O_{i,t}=\max(0,\mathrm{avail}_{i,t}-d_{i,t}-T_{i,t})\,(1-\tau_{i,t}).
 $$
+Carry capacity is
+$$
+W_{i,t}=\max(\mathtt{max\_stu}\,C_i^{\mathrm{ann}},1.5 s_i)
++\mathtt{pipeline\_max\_steps}\cdot C_i^{\mathrm{ann}}/24
++H_{i,t}.
+$$
+(Rice: \(\mathtt{pipeline\_max\_steps}=0\), year-round harvest.) Excess above \(W\) is dropped.
 
 #### Adaptive ask prices and Armington clear
 
@@ -359,8 +366,11 @@ with mean-reversion weight $\beta=0.18$, clipped to $[0.45\,p_0,\,2.8\,p_0]$.
 
 #### World price
 
-After trade, $\mathrm{free}_t=\sum_i S_{i,t+1}-\sum_i L_{i,t}$. Let
-$F^{\mathrm{twin}}_t$ and $u^{\mathrm{twin}}_t$ be free stocks and unmet fractions
+After trade, physical cover is \(\sum_i S_{i,t+1}-\sum_i L_{i,t}\). Surplus
+sitting behind an export cut is not world-market accessible:
+\(\mathrm{locked}_t=\sum_i \tau_{i,t}\max(0,S_{i,t+1}-T_{i,t})\),
+\(\mathrm{free}_t=\sum_i S_{i,t+1}-\sum_i L_{i,t}-\mathrm{locked}_t\).
+Let $F^{\mathrm{twin}}_t$ and $u^{\mathrm{twin}}_t$ be free stocks and unmet fractions
 from a **path-matched twin** (same $C_{i,t}$, mean-year $H$, $\tau\equiv 0$). Define
 $$
 u_t=1-\frac{\sum_i\mathrm{received}_{i,t}}{\max(\sum_i D_{i,t},\epsilon)},
@@ -375,8 +385,8 @@ $$
 p^{\mathrm{scar}}_t=p_0\cdot r_t^{\eta_{\mathrm{eff}}}
 \cdot\bigl(1+\kappa_u\Delta u_t+\kappa_b b_t\bigr),
 $$
-with $r_t=(F^{\mathrm{twin}}_t+f)/(\mathrm{free}_t+f)$ and $\eta_{\mathrm{eff}}=\eta$ if
-$r_t\ge 1$, else $0.2\eta$ (asymmetric abundance). Then
+with $r_t=(F^{\mathrm{twin}}_t+f)/(\mathrm{free}_t+f)$ and $\eta_{\mathrm{eff}}=\eta$
+(symmetric in surplus and shortage). Then
 $$
 p^\star_t=\omega\,p^{\mathrm{tr}}_t+(1-\omega)\,p^{\mathrm{scar}}_t,
 \qquad

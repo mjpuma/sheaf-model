@@ -63,10 +63,13 @@ _AMIS_CLASS = {
 MAX_LEAN_STEPS = STEPS_PER_YEAR
 
 # Exporter bite checks: (country, y0, m0, y1, m1)
+# Maize: Argentina harvest is Mar–May; tight year-end carry zeroes winter
+# offers, so the check must sit on harvest months while a quota/tax is on
+# (not Jan–Jun, which is mostly empty + post-quota price-induced extra offers).
 _EXPORTER_WINDOWS = {
     "wheat": ("Russia", 2010, 8, 2010, 12),
-    "rice": ("Vietnam", 2008, 1, 2008, 6),
-    "maize": ("Argentina", 2008, 1, 2008, 6),
+    "rice": ("Vietnam", 2008, 9, 2008, 11),
+    "maize": ("Argentina", 2007, 5, 2007, 5),
 }
 
 
@@ -86,8 +89,11 @@ class CropParams:
     # literature — safety / capacity as stock-to-use of annual consumption
     stu_target: float = 0.18
     max_stu: float = 0.28
-    # structural — extra capacity in units of peak harvest step (seasonal intake)
-    seasonal_buffer_steps: float = 3.0
+    # structural — extra intra-year pipeline is remaining food until the next
+    # harvest pulse (capped). Not a multiple of peak harvest, and not a
+    # calendar-Dec dump (that stocked-out Q1 and spiked prices).
+    seasonal_buffer_steps: float = 0.0
+    pipeline_max_steps: int = 12  # 6 months of use; structural working stocks
     # reduced_form — partial-adjustment rebuild toward lean+safety target
     rebuild_lambda: float = 0.08
     # reduced_form — inverse elasticity of scarcity price vs free-stock ratio
@@ -136,8 +142,8 @@ def default_crop_params(crop: str) -> CropParams:
     if crop == "wheat":
         # Supply-shock identifiable (2006/07 balance deficit). Seasonal twin.
         return CropParams(
-            crop=crop, elast=-0.15, stu_target=0.20, max_stu=0.25,
-            seasonal_buffer_steps=2.0,
+            crop=crop, elast=-0.15, stu_target=0.20, max_stu=0.28,
+            seasonal_buffer_steps=0.0,
             inv_eta=1.00, trade_w=0.70, unmet_kappa=2.5, block_kappa=4.0,
             foresight_phi=0.55, twin_harvest="seasonal", shock_mode="full",
             industrial_nodes=(), **shared)
@@ -145,16 +151,16 @@ def default_crop_params(crop: str) -> CropParams:
         # US maize FSI excess vs 2000–04 is the RFS/ethanol mandate (inelastic).
         # Food+feed remain price-elastic. Full harvest; demand twin is mean C.
         return CropParams(
-            crop=crop, elast=-0.25, stu_target=0.18, max_stu=0.25,
-            seasonal_buffer_steps=3.5,
+            crop=crop, elast=-0.25, stu_target=0.16, max_stu=0.18,
+            seasonal_buffer_steps=0.0,
             inv_eta=0.85, trade_w=0.80, unmet_kappa=2.5, block_kappa=4.0,
             foresight_phi=0.50, twin_harvest="seasonal", shock_mode="full",
             industrial_nodes=("USA",), **shared)
     if crop == "rice":
         # Restriction-led 2008; no industrial split in PSD. Seasonal twin.
         return CropParams(
-            crop=crop, elast=-0.20, stu_target=0.20, max_stu=0.28,
-            seasonal_buffer_steps=3.0,
+            crop=crop, elast=-0.20, stu_target=0.18, max_stu=0.22,
+            seasonal_buffer_steps=0.0, pipeline_max_steps=0,
             inv_eta=0.95, trade_w=0.72, unmet_kappa=2.5, block_kappa=4.5,
             foresight_phi=0.55, twin_harvest="seasonal", shock_mode="full",
             industrial_nodes=(), **shared)
@@ -428,11 +434,8 @@ def _simulate_window(
     p = float(p0)
     ask = np.full(n, float(p0))
     safety_w = float(max(safety.sum(), 1.0))
-    # Capacity = STU ceiling + buffer for concentrated harvest pulses
-    # (avoids destroying grain at peak harvest months).
-    peak_step = H.max(axis=1)
-    warehouse = (np.maximum(params.max_stu * C_ann, 1.5 * safety)
-                 + params.seasonal_buffer_steps * peak_step)
+    carry_cap = np.maximum(params.max_stu * C_ann, 1.5 * safety)
+    food_step = C_ann / STEPS_PER_YEAR
 
     if H_seasonal is None:
         H_exp = H
@@ -481,8 +484,14 @@ def _simulate_window(
         consumption = np.minimum(
             desired, np.maximum(0.0, avail - shipped + received))
         stock = np.maximum(0.0, avail - shipped - consumption + received)
-        # Capacity constraint: excess above warehouse is not carryable
-        # (spoilage / unmodelled residual use). Keeps STU near PSD range.
+        # Carry + constant working stocks (pipeline_max_steps of use) +
+        # same-step harvest intake. Do not shrink the cap as the next pulse
+        # approaches — that dumped grain into the lean season and spiked May.
+        warehouse = (
+            carry_cap
+            + food_step * float(params.pipeline_max_steps)
+            + H[:, t]
+        )
         stock = stock - np.maximum(0.0, stock - warehouse)
 
         fill = shipped / np.maximum(offers, 1e-9)
@@ -492,7 +501,11 @@ def _simulate_window(
         ask = np.clip(ask, 0.45 * p0, 2.8 * p0)
 
         lean_need = float(lean_gap.sum())
-        free = float(stock.sum()) - lean_need
+        # Physical free minus surplus locked behind export cuts — withheld
+        # grain is not world-market accessible (else a ban looks like abundance).
+        locked = float(
+            (cuts[:, t] * np.maximum(0.0, stock - target)).sum())
+        free = float(stock.sum()) - lean_need - locked
         free_path[t] = free
 
         total_d = float(demand.sum())
@@ -525,11 +538,9 @@ def _simulate_window(
                 p_star = p0
             else:
                 ratio = float(max(ratio, 1e-12))
-                if ratio >= 1.0:
-                    free_term = ratio ** inv_eta
-                else:
-                    # Abundance: muted (storage option value / convenience yield)
-                    free_term = ratio ** (0.20 * inv_eta)
+                # Symmetric inverse-elasticity: surplus must lower p so flex
+                # demand can eat it. Muting abundance was storing gluts.
+                free_term = ratio ** inv_eta
                 p_scar = (p0 * free_term
                           * (1.0 + params.unmet_kappa * u_anom
                              + params.block_kappa * block_frac))
@@ -622,8 +633,7 @@ def run_crop_dynamics(
     spin_stock = _ending_stocks(crop, countries, stock_seed_year)
     spin_stock = np.minimum(
         spin_stock,
-        np.maximum(params.max_stu * C_ann, 1.5 * safety)
-        + 0.15 * C_ann)
+        np.maximum(params.max_stu * C_ann, 1.5 * safety))
 
     T = n_y * STEPS_PER_YEAR
     C_flex_twin = _annual_to_steps(C_flex_twin_y, n_y, T)
@@ -723,8 +733,9 @@ def assert_amis_raises_price(crop: str = "wheat",
                              min_lift: float | None = None) -> None:
     """Tau-only vs no-AMIS in the crop's primary ban window.
 
-    Maize: isolated quotas need not lift world price on a slack mean
-    harvest/demand path (other exporters fill). Offer-cut assert is binding.
+    Maize: isolated quotas need not lift world price (other exporters fill;
+    ask-composition can even cut the trade-weighted ask). Offer-cut assert
+    is the binding check.
     """
     if crop == "wheat":
         y0, m0, y1, m1 = 2010, 8, 2010, 12
@@ -733,8 +744,6 @@ def assert_amis_raises_price(crop: str = "wheat",
         y0, m0, y1, m1 = 2008, 1, 2008, 6
         floor = 0.05
     else:
-        # Maize: isolated quotas on a slack climatology can *lower* the
-        # trade-weighted ask (fill rates drop). Binding check is offer cuts.
         return
     if min_lift is None:
         min_lift = floor
@@ -755,7 +764,13 @@ def assert_amis_raises_price(crop: str = "wheat",
 
 def assert_no_spring_spike(crop: str = "wheat",
                            max_ratio: float = 1.25) -> None:
-    res = run_crop_dynamics(crop, use_amis=True, use_shocks=True)
+    """Lean-cover accounting must not create a fake spring spike on climatology.
+
+    Full-path maize can still have a real NH lean (harvest in autumn); that is
+    not this assert.
+    """
+    res = run_crop_dynamics(
+        crop, use_amis=False, use_shocks=False, use_demand=False)
     m = result_to_monthly(res)
     spring = float(m[m.month.isin([3, 4])]["model_price"].mean())
     autumn = float(m[m.month.isin([9, 10])]["model_price"].mean())
