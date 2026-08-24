@@ -44,6 +44,10 @@ SHEAF has two related formulations:
    original market / strategic / storage layers.
 2. **Gate 0 sub-annual wheat spine** (`sheaf/dynamic_wheat.py`, §8) — Agrimate-aligned
    24-step/year bilateral stock–trade dynamics used for crisis hindcasts.
+3. **Multi-grain sub-annual spine** (`sheaf/dynamic_grains.py`) — same 24-step clock
+   for wheat/rice/maize with isoelastic cross-price demand (`subst_scale`); pool
+   trade until rice/maize bilateral E0 is vendored. Spillover diagnostic:
+   `scripts/score_subannual_spillover.py`.
 
 Crisis validation (Gate 0) uses §8. The annual SPE remains a reference / outer
 diagnostic and the multi-commodity / Level-2 host. Symbols are defined in the

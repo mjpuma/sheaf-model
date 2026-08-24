@@ -121,15 +121,20 @@ Annual hike-ratio scoring (`scripts/score_level1.py` as of 2026-08-22) is
    - hard asserts: twin identity, AMIS price lift, Russia offer cut, no spring spike
    - equations: README §8
 5. Score monthly prices vs Pink Sheet — hike signs + peak months on full leg;
-   multi-commodity / Level-2 still open.
-6. Add multi-commodity substitution on the sub-annual spine.
+   multi-commodity / Level-2 still open. Wheat Gate 0: `score_subannual_wheat.py`.
+6. Add multi-commodity substitution on the sub-annual spine — **done (pool trade)**:
+   `sheaf/dynamic_grains.py` + rice/maize calendars; cross-price via
+   `OWN_ELAST`/`RHO`/`subst_scale`; per-grain AMIS; twin free identity.
+   Spillover score: `scripts/score_subannual_spillover.py` (subst on vs off).
+   Bilateral E0 for rice/maize and Level-2 game still open.
 7. Add endogenous restriction game (Level 2).
 
 Commands:
 ```bash
 python scripts/fetch_external_data.py --prices-only   # annual + monthly Pink Sheet
 python scripts/run_subannual_wheat.py
-python scripts/score_subannual_wheat.py               # Gate 0 monthly score
+python scripts/score_subannual_wheat.py               # Gate 0 monthly wheat score
+python scripts/score_subannual_spillover.py           # W/R/M subst on vs off
 ```
 
 ## References

@@ -1,0 +1,19 @@
+country,harvest_start_month,harvest_end_month,peak_month,notes
+USA,9,11,10,Corn belt Sep-Nov peak Oct (USDA FAS)
+Russia,9,10,9,Sep-Oct
+EU,9,11,10,Sep-Nov
+Ukraine,9,11,10,Sep-Nov
+Kazakhstan,9,10,9,Sep-Oct
+Canada,10,11,10,Oct-Nov
+Australia,3,5,4,SH autumn
+Argentina,3,6,4,SH autumn (main)
+Brazil,2,6,3,First crop peak Feb-Mar (safrinha ignored in prototype)
+India,9,11,10,Kharif Sep-Nov
+Thailand,9,11,10,Minimal maize; NH-aligned placeholder
+Vietnam,9,11,10,Minimal; placeholder
+China,9,10,9,Sep-Oct
+Egypt,8,10,9,Aug-Oct
+Indonesia,2,4,3,Minimal; SH-ish placeholder
+Mexico,10,12,11,Autumn
+Nigeria,9,11,10,Sep-Nov
+RestOfWorld,9,11,10,Blend NH mass Sep-Nov

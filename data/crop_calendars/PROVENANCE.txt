@@ -42,7 +42,17 @@ Storage targets use a lean horizon to the next global harvest pulse
 same year-by-year demand, mean harvest, and no AMIS — so the expected
 pre-harvest lean is not a crisis, and a no-shock/no-AMIS run stays flat at p0.
 
+Rice / maize calendars
+----------------------
+``rice_harvest_months.csv`` and ``maize_harvest_months.csv`` use the same
+schema for the multi-grain sub-annual spine (``sheaf/dynamic_grains.py``).
+They are hand-curated peak-month prototypes from USDA FAS crop-calendar
+charts and standard NH/SH patterns — same caveats as wheat (not a digitised
+SAGE grid extract). Nodes with negligible production for a crop still carry
+a placeholder window so allocation never silently falls back to uniform
+unless the country row is missing entirely.
+
 Refresh / upgrade path
 ----------------------
-Replace this CSV with a SAGE- or FAO-derived extract aggregated to SHEAF nodes
+Replace these CSVs with a SAGE- or FAO-derived extract aggregated to SHEAF nodes
 when a reproducible bulk download is vendored; keep the same column schema.

@@ -1,0 +1,19 @@
+country,harvest_start_month,harvest_end_month,peak_month,notes
+USA,8,10,9,Southern US rice Aug-Oct (USDA FAS)
+Russia,9,10,9,Small rice; placeholder NH autumn
+EU,9,10,9,Limited EU rice
+Ukraine,9,10,9,Minimal; placeholder
+Kazakhstan,9,10,9,Minimal; placeholder
+Canada,9,10,9,Minimal; placeholder
+Australia,3,5,4,Northern Australia autumn
+Argentina,3,5,4,SH autumn
+Brazil,2,5,3,SH late summer/autumn
+India,10,12,11,Kharif peak Oct-Dec (main); rabi secondary ignored in prototype
+Thailand,10,12,11,Main crop Oct-Dec
+Vietnam,8,10,9,Autumn harvest peak (multi-crop simplified)
+China,8,10,9,Single/late rice Aug-Oct peak (prototype)
+Egypt,8,10,9,Aug-Oct
+Indonesia,3,5,4,Main wet-season harvest (prototype)
+Mexico,10,12,11,Autumn
+Nigeria,10,12,11,Autumn
+RestOfWorld,9,11,10,Blend tropical NH mass Sep-Nov

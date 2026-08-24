@@ -18,14 +18,27 @@ def _months_in_window(start: int, end: int) -> list[int]:
     return list(range(start, 13)) + list(range(1, end + 1))
 
 
-def load_wheat_harvest_calendar(
+def load_harvest_calendar(
+        crop: str = "wheat",
         path: Path | str | None = None) -> pd.DataFrame:
-    p = Path(path) if path else (_CAL_DIR / "wheat_harvest_months.csv")
+    """Load `{crop}_harvest_months.csv` (or an explicit path)."""
+    crop = crop.lower().strip()
+    p = Path(path) if path else (_CAL_DIR / f"{crop}_harvest_months.csv")
+    if not p.exists():
+        raise FileNotFoundError(
+            f"No harvest calendar for {crop!r} at {p}. "
+            f"Expected columns country, harvest_start_month, harvest_end_month.")
     df = pd.read_csv(p)
     required = {"country", "harvest_start_month", "harvest_end_month"}
     if not required.issubset(df.columns):
         raise ValueError(f"{p} missing columns {required - set(df.columns)}")
     return df
+
+
+def load_wheat_harvest_calendar(
+        path: Path | str | None = None) -> pd.DataFrame:
+    """Backward-compatible alias for wheat."""
+    return load_harvest_calendar("wheat", path=path)
 
 
 def harvest_month_weights(start: int, end: int,
