@@ -1,37 +1,20 @@
-"""Agrimate-aligned wheat dynamics (Gate 0) — bilateral offers + lean foresight.
+"""Agrimate-aligned wheat dynamics (Gate 0).
 
-24 steps/year. Out-of-equilibrium stock–trade with exogenous AMIS export cuts.
+24 steps/year. Bilateral offers, lean foresight, adaptive ask prices.
 
-Equations (Gate 0 spine)
-------------------------
-Per country i, step t (quantities MMT):
+See README §8 for the full equation set and symbol table. Implementation
+summary:
 
-  avail_i = S_{i,t} + H_{i,t}
-  desired_i = C_{i,t} (p_t / p0)^ε          # isoelastic food demand
-  lean_i = max(0, C^ahead_i − H^ahead_i)    # foresight to next harvest pulse
+  avail_i = S_i + H_i
+  desired_i = C_i (p / p0)^ε
+  lean from expected harvest ahead (blend of seasonal + realized)
   target_i = lean_i + safety_i
+  D_i = food shortfall + λ·stock-gap     (purchase demand)
+  O_i = max(0, avail − desired − target)·(1 − τ_i)   (AMIS-cut offers)
 
-  # Purchase demand covers food + stock rebuild (Agrimate-like importers)
-  D_i = max(0, desired_i + target_i − avail_i)
-
-  # Export offers: surplus above food + target, cut by AMIS τ_i ∈ [0,1]
-  O_i = max(0, avail_i − desired_i − target_i) · (1 − τ_i)
-
-Bilateral clear with FAOSTAT destination shares A_{ij} and source shares
-S_{ij} (Armington preferred-source matching, limited residual substitution).
-
-World price (path-matched twin; no flat AMIS surcharge):
-
-  free_t = Σ_i S_{i,t+1} − Σ_i lean_i
-  u_t    = unmet purchase demand fraction after bilateral clear
-  b_t    = share of demand whose preferred source is AMIS-restricted
-           (Σ_{i,j} S_{ij} τ_i D_j) / Σ D
-
-  p*_t = p0 · free_term(F^twin_t, free_t) · (1 + κ_u Δu_t + κ_b b_t)
-  p_t  = ρ p_{t−1} + (1−ρ) p*_t
-
-AMIS bites by cutting offers and blocking preferred import links (e.g.
-Egypt←Russia), not by a reduced-form world-price wedge.
+  Armington clear with ask-reweighted destination shares.
+  Exporter ask q_i adapts to fill rates (Agrimate-like offer prices).
+  World p blends trade-weighted asks with twin free-stock / blockage signal.
 """
 from __future__ import annotations
 
@@ -73,12 +56,16 @@ _AMIS_COUNTRY = {
 
 MAX_LEAN_STEPS = STEPS_PER_YEAR
 HARVEST_PULSE_FRAC = 0.12
-# Price response to *anomalous* unmet vs path-matched twin (not raw seasonal unmet)
-# Price response to anomalous unmet vs twin + preferred-source blockage
 UNMET_KAPPA = 5.0
-BLOCK_KAPPA = 3.5
-# Partial stock-gap closure per step (Agrimate-like gradual orders)
+BLOCK_KAPPA = 4.5
 REBUILD_LAMBDA = 0.20
+# Adaptive ask prices (Agrimate-like suppliers)
+ASK_ALPHA = 0.15          # speed of ask adjustment to fill gaps
+ASK_TARGET_FILL = 0.70    # target offer fill rate
+ASK_COMP_ELAST = 1.25     # destination reweight ∝ (q̄/q_i)^γ
+TRADE_PRICE_WEIGHT = 0.35 # blend of trade-weighted asks into p*
+# Harvest foresight: weight on realized path vs seasonal expectation
+FORESIGHT_PHI = 0.55
 
 
 @dataclass
@@ -98,6 +85,7 @@ class WheatSimResult:
     unmet_frac: np.ndarray | None = None
     offers: np.ndarray | None = None
     purchase_demand: np.ndarray | None = None
+    ask: np.ndarray | None = None  # exporter ask prices q_{i,t}
 
 
 def _psd_wheat_annual(countries: list[str],
@@ -223,16 +211,21 @@ def load_trade_shares(countries: list[str],
     return A, S
 
 
+def _ask_reweight_dest(A: np.ndarray, ask: np.ndarray, p0: float,
+                       gamma: float = ASK_COMP_ELAST) -> np.ndarray:
+    """Reweight destination shares toward cheaper ask prices; renorm rows."""
+    rel = (float(p0) / np.maximum(ask, 1e-6)) ** gamma
+    A_eff = A * rel[:, None]
+    row = A_eff.sum(axis=1, keepdims=True)
+    np.divide(A_eff, row, out=A_eff, where=row > 0)
+    return A_eff
+
+
 def _bilateral_clear(offers: np.ndarray, demand: np.ndarray,
                      A: np.ndarray, S: np.ndarray,
                      subst: float = 0.15,
                      ) -> tuple[np.ndarray, np.ndarray]:
-    """Armington-style clear: preferred sources first, limited substitution.
-
-    Round 1: ship_ij = min(offer_i·A_ij, demand_j·S_ij).
-    Round 2: residual demand draws residual offers in a pool, capped at
-    ``subst`` × leftover demand (imperfect redirection after a ban).
-    """
+    """Armington-style clear: preferred sources first, limited substitution."""
     O = offers[:, None] * A
     D = S * demand[None, :]
     ship = np.minimum(O, D)
@@ -245,10 +238,8 @@ def _bilateral_clear(offers: np.ndarray, demand: np.ndarray,
     if tot_o > 1e-15 and tot_t > 1e-15:
         fill = min(1.0, tot_o / tot_t)
         recv2 = take * fill
-        # Split each exporter's residual offers across importers by recv2 weights
         w = recv2 / max(float(recv2.sum()), 1e-15)
         ship2 = offer_left[:, None] * w[None, :]
-        # Cap by remaining importer need
         col = ship2.sum(axis=0)
         scale = np.ones_like(recv2)
         mask = col > recv2 + 1e-15
@@ -274,12 +265,15 @@ def _simulate_window(
         S: np.ndarray,
         free_twin: np.ndarray | None = None,
         unmet_twin: np.ndarray | None = None,
+        H_seasonal: np.ndarray | None = None,
         pulse_frac: float | None = None,
         unmet_kappa: float = UNMET_KAPPA,
         block_kappa: float = BLOCK_KAPPA,
         rebuild_lambda: float = REBUILD_LAMBDA,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray,
-           np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        foresight_phi: float = FORESIGHT_PHI,
+        ask_alpha: float = ASK_ALPHA,
+        trade_w: float = TRADE_PRICE_WEIGHT,
+) -> tuple[np.ndarray, ...]:
     if pulse_frac is None:
         pulse_frac = HARVEST_PULSE_FRAC
     n, T = H.shape
@@ -292,13 +286,21 @@ def _simulate_window(
     unmet_path = np.zeros(T)
     offer_path = np.zeros((n, T))
     demand_path = np.zeros((n, T))
+    ask_path = np.zeros((n, T))
     p = float(p0)
+    ask = np.full(n, float(p0))
     safety_w = float(max(safety.sum(), 1.0))
     warehouse = np.maximum(4.0 * C_ann, 8.0 * safety)
 
-    lean_h = steps_to_harvest_pulse(H, frac=pulse_frac,
+    # Expected harvest path for lean foresight (adaptive / seasonal blend).
+    if H_seasonal is None:
+        H_exp = H
+    else:
+        H_exp = foresight_phi * H + (1.0 - foresight_phi) * H_seasonal
+
+    lean_h = steps_to_harvest_pulse(H_exp, frac=pulse_frac,
                                     max_horizon=MAX_LEAN_STEPS)
-    H_ahead = rolling_ahead_variable(H, lean_h)
+    H_ahead = rolling_ahead_variable(H_exp, lean_h)
     C_ahead = rolling_ahead_variable(C_step, lean_h)
 
     for t in range(T):
@@ -307,7 +309,7 @@ def _simulate_window(
 
         lean_gap = np.maximum(
             0.0,
-            C_ahead[:, t] + C_step[:, t] - H_ahead[:, t] - H[:, t],
+            C_ahead[:, t] + C_step[:, t] - H_ahead[:, t] - H_exp[:, t],
         )
         target = lean_gap + safety
 
@@ -318,13 +320,23 @@ def _simulate_window(
         offers = np.maximum(0.0, avail - desired - target) * (1.0 - cuts[:, t])
         offer_path[:, t] = offers
         demand_path[:, t] = demand
+        ask_path[:, t] = ask
 
-        shipped, received = _bilateral_clear(offers, demand, A, S)
+        A_eff = _ask_reweight_dest(A, ask, p0)
+        shipped, received = _bilateral_clear(offers, demand, A_eff, S)
 
         consumption = np.minimum(
             desired, np.maximum(0.0, avail - shipped + received))
         stock = np.maximum(0.0, avail - shipped - consumption + received)
         stock = stock - np.maximum(0.0, stock - warehouse)
+
+        # Adaptive ask: raise if sold out (fill high), cut if left on shelf.
+        fill = shipped / np.maximum(offers, 1e-9)
+        fill = np.where(offers > 1e-9, fill, ASK_TARGET_FILL)
+        ask = ask * np.exp(ask_alpha * (fill - ASK_TARGET_FILL))
+        # Soft mean-reversion toward the current world price (anchors level).
+        ask = 0.82 * ask + 0.18 * p
+        ask = np.clip(ask, 0.45 * p0, 2.8 * p0)
 
         lean_need = float(lean_gap.sum())
         free = float(stock.sum()) - lean_need
@@ -335,12 +347,17 @@ def _simulate_window(
         unmet_frac = unmet / max(total_d, 1e-9)
         unmet_path[t] = unmet_frac
 
-        # Share of purchase demand whose preferred source is AMIS-restricted.
-        # Endogenous: scales with who is buying, not a flat policy surcharge.
         preferred_block = float((S * cuts[:, t][:, None] * demand[None, :]).sum())
         block_frac = preferred_block / max(total_d, 1e-9)
 
+        shipped_sum = float(shipped.sum())
+        if shipped_sum > 1e-12:
+            p_trade = float(np.dot(ask, shipped) / shipped_sum)
+        else:
+            p_trade = p
+
         if free_twin is None:
+            # Twin / spin-up: hold p0 so free/unmet baselines are physical-only.
             p_star = p0
         else:
             twin = float(free_twin[t])
@@ -352,9 +369,15 @@ def _simulate_window(
                 free_term = ratio ** (0.20 * inv_eta)
             u0 = float(unmet_twin[t]) if unmet_twin is not None else 0.0
             u_anom = max(0.0, unmet_frac - u0)
-            p_star = (p0 * free_term
+            p_scar = (p0 * free_term
                       * (1.0 + unmet_kappa * u_anom + block_kappa * block_frac))
-
+            # Calm match to twin: no trade-price drift (preserves twin identity).
+            calm = (abs(ratio - 1.0) < 1e-6 and u_anom < 1e-9
+                    and block_frac < 1e-9)
+            if calm:
+                p_star = p0
+            else:
+                p_star = trade_w * p_trade + (1.0 - trade_w) * p_scar
         p = float(smooth * p + (1.0 - smooth) * p_star)
         p = float(np.clip(p, 80.0, 900.0))
 
@@ -364,7 +387,7 @@ def _simulate_window(
         exp_path[:, t] = shipped
 
     return (price, stock_path, cons_path, exp_path,
-            free_path, unmet_path, offer_path, demand_path)
+            free_path, unmet_path, offer_path, demand_path, ask_path)
 
 
 def run_wheat_dynamics(
@@ -416,7 +439,7 @@ def run_wheat_dynamics(
                               spin_years[-1], calendar=cal)
         C_spin = np.tile((C_ann / STEPS_PER_YEAR)[:, None],
                          (1, H_spin.shape[1]))
-        _, stock_path_s, _, _, _, _, _, _ = _simulate_window(
+        _, stock_path_s, _, _, _, _, _, _, _ = _simulate_window(
             H_spin, C_spin, np.zeros_like(H_spin), spin_stock, safety,
             p0, elast, inv_eta, smooth, C_ann, A, S, free_twin=None)
         spin_stock = stock_path_s[:, -1]
@@ -426,9 +449,10 @@ def run_wheat_dynamics(
 
     H_twin = harvest_path(countries, tiled_mean, start_year, end_year,
                           calendar=cal)
-    _, _, _, _, free_twin, unmet_twin, _, _ = _simulate_window(
+    _, _, _, _, free_twin, unmet_twin, _, _, _ = _simulate_window(
         H_twin, C_step, np.zeros_like(H_twin), spin_stock.copy(), safety,
-        p0, elast, inv_eta, smooth, C_ann, A, S, free_twin=None)
+        p0, elast, inv_eta, smooth, C_ann, A, S, free_twin=None,
+        H_seasonal=H_twin)
 
     if use_shocks:
         H = harvest_path(countries, prod_score, start_year, end_year,
@@ -439,17 +463,17 @@ def run_wheat_dynamics(
             if use_amis else np.zeros((n, T)))
 
     (price, stock_path, cons_path, exp_path,
-     free_liq, unmet, offers, demand) = _simulate_window(
+     free_liq, unmet, offers, demand, ask) = _simulate_window(
         H, C_step, cuts, spin_stock.copy(), safety,
         p0, elast, inv_eta, smooth, C_ann, A, S,
-        free_twin=free_twin, unmet_twin=unmet_twin)
+        free_twin=free_twin, unmet_twin=unmet_twin, H_seasonal=H_twin)
 
     return WheatSimResult(
         countries=countries, start_year=start_year, end_year=end_year,
         price=price, stock=stock_path, harvest=H, consumption=cons_path,
         exports=exp_path, export_cut=cuts, spin_up_years=spin_up_years,
         free_liquid=free_liq, free_twin=free_twin, unmet_frac=unmet,
-        offers=offers, purchase_demand=demand,
+        offers=offers, purchase_demand=demand, ask=ask,
     )
 
 
@@ -473,17 +497,18 @@ def assert_twin_identity(tol_price: float = 0.02,
 
 
 def assert_amis_raises_price(min_lift: float = 0.08) -> None:
-    """Tau-only: Russia-ban window must lift prices vs pre-ban baseline."""
-    res = run_wheat_dynamics(use_amis=True, use_shocks=False)
-    t_pre = (2010 - res.start_year) * STEPS_PER_YEAR + (6 - 1) * 2
-    t_ban = (2010 - res.start_year) * STEPS_PER_YEAR + (10 - 1) * 2
-    pre = float(np.mean(res.price[t_pre:t_pre + 2]))
-    ban = float(np.mean(res.price[t_ban:t_ban + 2]))
-    lift = ban / max(pre, 1e-9) - 1.0
+    """Tau-only ban-window prices must exceed no-AMIS prices by min_lift."""
+    tau = run_wheat_dynamics(use_amis=True, use_shocks=False)
+    base = run_wheat_dynamics(use_amis=False, use_shocks=False)
+    t0 = (2010 - tau.start_year) * STEPS_PER_YEAR + (8 - 1) * 2
+    t1 = (2010 - tau.start_year) * STEPS_PER_YEAR + (12 - 1) * 2 + 2
+    p_tau = float(np.mean(tau.price[t0:t1]))
+    p_base = float(np.mean(base.price[t0:t1]))
+    lift = p_tau / max(p_base, 1e-9) - 1.0
     if lift < min_lift:
         raise AssertionError(
-            f"AMIS ban-window lift {lift:.3%} < {min_lift:.3%} "
-            f"(pre={pre:.1f}, ban={ban:.1f})")
+            f"AMIS vs no-AMIS ban-window lift {lift:.3%} < {min_lift:.3%} "
+            f"(tau={p_tau:.1f}, base={p_base:.1f})")
 
 
 def assert_no_spring_spike(max_ratio: float = 1.25) -> None:

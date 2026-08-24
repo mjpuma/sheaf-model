@@ -38,13 +38,18 @@ the decoupled, single-commodity limit.*
 
 ## Mathematical formulation
 
-SHEAF couples a **market layer** — a multi-commodity spatial price equilibrium that
-clears the trade network — with a **strategic layer** in which exporting governments
-choose export restrictions, and a **storage layer** that carries stocks between
-periods. This section states the model precisely; it is written to match the
-implementation in `sheaf/core.py` and to serve as a methods reference.
+SHEAF has two related formulations:
 
-### Notation
+1. **Annual multi-commodity SPE + export game** (`sheaf/core.py`, §§1–6) — the
+   original market / strategic / storage layers.
+2. **Gate 0 sub-annual wheat spine** (`sheaf/dynamic_wheat.py`, §8) — Agrimate-aligned
+   24-step/year bilateral stock–trade dynamics used for crisis hindcasts.
+
+Crisis validation (Gate 0) uses §8. The annual SPE remains a reference / outer
+diagnostic and the multi-commodity / Level-2 host. Symbols are defined in the
+notation tables of each subsection.
+
+### Notation (annual SPE layers, §§1–5)
 
 | Symbol | Meaning |
 |---|---|
@@ -217,16 +222,18 @@ rules; the state sets them. Oligopolistic traders with market power are a natura
 third agent class for future work, but for the export-ban question the first-order
 driver is state policy.
 
-### 5. Temporal dynamics
+### 5. Temporal dynamics (annual SPE orchestrator)
 
-Each period $t$ executes: (i) form expectations $p^e$; (ii) set storage
-$\Delta^{\mathrm{mkt}},\Delta^{\mathrm{gov}}$ and hence availability $A_t$;
-(iii) a **stress gate** solves the market at $\tau=0$ and plays the game only if
-$\max_{i,g} p_{i,g} > \mu\,p^{\mathrm{norm}}_g$ (calm periods have $\tau\approx 0$ regardless,
-so this only saves computation); (iv) clear the market / equilibrium game to get
-$p_t, D_t, f_t$; (v) update reserves $R_{t+1} = \max(0,\ R_t + \Delta_t)$ and carry
-$p^{\mathrm{prev}} \leftarrow p_t$. Shocks enter as production multipliers
-$\xi^g_i(t)$ and chokepoint disruptions as route multipliers $\psi_{ij}(t)$.
+Each **annual** period $t$ in `SheafModel` executes: (i) form expectations $p^e$;
+(ii) set storage $\Delta^{\mathrm{mkt}},\Delta^{\mathrm{gov}}$ and hence availability
+$A_t$; (iii) a **stress gate** solves the market at $\tau=0$ and plays the game only
+if $\max_{i,g} p_{i,g} > \mu\,p^{\mathrm{norm}}_g$; (iv) clear the market / equilibrium
+game to get $p_t, D_t, f_t$; (v) update reserves
+$R_{t+1} = \max(0,\ R_t + \Delta_t)$. Shocks enter as $\xi^g_i(t)$ and chokepoint
+multipliers $\psi_{ij}(t)$.
+
+**Gate 0 crisis hindcasts do not use this annual clock.** They use the 24-step/year
+spine in §8 (`ARCHITECTURE.md`).
 
 ### 6. The single-commodity models as a limiting case
 
@@ -244,20 +251,133 @@ substitution contribution is precisely the deviation from that boundary — the 
 
 ### 7. From data to parameters
 
-**Intended production path** (VALIDATION.md): production $Q$, baseline consumption
-$D_0$, and stocks $S_0$ from USDA PSD (`sheaf/data_usda.py`); reserves from USDA, not
-FAOSTAT (FAOSTAT stocks are food-balance residuals); baseline network structure from
-FAOSTAT bilateral matrices (`sheaf/data_faostat.py`).
+**Gate 0 wheat spine (§8):** USDA PSD country production, consumption, and ending
+stocks (`sheaf/data_usda.py`); FAOSTAT bilateral E0 shares
+(`sheaf/data_faostat.py`); AMIS export-restriction schedules; harvest calendars in
+`data/crop_calendars/`; monthly Pink Sheet prices for scoring.
 
-**Current runnable prototype:** `demo.py` and `SheafModel` use the illustrative
-hand-entered table in `sheaf/calibration.py`. The USDA/FAOSTAT adapters feed
-diagnostic scripts (`scripts/validate_forcing.py`, `scripts/build_network.py`) and
-are **not** yet wired into the live country list. Treat magnitudes as order-of-magnitude
-illustrations, not estimates. Own- and cross-price elasticities
-$(\varepsilon_g,\rho_{gh})$ are illustrative / literature-flavoured placeholders.
-Policy parameters $(w_{i,g}, \bar p_{i,g})$ are hand-set for the prototype; fitting
-them to historical restriction cascades is a **calibration** exercise (see
-`VALIDATION.md` Level 2), not a completed out-of-sample prediction.
+**Annual SPE prototype:** `demo.py` / `SheafModel` still use the illustrative table
+in `sheaf/calibration.py` (optionally overlaid with USDA quantities). Own- and
+cross-price elasticities $(\varepsilon_g,\rho_{gh})$ and policy weights
+$(w_{i,g}, \bar p_{i,g})$ remain illustrative pending Level-2 calibration
+(`VALIDATION.md`).
+
+### 8. Gate 0 sub-annual wheat spine (Agrimate-aligned)
+
+Implementation: `sheaf/dynamic_wheat.py`. Clock: $T_y=24$ steps per year
+($\Delta t \approx 15.2$ days). Quantities in million tonnes (MMT); prices in
+real \$/tonne (Pink Sheet deflator).
+
+#### Notation
+
+| Symbol | Meaning | Default / source |
+|---|---|---|
+| $i,j$ | SHEAF nodes (17 named + Rest-of-World) | `calibration.DATA` |
+| $t$ | sub-annual step index | $24$ per calendar year |
+| $H_{i,t}$ | harvest inflow (MMT/step) | PSD annual × calendar weights |
+| $C_{i,t}$ | baseline food use (MMT/step) | PSD consumption $/24$ |
+| $S_{i,t}$ | end-of-step stocks (MMT) | state variable |
+| $\mathrm{avail}_{i,t}$ | $S_{i,t}+H_{i,t}$ | — |
+| $p_t$ | world wheat price (\$/t) | state; smoothed |
+| $p_0$ | reference price | mean real Pink Sheet in start year |
+| $\varepsilon$ | food demand price elasticity | $-0.12$ |
+| $\tau_{i,t}\in[0,1]$ | AMIS export quantity cut | ban $0.95$, tax $0.50$, … |
+| $A_{ij}$ | destination share of $i$'s exports to $j$ | FAOSTAT E0 (diag $0$) |
+| $S_{ij}$ | source share of $j$'s imports from $i$ | FAOSTAT E0 (diag $0$) |
+| $q_{i,t}$ | exporter **ask** price (\$/t) | adapts to fill rates |
+| $\lambda$ | stock-rebuild speed per step | $0.20$ |
+| $\phi$ | weight on realized harvest in foresight | $0.55$ |
+| $\eta$ | scarcity-price inverse elasticity | $0.85$ |
+| $\rho$ | price smoothing toward $p^\star$ | $0.70$ |
+| $\kappa_u,\kappa_b$ | unmet-anomaly and preferred-block weights | $5.0$, $4.5$ |
+| $\alpha,\theta$ | ask-adjustment speed and target fill | $0.15$, $0.70$ |
+| $\gamma$ | ask competitiveness exponent | $1.25$ |
+| $\omega$ | weight on trade-weighted ask in $p^\star$ | $0.35$ |
+| $\beta$ | ask mean-reversion weight toward $p_t$ | $0.18$ |
+| $\nu$ | residual-substitution share after Armington | $0.15$ |
+| $s_i$ | safety stock | $\mathtt{stu\_target}\cdot C_i^{\mathrm{ann}}$ ($0.18$) |
+
+#### Harvest calendars
+
+Annual PSD production for country $i$ and year $y$ is spread over the $24$ steps
+with triangular month weights peaking at the country's `peak_month`
+(`sheaf/seasonal.py`).
+
+#### Lean foresight and targets
+
+Let $h_t$ be steps to the next global harvest pulse (cumulative future world
+harvest $\ge 12\%$ of mean annual world $H$). Expected harvest for foresight is
+the blend
+$$H^{\mathrm{exp}}_{i,t}=\phi\,H_{i,t}+(1-\phi)\,H^{\mathrm{seas}}_{i,t},$$
+where $H^{\mathrm{seas}}$ is the mean-year seasonal path. Then
+$$
+L_{i,t}=\max\Bigl(0,\ \sum_{k=1}^{h_t} C_{i,t+k}-\sum_{k=1}^{h_t} H^{\mathrm{exp}}_{i,t+k}\Bigr),
+\qquad
+T_{i,t}=L_{i,t}+s_i.
+$$
+
+#### Demand, offers, and AMIS
+
+$$
+d_{i,t}=C_{i,t}\,(p_t/p_0)^{\varepsilon},
+$$
+$$
+D_{i,t}=\max(0,d_{i,t}-\mathrm{avail}_{i,t})
++\lambda\max\bigl(0,\,T_{i,t}-\max(0,\mathrm{avail}_{i,t}-d_{i,t})\bigr),
+$$
+$$
+O_{i,t}=\max(0,\mathrm{avail}_{i,t}-d_{i,t}-T_{i,t})\,(1-\tau_{i,t}).
+$$
+
+#### Adaptive ask prices and Armington clear
+
+Destination shares are ask-reweighted,
+$$\tilde A_{ij}\propto A_{ij}\,(p_0/q_{i,t})^{\gamma}\quad(\text{rows renormed}),$$
+then
+$$\mathrm{ship}_{ij}=\min\bigl(O_{i,t}\tilde A_{ij},\,D_{j,t}S_{ij}\bigr),$$
+with a residual pool that can fill at most fraction $\nu$ of leftover demand.
+Fill rates update asks (sold-out $\Rightarrow$ raise ask; leftover $\Rightarrow$ cut):
+$$
+q_{i,t+1}
+=\bigl[(1-\beta)\,q_{i,t}\exp\bigl(\alpha(\mathrm{fill}_{i,t}-\theta)\bigr)
++\beta\,p_t\bigr],
+\qquad
+\mathrm{fill}_{i,t}=\frac{\sum_j\mathrm{ship}_{ij}}{\max(O_{i,t},\epsilon)},
+$$
+with mean-reversion weight $\beta=0.18$, clipped to $[0.45\,p_0,\,2.8\,p_0]$.
+
+#### World price
+
+After trade, $\mathrm{free}_t=\sum_i S_{i,t+1}-\sum_i L_{i,t}$. Let
+$F^{\mathrm{twin}}_t$ and $u^{\mathrm{twin}}_t$ be free stocks and unmet fractions
+from a **path-matched twin** (same $C_{i,t}$, mean-year $H$, $\tau\equiv 0$). Define
+$$
+u_t=1-\frac{\sum_i\mathrm{received}_{i,t}}{\max(\sum_i D_{i,t},\epsilon)},
+\quad
+b_t=\frac{\sum_{i,j} S_{ij}\,\tau_{i,t}\,D_{j,t}}{\max(\sum_j D_{j,t},\epsilon)},
+\quad
+\Delta u_t=\max(0,u_t-u^{\mathrm{twin}}_t).
+$$
+Trade-weighted ask $p^{\mathrm{tr}}_t=\sum_i q_{i,t}\mathrm{shipped}_{i,t}/\sum_i\mathrm{shipped}_{i,t}$
+(or $p_t$ if no trade). Scarcity signal
+$$
+p^{\mathrm{scar}}_t=p_0\cdot r_t^{\eta_{\mathrm{eff}}}
+\cdot\bigl(1+\kappa_u\Delta u_t+\kappa_b b_t\bigr),
+$$
+with $r_t=(F^{\mathrm{twin}}_t+f)/(\mathrm{free}_t+f)$ and $\eta_{\mathrm{eff}}=\eta$ if
+$r_t\ge 1$, else $0.2\eta$ (asymmetric abundance). Then
+$$
+p^\star_t=\omega\,p^{\mathrm{tr}}_t+(1-\omega)\,p^{\mathrm{scar}}_t,
+\qquad
+p_t=\rho\,p_{t-1}+(1-\rho)\,p^\star_t.
+$$
+If the path matches the twin (calm), $p^\star_t=p_0$ by construction
+(`assert_twin_identity`).
+
+#### Robustness asserts
+
+`assert_twin_identity`, `assert_amis_raises_price`, `assert_amis_cuts_exports`,
+`assert_no_spring_spike` — run by `scripts/score_subannual_wheat.py`.
 
 ### References
 
