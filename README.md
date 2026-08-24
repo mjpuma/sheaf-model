@@ -284,24 +284,28 @@ for wheat, maize, and rice (`diagnostics/GATE0_PER_CROP_PLAN.md`).
 | $C_{i,t}$ | baseline food use (MMT/step) | PSD consumption $/24$ |
 | $S_{i,t}$ | end-of-step stocks (MMT) | state variable |
 | $\mathrm{avail}_{i,t}$ | $S_{i,t}+H_{i,t}$ | — |
-| $p_t$ | world wheat price (\$/t) | state; smoothed |
+| $p_t$ | world price (\$/t) | state; smoothed |
 | $p_0$ | reference price | mean real Pink Sheet in start year |
-| $\varepsilon$ | food demand price elasticity | $-0.12$ |
+| $\varepsilon$ | food demand price elasticity | crop-specific (`CropParams.elast`) |
 | $\tau_{i,t}\in[0,1]$ | AMIS export quantity cut | ban $0.95$, tax $0.50$, … |
 | $A_{ij}$ | destination share of $i$'s exports to $j$ | FAOSTAT E0 (diag $0$) |
 | $S_{ij}$ | source share of $j$'s imports from $i$ | FAOSTAT E0 (diag $0$) |
 | $q_{i,t}$ | exporter **ask** price (\$/t) | adapts to fill rates |
-| $\lambda$ | stock-rebuild speed per step | $0.20$ |
-| $\phi$ | weight on realized harvest in foresight | $0.55$ |
-| $\eta$ | scarcity-price inverse elasticity | $0.85$ |
-| $\rho$ | price smoothing toward $p^\star$ | $0.70$ |
-| $\kappa_u,\kappa_b$ | unmet-anomaly and preferred-block weights | $5.0$, $4.5$ |
+| $\lambda$ | stock-rebuild speed per step | $0.08$ |
+| $\phi$ | weight on realized harvest in foresight | $0.55$ (maize $0.40$) |
+| $\eta$ | scarcity-price inverse elasticity | $\approx 1.0$ |
+| $\rho$ | price smoothing toward $p^\star$ | $0.65$ |
+| $\kappa_u,\kappa_b$ | unmet-anomaly and preferred-block weights | crop-specific |
 | $\alpha,\theta$ | ask-adjustment speed and target fill | $0.15$, $0.70$ |
 | $\gamma$ | ask competitiveness exponent | $1.25$ |
-| $\omega$ | weight on trade-weighted ask in $p^\star$ | $0.80$ (ask-dominated) |
+| $\omega$ | weight on trade-weighted ask in $p^\star$ | $\approx 0.65$–$0.72$ |
 | $\beta$ | ask mean-reversion weight toward $p_t$ | $0.18$ |
 | $\nu$ | residual-substitution share after Armington | $0.15$ |
-| $s_i$ | safety stock | $\mathtt{stu\_target}\cdot C_i^{\mathrm{ann}}$ ($0.18$) |
+| $s_i$ | safety stock | $\mathtt{stu\_target}\cdot C_i^{\mathrm{ann}}$ |
+
+Full parameterization, classes (structural / literature / reduced-form), and
+economic defensibility: [`diagnostics/GATE0_PARAMETERIZATION.md`](diagnostics/GATE0_PARAMETERIZATION.md).
+Defaults live in `sheaf.dynamic_crop.default_crop_params`.
 
 #### Harvest calendars
 

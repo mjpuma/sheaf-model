@@ -90,7 +90,8 @@ def main():
 
     lines = [f"# Gate 0 report — {crop}", "",
              f"Window {args.start}–{args.end}. Ask-dominated bilateral spine "
-             f"(`sheaf.dynamic_crop`). No cross-grain substitution.", ""]
+             f"(`sheaf.dynamic_crop`). No cross-grain substitution.", "",
+             "Parameters: see `diagnostics/GATE0_PARAMETERIZATION.md`.", ""]
 
     if not args.skip_asserts:
         print(f"Robustness asserts ({crop}):")
@@ -121,6 +122,10 @@ def main():
             crop, start_year=args.start, end_year=args.end,
             use_amis=True, use_shocks=False),
     }
+    if legs["full"].params is not None:
+        lines.append("## Parameters (`CropParams`)")
+        lines.append(f"```\n{legs['full'].params}\n```")
+        lines.append("")
 
     obs = load_price_series_monthly(deflated=True)
     obs = obs[(obs.year >= args.start) & (obs.year <= args.end)][

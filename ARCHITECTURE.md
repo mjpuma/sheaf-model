@@ -121,6 +121,7 @@ detailed diagnostics **before** substitution or Level 2. See
    stocks + bilateral trade + adaptive ask prices + exogenous AMIS —
    world $p$ **ask-dominated** (`sheaf/dynamic_crop.py`; wheat wrap in
    `dynamic_wheat.py`). Twin path = identity diagnostic only.
+   Parameters and defensibility: `diagnostics/GATE0_PARAMETERIZATION.md`.
 5. **Detailed per-crop Gate 0 diagnostics** (`scripts/score_subannual_crop.py`)
    — price legs, stocks/STU, exporter AMIS bite, attribution, markdown report.
    Wheat also keeps `score_subannual_wheat.py` as a thin entry point.

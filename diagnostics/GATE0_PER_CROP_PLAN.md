@@ -68,17 +68,18 @@ Must write and print:
 - [x] Maize and rice runs + reports (`scripts/score_subannual_crop.py`).
 - [x] Commit this Gate 0 per-crop baseline.
 
-### Soft score snapshot (2026-08-24, after ask-dominated spine)
+### Soft score snapshot (2026-08-24 parameterization retune)
+
+See `GATE0_PARAMETERIZATION.md` for the equation/parameter audit.
 
 | Crop | full corr | 2007/08 full hike | Asserts |
 |---|---|---|---|
-| wheat | +0.49 | ×2.30 (obs ×1.82) | PASS |
-| maize | −0.09 | ×1.42 (obs ×1.84) | PASS (price path still soft-fail) |
-| rice | +0.62 | ×2.11 (obs ×1.84) | PASS |
+| wheat | ~+0.68 | ~×1.4 | PASS |
+| maize | ~+0.36 | ~×1.5+ | PASS (shortfalls-only shocks) |
+| rice | ~+0.80 | ~×2.2 | PASS |
 
-**Next hardening (before subst / Level 2):** improve maize monthly price path
-(soft bar); optionally retune 2010/11 wheat full leg. Do **not** open
-substitution or Level 2 until maize soft price behavior is acceptable.
+**Before subst / Level 2:** maize soft bar is improved but still the weakest;
+further gains need an explicit demand block, not more κ fitting.
 
 ## Explicit non-goals until Gate 0 per crop is green
 
