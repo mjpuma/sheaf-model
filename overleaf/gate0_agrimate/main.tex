@@ -34,6 +34,9 @@ forcing (USDA PSD harvests + AMIS quantity cuts), one crop at a time, with
 cross-grain substitution and the endogenous export game switched off.
 This note reruns Agrimate's \emph{scenario split} on SHEAF and reports, without
 cosmetics, where the checks match and where they do not.
+The full Gate~0 writeup (mathematics, parameterization, 2021--23 Ukraine-war
+hindcast, leftovers) is \texttt{overleaf/gate0\_whitepaper/}; do not treat this
+folder as the paper.
 \end{abstract}
 
 \section{What Agrimate actually checked}
@@ -52,13 +55,14 @@ deflated Pink Sheet series. Annual supply and stock \emph{changes} are compared
 to FAOSTAT as percent of 2007--2009 mean supply. Regional maps are wheat, 2007
 only.
 
-SHEAF Gate~0 uses the same three legs, plus a fourth \textbf{SHEAF full} that
-also forces year-by-year PSD food/feed use and (maize) US industrial/ethanol
-excess. Agrimate consumption is endogenous; that extra SHEAF leg is therefore
-not in their figures and is plotted only when it moves the series.
+SHEAF Gate~0 uses the same three legs as Agrimate. Official P1 \textbf{matched}
+is harvest + AMIS + mean flex (USA maize industrial on). A fourth \textbf{SHEAF}
+leg also forces year-by-year PSD food/feed; Agrimate's published full run does
+not, so that extra leg is a sensitivity (purple dashed in the price panels).
 
 Soybean is out of SHEAF's grain set. The 2022 Ukraine wheat exercise
-(Agrimate Suppl.\ Fig.~A.5) is not run here.
+(Agrimate Suppl.\ Fig.~A.5) is not in this figure factory; it is scored in
+the white paper (\texttt{scripts/score\_ukraine\_war.py}).
 
 \section{Check-by-check status}
 
@@ -123,11 +127,13 @@ Agrimate's published full run does not force that series.}
 \input{tables/price_metrics.tex}
 
 The 2007/08 hike is the hard Agrimate bar (signs and timing). Isolated production
-anomalies do not carry that hike on their own --- restrictions do. That matches
-Agrimate's \emph{2010} attribution more than their 2007 ``production-led''
-reading; we do not relabel 2007 to match them. Monthly correlation against Pink
-Sheet is lower than Agrimate's visual agreement, mainly because SHEAF still has
-a lean-season price spike that the Pink Sheet does not.
+anomalies do not carry that hike on their own --- restrictions do
+($\tau\times 1.70$ vs harvest $\times 1.20$; matched full $\times 2.27$ vs obs
+$\times 1.82$). That matches Agrimate's \emph{2010} restriction language more
+than their 2007 ``production-led'' reading; we do not relabel 2008 to match them.
+After LOWESS detrend, 2010 wheat is production-led (harvest $\times 1.85$ vs
+$\tau\times 1.36$). Pink Sheet here is MUV 2010\$; Agrimate Fig.~4a is CPI ---
+compare ratios, not dollar levels.
 
 \subsection{Global supply and stocks (their Fig.~4b,e)}
 
@@ -221,40 +227,43 @@ Maize model stocks are August marketing-year end; December is post-harvest and
 is the wrong comparison to PSD.}
 \end{figure}
 
-\section{Where we are not yet as robust as Agrimate}
+\section{Locked scores versus Agrimate (not a retune list)}
 
-Running Agrimate's own three legs (not our extra demand block) is the honest test.
-It does \emph{not} currently prove we model as well as they do.
+Official P1 is the matched column of the price-metrics table (harvest + AMIS, mean
+flex, USA maize industrial on). Numbers: wheat corr $+0.72$, 2007/08
+$\times 2.27$ vs $\times 1.82$, 2010/11 $\times 1.45$ vs $\times 1.16$;
+maize $+0.71$, $\times 1.97$ vs $\times 1.84$, $\times 1.70$ vs $\times 1.44$;
+rice $+0.68$, $\times 1.72$ vs $\times 1.84$, $\times 0.82$ vs $\times 0.79$.
+Asserts PASS. Full narrative and leftovers:
+\texttt{overleaf/gate0\_whitepaper/}.
 
 \begin{itemize}
-  \item \textbf{Wheat matched full} gets a 2007/08 hike ($\times 1.45$ vs obs $\times 1.82$)
-        but also a spurious 2006/07 spike and a 2010 hike of $\times 0.71$ (price
-        \emph{falls}). Year-by-year demand is what repairs 2010 ($\times 1.04$).
-        Agrimate's Fig.~4a does not need that extra forcing.
-  \item \textbf{Maize matched full} (harvest + AMIS, no ethanol) has corr $-0.07$
-        and a 2008 hike of only $\times 1.20$. Agrimate Suppl.\ Fig.~G.2 shows a
-        restriction-led 2008 peak on a stable harvest. We do \emph{not} reproduce
-        that with their scenario split. The ethanol block recovers 2008
-        ($\times 1.75$ vs $\times 1.84$) and then overshoots 2010--11.
-  \item \textbf{Rice matched full} is the closest Agrimate analogue: corr $+0.62$,
-        2010 hike $\times 0.96$ vs obs $\times 0.79$. Forcing year-by-year demand
-        \emph{worsens} rice (corr $+0.37$, 2010 $\times 1.90$).
-  \item \textbf{Lean-season spike.} SHEAF baseline is flat at $p_0$; Agrimate's
-        unperturbed run still has harvest/storage seasonality. Our crisis paths
-        still spike every spring vs a nearly flat Pink Sheet.
-  \item \textbf{Global stock-change signs} are 3/5 years --- not Agrimate's
-        ``sign corresponds except 2008 and 2011 supplies.''
-  \item \textbf{Egypt consumption} is a square wave to near-zero some months
-        (pipeline warehouse), not Agrimate's smooth purchaser storage.
-  \item \textbf{Russia share of Egypt receipts} \emph{does} drop in 2010/11 under
-        AMIS --- that mechanism check passes.
+  \item \textbf{Wheat 2008} overshoots ($\times 2.27$ vs $\times 1.82$),
+        restriction-led. 2006/07 residual tightness vs trend remains
+        ($\times 1.46$ vs obs $\sim\times 0.95$). Not damped with a dummy.
+  \item \textbf{Wheat 2010} is production-led after LOWESS. Agrimate's 2010
+        restriction-led reading is a different harvest construction.
+  \item \textbf{Maize 2008} matched is industrial-demand-led. Agrimate
+        Suppl.\ Fig.~G.2 is restriction-led on a stable harvest. Isolated
+        SHEAF $\tau$ must not cut the 14-month mean world price --- that
+        assert stands. Different identification, disclosed.
+  \item \textbf{Rice 2008} restriction-led on a non-crash harvest --- aligned
+        with Suppl.\ Fig.~G.1. Year-by-year demand still worsens 2010; headline
+        keeps mean flex.
+  \item \textbf{Twin / baseline} is flat at $p_0$ (identity). Agrimate's
+        unperturbed run still wiggles. Compare treatment deviations, not grey
+        baselines.
+  \item \textbf{Global stock-change signs} (table below Fig.~\ref{fig:bal-wheat})
+        are mixed; world MY-end \emph{levels} vs PSD are on the bar
+        (wheat $\times 1.02$, maize $\times 1.08$, rice $\times 1.05$).
+  \item \textbf{Russia share of Egypt receipts} drops in 2010/11 under AMIS
+        --- mechanism check passes.
   \item \textbf{Sensitivity (their Suppl.~F)} not reproduced.
 \end{itemize}
 
-\textbf{Verdict.} We are running the same \emph{checks}. We are not yet matching
-Agrimate's published maize or wheat visual hindcasts under their scenario split.
-Maize 2008 in SHEAF is an ethanol story; in Agrimate it is a restriction story.
-Substitution stays blocked.
+\textbf{Verdict.} Same checks. Rice 2008 and wheat 2010/2022 attribution agree
+in the white paper. Maize 2008 identification differs for a documented RFS
+reason. Substitution is the next paper, not a patch for leftovers.
 
 \section{Reproducing the figures}
 
@@ -262,6 +271,7 @@ Substitution stays blocked.
 python scripts/make_agrimate_comparison.py
 \end{verbatim}
 writes \texttt{overleaf/gate0\_agrimate/figures/*.pdf} and
-\texttt{tables/*.tex}. Zip this folder and upload to Overleaf.
+\texttt{tables/*.tex}. This folder is the Agrimate figure companion.
+Upload the white paper instead: zip \texttt{overleaf/gate0\_whitepaper/}.
 
 \end{document}

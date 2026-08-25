@@ -10,3 +10,5 @@ level1_hindcast.csv
 data/usda_psd/psd_alldata.csv
 # Local copies of Kuhla et al. 2025 (copyrighted; do not commit)
 agrimate/
+# Convenience Overleaf zips (the folders are the source of truth)
+overleaf/*.zip

@@ -1,14 +1,16 @@
 # Long-term paper stack (collaborator feedback, 2026-08-24)
 
 Feedback from Kilian / Christian (and related) on uses of SHEAF. This is the
-**destination**. Gate 0 is still the next mile. Do not skip ahead.
+**destination**. Gate 0 / crisis P1 is **accepted** (white paper
+`overleaf/gate0_whitepaper/`). Next mile is **P3 substitution**. Do not skip
+to the game (P4–P5) or an endogenous network (P2).
 
 ## Papers
 
 | ID | Question | Now / next / later |
 |---|---|---|
-| **P1** | Reproduce observed **price, consumption, and trade** over crisis years (then decades) | **Now (Gate 0).** Agrimate bar: 2006–11, 24 steps/yr, per crop. Expand scoring beyond Pink Sheet to PSD consumption and coarse trade signs. Decades after crises hindcast. |
-| **P3** | Empirically validate **wheat–maize–rice substitution** vs 2007/08 spillovers | **Next.** Agrimate cannot do this (single commodity). Blocked until P1 is green per crop. |
+| **P1** | Reproduce observed **price, consumption, and trade** over crisis years (then decades) | **Crisis Gate 0 done.** Agrimate bar 2006–11 + Ukraine-war 2021–23 prices. Consumption and AMIS shipment *signs* scored; leftover *levels* are disclosed, not retuned. Decades after crises remain a later P1 expansion. |
+| **P3** | Empirically validate **wheat–maize–rice substitution** vs 2007/08 spillovers | **Next.** Agrimate cannot do this (single commodity). Run on the locked Gate 0 spine. |
 | **Cal** | Constrain behavioral + strategic parameters | **Alongside P1–P3.** See below. Kilian’s point stands: extra behavior needs a plan, not a grid search on crises. |
 | **P4** | Policy: exporters restrict *just enough* for domestic food security, minimizing importer harm; **club of the willing** if not all join | **After P1 is honest.** Same game layer, **normative / constrained-welfare** objective — not “who restricted in 2010.” Illustrative parameters OK if labeled. |
 | **P5** | Game theory: cooperation vs protectionism; **social tipping** | **After P4 setup.** Vary cooperation / food-security weights. Current IBR is non-cooperative only. |
@@ -32,9 +34,9 @@ appendix lists what was not estimated.
 ## Sequence (do not skip)
 
 ```
-P1  Gate 0 per crop  →  Agrimate-matched hindcast (price + consumption + trade signs)
+P1  Gate 0 crisis hindcast  ✓  (2006–11 + Ukraine-war prices; leftovers disclosed)
         ↓
-P3  Substitution on this spine
+P3  Substitution on this spine   ← next
         ↓
 Cal Written: structural / literature / estimated; train/hold-out for the game
         ↓

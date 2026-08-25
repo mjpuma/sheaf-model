@@ -3,7 +3,13 @@
 Zip **this folder** (`main.tex`, `refs.bib`, `sections/`, `tables/`, `figures/`)
 and upload to Overleaf: New Project → Upload Project.
 
-Compile with **pdfLaTeX + BibTeX** (Overleaf default).
+From the repo root:
+
+```
+cd overleaf && zip -r gate0_whitepaper.zip gate0_whitepaper -x "*.DS_Store"
+```
+
+The zip is gitignored; the folder is what to commit. Compile with **pdfLaTeX + BibTeX**.
 
 ## What this paper is
 
@@ -12,9 +18,8 @@ a time, 24 steps/year, exogenous AMIS cuts. Hindcasts 2007/08, 2010/11, and
 the 2021–23 Ukraine-war window.
 
 The older short note `../gate0_agrimate/` is a figure factory for the
-Agrimate scenario-split panels (some hike numbers in that `main.tex` are
-stale). **This folder is the writeup to upload.** Do not upload gitignored
-`agrimate/*.pdf` (copyright).
+Agrimate scenario-split panels. **This folder is the writeup to upload.** Do not
+upload gitignored `agrimate/*.pdf` (copyright).
 
 ## Regenerate from the repo root
 

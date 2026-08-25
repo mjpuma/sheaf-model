@@ -1,6 +1,8 @@
 # Gate 0 plan: per-crop Agrimate-style market before substitution / Level 2
 
-**Status:** active (locked 2026-08-24)  
+**Status:** accepted (2026-08-25). Official P1 scores, white paper, and
+Ukraine-war price hindcast are in `overleaf/gate0_whitepaper/`. Substitution
+(P3) is next; do not retune Gate 0 leftovers with crisis knobs.  
 **Replaces:** jumping to multi-grain substitution (`dynamic_grains` / spillover) before
 single-crop markets are proven.
 
@@ -74,17 +76,22 @@ Must write and print:
 - [x] Wheat thin-wrap (`dynamic_wheat.py`); Gate 0 wheat asserts still pass.
 - [x] Maize and rice runs + reports (`scripts/score_subannual_crop.py`).
 - [x] Commit this Gate 0 per-crop baseline.
+- [x] White paper (`overleaf/gate0_whitepaper/`) + 2021–23 Ukraine-war prices.
 
-### Soft score snapshot (demand/ethanol block)
+### Official P1 snapshot (matched: harvest + AMIS, mean flex, USA maize industrial)
 
-| Crop | full corr | 2007/08 full hike | Asserts |
-|---|---|---|---|
-| wheat | +0.74 | ×1.36 (obs ×1.82) | PASS |
-| maize | +0.58 | ×1.80 (obs ×1.84) | PASS |
-| rice | +0.81 | ×2.05 (obs ×1.84) | PASS |
+Source: `diagnostics/gate0_{crop}_report.md`. Authority for numbers: the white
+paper, not this table if they diverge.
 
-Industrial/ethanol: USA maize FSI excess vs 2000–04, inelastic. Substitution /
-Level 2 still paused until this per-crop bar is accepted.
+| Crop | full corr | 2007/08 full / obs | 2010/11 full / obs | Asserts |
+|---|---:|---:|---:|---|
+| wheat | +0.72 | ×2.27 / ×1.82 | ×1.45 / ×1.16 | PASS |
+| maize | +0.71 | ×1.97 / ×1.84 | ×1.70 / ×1.44 | PASS (isolated τ must not cut) |
+| rice | +0.68 | ×1.72 / ×1.84 | ×0.82 / ×0.79 | PASS |
+
+Industrial/ethanol: USA maize FSI excess vs 2000–04, inelastic. Substitution
+(P3) is next; Level 2 stays after that. Leftovers are listed in
+`GATE0_PARAMETERIZATION.md` §6 and the white paper — not a retune list.
 
 ## Official P1 scoring split (Agrimate-matched)
 
@@ -105,13 +112,15 @@ composition; (B) warehouse / lean-season dump; (C) demand default; (D) rice
 
 **Serial:** one writer on `sheaf/dynamic_crop.py`. Then parallel crop scores.
 
-**Pass (matched split):** wheat 2007/08 hike ≳ ×1.4 and no 2006/07 spike > 2008;
-wheat 2010 hike > 1.0 and restriction > harvest-only; maize 2008 matched ≳ ×1.4
-and matched > harvest-only (isolated τ must not cut world price); maize 2011
+**Pass (matched split, locked):** wheat 2007/08 hike ≳ ×1.4 and no 2006/07
+spike > 2008; wheat 2010 hike > 1.0. After LOWESS harvest anomalies, 2010 wheat
+is **production-led** (`shocks` > `tau`); do not force restriction > harvest
+with a 2010 dummy. Maize 2008 matched ≳ ×1.4 and matched > harvest-only
+(isolated τ must not cut the 14-month mean world price); maize 2011
 harvest-only > τ; rice 2008 ≳ ×1.5 restriction-led, 2010 not a false spike;
-corr wheat/rice ≳ +0.5, maize > 0; MY-end STU ~0.15–0.35.
+corr wheat/rice ≳ +0.5, maize > 0; world MY-end STU on PSD (~×1.0–1.1).
 
-## Explicit non-goals until Gate 0 per crop is green
+## Explicit non-goals of Gate 0 (still out of scope)
 
 - Fitting substitution scales on joint W/R/M crises (P3).
 - Endogenous restriction Nash / IBR, cooperative club, or tipping (Level 2 / P4–P5).

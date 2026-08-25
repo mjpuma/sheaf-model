@@ -11,7 +11,10 @@ SHEAF fills.
 
 ## Gate 0 — Agrimate-aligned reproduction first
 
-**Nothing in Level-2 (endogenous game) proceeds until Gate 0 is green.**
+**Gate 0 is green** (per-crop asserts PASS; official P1 scores in
+`diagnostics/gate0_*_report.md`; writeup `overleaf/gate0_whitepaper/`).
+Nothing in Level-2 (endogenous game) proceeds until **P3 substitution** has
+been run on that spine. Do not retune Gate 0 leftovers with crisis knobs.
 
 **Clock (locked):** **24 time steps per year** (~15.2 days), matching Agrimate
 (Kuhla et al. 2025 §4.1). Not annual. Not 26 fortnights by default — see
