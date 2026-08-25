@@ -1,0 +1,22 @@
+\begin{tabular}{l rrr ll}
+\toprule
+Parameter & Wheat & Maize & Rice & Class & Role \\
+\midrule
+$\varepsilon$ (\texttt{elast}) & $-0.15$ & $-0.25$ & $-0.20$ & literature & short-run flex demand \\
+\texttt{stu\_target} & $0.20$ & $0.16$ & $0.18$ & literature & safety $s_i$ \\
+\texttt{max\_stu} & $0.28$ & $0.18$ & $0.22$ & literature & carry ceiling \\
+\texttt{pipeline\_max\_steps} & $12$ & $12$ & $0$ & structural & working stocks \\
+$\lambda$ (\texttt{rebuild\_lambda}) & $0.08$ & $0.08$ & $0.08$ & reduced-form & lean rebuild \\
+\texttt{warehouse\_lambda} & $0.08$ & $0.08$ & $0.08$ & reduced-form & overflow drain \\
+$\eta$ (\texttt{inv\_eta}) & $1.00$ & $0.85$ & $0.95$ & reduced-form & scarcity inverse elast. \\
+$\rho$ (\texttt{smooth}) & $0.65$ & $0.65$ & $0.65$ & reduced-form & price AR smoother \\
+$\omega$ (\texttt{trade\_w}) & $0.70$ & $0.80$ & $0.72$ & reduced-form & ask weight in $p^\star$ \\
+$\kappa_u$ & $2.5$ & $2.5$ & $2.5$ & reduced-form & unmet anomaly \\
+$\kappa_b$ & $4.0$ & $4.0$ & $4.5$ & reduced-form & preferred-source block \\
+$\alpha,\theta,\gamma,\beta$ & \multicolumn{3}{c}{$0.15/0.70/1.25/0.18$} & reduced-form & ask adaptation \\
+$\alpha_r$ (\texttt{ask\_rival}) & $0.80$ & $0.80$ & $0.80$ & reduced-form & survivor markup \\
+$\phi$ (\texttt{foresight\_phi}) & $0.55$ & $0.50$ & $0.55$ & reduced-form & harvest foresight blend \\
+$\nu$ (\texttt{residual\_subst}) & $0.15$ & $0.15$ & $0.15$ & structural & residual Armington pool \\
+\texttt{industrial\_nodes} & --- & USA & --- & structural & RFS FSI residual \\
+\bottomrule
+\end{tabular}

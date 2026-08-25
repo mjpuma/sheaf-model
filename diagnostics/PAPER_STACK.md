@@ -53,8 +53,11 @@ Agrimate Figs. 3–4 / G.1–G.2:
 3. harvest + AMIS (`use_demand=False` except USA maize industrial)
 
 Year-by-year world food/feed PSD is a **sensitivity**, not the headline series.
-P1 also reports: world consumption vs PSD, MY-end stocks vs PSD, exporter
-shipment signs under AMIS.
+P1 also reports: world consumption vs PSD, MY-end stocks vs PSD (world and
+world excluding China; rice also excluding India), exporter
+shipment signs under AMIS (key restrictors, with vs without AMIS; optional
+PSD export signs). Not FAOSTAT bilateral crisis volumes or 28-region trade
+maps. Agrimate Fig. 3 is model-implied withheld grain, not observed trade.
 
 ## Explicitly not Gate 0
 

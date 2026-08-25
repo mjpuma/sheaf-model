@@ -1,0 +1,278 @@
+\section{Mathematical formulation}
+\label{sec:math}
+
+This section states every equation the Gate~0 spine actually solves. Symbols
+match \texttt{sheaf/dynamic\_crop.py} as of the commit that accompanies this
+note. Quantities are million tonnes (MMT) per step unless labelled annual;
+prices are real dollars per tonne (World Bank Pink Sheet, MUV 2010).
+
+\subsection{Clock, nodes, and state}
+
+There are $T_y=24$ steps per calendar year ($\Delta t\approx 15.2$ days),
+matching Agrimate~\citep{kuhla2025}. Nodes $i=1,\dots,n$ are the 17 named
+SHEAF countries plus a Rest-of-World residual. One crop $g$ is run at a time.
+The state at the start of step $t$ is commercial-plus-pipeline stock
+$S_{i,t}$, world price $p_t$, and exporter ask $q_{i,t}$. Harvest inflow
+$H_{i,t}$ arrives at the beginning of the step. Availability is
+\[
+\mathrm{avail}_{i,t}=S_{i,t}+H_{i,t}.
+\]
+
+\subsection{Harvest calendars and LOWESS anomalies}
+\label{sec:harvest}
+
+Annual USDA PSD production $Y_{i,y}$ is never laid on the calendar as a raw
+level. The twin (climatology) path is the score-window \emph{mean} seasonal
+harvest: triangular month weights from \texttt{sheaf/seasonal.py} applied to
+each country's mean production over the scoring years. Treatment harvest is
+that climatology times a per-country LOWESS multiplier,
+\begin{equation}
+\label{eq:harvest}
+H_{i,y}^{\mathrm{ann}}=\overline{H}_i\cdot(1+a_{i,y}),
+\qquad
+a_{i,y}=\frac{Y_{i,y}-\hat Y_{i,y}}{\hat Y_{i,y}},
+\end{equation}
+where $\hat Y$ is a local-linear LOWESS trend~\citep{cleveland1979} on a padded
+PSD history with a $\sim$10-year window (\texttt{detrend\_anomalies}; tricube
+weights, local intercept at the evaluation year). Signed anomalies keep
+surpluses (\texttt{shock\_mode=full}).
+
+\textbf{Why not the in-sample mean?} Post-2008 yield growth inflates a
+2006--11 mean. World wheat 2006 is about $-9\%$ versus that mean and only
+$-4\%$ versus LOWESS. Using raw levels treats 2006/07 as a crash (spurious
+lean-season spike) and under-weights the 2010 Russian drought, which sits
+near a boom-inflated mean. The same bias made 2008 maize look scarce when it
+is on-trend. Agrimate uses the same LOWESS construction; we follow it.
+
+Rice calendars are multi-crop (kharif+rabi / early+late) except Vietnam,
+whose autumn pulse is kept so the 2008 ban still hits offers.
+
+\subsection{Demand: flex versus industrial}
+\label{sec:demand}
+
+PSD domestic use is split
+\begin{equation}
+C_{i,y}=C^{\mathrm{flex}}_{i,y}+C^{\mathrm{ind}}_{i,y}.
+\end{equation}
+Flex use (food+feed) faces an isoelastic short-run response. Industrial use
+is price-inelastic in the step (a mandate, not a consumer FOC). USDA
+international PSD reports Feed and FSI, not ethanol gallons. For nodes in
+\texttt{industrial\_nodes} (default: USA maize only),
+\begin{equation}
+\label{eq:industrial}
+C^{\mathrm{ind}}_{i,y}=\min\Bigl(C_{i,y},\;
+\max\bigl(0,\;\mathrm{FSI}_{i,y}-\overline{\mathrm{FSI}}_{i,2000\text{--}04}\bigr)\Bigr).
+\end{equation}
+That residual is the RFS-era FSI surge~\citep{rfs2005,abbott2011,roberts2013}:
+US maize FSI 77~MMT in 2005 to 163~MMT in 2010, while feed fell. Wheat FSI is
+flat in this window; rice has no FSI attribute. China's FSI trend is
+\emph{not} treated as ethanol.
+
+Official P1 uses \textbf{mean flex} over the score window plus industrial on
+(\texttt{use\_demand=False}, \texttt{use\_industrial=True} for USA maize).
+Year-by-year food/feed is a sensitivity, not the headline. The twin has mean
+flex and $C^{\mathrm{ind}}=0$.
+
+Within-step desired use is
+\begin{equation}
+\label{eq:desired}
+d_{i,t}=C^{\mathrm{flex}}_{i,t}\,(p_t/p_0)^{\varepsilon}+C^{\mathrm{ind}}_{i,t},
+\end{equation}
+with $\varepsilon<0$ (Table~\ref{tab:params}). $p_0$ is the mean real Pink
+Sheet in the numeraire year (2006 for the 2006--11 hindcast; 2021 for the
+Ukraine-war exercise).
+
+\subsection{Lean foresight, targets, offers}
+\label{sec:lean}
+
+Let $h_t$ be steps to the next global harvest pulse (cumulative future world
+harvest $\ge 12\%$ of mean annual world $H$, capped at 24 steps). Expected
+harvest for foresight blends realized and seasonal paths,
+\begin{equation}
+H^{\mathrm{exp}}_{i,t}=\phi\,H_{i,t}+(1-\phi)\,H^{\mathrm{seas}}_{i,t}.
+\end{equation}
+Rolling sums $C^{\mathrm{ahead}}$, $H^{\mathrm{ahead}}$ cover the horizon.
+Lean cover and the stock target are
+\begin{equation}
+\label{eq:lean}
+L_{i,t}=\max\bigl(0,\,C^{\mathrm{ahead}}_{i,t}+C_{i,t}-H^{\mathrm{ahead}}_{i,t}-H^{\mathrm{exp}}_{i,t}\bigr),
+\qquad
+T_{i,t}=L_{i,t}+s_i,
+\end{equation}
+with safety $s_i=\mathtt{stu\_target}\cdot C_i^{\mathrm{ann}}$. Purchase demand
+and export offers are
+\begin{align}
+\label{eq:demand-offers}
+D_{i,t}&=\max(0,d_{i,t}-\mathrm{avail}_{i,t})
++\lambda\max\bigl(0,\,T_{i,t}-\max(0,\mathrm{avail}_{i,t}-d_{i,t})\bigr),\\
+O_{i,t}&=\max(0,\mathrm{avail}_{i,t}-d_{i,t}-T_{i,t})\,(1-\tau_{i,t}).
+\end{align}
+$\lambda$ is a partial-adjustment speed, not a storage Euler equation.
+$\tau_{i,t}\in[0,1]$ is the AMIS quantity cut (\S\ref{sec:amis}).
+
+This is Agrimate-aligned commercial cover plus an exogenous restriction,
+not a rational-expectations competitive-storage equilibrium
+\citep{wright1982,williams1991,deaton1992}. Continuity with TWIST/Agrimate
+is the design intent~\citep{schewe2017,kuhla2025}; a departure from
+Deaton--Laroque is not scored as an error.
+
+\subsection{Warehouse capacity}
+\label{sec:warehouse}
+
+Carry capacity at step $t$ is
+\begin{equation}
+\label{eq:warehouse}
+W_{i,t}=\mathtt{max\_stu}\,C_i^{\mathrm{ann}}
++\mathtt{pipeline\_max\_steps}\cdot C_i^{\mathrm{ann}}/24
++\mathbf{1}_{\{\mathtt{pipeline}>0\}}H_{i,t}.
+\end{equation}
+Pulse crops (wheat/maize, \texttt{pipeline\_max\_steps=12}) pad $W$ with
+same-step harvest so a pulse is not incinerated on intake. Rice
+(\texttt{pipeline=0}) clips toward carry: padding $W$ with every monsoon
+step stored harvest as if it were silos. Overflow is soft-clipped,
+\[
+S_{i,t+1}\leftarrow S_{i,t+1}-\mathtt{warehouse\_lambda}\cdot\max(0,S_{i,t+1}-W_{i,t}).
+\]
+A one-step hard dump incinerated $\sim$10\% of wheat/maize harvest and
+starved lean-season offers. The working-stock term is a \emph{constant} cap
+(not shrunk as the next harvest approaches). Seed stocks at spin-up are
+clipped to $\max(\mathtt{max\_stu}\,C,\,1.5s)$; the within-step ceiling is
+\texttt{max\_stu}\,C, not $1.5s$.
+
+\subsection{AMIS quantity cuts}
+\label{sec:amis}
+
+AMIS/OECD records policy \emph{classes}, not tonnes withheld
+\citep{amis_oecd,kuhla2025}. Mixed classes (\texttt{Maize + Wheat}) are
+dropped. Overlapping policies on the same node take the max cut:
+\begin{center}
+\small
+\begin{tabular}{lc}
+\toprule
+AMIS \texttt{PolicyMeasure\_Name} & $\tau$ \\
+\midrule
+Export prohibition & $0.95$ \\
+Export quota & $0.70$ \\
+Export tax & $0.50$ \\
+Minimum export price & $0.35$ \\
+Licensing requirement & $0.25$ \\
+Restriction on customs clearance point & $0.15$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+This is Agrimate's map (ban $\approx 95\%$, tax $\approx 50\%$). It is
+structural data, not a free parameter, and is not refit per crisis.
+Grain withheld in Fig.~3 analogues is the model object
+$O_{i,t}\tau_{i,t}/(1-\tau_{i,t})$ --- offers that would have existed
+without the cut --- not FAOSTAT observed trade.
+
+\subsection{Armington clear and adaptive asks}
+\label{sec:armington}
+
+FAOSTAT E0~\citep{faostat_trade} supplies destination shares $A_{ij}$ and
+source shares $S_{ij}$ with zero diagonal (no recorded self-trade). For
+2006--11 the default window is 2006--07; for 2021--23 we use 2019--21
+(latest vendored vintage). FAOSTAT rice E0 in the crisis files has a
+\textbf{zero Vietnam row}. \texttt{load\_trade\_shares} fills the destination
+mix from 2019--21 and scales the row to 12\% of crisis-window export total
+(Vietnam's observed world-rice-export share). That is a data repair, not a
+2008 price knob.
+
+Asks reweight destinations,
+\begin{equation}
+\label{eq:ask-reweight}
+\tilde A_{ij}\propto A_{ij}\,(p_0/q_{i,t})^{\gamma}
+\quad\text{(rows renormalised)},
+\end{equation}
+then preferred links clear as
+\begin{equation}
+\label{eq:armington}
+\mathrm{ship}_{ij}=\min\bigl(O_{i,t}\tilde A_{ij},\,D_{j,t}S_{ij}\bigr).
+\end{equation}
+A residual pool may fill at most fraction $\nu=0.15$ of leftover demand,
+allocated in proportion to residual offers. This is a reduced-form
+Armington~\citep{armington1969} on a \emph{prescribed} network. Endogenous
+network formation is paper P2, not Gate~0.
+
+Fill rates update asks (sold-out $\Rightarrow$ raise; leftover $\Rightarrow$
+cut), with a survivor markup when preferred sources are blocked (Agrimate's
+oligopolist channel):
+\begin{equation}
+\label{eq:ask}
+q_{i,t+1}
+=\bigl[(1-\beta)\,q_{i,t}\exp\bigl(\alpha(\mathrm{fill}_{i,t}-\theta)
++\alpha_r b_t\cdot\mathbf{1}_{O_{i,t}>0}\bigr)
++\beta\,p_t\bigr],
+\end{equation}
+clipped to $[0.45\,p_0,\,2.8\,p_0]$. Fill is shipped/$O$ (target
+$\theta=0.70$ if $O=0$). $b_t$ is the preferred-source block fraction
+(\S\ref{sec:price}). $\alpha_r=0$ recovers the own-fill law. Shared
+$\alpha_r=0.80$ is the smallest value at which isolated maize $\tau$ does
+not cut the 14-month mean world price; it is not fit to 2008 peaks.
+
+Physical update after trade:
+\begin{align}
+\mathrm{cons}_{i,t}&=\min\bigl(d_{i,t},\,\max(0,\mathrm{avail}_{i,t}-\mathrm{shipped}_i+\mathrm{received}_i)\bigr),\\
+S_{i,t+1}&=\max\bigl(0,\mathrm{avail}_{i,t}-\mathrm{shipped}_i-\mathrm{cons}_{i,t}+\mathrm{received}_i\bigr),
+\end{align}
+then the warehouse clip of \S\ref{sec:warehouse}.
+
+\subsection{World price}
+\label{sec:price}
+
+World-accessible free stocks subtract lean need and grain locked behind
+export cuts (otherwise a ban looks like abundance):
+\begin{equation}
+\label{eq:free}
+\mathrm{locked}_t=\sum_i\tau_{i,t}\max(0,S_{i,t+1}-T_{i,t}),
+\quad
+\mathrm{free}_t=\sum_i S_{i,t+1}-\sum_i L_{i,t}-\mathrm{locked}_t.
+\end{equation}
+A path-matched \textbf{twin} is simulated once: seasonal-mean harvest, mean
+flex, zero industrial, $\tau\equiv 0$, same seed stocks. Let
+$F^{\mathrm{twin}}_t$ and $u^{\mathrm{twin}}_t$ be its free stocks and unmet
+fractions. Unmet and blockage on the treatment path are
+\begin{equation}
+u_t=1-\frac{\sum_i\mathrm{received}_{i,t}}{\max(\sum_i D_{i,t},\epsilon)},
+\quad
+b_t=\frac{\sum_{i,j} S_{ij}\,\tau_{i,t}\,D_{j,t}}{\max(\sum_j D_{j,t},\epsilon)},
+\quad
+\Delta u_t=\max(0,u_t-u^{\mathrm{twin}}_t).
+\end{equation}
+Trade-weighted ask $p^{\mathrm{tr}}_t=\sum_i q_{i,t}\mathrm{shipped}_{i,t}/\sum_i\mathrm{shipped}_{i,t}$
+(or $p_t$ if no trade). Scarcity
+\begin{equation}
+\label{eq:scar}
+p^{\mathrm{scar}}_t=p_0\cdot r_t^{\eta}
+\cdot\bigl(1+\kappa_u\Delta u_t+\kappa_b b_t\bigr),
+\quad
+r_t=\frac{F^{\mathrm{twin}}_t+f}{\mathrm{free}_t+f},
+\end{equation}
+with a small positive shift $f$ so the ratio is defined when free stocks
+cross zero, and $\eta$ symmetric in surplus and shortage (muting abundance
+stored gluts: flex demand never cheapened enough to eat them). Then
+\begin{equation}
+\label{eq:pstar}
+p^\star_t=\omega\,p^{\mathrm{tr}}_t+(1-\omega)\,p^{\mathrm{scar}}_t,
+\qquad
+p_t=\rho\,p_{t-1}+(1-\rho)\,p^\star_t,
+\end{equation}
+clipped to $[60,1200]$ \$/t. If free, unmet anomaly, and blockage match the
+twin (\textbf{calm}), $p^\star_t=p_0$ by construction
+(\texttt{assert\_twin\_identity}). That is why the unperturbed baseline is a
+horizontal line at $p_0$, unlike Agrimate's seasonal unperturbed run.
+
+$\omega$, $\eta$, $\kappa_u$, $\kappa_b$, $\lambda$, $\rho$, and the ask
+gains are reduced-form and sign-constrained. They are shared across years
+and are \textbf{not} fit crisis-by-crisis.
+
+\subsection{Orchestration}
+\label{sec:orch}
+
+\texttt{run\_crop\_dynamics} (i)~clips seed stocks from PSD year
+\texttt{stock\_seed\_year} (2005 for 2006--11; 2020 for 2021--23);
+(ii)~spins two climatology years with $\tau=0$ and industrial off;
+(iii)~runs the twin; (iv)~runs the treatment with the chosen
+\texttt{use\_amis}/\texttt{use\_shocks}/\texttt{use\_demand}/\texttt{use\_industrial}
+flags. Official matched P1 is harvest on, AMIS on, mean flex, industrial on
+for USA maize.

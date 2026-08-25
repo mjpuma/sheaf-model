@@ -1,7 +1,8 @@
 # Gate 0 parameterization — equations, sources, and defensibility
 
 **Status:** locked with `sheaf/dynamic_crop.py` (`CropParams` / `default_crop_params`)  
-**Score entry point:** `python scripts/score_subannual_crop.py --crop {wheat,maize,rice}`
+**Score entry point:** `python scripts/score_subannual_crop.py --crop {wheat,maize,rice}`  
+**White paper (Overleaf):** `overleaf/gate0_whitepaper/` — substitution off, strategy off; 2006–11 plus Ukraine-war 2021–23.
 
 This note states (1) what every equation is, (2) how each parameter is set,
 and (3) what is structural vs literature vs reduced-form. It is the companion
@@ -253,11 +254,11 @@ PSD levels), rice multi-crop calendar, carry cap = `max_stu` (no \(1.5s\)
 ceiling bump), and rice \(H_t\) not padding \(W\) (`pipeline=0`). Headline
 `full` = harvest + AMIS + mean flex (+ USA maize industrial).
 
-| Crop | full corr | 2007/08 full / obs | 2010/11 full / obs | MY-end stocks vs PSD | Asserts |
-|---|---:|---:|---:|---:|---|
-| wheat | +0.72 | ×2.27 / ×1.82 | ×1.45 / ×1.16 | ×1.02 (May) | PASS |
-| maize | +0.71 | ×1.97 / ×1.84 | ×1.70 / ×1.44 | ×1.08 (Aug) | PASS (τ must not cut) |
-| rice | +0.68 | ×1.72 / ×1.84 | ×0.82 / ×0.79 | ×1.63 (Dec) | PASS (Vietnam autumn pulse kept) |
+| Crop | full corr | 2007/08 full / obs | 2010/11 full / obs | MY-end stocks vs PSD | ex-China MY-end | Asserts |
+|---|---:|---:|---:|---:|---:|---|
+| wheat | +0.72 | ×2.27 / ×1.82 | ×1.45 / ×1.16 | ×1.02 (May) | ×1.09 (China 28%) | PASS |
+| maize | +0.71 | ×1.97 / ×1.84 | ×1.70 / ×1.44 | ×1.08 (Aug) | ×1.49 (China 35%) | PASS (τ must not cut) |
+| rice | +0.68 | ×1.72 / ×1.84 | ×0.82 / ×0.79 | ×1.05 (Aug) | ×1.14 (China 44%) | PASS (Vietnam autumn pulse kept) |
 
 Agrimate-matched Overleaf table: `overleaf/gate0_agrimate/tables/price_metrics.tex`
 (regen: `python scripts/make_agrimate_comparison.py`).
@@ -273,9 +274,9 @@ Agrimate-matched Overleaf table: `overleaf/gate0_agrimate/tables/price_metrics.t
 - Maize 2010/11 matched ×1.70 vs obs ×1.44 (was ×0.99). Identified without a
   2011 dummy.
 - Rice 2010 matched ×0.82 vs obs ×0.79.
-- Rice MY-end STU 0.30–0.38 vs PSD 0.18–0.25 (×1.63, was ×2.45): multi-crop
-  calendar + no \(H_t\) pad on `pipeline=0`. Vietnam autumn window left intact
-  so the 2008 ban still bites offers.
+- Rice **world** MY-end is August, not calendar December (×1.05 vs PSD,
+  was ×1.63 at Dec). Country stocks scored at USDA local MY-end months
+  (`sheaf/marketing_years.py`), not 28-region groupings.
 
 **Leftover (structural, not hidden knobs)**
 - **Wheat 2007/08 still high** (×2.27 vs ×1.82). Restriction-led (tau×1.70 >
@@ -287,9 +288,34 @@ Agrimate-matched Overleaf table: `overleaf/gate0_agrimate/tables/price_metrics.t
 - **Wheat 2006/07** still ×1.46 vs obs ~×0.95 (harvest-only ×1.39). Residual
   of 2006 tightness vs trend, not incineration.
 - **Maize 2010/11 a bit high** (×1.70 vs ×1.44). Harvest-only ×1.01.
-- **Rice Dec STU still fat** (×1.63). Dec is post-kharif peak (same issue as
-  maize calendar-Dec vs Aug MY-end).
-- **No convenience-yield / futures smoothing.**
+- **Country stock *levels*:** world MY-end matches; many exporter nodes sit
+  on the global safety floor (USA/Canada/Australia wheat ~×0.2). Offer floor
+  is `lean + stu_target` with one world STU, so commercial carry is sold down.
+  A country-specific price-responsive hold was tried and rejected: it helped
+  USA wheat but fattened China maize ~×3. Δstock signs remain ~coin-flip
+  (wheat 35/83, maize 42/80, rice 36/64).
+- **World excluding China** is the FAO/AMIS tightness series (China 28% of
+  PSD wheat stocks, 35% maize, 44% rice). Same crop MY-end month as the world
+  bar; China stays a named node. Wheat ×1.09 and rice ×1.14 (ex-China+India
+  ×1.17) sit next to the including-China bar. Maize ×1.49 is leftover: the
+  world bar is August and China maize USDA MY-end is September, so the
+  snapshot under-subtracts China, and local-MY China is separately fat (~×2.8).
+  Not a warehouse retune.
+- **World consumption vs country-sum PSD** (P1 expansion, not Agrimate Fig. 4):
+  wheat ×0.92 corr −0.17 Δcons 3/5; maize ×0.92 corr −0.64 Δcons 2/5;
+  rice ×0.86 corr −0.74 Δcons 1/5. Median country-year ratio hides a falling
+  model path vs rising PSD. Official split is mean flex + isoelastic
+  (\(\varepsilon<0\)); 2006 wheat is ×1.00. Year-by-year food/feed is the
+  sensitivity. No warehouse retune. Score from the country table, not
+  `load_crop_world` (omits the EU).
+- **Vietnam rice** MY-end stocks ~×6 vs PSD already in **2006** (before AMIS).
+  Do not attribute that fat to the 2008 ban. India is the AMIS lock on stocks.
+- **AMIS shipment signs (P1, not Agrimate observed trade):** τ cuts
+  **offers**; cleared shipments are demand-constrained. Wheat Russia
+  Aug–Dec 2010 offers ×0.11, ships ×0.79 vs harvest-only; calendar 2010
+  still ×2.4 vs PSD. Maize Argentina May 2007 offers ×0.30, ships ×0.99.
+  Rice assert window is a 2008 tax; Oct–Dec 2007 ban+harvest signs are
+  right. Isolated-τ price bar for maize stands. No warehouse retune.
 
 Substitution and Level 2 stay blocked.
 

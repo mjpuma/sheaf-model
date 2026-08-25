@@ -28,6 +28,7 @@ import pandas as pd
 from sheaf.calendar24 import STEPS_PER_YEAR, steps_in_month
 from sheaf.data_usda import load_crop_world, load_price_series_monthly, load_psd_country
 from sheaf.dynamic_crop import run_crop_dynamics
+from sheaf.marketing_years import CROP_MY_END_MONTH, my_end_month
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "overleaf" / "gate0_agrimate"
@@ -41,7 +42,7 @@ C_FULL = "#e67e22"
 C_OBS = "#1f4e79"
 C_SHEAF = "#6c3483"
 
-MY_END_MONTH = {"wheat": 5, "maize": 8, "rice": 12}
+MY_END_MONTH = CROP_MY_END_MONTH
 
 
 def _months(res):
@@ -301,9 +302,6 @@ def fig_regional_2007(crop, legs):
     y = 2007
     t0 = (y - full.start_year) * STEPS_PER_YEAR
     t1 = t0 + STEPS_PER_YEAR
-    my = MY_END_MONTH[crop]
-    t_my = (y - full.start_year) * STEPS_PER_YEAR + (my - 1) * 2 + 1
-    t_my0 = (y - 1 - full.start_year) * STEPS_PER_YEAR + (my - 1) * 2 + 1
     for i, c in enumerate(full.countries):
         if c == "RestOfWorld":
             continue
@@ -320,6 +318,9 @@ def fig_regional_2007(crop, legs):
         hit0 = psd[(psd.country == c) & (psd.year == y - 1)]
         e06 = float(hit0.ending_stocks.iloc[0]) if len(hit0) else np.nan
         s_obs.append(((e07 - e06) / ms) * 100.0 if np.isfinite(e06) else np.nan)
+        my = my_end_month(crop, c)
+        t_my = (y - full.start_year) * STEPS_PER_YEAR + (my - 1) * 2 + 1
+        t_my0 = (y - 1 - full.start_year) * STEPS_PER_YEAR + (my - 1) * 2 + 1
         if t_my0 >= 0:
             s_mod.append(((float(full.stock[i, t_my])
                            - float(full.stock[i, t_my0])) / ms) * 100.0)

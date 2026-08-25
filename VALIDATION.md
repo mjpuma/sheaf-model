@@ -3,8 +3,8 @@
 The benchmark is Kuhla, Kubiczek & Otto, *Understanding agricultural market
 dynamics in times of crisis: the dynamic agent-based network model Agrimate*
 (Ecological Economics 231, 2025). Agrimate hindcasts wheat through both crises,
-reproducing monthly world price hikes and annual regional supply/consumption/stock
-changes. Crucially, it **imposes** the historical export restrictions as exogenous
+reproducing monthly world price hikes and annual regional supply and stock
+changes (Fig. 4; Egypt consumption is a path panel, not the global/regional bar). Crucially, it **imposes** the historical export restrictions as exogenous
 forcing (read from the AMIS policy database, bans ≈ 95% and taxes ≈ 50% quantity
 cuts) and leaves endogenous restriction dynamics to future work. That is the gap
 SHEAF fills.

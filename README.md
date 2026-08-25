@@ -382,6 +382,32 @@ harvest so a pulse is not incinerated on intake. Rice (`pipeline=0`) clips
 toward carry: padding \(W\) with every monsoon step stored harvest as silos.
 Overflow is soft-clipped at `warehouse_lambda` (default = rebuild \(\lambda\)).
 
+**Stock scoring (nodes, not groupings).** USDA PSD ending stocks are *local
+marketing-year* carry. World wheat is scored in May (×1.02 vs PSD) and maize in
+August (×1.08). Rice is August (×1.05), not calendar December — December is the
+post-kharif peak and was the old ×1.63 “fat STU.” Each SHEAF node is then
+scored at its own USDA MY-end month (`sheaf/marketing_years.py`). Do not
+aggregate into Agrimate’s 28 regions. World tightness is also scored
+FAO/AMIS-style: the same MY-end month **with and without China** (rice: also
+without India). Wheat ×1.09 and rice ×1.14 excluding China sit next to the
+including-China world bar; maize ×1.49 is leftover (China MY is September,
+world bar is August, and local-MY China maize is fat). China remains a named
+node; its stock *levels* are estimated state reserves and are not a Gate 0 fail.
+
+**Consumption scoring (P1 expansion, not Agrimate Fig. 4).** World calendar-year
+use vs **country-sum** PSD (not `load_crop_world`, which omits the EU): wheat
+×0.92, maize ×0.92, rice ×0.86. Official matched is mean flex + isoelastic, so
+the model path is flat/down while PSD use rises (wheat corr −0.17, maize −0.64,
+rice −0.74). Median country-year ratio is a sanity print, not the bar.
+Year-by-year food/feed is a sensitivity. Agrimate Fig. 4 scored supply Δ and
+stock Δ, not consumption levels.
+
+**AMIS shipment signs (P1 expansion).** Official matched vs harvest-only, not
+the isolated-τ assert. τ cuts offers; shipments are demand-constrained.
+Russia Aug–Dec 2010 offers ×0.11, ships ×0.79. Argentina May 2007 offers
+×0.30, ships ×0.99. Rice Oct–Dec 2007 ban+harvest signs are right; the
+scored Vietnam window is a 2008 tax. Not FAOSTAT bilateral crisis volumes.
+
 #### Adaptive ask prices and Armington clear
 
 Destination shares are ask-reweighted,

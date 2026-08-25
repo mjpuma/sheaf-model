@@ -1,0 +1,108 @@
+\section{Supplement: mathematics to code}
+\label{sec:code}
+
+Line numbers refer to \texttt{sheaf/dynamic\_crop.py} in the repository
+commit that ships with this note. They will drift; function names are the
+stable map. Nothing in \texttt{sheaf/core.py} (annual SPE, substitution
+matrix $M_i$, export-restriction game) is executed by the hindcasts here.
+
+\subsection{Entry points}
+
+\begin{center}
+\small
+\begin{tabular}{p{0.42\textwidth}p{0.52\textwidth}}
+\toprule
+Claim & Code \\
+\midrule
+Official P1 run &
+\texttt{scripts/score\_subannual\_crop.py --crop \{wheat,maize,rice\}}
+calls \texttt{run\_crop\_dynamics(..., use\_demand=False)} with
+\texttt{use\_industrial} defaulting on for USA maize. \\
+Ukraine-war run &
+\texttt{scripts/score\_ukraine\_war.py}:
+\texttt{start\_year=2021}, \texttt{end\_year=2023},
+\texttt{stock\_seed\_year=2020}, \texttt{trade\_window=(2019,2021)},
+\texttt{p0} = 2021 Pink Sheet mean. \\
+Parameter table &
+\texttt{default\_crop\_params} (lines 139--178);
+dataclass fields 77--136. Companion:
+\texttt{diagnostics/GATE0\_PARAMETERIZATION.md}. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Equation map}
+
+\begin{center}
+\small
+\begin{tabular}{llp{0.48\textwidth}}
+\toprule
+Eq.\ / object & Function (approx.\ lines) & Notes \\
+\midrule
+Clock $T_y=24$ & \texttt{sheaf/calendar24.py} & \texttt{STEPS\_PER\_YEAR} \\
+Calendars & \texttt{sheaf/seasonal.py} \texttt{harvest\_path} & triangular months \\
+LOWESS $a_{i,y}$ & \texttt{data\_usda.\_lowess} 82--101;
+\texttt{detrend\_anomalies} 104--112;
+\texttt{\_harvest\_anomaly\_scalars} 232--261 & tricube local linear;
+per-country PSD, not world aggregate \\
+Industrial~\eqref{eq:industrial} & \texttt{\_demand\_blocks} 369--418 &
+USA maize FSI minus 2000--04 mean \\
+Desired~\eqref{eq:desired} & \texttt{\_simulate\_window} 554--555 &
+\texttt{(p/p0)**elast} on flex only \\
+Lean~\eqref{eq:lean} & 541--563 &
+\texttt{steps\_to\_harvest\_pulse}, \texttt{rolling\_ahead\_variable} \\
+Offers~\eqref{eq:demand-offers} & 565--570 &
+\texttt{cuts[:,t]} is $\tau$ \\
+Warehouse~\eqref{eq:warehouse} & 588--597 &
+\texttt{pipeline\_max\_steps>0} pads $H_t$; rice has 0 \\
+AMIS map & \texttt{\_AMIS\_CUT} 43--50;
+\texttt{amis\_export\_cuts} 299--330 & overlapping $\mapsto$ \texttt{max} \\
+Vietnam rice E0 & \texttt{\_repair\_vietnam\_rice\_e0} 420--439 &
+2019--21 mix, 12\% scale \\
+$\tilde A$~\eqref{eq:ask-reweight} & \texttt{\_ask\_reweight\_dest} 462--468 & \\
+Clear~\eqref{eq:armington} & \texttt{\_bilateral\_clear} 471--496 &
+residual pool $\nu$ \\
+Ask~\eqref{eq:ask} & 599--610 & clip $[0.45p_0,2.8p_0]$ \\
+Free~\eqref{eq:free} & 612--618 & locked $= \tau\max(S-T,0)$ \\
+$p^\star$~\eqref{eq:pstar} & 630--654 & calm $\Rightarrow p_0$;
+else $\omega p^{\mathrm{tr}}+(1-\omega)p^{\mathrm{scar}}$ \\
+Twin identity & \texttt{assert\_twin\_identity} 828--846 &
+no harvest/AMIS/industrial $\Rightarrow$ flat $p_0$ \\
+AMIS raises $p$ & \texttt{assert\_amis\_raises\_price} 848--881 &
+maize: isolated $\tau$ must \emph{not} cut 14-month mean \\
+AMIS cuts $O$ & \texttt{assert\_amis\_cuts\_exports} 902+ &
+wheat: offers and shipments; maize/rice: offers only \\
+No fake spring spike & \texttt{assert\_no\_spring\_spike} 883--900 &
+climatology path \\
+Local MY-end stocks & \texttt{sheaf/marketing\_years.py} &
+not calendar December \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{What is deliberately not in this spine}
+
+\begin{itemize}
+\item \texttt{DemandSystem} / \texttt{subst\_scale} in \texttt{sheaf/core.py}
+      --- substitution off.
+\item \texttt{ExportRestrictionGame} --- $\tau$ is AMIS, not a best response.
+\item \texttt{SpatialEquilibrium} QP (CLARABEL/SCS/OSQP) --- Gate~0 clears
+      by Armington min, not a Takayama--Judge program.
+\item \texttt{market\_responsive\_storage} / \texttt{strategic\_storage} in
+      \texttt{core.py} --- Gate~0 uses lean targets + warehouse clip.
+\item Convenience yield, futures, acreage response, WASDE ethanol gallons.
+\end{itemize}
+
+\subsection{Reproducing every number in this note}
+
+\begin{verbatim}
+python scripts/score_subannual_crop.py --crop wheat
+python scripts/score_subannual_crop.py --crop maize
+python scripts/score_subannual_crop.py --crop rice
+python scripts/make_agrimate_comparison.py
+python scripts/score_ukraine_war.py
+python scripts/assemble_whitepaper.py
+\end{verbatim}
+
+Zip \texttt{overleaf/gate0\_whitepaper/} and upload to Overleaf
+(New Project $\to$ Upload Project). Do not upload gitignored Agrimate PDFs.

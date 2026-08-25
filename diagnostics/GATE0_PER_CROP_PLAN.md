@@ -53,7 +53,14 @@ Must write and print:
 
 1. Robustness asserts (twin / AMIS / seasonality / exporter cut where applicable).
 2. Legs: `full`, `shocks`, `tau` monthly prices vs Pink Sheet (corr + crisis hike ratios).
-3. World stock and stock-to-use path (model) vs PSD annual ending stocks (soft).
+3. World stock vs PSD at the crop MY-end month (wheat May, maize August,
+   rice **August** — not calendar December), **with and without China**
+   (rice: also without India). FAO/AMIS tightness; China stays a named node.
+   Country stocks vs PSD at each node’s USDA local MY-end
+   (`sheaf/marketing_years.py`). No 28-region maps.
+   World **consumption** vs country-sum PSD (calendar year): levels, corr,
+   Δcons as % of mean PSD use. Not Agrimate Fig. 4 (supply + Δstocks).
+   Do not use `load_crop_world` consumption as the bar (omits the EU).
 4. Top exporters’ offers/shipments in crisis windows (AMIS effect visible).
 5. Attribution one-liner: which leg carries 2007/08 vs 2010/11.
 6. Figure panel + CSV under `diagnostics/` and `figures/`.
