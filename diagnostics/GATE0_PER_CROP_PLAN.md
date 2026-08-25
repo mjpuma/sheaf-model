@@ -17,7 +17,8 @@ clears and stocks/trade behave on their own.
 1. **Per-crop Gate 0** — wheat, then maize, then rice — each alone (`subst = 0`).
 2. **Detailed diagnostics** proving reproduction vs Pink Sheet / PSD / AMIS.
 3. **Commit** when each crop’s hard bar is green.
-4. **Only then** re-enable multi-commodity substitution tests.
+4. **Only then** re-enable multi-commodity substitution tests (**Gate 1**,
+   `diagnostics/GATE1_PLAN.md` — scored as a σ band, not a 2008 fit).
 5. **Only then** Level 2 endogenous restriction game.
 
 The existing `sheaf/dynamic_grains.py` + `score_subannual_spillover.py` path is

@@ -203,6 +203,32 @@ class CropSimResult:
     industrial: np.ndarray | None = None  # (n, T) inelastic use
 
 
+@dataclass
+class CropPrep:
+    """Arrays for one Gate 0 crop, ready to simulate (single or coupled)."""
+    crop: str
+    countries: list[str]
+    start_year: int
+    end_year: int
+    params: CropParams
+    p0: float
+    H: np.ndarray
+    H_seas: np.ndarray
+    C_flex: np.ndarray
+    C_ind: np.ndarray
+    C_flex_twin: np.ndarray
+    C_ind_twin: np.ndarray
+    cuts: np.ndarray
+    stock0: np.ndarray
+    safety: np.ndarray
+    C_ann: np.ndarray
+    A: np.ndarray
+    S: np.ndarray
+    free_twin: np.ndarray
+    unmet_twin: np.ndarray
+    spin_up_years: int
+
+
 def _psd_annual(crop: str, countries: list[str],
                 years: list[int]) -> tuple[pd.DataFrame, pd.DataFrame]:
     psd = load_psd_country(crop)
@@ -664,7 +690,7 @@ def _simulate_window(
             recv_path, trade_path)
 
 
-def run_crop_dynamics(
+def prepare_crop_run(
         crop: str = "wheat",
         countries: list[str] | None = None,
         start_year: int = 2006,
@@ -679,21 +705,9 @@ def run_crop_dynamics(
         spin_up_years: int = 2,
         trade_window: tuple[int, int] = (2006, 2007),
         **overrides,
-) -> CropSimResult:
-    """Run single-crop Gate 0 spine (ask-dominated bilateral market).
-
-    ``use_shocks``: climatological seasonal harvest times LOWESS production
-    anomalies (else seasonal mean). Raw PSD year totals are not used as
-    levels — they mix shocks with trend and contaminate the in-sample mean.
-    ``use_demand``: year-by-year flex food/feed (else mean flex).
-    ``use_industrial``: inelastic industrial/ethanol residual (USA maize RFS).
-    Default ``None`` → on iff ``params.industrial_nodes`` is nonempty.
-    Official P1 matched split is mean flex + industrial on + harvest ± AMIS.
-    Twin identity requires ``use_industrial=False`` (no-mandate climatology).
-    ``use_amis``: exogenous AMIS quantity cuts.
-
-    Pass ``params=`` or field overrides. See
-    ``diagnostics/GATE0_PARAMETERIZATION.md``.
+) -> CropPrep:
+    """Build Gate 0 arrays (harvest, demand, AMIS, twin) without simulating
+    the treatment path. ``run_crop_dynamics`` and Gate 1 coupling share this.
     """
     crop = crop.lower().strip()
     if crop not in _AMIS_CLASS:
@@ -734,8 +748,6 @@ def run_crop_dynamics(
     C_flex_y, C_ind_y = _demand_blocks(
         crop, countries, years, cons_score, C_ann, params)
     C_flex_mean = C_flex_y.mean(axis=1)
-    # Twin industrial = 0 excess (pre-mandate / no RFS). Mean flex = sample
-    # food+feed climatology.
     C_flex_twin_y = np.repeat(C_flex_mean[:, None], n_y, axis=1)
     C_ind_twin_y = np.zeros_like(C_ind_y)
 
@@ -796,20 +808,70 @@ def run_crop_dynamics(
     cuts = (amis_export_cuts(crop, countries, start_year, end_year)
             if use_amis else np.zeros((n, T)))
 
+    return CropPrep(
+        crop=crop, countries=countries, start_year=start_year,
+        end_year=end_year, params=params, p0=float(p0),
+        H=H, H_seas=H_seas, C_flex=C_flex, C_ind=C_ind,
+        C_flex_twin=C_flex_twin, C_ind_twin=C_ind_twin, cuts=cuts,
+        stock0=spin_stock, safety=safety, C_ann=C_ann, A=A, S=S,
+        free_twin=free_twin, unmet_twin=unmet_twin,
+        spin_up_years=spin_up_years,
+    )
+
+
+def run_crop_dynamics(
+        crop: str = "wheat",
+        countries: list[str] | None = None,
+        start_year: int = 2006,
+        end_year: int = 2011,
+        p0: float | None = None,
+        params: CropParams | None = None,
+        use_amis: bool = True,
+        use_shocks: bool = True,
+        use_demand: bool = True,
+        use_industrial: bool | None = None,
+        stock_seed_year: int = 2005,
+        spin_up_years: int = 2,
+        trade_window: tuple[int, int] = (2006, 2007),
+        **overrides,
+) -> CropSimResult:
+    """Run single-crop Gate 0 spine (ask-dominated bilateral market).
+
+    ``use_shocks``: climatological seasonal harvest times LOWESS production
+    anomalies (else seasonal mean). Raw PSD year totals are not used as
+    levels — they mix shocks with trend and contaminate the in-sample mean.
+    ``use_demand``: year-by-year flex food/feed (else mean flex).
+    ``use_industrial``: inelastic industrial/ethanol residual (USA maize RFS).
+    Default ``None`` → on iff ``params.industrial_nodes`` is nonempty.
+    Official P1 matched split is mean flex + industrial on + harvest ± AMIS.
+    Twin identity requires ``use_industrial=False`` (no-mandate climatology).
+    ``use_amis``: exogenous AMIS quantity cuts.
+
+    Pass ``params=`` or field overrides. See
+    ``diagnostics/GATE0_PARAMETERIZATION.md``.
+    """
+    prep = prepare_crop_run(
+        crop, countries=countries, start_year=start_year, end_year=end_year,
+        p0=p0, params=params, use_amis=use_amis, use_shocks=use_shocks,
+        use_demand=use_demand, use_industrial=use_industrial,
+        stock_seed_year=stock_seed_year, spin_up_years=spin_up_years,
+        trade_window=trade_window, **overrides)
+
     (price, stock_path, cons_path, exp_path,
      free_liq, unmet, offers, demand, ask, received, trade) = _simulate_window(
-        H, C_flex, C_ind, cuts, spin_stock.copy(), safety,
-        p0, C_ann, A, S, params,
-        free_twin=free_twin, unmet_twin=unmet_twin, H_seasonal=H_seas)
+        prep.H, prep.C_flex, prep.C_ind, prep.cuts, prep.stock0.copy(),
+        prep.safety, prep.p0, prep.C_ann, prep.A, prep.S, prep.params,
+        free_twin=prep.free_twin, unmet_twin=prep.unmet_twin,
+        H_seasonal=prep.H_seas)
 
     return CropSimResult(
-        crop=crop, countries=countries, start_year=start_year,
-        end_year=end_year, price=price, stock=stock_path, harvest=H,
-        consumption=cons_path, exports=exp_path, export_cut=cuts,
-        spin_up_years=spin_up_years, free_liquid=free_liq,
-        free_twin=free_twin, unmet_frac=unmet, offers=offers,
+        crop=prep.crop, countries=prep.countries, start_year=prep.start_year,
+        end_year=prep.end_year, price=price, stock=stock_path, harvest=prep.H,
+        consumption=cons_path, exports=exp_path, export_cut=prep.cuts,
+        spin_up_years=prep.spin_up_years, free_liquid=free_liq,
+        free_twin=prep.free_twin, unmet_frac=unmet, offers=offers,
         purchase_demand=demand, ask=ask, received=received, trade=trade,
-        params=params, industrial=C_ind,
+        params=prep.params, industrial=prep.C_ind,
     )
 
 
