@@ -30,29 +30,28 @@ without substitution or strategic export restrictions}
 
 \begin{abstract}
 SHEAF (Substitution, Heterogeneous agents, Equilibrium, And Fragility) is
-designed as a multi-commodity, game-theoretic successor to TWIST and
-Agrimate. Those differentiators are not exercised here. This note documents
-and scores the Gate~0 spine: one crop at a time, 24 steps per year,
-exogenous AMIS quantity cuts, no cross-grain substitution, no endogenous
-restriction game. The mathematics, the classification of every parameter
-(structural / literature / reduced-form), and the mapping to code are stated
-in full. Official identification follows Agrimate's split---climatology
-harvest versus LOWESS production anomalies versus anomalies plus historical
-restrictions---with mean flex demand and, for maize, a USDA FSI residual for
-the US Renewable Fuel Standard. World prices are compared to MUV-deflated
-Pink Sheet series (constant 2010 dollars), not Agrimate's CPI-deflated
-levels. On 2006--11 the matched run correlates $+0.72$ (wheat), $+0.71$
-(maize), $+0.68$ (rice) with monthly Pink Sheet; 2007/08 wheat and rice
-hikes are restriction-led, maize 2007/08 is industrial-demand-led, and
-2010/11 wheat is production-led after detrend. A 2021--23 Ukraine-war
-hindcast with locked parameters and 2019--21 FAOSTAT network structure
-reproduces the wheat hike ($\times 1.61$ versus observed $\times 1.57$),
-almost entirely from AMIS (India's May 2022 prohibition and Russia's
-March 2022 measures), while maize and rice barely moved in the data and
-the model does not invent a spike. World marketing-year-end stocks match
-PSD to $\times 1.02$--$1.08$; consumption levels and some exporter shipment
-\emph{volumes} versus PSD do not. The leftover list is structural. Cross-grain
-substitution remains the next paper, not a repair for these residuals.
+meant, eventually, as a multi-crop model in which governments choose export
+bans. Those extras are switched off here. This note is Gate~0: one grain at
+a time, a step every two weeks, historical export bans taken from a policy
+diary, no switching from wheat to rice when wheat is expensive, no government
+choosing a ban. We write the mathematics in full, say where every number
+came from, and map equations to code. Scoring follows Agrimate's idea of
+three runs---a normal harvest, a harvest with shocks, and shocks plus the
+real bans---with average food-and-feed demand and, for maize, a US ethanol
+mandate leftover. World prices are compared to World Bank Pink Sheet series
+in constant 2010 dollars, not Agrimate's CPI-deflated levels. On 2006--11
+the matched run correlates $+0.72$ (wheat), $+0.71$ (maize), $+0.68$ (rice)
+with monthly Pink Sheet; 2007/08 wheat and rice spikes are driven by export
+bans, maize 2007/08 by US ethanol demand, and 2010/11 wheat by the harvest
+after we remove the slow yield trend. A 2021--23 Ukraine-war run with the
+same parameters reproduces the wheat spike ($\times 1.61$ versus observed
+$\times 1.57$), almost entirely from recorded bans (India's May 2022 wheat
+ban and Russia's March 2022 measures), while maize and rice barely moved in
+the data and the model does not invent a spike. World stocks at the end of
+each marketing year match USDA to $\times 1.02$--$1.08$; the path of
+consumption and some export \emph{volumes} do not. Those leftovers are left
+as leftovers. Turning on substitution is the next paper, not a way to hide
+them.
 \end{abstract}
 
 \tableofcontents
@@ -61,48 +60,71 @@ substitution remains the next paper, not a repair for these residuals.
 \section{Purpose and scope}
 \label{sec:scope}
 
-SHEAF's destination is a country-level, multi-commodity network in which
-governments choose export restrictions and consumers substitute across
-wheat, rice, and maize~\citep{kuhla2025,schewe2017}. Collaborator feedback
-and the project's own paper stack put a logically prior claim first:
-before substitution or a game can be interpreted, each crop's sub-annual
-market must clear, stocks must be scored at the right month, and historical
-restrictions must cut offers on the nodes that actually restricted.
+SHEAF's destination is a country-level model of wheat, rice, and maize in
+which governments choose export restrictions and consumers can switch among
+grains when one of them spikes~\citep{kuhla2025,schewe2017}. That is not this
+paper. Before those extras can be tested, each crop's market has to work on
+its own: prices should move in the right months, stocks should be compared
+at the month USDA actually reports, and historical bans should cut export
+offers in the countries that actually banned.
 
-This note is that prior claim (Gate~0 / paper P1). It does three things.
+This note is that prior claim (Gate~0 / paper P1). It does four things.
 
 \begin{enumerate}
 \item State the Gate~0 mathematics without remainder
       (\S\ref{sec:math}), including every parameterization choice and
       what was tried and rejected (\S\ref{sec:params}).
+\item Say, in one place, what is copied from Agrimate and what is not
+      (\S\ref{sec:vs-agrimate}).
 \item Score locked parameters on 2007/08, 2010/11, and the 2022 Ukraine-war
       window (\S\ref{sec:results}--\S\ref{sec:ukraine}), substitution off
       and strategy off.
-\item Place that performance next to TWIST and Agrimate on objects they
-      actually published, not on a richer model SHEAF never claimed to be
-      (\S\ref{sec:compare}).
+\item Place those scores next to TWIST and Agrimate on objects they
+      actually published (\S\ref{sec:compare}).
 \end{enumerate}
 
 A supplement maps every equation to functions in
-\texttt{sheaf/dynamic\_crop.py} (\S\ref{sec:code}). The annual spatial-price
-equilibrium, Slutsky demand system, and iterated-best-response export game
-in \texttt{sheaf/core.py}~\citep{takayama1971,samuelson1952} are the host
-for later papers. They are not run here.
+\texttt{sheaf/dynamic\_crop.py} (\S\ref{sec:code}). An older annual
+market-clearing program in \texttt{sheaf/core.py} (spatial price equilibrium
+plus a government export game) is the host for later papers. It is not run
+here~\citep{takayama1971,samuelson1952}.
 
-\textbf{What is switched off.} Cross-price terms are identically zero
-(three independent single-commodity models). Export cuts $\tau_{i,t}$ are
-an AMIS/OECD policy timeline mapped to quantity wedges, not a Nash best
-response. FAOSTAT bilateral shares are prescribed (paper P2 would ask
-whether a network \emph{emerges} from costs). Crisis-year dummy parameters
-are forbidden.
+\textbf{What is switched off.} Consumers cannot substitute wheat for rice
+or maize. Export cuts are a historical diary, not a choice governments
+make inside the model. Who trades with whom is taken from FAOSTAT, not
+grown from shipping costs. We do not add special knobs for 2008 or 2010.
 
-\textbf{What is claimed.} With those restrictions, the spine is an
-Agrimate-aligned stock--trade--ask system whose pieces are economically
-interpretable, whose reduced-form weights are sign-constrained and shared
-across years, and whose official hindcast is identified by Agrimate's
-scenario split plus a documented US maize industrial residual. We do not
-claim a Deaton--Laroque equilibrium, a WASDE ethanol gallon series, or
-Agrimate's private CPI price path.
+\textbf{What is claimed.} With those restrictions, the spine is a
+stock--trade--selling-price system whose pieces can be explained, whose
+tightness weights keep the same sign every year, and whose official
+hindcast is identified the way Agrimate identifies it, plus a documented
+US maize ethanol leftover. We do not claim a textbook competitive-storage
+equilibrium, a gallon-by-gallon ethanol series, or Agrimate's private CPI
+price path.
+
+\subsection{A short glossary}
+
+\begin{description}
+\item[Ask] The selling price an exporter posts this fortnight. Raise it
+      when the shipment sold out; cut it when grain sat unsold.
+\item[Offer] Tonnes the exporter is willing to put on the water after
+      feeding people and keeping a hungry-season buffer, then after any
+      ban or tax.
+\item[AMIS] The G20/OECD diary of real export policies (bans, quotas,
+      taxes). We map labels to a fraction of the offer, not to observed
+      tonnes.
+\item[Armington] Importers prefer their usual suppliers rather than
+      treating all origins as one pile of identical grain.
+\item[Twin] A calm-weather copy of the same model (normal harvest, no
+      bans, no ethanol) used as a baseline. If the crisis run matches it,
+      the world price target is the reference price.
+\item[Pink Sheet] World Bank monthly commodity prices. Ours are in
+      constant 2010 dollars (MUV deflator).
+\item[PSD] USDA Production, Supply and Distribution balances
+      (harvests, use, ending stocks).
+\item[Matched / official split] The headline run: harvest shocks plus
+      AMIS bans, average food-and-feed demand, US maize ethanol on.
+\end{description}
 
 \section{Lineage: TWIST $\to$ Agrimate $\to$ SHEAF}
 \label{sec:lineage}
@@ -122,49 +144,149 @@ mechanism case, and a 2022 wheat exercise (Suppl.\ Fig.~A.5). Agrimate is
 explicitly single-commodity.
 
 SHEAF exists to put two things on that network that Agrimate does not:
-cross-grain substitution and endogenous strategy. Gate~0 asks whether the
-network-plus-storage spine, \emph{without} those two things, already
-hindcasts prices, stocks, and restriction signs. If it does not, turning
-substitution on cannot be interpreted as a test of substitution.
+consumers switching among grains, and governments choosing restrictions
+rather than following a diary. Gate~0 asks whether the network-plus-storage
+spine, \emph{without} those two things, already hindcasts prices, stocks,
+and restriction signs. If it does not, turning substitution on cannot be
+read as a test of substitution.
 
-Food-trade fragility work~\citep{puma2015} motivates the network view.
-Export restrictions as price insulation are the empirical reason the AMIS
-layer exists~\citep{headey2011,martin2012,wright2011}. Spatial price
-equilibrium~\citep{enke1951,samuelson1952,takayama1971} is the annual
-market layer SHEAF will return to; Gate~0 uses an Armington
-min-clear~\citep{armington1969} every fortnight instead, because that is
-what Agrimate's clock requires.
+Food-trade fragility work~\citep{puma2015} motivates looking at who buys
+from whom. Export restrictions as a way to keep domestic prices down are
+why the AMIS diary exists~\citep{headey2011,martin2012,wright2011}. A
+full spatial price equilibrium~\citep{enke1951,samuelson1952,takayama1971}
+is the annual market layer SHEAF will return to; Gate~0 instead matches
+offers to usual suppliers every fortnight, because that is the clock
+Agrimate uses.
+
+\section{How Gate~0 differs from Agrimate}
+\label{sec:vs-agrimate}
+
+Gate~0 is deliberately Agrimate-like: one crop, two-week steps, historical
+bans taken as given. It is not a reimplementation of Agrimate, and it
+should not be read as ``we recoded their agents.'' This section lists the
+design differences. Score differences (who carried 2008 maize, how fat
+stocks are) are in \S\ref{sec:compare}.
+
+\subsection{What we copy}
+
+The clock (24 steps per year). Harvest shocks as deviations from a slow
+local trend, not from a raw six-year mean. Export policy as an AMIS diary
+with bans taking most of the offer and taxes taking about half. The three
+runs used to tell harvest stories from ban stories: a normal harvest, a
+shocked harvest, and a shocked harvest plus the real bans. A bilateral
+trade network rather than one world pool. Exporters who post selling
+prices and adjust them. Storage as an operational buffer, not a
+rational-expectations commodity-storage equilibrium. Wheat as the
+main-text bar; rice and maize scored the same way, as Agrimate's
+Supplement~G does. The 2022 wheat episode as a hold-out of sorts
+(their Suppl.\ Fig.~A.5; our \S\ref{sec:ukraine}).
+
+\subsection{Where the models are not the same}
+
+\paragraph{The quiet baseline.}
+Agrimate's unperturbed run still moves with the harvest calendar and
+storage cost. Ours is an identity: if nothing is shocked and nobody
+restricts, the world price target is the reference price, so the grey
+line in our figures is flat. Comparing grey baselines visually is
+therefore unfair. Compare how the crisis run peels away from its own
+baseline.
+
+\paragraph{What ``world price'' is.}
+Agrimate's published series is an export-weighted offer price from an
+agent-based commercial layer (and they deflate Pink Sheet with US CPI).
+Ours is mostly the tonnage-weighted average of posted asks, plus a
+smaller tightness residual against the twin, in MUV 2010 dollars. A
+SHEAF peak near \$400/t and an Agrimate peak near \$200/t are not a
+forecast error; they are different deflators. We compare hike
+\emph{ratios} and monthly correlation, not dollar levels.
+
+\paragraph{Demand.}
+Agrimate lets consumption emerge from agents. Official Gate~0 holds
+food-and-feed use at its 2006--11 average (so a price spike can still
+cut use through the elasticity, but the baseline diet does not trend)
+and, for maize only, adds US ethanol as a mandate leftover. That ethanol
+block is why our 2008 maize story is ``industrial demand'' and theirs is
+``restrictions on a stable harvest.'' Both can be true of their models;
+they are not the same identification. Feeding year-by-year PSD diets is
+a sensitivity we report, not their Fig.~4.
+
+\paragraph{Who is on the map.}
+Agrimate publishes 28-region wheat maps for 2007. We have 17 named
+countries plus Rest-of-World. We cannot redraw their map. Node-level
+bars versus USDA are the substitute.
+
+\paragraph{Silos.}
+Agrimate distinguishes commercial and strategic stockholding with more
+agent detail. We have one stock per country, a hungry-season target, a
+carry ceiling, and a wheat/maize pipeline pad. Rice gets no extra
+pipeline pad, because year-round harvest was being stored as if it were
+silos. One selling price per exporter: we do not split a cheap domestic
+offer from a dear export offer.
+
+\paragraph{Trade stickiness.}
+Both models use a network. Ours takes FAOSTAT shares from a declared
+window and keeps them. Agrimate's agents are richer. Neither Gate~0 nor
+Agrimate grows a new network from freight costs (that is SHEAF paper P2).
+When a ban hits, our importers only partly reroute through a 15\% leftover
+pool; leftover shipment \emph{volumes} versus USDA are often too high,
+which we list rather than patch.
+
+\paragraph{What we score that they did not.}
+World consumption \emph{levels} versus USDA (their Fig.~4 is harvest and
+stock \emph{changes}). Export-offer and shipment signs with bans on versus
+off. World stocks with China taken out, because FAO/AMIS tightness talk
+is about grain that can actually reach the market. Those extras make
+Gate~0 look worse than a price-only score; that is intended.
+
+\paragraph{What they score that we do not.}
+Their Supplement~F parameter sensitivity. Soybean. A seasonal unperturbed
+price. CPI-deflated HRW levels. We do not claim those.
+
+\paragraph{What neither of us does in this comparison.}
+Cross-grain substitution (Agrimate is single-crop; Gate~0 switches it
+off). Governments choosing bans (both take AMIS as given). That common
+limit is the point of Gate~0: isolate the market spine before SHEAF's
+own extras.
 
 \input{sections/math}
 
-\section{Parameterization: classes, sources, and rejected alternatives}
+\section{Where the numbers come from}
 \label{sec:params}
 
-Table~\ref{tab:params} is \texttt{default\_crop\_params()}. Every number
-falls in one class.
+Table~\ref{tab:params} is the default parameter set. Every number is one of
+three kinds. \textbf{Structural} means a data definition or a lineage
+choice (the two-week clock, the AMIS diary map, US maize ethanol as a
+mandate leftover). Changing it is a redesign, not a fit. \textbf{Literature}
+means a published elasticity or a typical calm-year stock-to-use, not
+something we backed out of 2008 prices. \textbf{Reduced-form} means a
+weight that links a measured tightness (how empty the world's free grain
+is, whether usual suppliers are blocked) to price. Those weights keep a
+required sign --- tighter markets raise prices --- and they are the same
+in 2008 and 2010. They are not structural first-order conditions.
 
 \begin{table}[H]
 \centering
-\caption{Gate~0 \texttt{CropParams}. Shared knobs are identical across
-crops unless a documented crop reason exists. Nothing is fit to a single
-crisis year.}
+\caption{Gate~0 defaults. Shared knobs are identical across crops unless
+a crop reason is written down. Nothing is fit to a single crisis year.}
 \label{tab:params}
 \small
 \input{tables/params.tex}
 \end{table}
 
 \paragraph{Structural (not free).}
-The 24-step clock, harvest calendars, LOWESS method, AMIS class map,
-FAOSTAT E0 (including the Vietnam rice row repair), USA-maize industrial
-definition, rice \texttt{pipeline=0}, and the twin identity are design or
-data. Changing them is a modelling redesign, not a calibration step.
+The two-week clock, harvest calendars, the slow-trend harvest smoother, the
+AMIS diary map, who trades with whom (including the Vietnam rice repair),
+US maize ethanol as a leftover above 2000--04, rice without extra pipeline
+silos, and the rule that a quiet twin sits at the reference price. Changing
+them is a redesign, not a calibration step.
 
 \paragraph{Literature.}
-Short-run food/feed elasticities sit in the USDA ERS / ICP range for
-staples~\citep{muhammad2011}: wheat the most inelastic of the three,
-maize more elastic through feed. They are not estimated on 2008 prices.
-Stock-to-use targets and carry ceilings are the order of USDA world STU
-in calm years ($\sim$0.15--0.28), not fitted peaks.
+How much food-and-feed use shrinks when price rises sits in the USDA ERS
+range for staples~\citep{muhammad2011}: wheat the least responsive of the
+three, maize more so through feed. Those elasticities are not estimated on
+2008 prices. Target and maximum stocks as a share of annual use are the
+order of USDA world ratios in calm years ($\sim$0.15--0.28), not fitted
+peaks.
 Roberts and Schlenker~\citep{roberts2013} identify calorie supply/demand
 and the ethanol mandate at a different aggregation; we use their
 \emph{qualitative} implication (US maize industrial demand is a mandate,
@@ -208,55 +330,66 @@ dollars~\citep{worldbank_pink}. Agrimate Fig.~4a uses US-CPI deflated HRW
 (their peak near \$200/t versus SHEAF's real peak near \$400/t). Dollar
 \emph{levels} are not a target; hike ratios and monthly correlation are.
 
-\section{Identification and scoring protocol}
+\section{How we tell harvest stories from ban stories}
 \label{sec:ident}
 
-Official matched P1, for each crop:
+For each crop we run four variants, then compare them. This is Agrimate's
+idea, plus an extra sensitivity.
 
 \begin{enumerate}
-\item \textbf{baseline} --- seasonal-mean harvest, no AMIS, industrial off
-      (twin; $p\equiv p_0$).
-\item \textbf{shocks} --- LOWESS harvest anomalies, no AMIS; maize
-      industrial on.
-\item \textbf{tau} --- climatology harvest, AMIS on, industrial off.
-\item \textbf{full} --- anomalies + AMIS + mean flex + maize industrial on.
+\item \textbf{baseline} --- a normal seasonal harvest, no bans, no ethanol.
+      The twin. Price should sit at the reference $p_0$.
+\item \textbf{shocks} --- real harvest highs and lows, no bans; maize
+      ethanol on. If this run spikes, the harvest did it.
+\item \textbf{tau} --- a normal harvest, but the real AMIS bans on, ethanol
+      off. If this run spikes, the bans did it.
+\item \textbf{full} --- harvest shocks plus bans, average food-and-feed,
+      maize ethanol on. This is the official headline.
 \end{enumerate}
 
-Year-by-year PSD food/feed (\texttt{use\_demand=True}) is reported as a
-sensitivity. Agrimate's published full run does not force that series;
-their consumption is endogenous.
+Feeding each year's actual PSD food-and-feed (\texttt{use\_demand=True}) is
+reported as a sensitivity. Agrimate's published full run does not force
+that series; their consumption comes from agents.
 
-\textbf{Price metric.} Monthly correlation against Pink Sheet, and a
-3-month-mean hike ratio: 2007/08 is June 2006 versus March 2008; 2010/11
-is June 2009 versus February 2011. Attribution is which isolated leg
-carries the hike (largest isolated ratio, not a Shapley decomposition).
+\textbf{Price.} We report monthly correlation with Pink Sheet, and a hike
+ratio: the 3-month mean around the crisis peak divided by the 3-month mean
+around a pre-crisis base. For 2007/08 that is June 2006 versus March 2008;
+for 2010/11, June 2009 versus February 2011. ``Restriction-led'' means the
+bans-only run moved more than the harvest-only run. It is not a Shapley
+decomposition.
 
-\textbf{Stocks.} World ending stocks versus USDA PSD~\citep{usda_psd} at the
-crop marketing-year-end month (wheat May, maize August, rice
-\textbf{August} not calendar December). Country nodes at USDA local MY-end
-months (\texttt{sheaf/marketing\_years.py}). FAO/AMIS tightness is the same
-month with and without China (rice: also without India). China stays a
-named node; its levels are estimated state reserves.
+\textbf{Stocks.} USDA ending stocks are a marketing-year number, not a
+calendar December snapshot. We compare world stocks in the month that
+matches that crop's USDA year (wheat May, maize August, rice
+\textbf{August}). Each country is then compared at its own USDA month.
+``World excluding China'' is the same month with China's pile removed,
+because a lot of China grain never reaches the traded market. China stays
+in the model as a named country.
 
-\textbf{Consumption.} Calendar-year use versus the \emph{sum of SHEAF
-nodes'} PSD, not \texttt{load\_crop\_world} (that world file omits the EU).
-Agrimate Fig.~4 is supply $\Delta$ and stock $\Delta$, not consumption
-levels. This consumption bar is a P1 expansion.
+\textbf{Consumption.} Calendar-year use versus the sum of our countries'
+USDA use --- not the world PSD file, which omits the EU. Agrimate Fig.~4
+is harvest and stock \emph{changes}, not consumption levels. This bar is
+extra, and it is not green.
 
-\textbf{Trade.} Fair P1 is $\mathrm{ship}_{\mathrm{AMIS}} <
-\mathrm{ship}_{\mathrm{noAMIS}}$ for key restrictors. Agrimate Fig.~3 is
-model-implied withheld grain, not FAOSTAT crisis volumes. Optional
-calendar-year PSD exports are a level check, not the sign check. Isolated
-$\tau$ must not cut maize's 14-month mean world price (the May 2007 month
-can dip; the mean must not).
+\textbf{Trade.} The fair check is: with bans on, did the restricting
+country offer (and, where we can, ship) \emph{less} than in the harvest-only
+run? Agrimate's Fig.~3 is grain the model says was withheld, not FAOSTAT
+crisis trade. Comparing annual model exports to USDA tonnes is a level
+check we also print; several of those levels fail. For maize, turning
+bans on by themselves must not \emph{cut} the 14-month mean world price
+(one May 2007 fortnight may dip; the mean must not).
 
-\textbf{Asserts} (all PASS on the locked parameters): twin identity; AMIS
-raises wheat/rice price in the primary ban window; AMIS cuts the designated
-exporter's offers (wheat: also shipments); climatology path has no fake
-spring spike.
+\textbf{Asserts} (all PASS on the locked parameters): the quiet twin stays
+flat; AMIS raises wheat and rice prices in the main ban window; AMIS cuts
+the designated exporter's offers (wheat: also shipments); a normal-harvest
+year has no fake spring price spike.
 
 \section{Results: 2006--2011}
 \label{sec:results}
+
+Headline numbers are the official matched run: harvest shocks plus the real
+bans, average food-and-feed, US maize ethanol on. Isolated harvest-only and
+bans-only runs are how we say who carried the spike.
 
 \subsection{World prices}
 
@@ -483,8 +616,12 @@ Observed price \emph{fell} ($\times 0.91$). Full $\times 0.99$, correlation
 $+0.61$. India's later 2022 rice measures sit partly after the May 2022
 hike window; we do not slide the window to catch them.
 
-\section{Performance in the context of TWIST and Agrimate}
+\section{How the scores compare with TWIST and Agrimate}
 \label{sec:compare}
+
+Design differences are in \S\ref{sec:vs-agrimate}. This section is the
+scorecard: on objects Agrimate actually published, where do we agree, and
+where do we not?
 
 \paragraph{TWIST.}
 TWIST is annual, single-commodity, no network, no AMIS~\citep{schewe2017}.
@@ -546,8 +683,12 @@ wheat 2010 attribution and 2022 wheat hike are in agreement; maize 2008
 identification differs for a documented structural reason; leftovers are
 listed.
 
-\section{Leftovers (structural, not a retune list)}
+\section{What still misses, on purpose}
 \label{sec:leftovers}
+
+These are not a to-do list for the next parameter tweak. They are things
+the current spine gets wrong, or only partly right, after we already tried
+the obvious patches and rejected them.
 
 \begin{itemize}
 \item Wheat 2007/08 still high ($\times 2.27$ versus $\times 1.82$).
@@ -574,15 +715,16 @@ them: it is a cross-crop claim that requires this spine to stay honest.
 \label{sec:conc}
 
 Gate~0 is complete enough to write down. With substitution off and
-strategy off, a 24-step Armington spine with LOWESS harvests, an AMIS
-quantity map, lean-cover storage, and ask-dominated prices hindcasts
-monthly Pink Sheet correlation near $+0.7$ on 2006--11 for all three
-grains, attributes 2008 wheat and rice to restrictions and 2010 wheat to
-production, matches world MY-end stocks, and---without retuning---matches
-the 2022 wheat hike as an AMIS event. It does not match Agrimate's maize
-2008 story, does not track PSD consumption trends, and does not match
-several exporter shipment \emph{volumes}. Those sentences are the result.
-The next paper turns substitution on, on this spine, not instead of it.
+governments not choosing bans, a two-week market with trend-based harvest
+shocks, a diary of real export policies, hungry-season buffers, and
+exporter selling prices tracks monthly Pink Sheet correlation near $+0.7$
+on 2006--11 for all three grains, attributes 2008 wheat and rice to bans
+and 2010 wheat to the harvest, matches world stocks at USDA's month,
+and---without retuning---matches the 2022 wheat spike as a ban event. It
+does not match Agrimate's maize 2008 story, does not track USDA
+consumption trends, and does not match several exporter shipment
+\emph{volumes}. Those sentences are the result. The next paper turns
+substitution on, on this spine, not instead of it.
 
 \appendix
 \input{sections/code_map}
