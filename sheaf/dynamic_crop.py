@@ -453,7 +453,7 @@ def _repair_vietnam_rice_e0(E: pd.DataFrame, countries: list[str]) -> pd.DataFra
         load_trade_matrix("rice", window=_VNM_RICE_PATTERN_WINDOW),
         SHEAF_NODE_MAP)
     E_ref = E_ref.reindex(index=countries, columns=countries, fill_value=0.0)
-    row = E_ref.loc["Vietnam"].to_numpy(dtype=float)
+    row = E_ref.loc["Vietnam"].to_numpy(dtype=float, copy=True)
     i = countries.index("Vietnam")
     row[i] = 0.0
     s = float(row.sum())
@@ -474,8 +474,8 @@ def load_trade_shares(crop: str, countries: list[str],
     E = E.reindex(index=countries, columns=countries, fill_value=0.0)
     if crop.lower().strip() == "rice":
         E = _repair_vietnam_rice_e0(E, countries)
-    A = bilateral_shares(E, by="destination").to_numpy(dtype=float)
-    S = bilateral_shares(E, by="source").to_numpy(dtype=float)
+    A = bilateral_shares(E, by="destination").to_numpy(dtype=float, copy=True)
+    S = bilateral_shares(E, by="source").to_numpy(dtype=float, copy=True)
     np.fill_diagonal(A, 0.0)
     np.fill_diagonal(S, 0.0)
     row = A.sum(axis=1, keepdims=True)

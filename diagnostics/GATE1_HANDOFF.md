@@ -1,8 +1,9 @@
 # Gate 1 handoff (read this first)
 
-**Date:** 2026-08-26. Experiments **E0–E8** are done. P3 draft is written.
-Do not re-run the σ band or E5/E6 unless reproducing. Do not start the
-export game. Do not pick σ*.
+**Date:** 2026-08-26. Experiments **E0–E9** are done. P3 draft is written.
+Substitution red-team: signs and σ=0 state identity hold
+(`diagnostics/GATE1_REDTEAM.md`). Do not re-run the σ band or E5/E6 unless
+reproducing. Do not start the export game. Do not pick σ*.
 
 Living Overleaf note: `overleaf/gate1_substitution/` (zip that folder).
 **P3 draft to upload:** `overleaf/gate1_whitepaper/` (zip that folder).
@@ -12,12 +13,14 @@ P4–P5 later).
 
 ## What the new agent should do
 
-**Stop** unless asked to revise the P3 draft.
+**Stop** unless asked to revise the P3 draft or extend the red-team.
 
-The writeup is `overleaf/gate1_whitepaper/`. Frozen claim still lives in
-`overleaf/gate1_substitution/sections/claim.tex` (unchanged). Optional
-consumption vs PSD diagnostic is scored (`diagnostics/gate1_consumption_report.md`);
-it is not a retune target.
+Substitution correctness: `diagnostics/GATE1_REDTEAM.md` and
+`tests/test_gate1_substitution.py`. Frozen claim still lives in
+`overleaf/gate1_substitution/sections/claim.tex` (unchanged). The writeup
+is `overleaf/gate1_whitepaper/`. Optional consumption vs PSD diagnostic is
+scored (`diagnostics/gate1_consumption_report.md`); it is not a retune
+target.
 
 Zip for Overleaf:
 
@@ -78,6 +81,9 @@ do not equate.
 | `scripts/score_gate1_e5.py` | Maize 2010 counterfactuals |
 | `scripts/score_gate1_e6.py` | 2021–23 hold-out |
 | `scripts/score_gate1_consumption.py` | Optional world use vs PSD (diagnostic) |
+| `scripts/redteam_gate1_substitution.py` | E9 substitution probes |
+| `tests/test_gate1_substitution.py` | Identity / signs pytest |
+| `diagnostics/GATE1_REDTEAM.md` | E9 classified findings |
 | `diagnostics/gate1_report.md` | E4 scores |
 | `diagnostics/gate1_e5_report.md` | E5 classification |
 | `diagnostics/gate1_e6_report.md` | E6 hold-out |

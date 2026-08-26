@@ -276,18 +276,24 @@ def run_coupled_dynamics(
     )
 
 
-def assert_subst0_matches_gate0(tol: float = 0.005) -> None:
-    """Coupled σ=0 monthly prices match independent Gate 0 runs."""
-    from .dynamic_crop import result_to_monthly, run_crop_dynamics
+def assert_subst0_matches_gate0(tol: float = 1e-9) -> None:
+    """Coupled σ=0 matches independent Gate 0 on price, stocks, use, and offers.
+
+    Monthly-price-only at 0.5% is too loose to catch loop drift. Step-level
+    relative error on the official split should be numerical (~1e-15).
+    """
+    from .dynamic_crop import run_crop_dynamics
 
     coupled = run_coupled_dynamics(subst_scale=0.0, use_demand=False)
+    fields = ("price", "stock", "consumption", "offers")
     for g in coupled.grains:
         solo = run_crop_dynamics(g, use_amis=True, use_shocks=True,
                                  use_demand=False)
-        a = result_to_monthly(coupled.by_crop[g])["model_price"].to_numpy()
-        b = result_to_monthly(solo)["model_price"].to_numpy()
-        rel = float(np.max(np.abs(a - b) / np.maximum(np.abs(b), 1.0)))
-        if rel > tol:
-            raise AssertionError(
-                f"Gate 1 identity fail {g}: max rel monthly |Δp|={rel:.3%} "
-                f"> {tol:.3%}")
+        for f in fields:
+            a = np.asarray(getattr(coupled.by_crop[g], f), float)
+            b = np.asarray(getattr(solo, f), float)
+            rel = float(np.max(np.abs(a - b) / np.maximum(np.abs(b), 1.0)))
+            if rel > tol:
+                raise AssertionError(
+                    f"Gate 1 identity fail {g}.{f}: max rel |Δ|={rel:.3e} "
+                    f"> {tol:.3e}")
