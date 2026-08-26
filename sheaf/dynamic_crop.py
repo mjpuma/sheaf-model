@@ -453,7 +453,7 @@ def _repair_vietnam_rice_e0(E: pd.DataFrame, countries: list[str]) -> pd.DataFra
         load_trade_matrix("rice", window=_VNM_RICE_PATTERN_WINDOW),
         SHEAF_NODE_MAP)
     E_ref = E_ref.reindex(index=countries, columns=countries, fill_value=0.0)
-    row = E_ref.loc["Vietnam"].to_numpy(dtype=float)
+    row = E_ref.loc["Vietnam"].to_numpy(dtype=float, copy=True)
     i = countries.index("Vietnam")
     row[i] = 0.0
     s = float(row.sum())
@@ -474,8 +474,8 @@ def load_trade_shares(crop: str, countries: list[str],
     E = E.reindex(index=countries, columns=countries, fill_value=0.0)
     if crop.lower().strip() == "rice":
         E = _repair_vietnam_rice_e0(E, countries)
-    A = bilateral_shares(E, by="destination").to_numpy(dtype=float)
-    S = bilateral_shares(E, by="source").to_numpy(dtype=float)
+    A = bilateral_shares(E, by="destination").to_numpy(dtype=float, copy=True)
+    S = bilateral_shares(E, by="source").to_numpy(dtype=float, copy=True)
     np.fill_diagonal(A, 0.0)
     np.fill_diagonal(S, 0.0)
     row = A.sum(axis=1, keepdims=True)
@@ -856,18 +856,28 @@ def run_crop_dynamics(
         use_demand=use_demand, use_industrial=use_industrial,
         stock_seed_year=stock_seed_year, spin_up_years=spin_up_years,
         trade_window=trade_window, **overrides)
+    return simulate_prep(prep)
 
+
+def simulate_prep(prep: CropPrep, cuts: np.ndarray | None = None,
+                  harvest: np.ndarray | None = None) -> CropSimResult:
+    """Run the Gate 0 market on an already-built ``CropPrep``.
+
+    ``cuts`` / ``harvest`` override the prep arrays without rebuilding
+    AMIS, trade shares, or the calm twin. Used by the Gate 2 policy beta.
+    """
+    H = prep.H if harvest is None else harvest
+    cuts_use = prep.cuts if cuts is None else cuts
     (price, stock_path, cons_path, exp_path,
      free_liq, unmet, offers, demand, ask, received, trade) = _simulate_window(
-        prep.H, prep.C_flex, prep.C_ind, prep.cuts, prep.stock0.copy(),
+        H, prep.C_flex, prep.C_ind, cuts_use, prep.stock0.copy(),
         prep.safety, prep.p0, prep.C_ann, prep.A, prep.S, prep.params,
         free_twin=prep.free_twin, unmet_twin=prep.unmet_twin,
         H_seasonal=prep.H_seas)
-
     return CropSimResult(
         crop=prep.crop, countries=prep.countries, start_year=prep.start_year,
-        end_year=prep.end_year, price=price, stock=stock_path, harvest=prep.H,
-        consumption=cons_path, exports=exp_path, export_cut=prep.cuts,
+        end_year=prep.end_year, price=price, stock=stock_path, harvest=H,
+        consumption=cons_path, exports=exp_path, export_cut=cuts_use,
         spin_up_years=prep.spin_up_years, free_liquid=free_liq,
         free_twin=prep.free_twin, unmet_frac=unmet, offers=offers,
         purchase_demand=demand, ask=ask, received=received, trade=trade,

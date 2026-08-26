@@ -3,17 +3,20 @@
 Feedback from Kilian / Christian (and related) on uses of SHEAF. This is the
 **destination**. Gate 0 / crisis P1 is **accepted** (white paper
 `overleaf/gate0_whitepaper/`). P3 substitution draft is **written**
-(`overleaf/gate1_whitepaper/`). Do not skip to the game (P4–P5) or an
-endogenous network (P2).
+(`overleaf/gate1_whitepaper/`). A **P4 beta** (one exporter, open-loop τ,
+illustrative knobs, not a 2008/10 score) lives in
+`diagnostics/GATE2_PLAN.md`. That is not P4 proper and not P5. Do not
+skip to cooperative/club (P4) or tipping (P5), or an endogenous network
+(P2).
 
 ## Papers
 
 | ID | Question | Now / next / later |
 |---|---|---|
 | **P1** | Reproduce observed **price, consumption, and trade** over crisis years (then decades) | **Crisis Gate 0 done.** Agrimate bar 2006–11 + Ukraine-war 2021–23 prices. Consumption and AMIS shipment *signs* scored; leftover *levels* are disclosed, not retuned. Decades after crises remain a later P1 expansion. |
-| **P3** | Empirically validate **wheat–maize–rice substitution** vs 2007/08 spillovers | **E0–E8 done.** Claim frozen. Draft: `overleaf/gate1_whitepaper/`. Handoff: `diagnostics/GATE1_HANDOFF.md`. Living note: `overleaf/gate1_substitution/`. **Stop.** Do not start P4–P5. |
+| **P3** | Empirically validate **wheat–maize–rice substitution** vs 2007/08 spillovers | **E0–E8 done.** Claim frozen. Draft: `overleaf/gate1_whitepaper/`. Handoff: `diagnostics/GATE1_HANDOFF.md`. Living note: `overleaf/gate1_substitution/`. Do not retune, densify σ, or pick σ*. |
 | **Cal** | Constrain behavioral + strategic parameters | **Alongside P1–P3.** See below. Kilian’s point stands: extra behavior needs a plan, not a grid search on crises. |
-| **P4** | Policy: exporters restrict *just enough* for domestic food security, minimizing importer harm; **club of the willing** if not all join | **After P1 is honest.** Same game layer, **normative / constrained-welfare** objective — not “who restricted in 2010.” Illustrative parameters OK if labeled. |
+| **P4** | Policy: exporters restrict *just enough* for domestic food security, minimizing importer harm; **club of the willing** if not all join | **P4 beta** (mechanism check, not this paper): one exporter vs the Gate 0 market, open-loop τ, illustrative knobs, synthetic harvest cut. Protocol `diagnostics/GATE2_PLAN.md`. **P4 proper** (cooperative / club) remains after that. Not “who restricted in 2010.” |
 | **P5** | Game theory: cooperation vs protectionism; **social tipping** | **After P4 setup.** Vary cooperation / food-security weights. Current IBR is non-cooperative only. |
 | **P2** | Does a realistic network **emerge** from costs and prices without prescribing FAOSTAT E0? | **Later, optional.** Gate 0 **prescribes** Armington on FAOSTAT E0. Say so in P1. P2 is a different paper. |
 
@@ -41,6 +44,7 @@ P3  Substitution on this spine   ✓  **E8: P3 draft written** (`overleaf/gate1_
         ↓
 Cal Written: structural / literature / estimated; train/hold-out for the game
         ↓
+P4 beta  One-player open-loop τ on the Gate 0 spine (illustrative)  ← `diagnostics/GATE2_PLAN.md`
 P4  Cooperative τ vs Nash; club of the willing (illustrative OK)  ← **not now**
 P5  Tipping: cooperation vs food-security weights
         ↓
