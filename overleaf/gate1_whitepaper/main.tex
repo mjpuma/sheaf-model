@@ -1,0 +1,597 @@
+% SHEAF Gate 1 white paper — substitution on, strategy off.
+% Overleaf: zip this folder (main.tex, refs.bib, sections/, tables/, figures/)
+% and upload (New Project → Upload Project). Compile with pdfLaTeX + BibTeX.
+% Living protocol twin: ../gate1_substitution/. Frozen claim: sections/claim.tex there.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{amsmath,amssymb}
+\usepackage[round,authoryear]{natbib}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{setspace}
+\setstretch{1.08}
+
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue}
+\graphicspath{{figures/}}
+\bibliographystyle{apalike}
+
+\title{SHEAF Gate~1: food and feed substitution on a locked\\
+single-commodity grain-market spine}
+\author{Working paper (not a journal submission)}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+SHEAF is meant, eventually, as a multi-crop model in which governments
+choose export bans. Gate~0 locked the single-crop spine: one grain at a
+time, a step every two weeks, historical bans from a policy diary, no
+switching among grains. This note is Gate~1 (paper P3). It turns on only
+the switching. Food and feed respond isoelastically to the other grains'
+prices; US maize ethanol does not. Each grain still clears on its own
+FAOSTAT network and its own selling prices. A scale \(\sigma\) multiplies
+the cross-price exponents. We do not estimate \(\sigma\). We report a
+pre-declared band \(\{0,0.3,0.6\}\), declared before looking at coupled
+scores. Coupled \(\sigma=0\) recovers Gate~0 world prices to machine
+precision on 2006--11 and on 2021--23. In 2007/08, raising \(\sigma\)
+raises rice and maize hikes (the substitution sign). Wheat stays
+restriction-led in 2008 and production-led in 2010 at every reported
+\(\sigma>0\). Isolated rice AMIS still carries essentially all of the 2008
+rice hike: substitution is a spillover, not a replacement for
+India/Vietnam bans. Agrimate cannot do this layer, because it is
+single-commodity~\citep{kuhla2025}. A 2010 maize hike-ratio drop at
+\(\sigma=0.6\) is a higher 2009 base after the 2008 wheat--maize
+spillover, not a lower 2011 peak. In 2022, wheat stays AMIS-led, maize
+stays flat, and rice drifts the wrong way. Gate~0 consumption and shipment
+leftovers are not fixed. Governments do not choose bans here.
+\end{abstract}
+
+\tableofcontents
+\vspace{1em}
+
+\section{Purpose and scope}
+\label{sec:scope}
+
+SHEAF's destination is a country-level model of wheat, rice, and maize in
+which governments choose export restrictions and consumers can switch
+among grains when one of them spikes~\citep{kuhla2025,schewe2017}. Gate~0
+asked whether each grain's market already works on its own. It did, with
+listed leftovers, and those parameters are frozen. This note asks the next
+question: when wheat (or rice) spikes, do maize and rice prices move in a
+way that isoelastic cross-price demand on that locked market can explain
+--- and that three independent single-crop runs cannot?
+
+This note is that claim (Gate~1 / paper P3). It does four things.
+
+\begin{enumerate}
+\item State the substitution mathematics without remainder
+      (\S\ref{sec:math}), including the dual demand host that is
+      \emph{not} this layer.
+\item Say, before any coupled score, how \(\sigma\) is identified
+      (\S\ref{sec:ident}) and what Pink Sheet 2007/08 actually shows
+      (\S\ref{sec:data}).
+\item Score the pre-declared band on 2007/08, 2010/11, and the 2022
+      Ukraine-war window (\S\ref{sec:results}--\S\ref{sec:ukraine}),
+      with the 2010 maize leftover classified rather than patched
+      (\S\ref{sec:e5}).
+\item Write down what the band can claim, must disclose, and must not
+      claim (\S\ref{sec:claim}).
+\end{enumerate}
+
+A supplement maps every new equation to functions in
+\texttt{sheaf/dynamic\_coupled.py} (\S\ref{sec:code}). The Gate~0 white
+paper remains the spine. An older annual market-clearing program in
+\texttt{sheaf/core.py} is the host for later papers. It is not run
+here~\citep{takayama1971,samuelson1952}.
+
+\textbf{What is switched on.} Food and feed can substitute among wheat,
+rice, and maize. The strength of that switching is a reported band, not a
+fitted peak.
+
+\textbf{What stays off.} Export cuts are still a historical AMIS diary,
+not a choice governments make inside the model. Who trades with whom is
+still FAOSTAT. Gate~0 elasticities, warehouse knobs, asks, and the US
+maize ethanol leftover are not retuned. We do not add special knobs for
+2008 or 2010.
+
+\textbf{What is claimed.} With those restrictions, coupled \(\sigma=0\) is
+Gate~0; \(\sigma>0\) spills in the substitute direction in 2007/08 without
+flipping wheat's 2008/2010 attribution or replacing rice's own bans. We do
+not claim an estimated \(\sigma^\star\), a clean wheat\(\to\)rice test in
+2008, or that Gate~0 leftovers went away.
+
+\subsection{A short glossary}
+
+\begin{description}
+\item[Gate~0 spine] The locked single-crop fortnightly market: harvest
+      shocks, hungry-season buffers, AMIS diary, Armington trade, exporter
+      asks. Parameters in the Gate~0 white paper, Table~1.
+\item[\(\sigma\)] Scale on cross-price exponents. Zero is three separate
+      crops. Larger means stronger switching. Reported as a band, not a
+      point.
+\item[\(\rho\)] Illustrative substitutability among grains (wheat--maize
+      strongest via feed). Frozen in \texttt{calibration.py}.
+\item[Jacobi] One step: all three demands from this fortnight's prices,
+      then all three markets, then the three new prices.
+\item[AMIS] The G20/OECD diary of real export policies. Same map as
+      Gate~0.
+\item[Pink Sheet] World Bank monthly commodity prices, constant 2010
+      dollars (MUV). Same series as Gate~0.
+\item[Matched / official split] Harvest shocks plus AMIS, average
+      food-and-feed, US maize ethanol on. Same flags as Gate~0.
+\item[Dual host] Annual linear Slutsky demand in \texttt{sheaf/core.py}
+      versus isoelastic demand on this 24-step spine. Different
+      \(\varepsilon\). This paper is the second.
+\end{description}
+
+\section{Lineage: what Agrimate cannot do}
+\label{sec:lineage}
+
+TWIST~\citep{schewe2017} is annual, single-commodity, no network, no AMIS.
+Agrimate~\citep{kuhla2025} adds a 24-step agent-based network with
+historical restrictions taken as given. Wheat is the main-text hindcast;
+rice and maize are separate single-commodity calibrations in
+Supplement~G. If wheat gets expensive, Agrimate's rice consumers do not
+notice. That is not a bug in Agrimate. It is the design.
+
+SHEAF exists to put two things on that network that Agrimate does not:
+consumers switching among grains, and governments choosing restrictions
+rather than following a diary. Gate~0 was the first thing without the
+second. Gate~1 is the switching, still without the diary becoming a
+choice. Paper P4--P5 is the choice. It is not this paper.
+
+Food-trade fragility work~\citep{puma2015} motivates looking at who buys
+from whom. Export restrictions as a way to keep domestic prices down are
+why the AMIS diary exists~\citep{headey2011,martin2012,wright2011}. Cross
+grain calorie substitution is a different object: Roberts and
+Schlenker~\citep{roberts2013} identify it at a different aggregation. We
+use their \emph{qualitative} implication that US maize industrial demand is
+a mandate, not an isoelastic consumer, and we keep that block out of
+substitution. We do not import their calorie elasticity as
+\(\varepsilon\) or as \(\sigma\).
+
+\section{What stays locked}
+\label{sec:locked}
+
+Change this list only if the \emph{protocol} changes, not because a score
+disappointed you.
+
+\paragraph{Frozen Gate~0 pieces.}
+Own-price elasticities, stock-to-use targets, ask and warehouse knobs, the
+AMIS map, LOWESS harvests, mean food/feed, US maize industrial/ethanol,
+FAOSTAT trade shares, and the calm-weather twin. Official scoring split:
+harvest anomalies plus AMIS, year-by-year food/feed \emph{off}, industrial
+\emph{on} for maize. Leftovers listed in the Gate~0 white paper
+(\S9 there) stay leftovers. Substitution is not a patch for them.
+
+\paragraph{New knobs, also frozen before scores.}
+Table~\ref{tab:params} is the Gate~1 layer only.
+
+\begin{table}[H]
+\centering
+\caption{Gate~1 defaults. \(\sigma\) is a band, not a fit. \(\rho\) is
+illustrative structure, not estimated on 2008. Own \(\varepsilon\) is
+Gate~0, not \texttt{OWN\_ELAST}.}
+\label{tab:params}
+\small
+\input{tables/params.tex}
+\end{table}
+
+\(\sigma=0\) is Gate~0 identity. \(\sigma=0.6\) is the old prototype /
+\texttt{build\_countries(substitution=True)} default, not a fitted peak.
+\(\sigma=0.3\) is the midpoint. Do not add \(0.9\) after seeing prices.
+
+\input{sections/math}
+
+\section{How we identify substitution without fitting 2008}
+\label{sec:ident}
+
+For each \(\sigma\) in the pre-declared band we run the same three
+Agrimate-style legs Gate~0 used, now on the coupled spine: harvest-only,
+AMIS-only, and official full (harvest plus AMIS, mean flex, maize ethanol
+on). Price metrics are the same: monthly correlation with Pink Sheet, and
+a hike ratio (3-month mean around the crisis peak divided by 3-month mean
+around a pre-crisis base). For 2007/08 that is June 2006 versus March
+2008; for 2010/11, June 2009 versus February 2011; for 2021/22, June 2021
+versus May 2022.
+
+\textbf{Preferred claim:} report all three \(\sigma\). No point estimate.
+
+\textbf{If a preferred \(\sigma\) were required:} select only on the
+2007/08 \textbf{wheat\(\to\)maize} margin. Hold out rice 2008, plus
+2010/11, plus 2022. Training on rice 2008 is withdrawn: that episode is an
+own-ban, not a clean substitution fingerprint (\S\ref{sec:data}). This
+paper does not exercise that option. The band is the result.
+
+Fitting 2008 then claiming validation includes: maximizing 2007/08
+rice/maize fit then reporting that window as the result; joint \(\sigma\)
+on 2008+2010+2022; retuning \texttt{CropParams} / \(\rho\) / Gate~0
+leftovers to help spillovers; peeking at coupled scores then declaring the
+grid. None of that is done here.
+
+\subsection{Hard bars (every reported \(\sigma>0\))}
+
+\begin{enumerate}
+\item \textbf{Identity.} Coupled \(\sigma=0\), official split: monthly
+      world price of each grain matches the corresponding
+      \texttt{run\_crop\_dynamics} to relative error \(\lesssim 0.5\%\).
+\item \textbf{Spillover sign.} In 2007/08, \(\sigma>0\) must not
+      \emph{lower} rice and maize hikes relative to \(\sigma=0\) while
+      wheat is up. A fall is a bug or a wrong \(\rho\) sign.
+\item \textbf{Wheat Gate~0 not wrecked.} 2007/08 stays restriction-led and
+      2010/11 stays production-led (isolated-leg signs). Amplitude may
+      move; a sign flip is a fail.
+\item \textbf{Rice still has its own ban.} Isolated rice AMIS must still
+      carry most of the 2008 rice hike. Substitution is a spillover, not a
+      replacement for India/Vietnam \(\tau\).
+\end{enumerate}
+
+Soft \(\Delta\)corr / \(\Delta\)hike on hold-outs are reported, not used
+to pick \(\sigma^\star\). A pass must not invent a rice hike in 2010/11
+(observed ratio \(<1\)). World consumption versus PSD is a diagnostic, not
+a selection target (\S\ref{sec:cons}).
+
+\section{What the data show (not a model claim)}
+\label{sec:data}
+
+Same hike windows as Gate~0. Pink Sheet real 2010 dollars
+\citep{worldbank_pink}.
+
+\begin{table}[H]
+\centering
+\caption{Observed hike ratios. Source: Pink Sheet, MUV 2010\$.}
+\label{tab:pink}
+\small
+\input{tables/pink_hikes.tex}
+\end{table}
+
+Calendar peaks versus the same June-2006 baseline are higher than the
+fixed March-2008 window captures: wheat \(\times 1.95\) (March 2008), rice
+\(\times 2.54\) (April 2008), maize \(\times 2.26\) (June 2008). Wheat was
+already \(\times 1.5\)--\(1.8\) from September 2007 through January 2008
+while rice stayed near baseline. The largest rice month-to-month jump was
+April 2008, while wheat was already falling.
+
+AMIS rice measures (Vietnam prohibition 2007-07, India from 2007-10,
+second wave 2008-02/04) line up with the rice cliff~\citep{amis_oecd}.
+\textbf{2007/08 rice is primarily an own-ban episode.} Matching that spike
+is not a clean substitution validation target---the model already feeds
+rice AMIS. The least-confounded cross-grain move in the data is maize.
+\textbf{2010/11 is the contrast:} wheat and maize up, rice down. A pass
+must not invent a rice hike. 2022 wheat is another restriction-led event
+on the AMIS timeline we have; observed maize barely moved and observed
+rice fell.
+
+Fair empirical bar: wheat hike and timing in both crisis windows; maize
+co-movement as the least-confounded spillover; rice 2008 = own-policy
+(hard bar 4); rice 2010 = no fake co-spike. Do not require all three
+series to look equally pretty.
+
+\section{Results: 2006--2011}
+\label{sec:results}
+
+Headline numbers are the official matched run. Isolated harvest-only and
+bans-only runs are how we say who carried the spike. No \(\sigma^\star\)
+is selected from this table.
+
+\begin{table}[H]
+\centering
+\caption{Hard bars on the pre-declared band. Soft leftovers are not
+selection targets. Source: \texttt{diagnostics/gate1\_report.md}.}
+\label{tab:bars}
+\small
+\input{tables/hard_bars.tex}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Official-split full versus Pink Sheet. ``vs \(\sigma{=}0\)'' is
+the substitution increment, not a fit residual. Source:
+\texttt{diagnostics/gate1\_score.csv}.}
+\label{tab:band}
+\small
+\resizebox{\textwidth}{!}{\input{tables/score_band.tex}}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{fig_gate1_substitution}
+\caption{Monthly world prices, official split,
+\(\sigma\in\{0,0.3,0.6\}\) versus Pink Sheet (real 2010\$). Rice 2010 does
+not invent a co-spike. Maize 2010 hike ratio at \(\sigma=0.6\) is a higher
+2009 base (\S\ref{sec:e5}).}
+\label{fig:band}
+\end{figure}
+
+\paragraph{Identity.}
+Coupled \(\sigma=0\) matches independent Gate~0 monthly prices at
+\(\sim 10^{-16}\). The coupling machinery does not invent a fourth model
+when switching is off.
+
+\paragraph{Spillover sign, 2007/08.}
+Raising \(\sigma\) raises rice and maize full hikes: rice
+\(\times 1.72\to\times 1.79\), maize \(\times 1.97\to\times 2.14\).
+Wheat also lifts
+(\(\times 2.27\to\times 2.45\)) because dear rice and maize feed back
+through~\eqref{eq:cross}. That feedback makes the already-high Gate~0
+wheat 2008 overshoot a bit worse. We do not damp it with a 2008 dummy.
+
+\paragraph{Wheat attribution.}
+Table~\ref{tab:wheat}. 2008 stays restriction-led and 2010 stays
+production-led at every reported \(\sigma\). Isolated AMIS legs barely
+move. Harvest-only 2010 wheat rises with \(\sigma\)
+(\(\times 1.85\to\times 2.08\)) because harvest tightness spills into the
+other grains and feeds back; the production-led \emph{sign} still holds.
+Amplitude of the full wheat hike rises with \(\sigma\). That is allowed.
+A sign flip would not have been.
+
+\begin{table}[H]
+\centering
+\caption{Wheat isolated-leg hikes. Restriction-led means AMIS-only \(>\)
+harvest-only. Source: \texttt{diagnostics/gate1\_score.csv}.}
+\label{tab:wheat}
+\small
+\input{tables/wheat_attr.tex}
+\end{table}
+
+\paragraph{Rice still has its own ban.}
+Table~\ref{tab:rice}. Isolated rice AMIS remains \(\times 1.75\)--\(1.76\)
+while harvest-only stays \(\times 0.93\). AMIS share of the 2008 full hike
+is \(104\%\), \(100\%\), \(97\%\) along the band. Substitution adds a
+small spillover (\(\Delta\)hike \(+0.03\) then \(+0.07\)). It does not
+replace India and Vietnam.
+
+\begin{table}[H]
+\centering
+\caption{Rice 2008 isolated legs. AMIS share \((\tau-1)/(\mathrm{full}-1)\).
+Source: \texttt{diagnostics/gate1\_report.md}.}
+\label{tab:rice}
+\small
+\input{tables/rice_amis.tex}
+\end{table}
+
+\paragraph{Rice 2010.}
+Observed \(\times 0.79\). Official full stays \(\times 0.82\) at every
+\(\sigma\). No invented co-spike on the headline run. Isolated harvest-only
+rice does pick up some wheat-harvest spill at \(\sigma=0.6\)
+(\(\times 1.06\to\times 1.22\)); lingering AMIS on the full run keeps the
+headline down. That is a mechanism note, not a hard-bar fail.
+
+\paragraph{Maize 2008.}
+Full hike \(\times 1.97\to\times 2.14\) versus observed \(\times 1.84\).
+The substitution increment is the right sign. The official Gate~0 maize
+story remains industrial-demand-led (US ethanol leftover interacting with
+harvest and AMIS), which is still not Agrimate Supplement~G's
+restriction-led 2008. Substitution does not rewrite that identification.
+
+\paragraph{Maize 2010 and monthly correlation.}
+The material soft leftover is maize at \(\sigma=0.6\): hike
+\(\times 1.70\to\times 1.15\) (observed \(\times 1.44\)), monthly corr
+\(+0.71\to +0.59\). Do not crown \(\sigma=0.3\) because that cell is
+closer to the data. Classify the ratio (\S\ref{sec:e5}); do not retune
+\(\rho\).
+
+\section{The 2010 maize hike-ratio leftover}
+\label{sec:e5}
+
+Cheap rice is not the main channel. Holding rice on the \(\sigma=0\) price
+path restores 2\% of the (\(\sigma=0\) minus \(\sigma=0.6\)) hike-ratio
+drop. Zeroing rice--maize \(\rho\) restores 43\%. Zeroing wheat--maize
+\(\rho\) restores 87\%.
+
+\begin{table}[H]
+\centering
+\caption{E5 maize 2010 counterfactuals, official split. Restoration is the
+share of (\(\sigma=0\) minus \(\sigma=0.6\)) hike closed. Base/peak are
+3-month means in the Gate~0 hike window. Source:
+\texttt{diagnostics/gate1\_e5\_report.md}.}
+\label{tab:e5}
+\small
+\input{tables/e5.tex}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{fig_gate1_e5_maize}
+\caption{Maize world price under E5 counterfactuals, official split. The
+2011 peak is slightly \emph{higher} under \(\sigma=0.6\); the ratio falls
+because June 2009 is already expensive.}
+\label{fig:e5}
+\end{figure}
+
+Decompose the hike window. At \(\sigma=0\), June 2009 maize is \$182/t and
+February 2011 is \$310/t (\(\times 1.70\)). At \(\sigma=0.6\), those
+3-month means are \$283 and \$327 (\(\times 1.15\)). The 2011
+\emph{level} is slightly up. The ratio falls because wheat--maize feed
+substitution keeps maize expensive through 2009 after the 2008 spillover.
+Zero wheat--maize \(\rho\) puts the June 2009 base back near \$199 and the
+hike back to \(\times 1.63\).
+
+This is hike-window arithmetic, not an inverted 2010 demand sign. Disclose
+it. Do not retune \(\rho\) to pretty-up the 2010 hike statistic. Do not
+treat \(\times 1.15\) as ``substitution inverted maize in 2010.''
+
+\section{Results: Ukraine war, 2021--2023}
+\label{sec:ukraine}
+
+Same flags as Gate~0 Ukraine: years 2021--23, stocks seeded from 2020 PSD,
+FAOSTAT E0 from 2019--21, \(p_0=\) 2021 Pink Sheet mean, hike June 2021
+versus May 2022. Parameters were not touched. Identity at \(\sigma=0\)
+holds (max relative \(|\Delta p|\lesssim 2\times 10^{-16}\)).
+
+\begin{table}[H]
+\centering
+\caption{E6 official-split full, June 2021 \(\to\) May 2022. Pink Sheet
+real 2010\$. Source: \texttt{diagnostics/gate1\_e6\_score.csv}.}
+\label{tab:e6}
+\small
+\input{tables/e6.tex}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Wheat isolated legs, same hike window. AMIS-led at every
+\(\sigma\).}
+\label{tab:ukr-w}
+\small
+\input{tables/ukraine_attr.tex}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{fig_gate1_e6_ukraine}
+\caption{Monthly world prices, 2021--23, frozen \(\sigma\) band versus
+Pink Sheet. Wheat tracks the spike. Maize stays flat. Rice drifts up
+against a falling observed series.}
+\label{fig:e6}
+\end{figure}
+
+\paragraph{Wheat.}
+Observed \(\times 1.57\). Full \(\times 1.61\to\times 1.69\). Isolated AMIS
+\(\times 1.55\to\times 1.66\) outruns harvest \(\times 1.09\to\times 1.04\)
+at every \(\sigma\). Monthly corr rises \(+0.69\to +0.75\). That last
+number is \textbf{not} a reason to pick \(\sigma=0.6\).
+
+\paragraph{Maize.}
+Observed hike is only \(\times 1.09\). Full stays \(\times 1.01\) at every
+\(\sigma\). No invented spike. A weak observed move plus a 2019--21 maize
+network that need not match 2022 flows is not a fail of the 2008 maize
+industrial story, and not a substitution test.
+
+\paragraph{Rice.}
+Observed price \emph{fell} (\(\times 0.91\)). Full \(\times 0.99\to
+\times 1.18\), corr \(+0.61\to +0.46\). That is a soft wrong-way drift, not
+a 2008-scale spike (the hold-out rule was hike \(<1.20\)). India's later
+2022 rice measures sit partly after the May 2022 window; we do not slide
+the window to catch them, and we do not call the drift a substitution win.
+
+\section{Diagnostic: world consumption versus PSD}
+\label{sec:cons}
+
+Gate~0 already failed to track USDA consumption \emph{trends}: official
+split is mean flex plus \(\varepsilon<0\), so when price spikes, use
+falls, and there is no year-by-year food/feed forcing in the headline.
+World mean ratios were \(\times 0.86\)--\(0.92\) with negative
+correlations. That leftover is not a retune target, and substitution is
+not a license to hide it.
+
+Table~\ref{tab:cons} scores the same object on the frozen band. At
+\(\sigma=0\) the numbers match Gate~0 (identity). Raising \(\sigma\)
+ticks mean ratios up a little (wheat \(\times 0.92\to\times 0.94\), rice
+\(\times 0.86\to\times 0.88\), maize \(\times 0.92\to\times 0.93\)): dear
+substitutes raise flex demand. Wheat and rice correlations become less
+negative; maize correlation gets worse (\(-0.64\to -0.84\)). Year-to-year
+sign counts do not move (3/5, 1/5, 2/5). The path versus PSD is still
+wrong. Do not pick \(\sigma\) from these ratios. Do not reopen the
+warehouse.
+
+\begin{table}[H]
+\centering
+\caption{World calendar-year use versus country-sum PSD, official split.
+Diagnostic only. Source:
+\texttt{diagnostics/gate1\_consumption\_score.csv}.}
+\label{tab:cons}
+\small
+\input{tables/consumption.tex}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{fig_gate1_consumption}
+\caption{World calendar-year use, official split, versus country-sum PSD.
+Substitution does not turn the falling model path into the rising PSD
+path.}
+\label{fig:cons}
+\end{figure}
+
+\section{What this paper can say}
+\label{sec:claim}
+
+This is what substitution on the locked Gate~0 spine can say. It is not a
+fitted \(\sigma^\star\). Agrimate cannot do this layer~\citep{kuhla2025}.
+
+\paragraph{Can claim.}
+Coupled isoelastic food/feed demand with \(\sigma=0\) recovers the
+single-crop Gate~0 prices (2006--11 and 2021--23) to machine precision.
+In 2007/08, turning \(\sigma\) up raises rice and maize hikes relative to
+\(\sigma=0\) (the substitution sign). Wheat stays restriction-led in 2008
+and production-led in 2010 at every reported \(\sigma>0\). Isolated rice
+AMIS still carries essentially all of the 2008 rice hike; substitution is a
+spillover, not a replacement for India/Vietnam bans. In 2021--23 wheat
+stays AMIS-led and maize stays flat.
+
+\paragraph{Must disclose.}
+\(\sigma\in\{0,0.3,0.6\}\) was declared before looking at coupled scores.
+Rice 2008 in Pink Sheet is primarily an own-ban episode, not a clean
+wheat\(\to\)rice test. The 2010 maize hike-\emph{ratio} drop at
+\(\sigma=0.6\) is a higher June 2009 base after the 2008 wheat--maize
+spillover, not a lower 2011 peak. In 2022 rice drifts up
+(\(\times 1.18\)) against a falling Pink Sheet (\(\times 0.91\)). Dual
+host: this layer is not annual Slutsky \(M_i\). Wheat 2008 overshoot gets
+a bit worse as \(\sigma\) rises. Gate~0 consumption leftovers are
+inherited: mean ratios tick up a little, maize use-correlation gets worse,
+and \(\Delta\)cons signs do not move. Shipment leftovers are untouched.
+
+\paragraph{Must not claim.}
+That \(\sigma=0.6\) (or \(0.3\)) is estimated. That matching the 2008 rice
+spike validates substitution. That 2022 wheat corr (\(0.69\to 0.75\))
+selects \(\sigma\). That Gate~0 consumption/shipment leftovers are fixed.
+That governments choose bans (that is P4--P5).
+
+\section{What still misses, on purpose}
+\label{sec:leftovers}
+
+These are not a to-do list for the next parameter tweak.
+
+\begin{itemize}
+\item Wheat 2007/08 still high, and substitution pushes it higher
+      (\(\times 2.27\to\times 2.45\) versus observed \(\times 1.82\)).
+\item Maize 2010 hike \emph{ratio} at \(\sigma=0.6\) looks like a collapse
+      because 2009 is already expensive (\S\ref{sec:e5}).
+\item 2022 rice drifts the wrong way (\(\times 0.99\to\times 1.18\) versus
+      \(\times 0.91\)).
+\item Gate~0 consumption path versus PSD trend. Substitution ticks mean
+      ratios up a little and makes maize's correlation worse
+      (\(-0.64\to -0.84\)); \(\Delta\)cons signs do not move
+      (\S\ref{sec:cons}).
+\item Gate~0 AMIS shipment \emph{levels} versus PSD; prescribed FAOSTAT E0.
+\item Dual host: isoelastic \(\eta\) here, linear \(M_i\) in the annual
+      SPE. Not equated.
+\item No convenience yield / futures smoothing.
+\item Ukraine 2022: AMIS classes only; wartime logistics outside AMIS are
+      not in \(\tau\).
+\item Governments do not choose bans.
+\end{itemize}
+
+None of these is a license to fit 2008. Densifying \(\{0,0.3,0.6\}\),
+picking \(\sigma^\star\) because wheat 2022 corr rose, retuning
+\texttt{CropParams} or \(\rho\), unpausing \texttt{dynamic\_grains.py}, or
+starting the export game would be a different paper.
+
+\section{Conclusion}
+\label{sec:conc}
+
+Gate~1 is complete enough to write down. On the locked Gate~0 spine, with
+governments still not choosing bans, isoelastic food/feed substitution at
+a pre-declared \(\sigma\) band recovers single-crop prices when switching
+is off, spills in the substitute direction in 2007/08, leaves wheat's
+2008/2010 attribution signs and rice's own-ban dominance intact, and does
+not invent a 2022 maize spike. It does not estimate \(\sigma\), does not
+turn 2008 rice into a substitution test, does not fix Gate~0 consumption
+or shipment leftovers, and does not hide a 2010 maize hike-ratio leftover
+that is really a 2009 level. Those sentences are the result. The next
+paper is the export game, on this spine, not instead of it --- and not
+until someone asks for it.
+
+\appendix
+\input{sections/code_map}
+
+\bibliography{refs}
+
+\end{document}

@@ -1,0 +1,52 @@
+\section{Supplement: which equation lives in which function}
+\label{sec:code}
+
+Line numbers refer to the commit that ships with this note. They will
+drift; function names are the stable map. Nothing in
+\texttt{sheaf/core.py} (annual SPE + export game) and nothing in
+\texttt{sheaf/dynamic\_grains.py} (paused prototype) is run by the
+hindcasts here.
+
+\begin{center}
+\small
+\begin{tabular}{llp{0.46\textwidth}}
+\toprule
+Eq.\ / object & Function & Notes \\
+\midrule
+Official P3 run &
+\texttt{scripts/score\_gate1.py} &
+band \(\{0,0.3,0.6\}\), hard bars, Fig.~\ref{fig:band} \\
+Coupled step &
+\texttt{sheaf/dynamic\_coupled.py}
+\texttt{\_simulate\_coupled} &
+Jacobi: \texttt{fac=exp(η log(p/p0))} then Gate~0 market \\
+\(\eta\)~\eqref{eq:cross} &
+\texttt{cross\_price\_eta} &
+own \(\varepsilon\) from \texttt{default\_crop\_params};
+\(\rho\) from \texttt{calibration.RHO} \\
+Identity &
+\texttt{assert\_subst0\_matches\_gate0} &
+coupled \(\sigma=0\) vs \texttt{run\_crop\_dynamics} \\
+Gate~0 market &
+\texttt{sheaf/dynamic\_crop.py}
+\texttt{prepare\_crop\_run} &
+locked \texttt{CropParams}; not retuned \\
+E5 leftover &
+\texttt{scripts/score\_gate1\_e5.py} &
+\texttt{zero\_pairs}, \texttt{freeze\_price} \\
+E6 hold-out &
+\texttt{scripts/score\_gate1\_e6.py} &
+years 2021--23, stock seed 2020,
+FAOSTAT 2019--21, \(p_0=\) 2021 Pink Sheet mean \\
+Consumption diagnostic &
+\texttt{scripts/score\_gate1\_consumption.py} &
+calendar-year use vs country-sum PSD;
+not a retune target \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\texttt{p0} in \texttt{run\_coupled\_dynamics} is an optional per-crop
+numeraire. Omit it for 2006--11 (Gate~0 \texttt{\_anchor\_p0}). Pass 2021
+Pink Sheet means for the Ukraine-war window. \texttt{zero\_pairs} and
+\texttt{freeze\_price} exist for diagnosis; they do not retune \(\rho\).

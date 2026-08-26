@@ -1,21 +1,29 @@
 # Gate 1 handoff (read this first)
 
-**Date:** 2026-08-26. Experiments **E0–E7** are done. Do not re-run the σ
-band or E5/E6 unless reproducing. Do not start the export game.
+**Date:** 2026-08-26. Experiments **E0–E8** are done. P3 draft is written.
+Do not re-run the σ band or E5/E6 unless reproducing. Do not start the
+export game. Do not pick σ*.
 
 Living Overleaf note: `overleaf/gate1_substitution/` (zip that folder).
+**P3 draft to upload:** `overleaf/gate1_whitepaper/` (zip that folder).
 Protocol twin: this file + `diagnostics/GATE1_PLAN.md`.
-Paper stack: `diagnostics/PAPER_STACK.md` (P1 accepted; P3 next; P4–P5 later).
+Paper stack: `diagnostics/PAPER_STACK.md` (P1 accepted; P3 draft written;
+P4–P5 later).
 
 ## What the new agent should do
 
-**E8 — write the P3 draft** from the frozen claim in
-`overleaf/gate1_substitution/sections/claim.tex`, in the same plain-English
-+ equations style as `overleaf/gate0_whitepaper/`. Still substitution only.
-Still no σ\*.
+**Stop** unless asked to revise the P3 draft.
 
-Optional, not blocking: world consumption vs PSD as a **diagnostic**
-(Gate 0 leftover; not a retune target).
+The writeup is `overleaf/gate1_whitepaper/`. Frozen claim still lives in
+`overleaf/gate1_substitution/sections/claim.tex` (unchanged). Optional
+consumption vs PSD diagnostic is scored (`diagnostics/gate1_consumption_report.md`);
+it is not a retune target.
+
+Zip for Overleaf:
+
+```
+cd overleaf && zip -r gate1_whitepaper.zip gate1_whitepaper -x "*.DS_Store"
+```
 
 ## What the new agent must not do
 
@@ -55,19 +63,25 @@ do not equate.
   wrong-way miss. Do not pick σ=0.6 because wheat corr rose (+0.69 → +0.75).
 - Rice 2008 in the *data* is primarily own-ban (India/Vietnam), not a clean
   wheat→rice substitution fingerprint.
+- Consumption vs PSD: σ=0 inherits Gate 0 leftover; σ=0.6 ticks mean ratios
+  up slightly (wheat ×0.92→×0.94) and makes maize corr worse (−0.64→−0.84).
+  Δcons signs unchanged. Diagnostic only.
 
 ## Code
 
 | Path | Role |
 |---|---|
+| `overleaf/gate1_whitepaper/` | **P3 draft** (E8) |
 | `sheaf/dynamic_coupled.py` | Coupling; `p0` dict; `zero_pairs`; `freeze_price` |
 | `sheaf/dynamic_crop.py` | `prepare_crop_run` / Gate 0 market (locked params) |
 | `scripts/score_gate1.py` | 2006–11 band + hard bars |
 | `scripts/score_gate1_e5.py` | Maize 2010 counterfactuals |
 | `scripts/score_gate1_e6.py` | 2021–23 hold-out |
+| `scripts/score_gate1_consumption.py` | Optional world use vs PSD (diagnostic) |
 | `diagnostics/gate1_report.md` | E4 scores |
 | `diagnostics/gate1_e5_report.md` | E5 classification |
 | `diagnostics/gate1_e6_report.md` | E6 hold-out |
+| `diagnostics/gate1_consumption_report.md` | E8 consumption diagnostic |
 
 Official P1 flags: `use_demand=False`, harvest+AMIS, maize industrial on.
 Ukraine window: years 2021–23, stock seed 2020, FAOSTAT 2019–21, per-crop
@@ -75,4 +89,4 @@ Ukraine window: years 2021–23, stock seed 2020, FAOSTAT 2019–21, per-crop
 
 After an experiment: edit `overleaf/gate1_substitution/tables/status.tex`,
 append `tables/log.tex`, replace `sections/next.tex`. Do not rewrite locked
-math/identification.
+math/identification. The P3 prose lives in `overleaf/gate1_whitepaper/`.

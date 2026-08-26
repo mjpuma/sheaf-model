@@ -1,0 +1,20 @@
+% New knobs only. Gate 0 CropParams stay frozen (see gate0_whitepaper/tables/params.tex).
+\begin{tabular}{ll l}
+\toprule
+Object & Value & Class \\
+\midrule
+Own \(\varepsilon\) & wheat $-0.15$, rice $-0.20$, maize $-0.25$
+  & Gate~0 literature; not \texttt{OWN\_ELAST} \\
+\(\rho\) (wheat, rice, maize)
+  & wheat--rice $0.30$; wheat--maize $0.40$; rice--maize $0.20$
+  & frozen illustrative (\texttt{calibration.RHO}) \\
+\(\sigma\) band & \(\{0,0.3,0.6\}\)
+  & pre-declared sensitivity; not an estimate \\
+Industrial/ethanol & does not enter \(\eta\)
+  & structural (mandate residual) \\
+Coupling & Jacobi: demand then market then prices
+  & one simultaneous step; not a joint QP \\
+Demand host & isoelastic on the 24-step spine
+  & dual to annual Slutsky \(M_i\); disclose \\
+\bottomrule
+\end{tabular}

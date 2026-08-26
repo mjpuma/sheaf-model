@@ -1,7 +1,8 @@
 # SHEAF Gate 1 — substitution strategy (living Overleaf note)
 
-This folder is a **working protocol**, not a journal draft. Zip it and upload
-to Overleaf (New Project → Upload Project). Compile with **pdfLaTeX + BibTeX**.
+This folder is a **working protocol**, not a journal draft. The P3 paper
+to upload is `../gate1_whitepaper/`. Zip either folder and upload to
+Overleaf (New Project → Upload Project). Compile with **pdfLaTeX + BibTeX**.
 
 From the repo root:
 
@@ -9,10 +10,12 @@ From the repo root:
 cp figures/fig_gate1_substitution.png overleaf/gate1_substitution/figures/
 cp figures/fig_gate1_e5_maize.png overleaf/gate1_substitution/figures/
 cp figures/fig_gate1_e6_ukraine.png overleaf/gate1_substitution/figures/
+cp figures/fig_gate1_consumption.png overleaf/gate1_substitution/figures/
 cd overleaf && zip -r gate1_substitution.zip gate1_substitution -x "*.DS_Store"
 ```
 
-New-agent handoff: `diagnostics/GATE1_HANDOFF.md`.
+New-agent handoff: `diagnostics/GATE1_HANDOFF.md` (status: **stop**; P3
+draft is written).
 
 The zip is gitignored; commit the folder. After each experiment, edit the
 files listed below, re-zip (or pull in Overleaf), and recompile.

@@ -1,0 +1,103 @@
+\section{Mathematics}
+\label{sec:math}
+
+This section writes down the one new layer. Every other equation --- harvest
+calendars, hungry-season buffers, AMIS cuts, Armington clearing, asks, the
+world-price mix --- is the Gate~0 spine and is not restated. See the Gate~0
+white paper, \S3. Quantities are million tonnes per step; prices are real
+dollars per tonne (Pink Sheet, MUV 2010).
+
+\subsection{What the layer is doing, in one paragraph}
+
+Each country still wants a baseline pile of food and feed for each grain,
+plus (for US maize) an ethanol pile that does not care about wheat or rice
+prices. The food-and-feed pile shrinks when that grain is expensive, and
+grows a little when a \emph{substitute} grain is expensive. Then each grain
+runs the same Gate~0 market it always did: offers, asks, Armington trade,
+warehouse. We compute all three demands from this fortnight's three prices,
+then all three markets, then the three new prices. That is Jacobi coupling.
+Nothing in this paper jointly optimises the three grains, and nothing lets
+a government choose a ban.
+
+\subsection{Flex demand with cross prices}
+\label{sec:flex}
+
+Gate~0 desired use for grain \(g\) is isoelastic in its own price only,
+\begin{equation}
+\label{eq:own}
+d^g_{i,t}
+= C^{g,\mathrm{flex}}_{i,t}
+  \bigl(p^g_t/p^g_0\bigr)^{\varepsilon_g}
++ C^{g,\mathrm{ind}}_{i,t}.
+\end{equation}
+Gate~1 keeps that split and multiplies the flex pile by every grain's
+relative price:
+\begin{equation}
+\label{eq:flex}
+d^g_{i,t}
+= C^{g,\mathrm{flex}}_{i,t}
+  \prod_h \Bigl(\frac{p^h_t}{p^h_0}\Bigr)^{\eta_{gh}}
++ C^{g,\mathrm{ind}}_{i,t}.
+\end{equation}
+Own exponents are the locked Gate~0 elasticities,
+\(\eta_{gg}=\varepsilon_g\) from \texttt{CropParams.elast} (wheat \(-0.15\),
+rice \(-0.20\), maize \(-0.25\)). Cross exponents (\(g\neq h\)) are
+\begin{equation}
+\label{eq:cross}
+\eta_{gh}=\sigma\,\rho_{gh}\,|\varepsilon_g|.
+\end{equation}
+\(\rho\) is the illustrative substitutability matrix in
+\texttt{sheaf/calibration.py}: wheat--maize \(0.40\) (feed), wheat--rice
+\(0.30\) (food), rice--maize \(0.20\). It is frozen. \(\sigma\) scales the
+whole off-diagonal. Industrial/ethanol does not enter~\eqref{eq:cross}.
+
+At \(p=p_0\) the product is \(1\) for any \(\sigma\), so the calm twin stays
+flat. Code evaluates \(\mathtt{fac}=\exp(\eta\log(p/p_0))\) in
+\texttt{sheaf/dynamic\_coupled.py}. Grain order is wheat, rice, maize.
+
+\begin{table}[H]
+\centering
+\caption{Worked \(\eta\) on the reported band. Maize answers wheat more than
+wheat answers maize because \(|\varepsilon_{\mathrm{maize}}|>
+|\varepsilon_{\mathrm{wheat}}|\). That asymmetry is~\eqref{eq:cross}, not a
+coding error.}
+\label{tab:eta}
+\small
+\input{tables/eta.tex}
+\end{table}
+
+\subsection{Jacobi step}
+\label{sec:jacobi}
+
+Write \(p_t=(p^{\mathrm{w}}_t,p^{\mathrm{r}}_t,p^{\mathrm{m}}_t)\). One
+fortnight is
+\begin{enumerate}
+\item demand: evaluate~\eqref{eq:flex} at \(p_t\) for all three grains;
+\item market: run the Gate~0 offer / Armington / ask / warehouse map on each
+      grain separately, with that grain's FAOSTAT network and that grain's
+      AMIS diary;
+\item prices: each grain's world-price map produces \(p_{t+1}\).
+\end{enumerate}
+There is no inner loop to a simultaneous multi-grain fixed point, and no
+joint quadratic program. Offers and asks remain crop-specific. The only
+cross-grain object is the demand product~\eqref{eq:flex}.
+
+\subsection{Dual host (disclose, do not equate)}
+\label{sec:dual}
+
+An older annual market-clearing program in \texttt{sheaf/core.py} uses a
+linear Slutsky system \(D=a-Mp\) with own-price vector
+\texttt{calibration.OWN\_ELAST} (wheat \(-0.25\), rice \(-0.20\), maize
+\(-0.30\)) and a constructed positive-definite \(M_i\). That host is not
+run here. Switching Gate~1 own-price \(\varepsilon\) to
+\texttt{OWN\_ELAST} would break the \(\sigma=0\) identity against Gate~0.
+The cross form~\eqref{eq:cross} is a constant-elasticity overlay: the
+demand Jacobian is not Slutsky-symmetric. Paper P3 is isoelastic food/feed
+on the 24-step spine. It is not README~\S1.
+
+\subsection{What is not in this layer}
+
+Joint multi-grain quadratic program; annual integrable \(M_i\); endogenous
+export game; endogenous trade network; convenience yield / futures
+smoothing. Those are other papers~\citep{armington1969,takayama1971}.
+The paused prototype in \texttt{sheaf/dynamic\_grains.py} is not scored.

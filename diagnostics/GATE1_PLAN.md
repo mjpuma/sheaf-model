@@ -1,10 +1,12 @@
 # Gate 1: cross-grain substitution on the locked Gate 0 spine
 
-**Status:** E0–E7 done (2026-08-26). Band scored; E5 leftover classified;
-E6 2022 hold-out scored; P3 claim frozen. **No σ\***. **No game.**
+**Status:** E0–E8 done (2026-08-26). P3 draft written:
+`overleaf/gate1_whitepaper/`. Band scored; E5 leftover classified;
+E6 2022 hold-out scored; P3 claim frozen; consumption diagnostic scored.
+**No σ\***. **No game.** **Next: stop.** Do not start P4–P5.
 **Handoff for a new agent:** `diagnostics/GATE1_HANDOFF.md` (read first).
 **Living Overleaf note:** `overleaf/gate1_substitution/`.
-**Next:** E8 write the P3 draft from the frozen claim.
+**P3 draft:** `overleaf/gate1_whitepaper/`.
 **Paper:** P3. Agrimate cannot do this (single commodity).
 **Does not retune** `CropParams`. Does not turn on the export game.
 
@@ -125,7 +127,8 @@ stays Gate 0 `CropParams.elast`. No game.
 - Rice 2010/11 observed hike is **< 1**. σ>0 must not be scored as a win for
   inventing a rice co-spike that year.
 - Consumption: substitution can raise rice/maize use when wheat is expensive.
-  Score vs PSD as a diagnostic, not a retune target.
+  Scored in E8 vs PSD as a diagnostic, not a retune target (maize corr
+  worsens; Δcons signs unchanged). Do not pick σ* from these ratios.
 
 ## 2007/08 data (Pink Sheet real 2010$, same `_hike` windows as Gate 0)
 
@@ -160,6 +163,8 @@ the least-confounded spillover; rice 2008 = own-policy (hard bar 4); rice 2010
 | `scripts/score_gate1.py` | Identity assert, \(\sigma\) grid, spillover table, figure |
 | `scripts/score_gate1_e5.py` | Maize 2010 counterfactuals |
 | `scripts/score_gate1_e6.py` | 2021–23 hold-out |
+| `scripts/score_gate1_consumption.py` | World use vs PSD (diagnostic; E8) |
+| `overleaf/gate1_whitepaper/` | P3 draft (E8) |
 | `diagnostics/GATE1_HANDOFF.md` | New-agent start here |
 | `diagnostics/GATE1_PLAN.md` | This file |
 | `sheaf/dynamic_grains.py` | Stay paused (do not score Gate 1 on it) |

@@ -36,7 +36,8 @@
 \maketitle
 
 \begin{abstract}
-This is the to-do list for paper P3, not the paper. Gate~0 (one crop at a
+This is the to-do list for paper P3, not the paper. The draft is
+\texttt{overleaf/gate1\_whitepaper/}. Gate~0 (one crop at a
 time, historical export bans, no switching among grains) is locked.
 Agrimate cannot do substitution~\citep{kuhla2025}. SHEAF can, on that
 spine, by letting food and feed respond to the other grains' prices. We
@@ -156,6 +157,32 @@ Pink Sheet.}
 
 \input{sections/claim.tex}
 
+\section{E8: P3 draft}
+\label{sec:e8}
+
+The paper is \texttt{overleaf/gate1\_whitepaper/}, Gate~0 white-paper
+style, from the frozen claim above. This folder stays the protocol.
+
+Optional consumption vs PSD (calendar-year world use versus country-sum
+PSD, official split) is a diagnostic. \(\sigma=0\) inherits the Gate~0
+leftover. Raising \(\sigma\) ticks mean ratios up a little and makes maize
+correlation worse. \(\Delta\)cons signs do not move. Not a retune target;
+not a reason to pick \(\sigma^\star\).
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/consumption.tex}
+\caption{World calendar-year use versus country-sum PSD. Diagnostic only.
+Source: \texttt{diagnostics/gate1\_consumption\_score.csv}.}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate1_consumption.png}
+\caption{World calendar-year use, official split, versus country-sum PSD.}
+\end{figure}
+
 \section{Experiment log}
 \label{sec:log}
 
@@ -182,6 +209,8 @@ Path & Role \\
 \texttt{scripts/score\_gate1.py} & Band, hard bars, figure \\
 \texttt{scripts/score\_gate1\_e5.py} & Maize 2010 counterfactuals \\
 \texttt{scripts/score\_gate1\_e6.py} & 2021--23 hold-out \\
+\texttt{scripts/score\_gate1\_consumption.py} & World use vs PSD (diagnostic) \\
+\texttt{overleaf/gate1\_whitepaper/} & P3 draft (E8) \\
 \texttt{diagnostics/GATE1\_PLAN.md} & Same protocol in markdown \\
 \texttt{sheaf/dynamic\_grains.py} & Paused prototype --- do not score P3 here \\
 \texttt{sheaf/core.py} & Annual SPE + game; not this layer \\
