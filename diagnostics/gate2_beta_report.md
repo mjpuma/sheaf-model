@@ -1,6 +1,6 @@
 # Gate 2 beta
 
-Exporter Russia wheat. Synthetic 2007 harvest ×0.5. AMIS off. Illustrative `gov_stu`=0.48, `fs_stock_weight`=12. Government buffer $s^{\mathrm{gov}}$ = 18.13 MMT.
+Exporter Russia wheat. Synthetic 2007 harvest ×0.5. AMIS off. Illustrative `gov_stu`=0.48, `fs_stock_weight`=12. Government buffer s_gov = 18.13 MMT.
 
 - Calm τ* = **0**
 - Shock τ* = **0.6**
