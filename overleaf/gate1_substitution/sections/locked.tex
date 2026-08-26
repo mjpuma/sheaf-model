@@ -1,0 +1,75 @@
+\section{Locked rules}
+\label{sec:locked}
+
+Change this section only if the \emph{protocol} changes, not because a
+score disappointed you. The machine-readable twin is
+\texttt{diagnostics/GATE1\_PLAN.md}.
+
+\subsection{Frozen Gate~0 pieces}
+
+Own-price elasticities, stock-to-use targets, ask and warehouse knobs, the
+AMIS map, LOWESS harvests, mean food/feed, US maize industrial/ethanol,
+FAOSTAT trade shares, and the calm-weather twin. Official scoring split:
+harvest anomalies plus AMIS, year-by-year food/feed \emph{off}, industrial
+\emph{on} for maize. Leftovers listed in the Gate~0 parameterization note
+stay leftovers.
+
+\subsection{Demand host}
+
+Gate~1 is \textbf{not} the annual linear Slutsky system
+\(D=a-Mp\) in \texttt{sheaf/core.py}. That host uses
+\texttt{calibration.OWN\_ELAST}. The crisis spine uses isoelastic demand
+with Gate~0 \texttt{CropParams.elast} (wheat \(-0.15\), rice \(-0.20\),
+maize \(-0.25\)). Switching own-price \(\varepsilon\) to
+\texttt{OWN\_ELAST} would break the \(\sigma=0\) identity. Cross-price
+exponents \(\eta_{gh}=\sigma\,\rho_{gh}\,|\varepsilon_g|\) are a
+constant-elasticity overlay; the demand Jacobian is not
+Slutsky-symmetric. Industrial/ethanol does not substitute. Disclose the
+dual host in any P3 prose; do not equate Gate~1 \(\eta\) with annual
+\(M_i\).
+
+\(\rho\) is the illustrative matrix in \texttt{sheaf/calibration.py}
+(wheat--maize \(0.40\) via feed; wheat--rice \(0.30\); rice--maize
+\(0.20\)). It stays frozen.
+
+\subsection{Identification}
+
+\(\sigma\in\{0,0.3,0.6\}\) is a \textbf{pre-declared sensitivity band}, not
+an estimate. Zero is Gate~0 identity. \(0.6\) is the old prototype /
+\texttt{build\_countries(substitution=True)} default, not a fitted peak.
+\(0.3\) is the midpoint. Do not add \(0.9\) after seeing prices. Do not
+take \(\arg\max\) of 2008 \(\Delta\)corr.
+
+\textbf{Preferred claim:} report all three. No point estimate.
+
+\textbf{If a preferred \(\sigma\) is required:} select only on the 2007/08
+\textbf{wheat\(\to\)maize} margin. Hold out rice 2008, plus 2010/11, plus
+2022. Training on rice 2008 is withdrawn: that episode is an own-ban, not
+a clean substitution fingerprint.
+
+Fitting 2008 then claiming validation includes: maximizing 2007/08
+rice/maize fit then reporting that window as the result; joint \(\sigma\)
+on 2008+2010+2022; retuning \texttt{CropParams} / \(\rho\) / Gate~0
+leftovers to help spillovers; peeking at coupled scores then declaring the
+grid.
+
+\subsection{Hard bars (every reported \(\sigma>0\))}
+
+\begin{enumerate}
+\item \textbf{Identity.} Coupled \(\sigma=0\), official split, 2006--11:
+      monthly world price of each grain matches the corresponding
+      \texttt{run\_crop\_dynamics} to relative error \(\lesssim 0.5\%\).
+\item \textbf{Spillover sign.} In 2007/08, \(\sigma>0\) must not
+      \emph{lower} rice and maize hikes relative to \(\sigma=0\) while
+      wheat is up. A fall is a bug or a wrong \(\rho\) sign.
+\item \textbf{Wheat Gate~0 not wrecked.} 2007/08 stays restriction-led and
+      2010/11 stays production-led (isolated-leg signs). Amplitude may
+      move; a sign flip is a fail.
+\item \textbf{Rice still has its own ban.} Isolated rice AMIS must still
+      carry most of the 2008 rice hike. Substitution is a spillover, not a
+      replacement for India/Vietnam \(\tau\).
+\end{enumerate}
+
+Soft \(\Delta\)corr / \(\Delta\)hike on hold-outs are reported, not used
+to pick \(\sigma^\star\). A pass must not invent a rice hike in 2010/11
+(observed ratio \(<1\)).

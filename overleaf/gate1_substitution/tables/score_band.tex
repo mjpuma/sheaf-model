@@ -1,0 +1,22 @@
+% Source: diagnostics/gate1_score.csv after scripts/score_gate1.py
+% Official P1 split: harvest LOWESS + AMIS, mean flex, USA maize industrial on.
+% Full leg only. Do not pick \(\sigma^\star\) from this table.
+\begin{tabular}{l r rr rr rr}
+\toprule
+ &  & \multicolumn{2}{c}{monthly corr} & \multicolumn{2}{c}{2007/08 hike} & \multicolumn{2}{c}{2010/11 hike} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+Grain & \(\sigma\) & model & vs \(\sigma{=}0\) & model / obs & vs \(\sigma{=}0\) & model / obs & vs \(\sigma{=}0\) \\
+\midrule
+wheat & 0   & $+0.72$ & --- & $\times 2.27$ / $\times 1.82$ & --- & $\times 1.45$ / $\times 1.16$ & --- \\
+wheat & 0.3 & $+0.72$ & $+0.00$ & $\times 2.36$ / $\times 1.82$ & $+0.09$ & $\times 1.50$ / $\times 1.16$ & $+0.05$ \\
+wheat & 0.6 & $+0.72$ & $+0.00$ & $\times 2.45$ / $\times 1.82$ & $+0.19$ & $\times 1.54$ / $\times 1.16$ & $+0.10$ \\
+\midrule
+rice  & 0   & $+0.68$ & --- & $\times 1.72$ / $\times 1.84$ & --- & $\times 0.82$ / $\times 0.79$ & --- \\
+rice  & 0.3 & $+0.67$ & $-0.00$ & $\times 1.75$ / $\times 1.84$ & $+0.03$ & $\times 0.82$ / $\times 0.79$ & $0.00$ \\
+rice  & 0.6 & $+0.67$ & $-0.01$ & $\times 1.79$ / $\times 1.84$ & $+0.07$ & $\times 0.82$ / $\times 0.79$ & $0.00$ \\
+\midrule
+maize & 0   & $+0.71$ & --- & $\times 1.97$ / $\times 1.84$ & --- & $\times 1.70$ / $\times 1.44$ & --- \\
+maize & 0.3 & $+0.67$ & $-0.04$ & $\times 2.05$ / $\times 1.84$ & $+0.08$ & $\times 1.52$ / $\times 1.44$ & $-0.18$ \\
+maize & 0.6 & $+0.59$ & $-0.12$ & $\times 2.14$ / $\times 1.84$ & $+0.17$ & $\times 1.15$ / $\times 1.44$ & $-0.55$ \\
+\bottomrule
+\end{tabular}

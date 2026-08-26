@@ -1,10 +1,11 @@
 # Gate 1: cross-grain substitution on the locked Gate 0 spine
 
-**Status:** scored (2026-08-25). Identity PASS. Hard bars PASS on the
-pre-declared band σ ∈ {0, 0.3, 0.6}. **No σ\* selected.** Soft: 2008
-rice/maize hikes move the right way; maize 2010 hike/corr deteriorate at
-σ=0.6 (×1.70 → ×1.15 vs obs ×1.44). See `diagnostics/gate1_report.md`.  
-**Paper:** P3. Agrimate cannot do this (single commodity).  
+**Status:** E0–E7 done (2026-08-26). Band scored; E5 leftover classified;
+E6 2022 hold-out scored; P3 claim frozen. **No σ\***. **No game.**
+**Handoff for a new agent:** `diagnostics/GATE1_HANDOFF.md` (read first).
+**Living Overleaf note:** `overleaf/gate1_substitution/`.
+**Next:** E8 write the P3 draft from the frozen claim.
+**Paper:** P3. Agrimate cannot do this (single commodity).
 **Does not retune** `CropParams`. Does not turn on the export game.
 
 Gate 0 is accepted. `sheaf/dynamic_grains.py` + `scripts/score_subannual_spillover.py`
@@ -157,6 +158,9 @@ the least-confounded spillover; rice 2008 = own-policy (hard bar 4); rice 2010
 |---|---|
 | `sheaf/dynamic_coupled.py` | Joint 24-step runner on Gate 0 arrays |
 | `scripts/score_gate1.py` | Identity assert, \(\sigma\) grid, spillover table, figure |
+| `scripts/score_gate1_e5.py` | Maize 2010 counterfactuals |
+| `scripts/score_gate1_e6.py` | 2021–23 hold-out |
+| `diagnostics/GATE1_HANDOFF.md` | New-agent start here |
 | `diagnostics/GATE1_PLAN.md` | This file |
 | `sheaf/dynamic_grains.py` | Stay paused (do not score Gate 1 on it) |
 

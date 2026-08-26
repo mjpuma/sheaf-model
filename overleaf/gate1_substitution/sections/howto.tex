@@ -1,0 +1,25 @@
+\section{How to update this note}
+\label{sec:howto}
+
+This file exists so the next sitting does not have to reconstruct the
+protocol from chat. After an experiment:
+
+\begin{enumerate}
+\item Run the code. Do not edit Gate~0 leftovers to help the plot.
+\item Append one row to \texttt{tables/log.tex}. Leave old rows alone.
+\item If official-split prices changed, replace
+      \texttt{tables/score\_band.tex} from \texttt{diagnostics/gate1\_score.csv}.
+\item Rewrite \texttt{tables/status.tex} (\(\backslash\)Gnow, \(\backslash\)Gnext,
+      \(\backslash\)Gnever) in one sitting.
+\item Replace \texttt{sections/next.tex} with the new next experiment,
+      including what \emph{not} to do.
+\item Copy a new figure into \texttt{figures/} if you made one.
+\item Recompile. Zip the folder (see README) or pull in Overleaf.
+\end{enumerate}
+
+\texttt{sections/locked.tex} and \texttt{sections/math.tex} should barely
+move. If you find yourself editing them to excuse a score, stop.
+
+Repo paths: \texttt{sheaf/dynamic\_coupled.py},
+\texttt{scripts/score\_gate1.py}, \texttt{diagnostics/GATE1\_PLAN.md}.
+Stay away from \texttt{sheaf/dynamic\_grains.py}.

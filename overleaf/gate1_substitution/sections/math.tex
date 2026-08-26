@@ -1,0 +1,56 @@
+\section{Mathematics}
+\label{sec:math}
+
+\paragraph{Plain English.}
+Each country still wants a baseline pile of food and feed for each grain,
+plus (for US maize) an ethanol pile that does not care about wheat or rice
+prices. The food-and-feed pile shrinks when that grain is expensive, and
+grows a little when a \emph{substitute} grain is expensive. Then each grain
+runs the same Gate~0 market it always did: offers, asks, Armington trade,
+warehouse. We compute all three demands from this fortnight's three prices,
+then all three markets, then the three new prices (Jacobi).
+
+\paragraph{Flex demand.}
+For grain \(g\), country \(i\), step \(t\),
+
+\begin{equation}
+  d^g_{i,t}
+  = C^{g,\mathrm{flex}}_{i,t}
+    \prod_h \Bigl(\frac{p^h_t}{p^h_0}\Bigr)^{\eta_{gh}}
+  + C^{g,\mathrm{ind}}_{i,t}.
+  \label{eq:flex}
+\end{equation}
+
+Own exponents \(\eta_{gg}=\varepsilon_g\) from Gate~0
+\texttt{CropParams.elast}. Cross exponents (\(g\neq h\))
+
+\begin{equation}
+  \eta_{gh}=\sigma\,\rho_{gh}\,|\varepsilon_g|.
+  \label{eq:cross}
+\end{equation}
+
+At \(p=p_0\) the product is 1 for any \(\sigma\), so the calm twin stays
+flat. Code: \(\mathtt{fac}=\exp(\eta\log(p/p_0))\) in
+\texttt{sheaf/dynamic\_coupled.py}. Grain order is wheat, rice, maize.
+
+\paragraph{Worked \(\eta\) at \(\sigma=0.6\).}
+
+\[
+\eta =
+\begin{pmatrix}
+-0.15 & 0.027 & 0.036 \\
+ 0.036 & -0.20 & 0.024 \\
+ 0.060 & 0.030 & -0.25
+\end{pmatrix}
+\quad
+\text{(rows/cols: wheat, rice, maize).}
+\]
+
+Maize answers wheat more than wheat answers maize because
+\(|\varepsilon_{\mathrm{maize}}|>|\varepsilon_{\mathrm{wheat}}|\). That
+asymmetry is a feature of~\eqref{eq:cross}, not a coding error.
+
+\paragraph{What is not in this layer.}
+Joint multi-grain quadratic program; annual integrable \(M_i\); endogenous
+export game; endogenous trade network. Those are other papers
+\citep{armington1969}.

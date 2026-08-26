@@ -28,10 +28,15 @@ COUPLED_GRAINS = ("wheat", "rice", "maize")
 
 
 def cross_price_eta(subst_scale: float,
-                    grains: tuple[str, ...] = COUPLED_GRAINS) -> np.ndarray:
-    """(G,G) isoelastic exponents. Own ε from Gate 0 CropParams; ρ from calibration."""
+                    grains: tuple[str, ...] = COUPLED_GRAINS,
+                    zero_pairs: tuple[tuple[str, str], ...] = ()) -> np.ndarray:
+    """(G,G) isoelastic exponents. Own ε from Gate 0 CropParams; ρ from calibration.
+
+    ``zero_pairs`` zeros both off-diagonals for diagnosis (does not retune ρ).
+    """
     G = len(grains)
     idx = {g: i for i, g in enumerate(GRAINS)}
+    loc = {g: i for i, g in enumerate(grains)}
     eta = np.zeros((G, G))
     elast = np.array([default_crop_params(g).elast for g in grains], float)
     for a, ga in enumerate(grains):
@@ -42,6 +47,10 @@ def cross_price_eta(subst_scale: float,
                 continue
             ib = idx[gb]
             eta[a, b] = float(subst_scale) * float(RHO[ia, ib]) * abs(elast[a])
+    for ga, gb in zero_pairs:
+        a, b = loc[ga], loc[gb]
+        eta[a, b] = 0.0
+        eta[b, a] = 0.0
     return eta
 
 
@@ -55,9 +64,14 @@ class CoupledSimResult:
     by_crop: dict[str, CropSimResult]
 
 
-def _simulate_coupled(preps: list[CropPrep], eta: np.ndarray
+def _simulate_coupled(preps: list[CropPrep], eta: np.ndarray,
+                      freeze_price: dict[str, np.ndarray] | None = None,
                       ) -> list[CropSimResult]:
-    """Jacobi step: all flex demands from p_t, then each Gate 0 market, then prices."""
+    """Jacobi step: all flex demands from p_t, then each Gate 0 market, then prices.
+
+    ``freeze_price`` maps crop name → length-T world-price path. After each
+    step the named grain's price is overwritten (E5 rice-path hold).
+    """
     G = len(preps)
     n = len(preps[0].countries)
     T = preps[0].H.shape[1]
@@ -188,6 +202,8 @@ def _simulate_coupled(preps: list[CropPrep], eta: np.ndarray
 
             pg = float(params.smooth * p[g] + (1.0 - params.smooth) * p_star)
             pg = float(np.clip(pg, 60.0, 1200.0))
+            if freeze_price and pr.crop in freeze_price:
+                pg = float(freeze_price[pr.crop][t])
             new_p[g] = pg
             new_ask.append(ask_g)
             new_stock.append(st)
@@ -229,21 +245,29 @@ def run_coupled_dynamics(
         stock_seed_year: int = 2005,
         spin_up_years: int = 2,
         trade_window: tuple[int, int] = (2006, 2007),
+        p0: dict[str, float] | None = None,
+        zero_pairs: tuple[tuple[str, str], ...] = (),
+        freeze_price: dict[str, np.ndarray] | None = None,
 ) -> CoupledSimResult:
-    """Official P1 flags by default (mean flex; maize industrial on via params)."""
+    """Official P1 flags by default (mean flex; maize industrial on via params).
+
+    ``p0`` is an optional per-crop numeraire (Ukraine-war window uses 2021
+    Pink Sheet means). Omit to keep Gate 0 ``_anchor_p0`` defaults.
+    """
     preps = []
     countries = None
     for g in grains:
         pr = prepare_crop_run(
             g, countries=countries, start_year=start_year, end_year=end_year,
+            p0=None if p0 is None else float(p0[g]),
             use_amis=use_amis, use_shocks=use_shocks, use_demand=use_demand,
             use_industrial=use_industrial,
             stock_seed_year=stock_seed_year, spin_up_years=spin_up_years,
             trade_window=trade_window)
         countries = pr.countries
         preps.append(pr)
-    eta = cross_price_eta(subst_scale, grains)
-    results = _simulate_coupled(preps, eta)
+    eta = cross_price_eta(subst_scale, grains, zero_pairs=zero_pairs)
+    results = _simulate_coupled(preps, eta, freeze_price=freeze_price)
     return CoupledSimResult(
         grains=grains, countries=preps[0].countries,
         start_year=start_year, end_year=end_year,

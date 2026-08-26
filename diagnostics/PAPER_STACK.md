@@ -10,7 +10,7 @@ to the game (P4–P5) or an endogenous network (P2).
 | ID | Question | Now / next / later |
 |---|---|---|
 | **P1** | Reproduce observed **price, consumption, and trade** over crisis years (then decades) | **Crisis Gate 0 done.** Agrimate bar 2006–11 + Ukraine-war 2021–23 prices. Consumption and AMIS shipment *signs* scored; leftover *levels* are disclosed, not retuned. Decades after crises remain a later P1 expansion. |
-| **P3** | Empirically validate **wheat–maize–rice substitution** vs 2007/08 spillovers | **Gate 1 scored** (`diagnostics/GATE1_PLAN.md`). σ band, not a 2008 fit. Maize 2010 leftover disclosed. Locked Gate 0 `CropParams`. |
+| **P3** | Empirically validate **wheat–maize–rice substitution** vs 2007/08 spillovers | **E0–E7 done.** Claim frozen. Next: E8 P3 draft. Handoff: `diagnostics/GATE1_HANDOFF.md`. Living note: `overleaf/gate1_substitution/`. |
 | **Cal** | Constrain behavioral + strategic parameters | **Alongside P1–P3.** See below. Kilian’s point stands: extra behavior needs a plan, not a grid search on crises. |
 | **P4** | Policy: exporters restrict *just enough* for domestic food security, minimizing importer harm; **club of the willing** if not all join | **After P1 is honest.** Same game layer, **normative / constrained-welfare** objective — not “who restricted in 2010.” Illustrative parameters OK if labeled. |
 | **P5** | Game theory: cooperation vs protectionism; **social tipping** | **After P4 setup.** Vary cooperation / food-security weights. Current IBR is non-cooperative only. |
@@ -36,7 +36,7 @@ appendix lists what was not estimated.
 ```
 P1  Gate 0 crisis hindcast  ✓  (2006–11 + Ukraine-war prices; leftovers disclosed)
         ↓
-P3  Substitution on this spine   ← **Gate 1 scored** (band, not a fit)
+P3  Substitution on this spine   ← **E8: write the P3 draft** (claim frozen; no game)
         ↓
 Cal Written: structural / literature / estimated; train/hold-out for the game
         ↓

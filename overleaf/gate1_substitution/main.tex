@@ -1,0 +1,193 @@
+% SHEAF Gate 1 — living substitution strategy note (not a journal draft).
+% Overleaf: zip this folder and upload. Compile pdfLaTeX + BibTeX.
+% After each experiment: edit tables/status.tex, append tables/log.tex,
+% rewrite sections/next.tex. See README.md.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{amsmath,amssymb}
+\usepackage[table]{xcolor}
+\usepackage{setspace}
+\usepackage{array}
+\usepackage[round,authoryear]{natbib}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{float}
+\setstretch{1.08}
+
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue}
+\graphicspath{{figures/}}
+\bibliographystyle{apalike}
+
+\definecolor{nowbg}{RGB}{232,245,233}
+\definecolor{nextbg}{RGB}{255,248,225}
+\definecolor{neverbg}{RGB}{255,235,238}
+
+\input{tables/status.tex}
+
+\title{SHEAF Gate~1: strategy for implementing substitution\\
+\large living working note (plain English + protocol)}
+\author{Working document --- update after every experiment}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This is the to-do list for paper P3, not the paper. Gate~0 (one crop at a
+time, historical export bans, no switching among grains) is locked.
+Agrimate cannot do substitution~\citep{kuhla2025}. SHEAF can, on that
+spine, by letting food and feed respond to the other grains' prices. We
+do not fit a favourite \(\sigma\) on 2008. We report a pre-declared band,
+keep Gate~0 parameters frozen, and write down the next experiment before
+running it. Edit the coloured box, the log, and \S\ref{sec:next} after
+each sitting so the next sitting starts from the truth.
+\end{abstract}
+
+\section*{Dashboard --- where we are}
+\addcontentsline{toc}{section}{Dashboard}
+
+\noindent
+\renewcommand{\arraystretch}{1.35}
+\begin{tabularx}{\textwidth}{>{\bfseries}p{0.14\textwidth} X}
+\rowcolor{nowbg}
+Now & \Gnow \\
+\rowcolor{nextbg}
+Next & \Gnext \\
+\rowcolor{neverbg}
+Never & \Gnever \\
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+
+\vspace{0.6em}
+\noindent\textit{Edit} \texttt{tables/status.tex} \textit{to change this box.
+Append} \texttt{tables/log.tex}\textit{; replace} \texttt{sections/next.tex}.
+
+\tableofcontents
+\vspace{1em}
+
+\input{sections/plain.tex}
+\input{sections/locked.tex}
+\input{sections/math.tex}
+\input{sections/data.tex}
+
+\section{Band already scored (E4)}
+\label{sec:e4}
+
+Official P1 split, 2006--11, \texttt{scripts/score\_gate1.py}. No
+\(\sigma^\star\) selected.
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/hard_bars.tex}
+\caption{Hard bars on the pre-declared band. Soft leftovers are not
+selection targets.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{\input{tables/score_band.tex}}
+\caption{Official-split full leg versus Pink Sheet. ``vs \(\sigma{=}0\)''
+is the substitution increment, not a fit residual. The maize 2010 hike
+drop at \(\sigma{=}0.6\) is classified in E5 (higher 2009 base).}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate1_substitution.png}
+\caption{Monthly world prices, official split, \(\sigma\in\{0,0.3,0.6\}\)
+versus Pink Sheet (real 2010\$). Rice 2010 does not invent a co-spike.
+Maize 2010 hike ratio at \(\sigma{=}0.6\) is a higher 2009 base (E5).}
+\end{figure}
+
+\section{E5: maize 2010 hike collapse}
+\label{sec:e5}
+
+Cheap rice is not the main channel. Zero wheat--maize \(\rho\) restores
+87\% of the hike-ratio drop; holding rice on the \(\sigma=0\) path restores
+2\%. The February 2011 maize \emph{level} is slightly higher under
+\(\sigma=0.6\). The ratio falls because June 2009 maize is \$182 at
+\(\sigma=0\) and \$283 at \(\sigma=0.6\)---wheat--maize feed substitution
+keeps maize expensive after 2008. Disclose this; do not retune \(\rho\) to
+pretty-up the 2010 hike statistic.
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/e5.tex}
+\caption{E5 maize 2010 counterfactuals. Restoration is the share of
+(\(\sigma=0\) minus \(\sigma=0.6\)) hike closed. Base/peak are 3-month
+means in the Gate~0 hike window.}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate1_e5_maize.png}
+\caption{Maize world price under E5 counterfactuals, official split.}
+\end{figure}
+
+\section{E6: 2021--23 Ukraine-war hold-out}
+\label{sec:e6}
+
+Same flags as Gate~0 Ukraine. Identity at \(\sigma=0\) holds. Wheat stays
+restriction-led. Maize stays flat (\(\times 1.01\)). Rice drifts up
+(\(\times 0.99\to\times 1.18\) vs observed \(\times 0.91\))---a soft
+wrong-way miss, not a 2008-scale spike. Wheat monthly corr rises
+(\(+0.69\to +0.75\)); that is \textbf{not} a reason to pick
+\(\sigma^\star\).
+
+\begin{table}[H]
+\centering
+\small
+\input{tables/e6.tex}
+\caption{E6 official-split full leg, June 2021 \(\to\) May 2022 hike
+window. Pink Sheet real 2010\$.}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate1_e6_ukraine.png}
+\caption{Monthly world prices, 2021--23, frozen \(\sigma\) band versus
+Pink Sheet.}
+\end{figure}
+
+\input{sections/claim.tex}
+
+\section{Experiment log}
+\label{sec:log}
+
+Oldest first. Append a row when an experiment finishes; do not edit old verdicts.
+
+\begin{center}
+\small
+\input{tables/log.tex}
+\end{center}
+
+\input{sections/next.tex}
+\input{sections/howto.tex}
+
+\section{Code map}
+\label{sec:code}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Path & Role \\
+\midrule
+\texttt{sheaf/dynamic\_coupled.py} & Jacobi coupling; \(\eta\); identity assert \\
+\texttt{sheaf/dynamic\_crop.py} & \texttt{prepare\_crop\_run} / Gate~0 market \\
+\texttt{scripts/score\_gate1.py} & Band, hard bars, figure \\
+\texttt{scripts/score\_gate1\_e5.py} & Maize 2010 counterfactuals \\
+\texttt{scripts/score\_gate1\_e6.py} & 2021--23 hold-out \\
+\texttt{diagnostics/GATE1\_PLAN.md} & Same protocol in markdown \\
+\texttt{sheaf/dynamic\_grains.py} & Paused prototype --- do not score P3 here \\
+\texttt{sheaf/core.py} & Annual SPE + game; not this layer \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\bibliography{refs}
+\end{document}

@@ -1,0 +1,40 @@
+\section{Plain English: what we are doing}
+\label{sec:plain}
+
+Agrimate runs wheat, rice, and maize as three separate worlds
+\citep{kuhla2025}. If wheat gets expensive, Agrimate's rice consumers do
+not notice. SHEAF's extra claim (paper P3) is that they \emph{do}: food and
+feed can switch among grains, so a wheat shock should spill into rice and
+maize prices.
+
+Gate~0 already showed that each grain's own market---harvests, stocks,
+selling prices (asks), who-trades-with-whom, and the historical ban
+diary---can move monthly world prices in the same direction as the World
+Bank Pink Sheet~\citep{worldbank_pink,amis_oecd}. That spine is locked.
+We do not retune it to make substitution look better.
+
+Gate~1 turns on only the switching. Each grain still has its own trade
+network and its own selling prices. The only new link is demand: when
+wheat is dear, countries want a bit more rice and maize (food and feed),
+not more ethanol. Then those three markets clear, then prices update, then
+we repeat. A knob \(\sigma\) scales how strongly that switching is. We
+report a small pre-declared set of knobs, not a best-fit number cooked on
+2008.
+
+\paragraph{What would count as success.}
+Substitution should not break Gate~0. When wheat spikes in 2007/08, rice
+and maize prices should not \emph{fall} relative to the no-switching run.
+Wheat's own story (bans in 2008, harvest in 2010) should keep the same
+sign. Rice's 2008 explosion should still be mostly India's and Vietnam's
+bans, not ``because wheat.'' Matching the rice spike is not a substitution
+win: history had a rice-specific panic. The cleanest cross-grain test in
+the data is maize. 2010/11 is a contrast year: wheat and maize rose, rice
+fell. Inventing a rice co-spike that year would be a miss.
+
+\paragraph{What would be cheating.}
+Choosing \(\sigma\) so 2008 rice and maize both look prettier, then calling
+that same 2008 window ``validation.'' Fitting all three crises at once.
+Turning the ethanol leftover into a substitute. Quietly changing Gate~0
+elasticities or warehouse knobs. Starting the government export game.
+\citep{schewe2017} is the storage lineage; it is not a license to add
+crisis dummies.
