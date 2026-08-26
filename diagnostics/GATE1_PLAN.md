@@ -1,8 +1,10 @@
 # Gate 1: cross-grain substitution on the locked Gate 0 spine
 
-**Status:** E0–E8 done (2026-08-26). P3 draft written:
-`overleaf/gate1_whitepaper/`. Band scored; E5 leftover classified;
-E6 2022 hold-out scored; P3 claim frozen; consumption diagnostic scored.
+**Status:** E0–E9 done (2026-08-26). P3 draft written:
+`overleaf/gate1_whitepaper/`. Substitution red-team:
+`diagnostics/GATE1_REDTEAM.md` (identity and quantity signs hold).
+Band scored; E5 leftover classified; E6 2022 hold-out scored; P3 claim
+frozen; consumption diagnostic scored.
 **No σ\***. **No game.** **Next: stop.** Do not start P4–P5.
 **Handoff for a new agent:** `diagnostics/GATE1_HANDOFF.md` (read first).
 **Living Overleaf note:** `overleaf/gate1_substitution/`.
@@ -108,6 +110,8 @@ stays Gate 0 `CropParams.elast`. No game.
 1. **Identity.** Coupled \(\sigma=0\), official split, 2006–11: monthly world
    price of each grain matches the corresponding `run_crop_dynamics` to
    relative error \(\lesssim 0.5\%\) (numerical, not a new model).
+   Guardrail after E9: step-level price, stocks, use, offers at \(10^{-9}\)
+   (`assert_subst0_matches_gate0`).
 2. **Sign of spillover.** In the 2007/08 stress window, \(\sigma>0\) must not
    *lower* rice and maize prices relative to \(\sigma=0\) when wheat is up
    (substitutes: wheat dear \(\Rightarrow\) more rice/maize demand). A fall is
@@ -164,6 +168,9 @@ the least-confounded spillover; rice 2008 = own-policy (hard bar 4); rice 2010
 | `scripts/score_gate1_e5.py` | Maize 2010 counterfactuals |
 | `scripts/score_gate1_e6.py` | 2021–23 hold-out |
 | `scripts/score_gate1_consumption.py` | World use vs PSD (diagnostic; E8) |
+| `scripts/redteam_gate1_substitution.py` | E9 probes |
+| `tests/test_gate1_substitution.py` | Identity / η / quantity-sign guardrails |
+| `diagnostics/GATE1_REDTEAM.md` | E9 classified findings |
 | `overleaf/gate1_whitepaper/` | P3 draft (E8) |
 | `diagnostics/GATE1_HANDOFF.md` | New-agent start here |
 | `diagnostics/GATE1_PLAN.md` | This file |

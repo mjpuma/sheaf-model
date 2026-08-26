@@ -220,7 +220,8 @@ grid. None of that is done here.
 \begin{enumerate}
 \item \textbf{Identity.} Coupled \(\sigma=0\), official split: monthly
       world price of each grain matches the corresponding
-      \texttt{run\_crop\_dynamics} to relative error \(\lesssim 0.5\%\).
+      \texttt{run\_crop\_dynamics} to machine precision
+      (\(\sim 10^{-16}\) step-level on price, stocks, use, and offers).
 \item \textbf{Spillover sign.} In 2007/08, \(\sigma>0\) must not
       \emph{lower} rice and maize hikes relative to \(\sigma=0\) while
       wheat is up. A fall is a bug or a wrong \(\rho\) sign.
