@@ -38,3 +38,8 @@ python scripts/score_whitepaper_maps.py   # choropleths; not a retune
 
 `assemble_whitepaper.py` copies PDFs/PNGs into `figures/`. Tables under
 `tables/` are locked to the scored numbers; re-score before editing them.
+
+Choropleths are in `figures/fig_gate0_map_*.png`. After a fresh compile
+the first map is in **Purpose and scope** (wheat 2007–08 who banned vs
+who lost harvest). The rest are **§ Results → Country maps**. Zip this
+folder (not `gate0_agrimate/`).

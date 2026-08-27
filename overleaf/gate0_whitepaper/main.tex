@@ -50,8 +50,9 @@ ban and Russia's March 2022 measures), while maize and rice barely moved in
 the data and the model does not invent a spike. World stocks at the end of
 each marketing year match USDA to $\times 1.02$--$1.08$; the path of
 consumption and some export \emph{volumes} do not. Those leftovers are left
-as leftovers. Turning on substitution is the next paper, not a way to hide
-them.
+as leftovers. Country choropleths of who banned, who lost harvest, and
+where use sits versus PSD are in \S\ref{sec:maps} (and Fig.~\ref{fig:g0-roles}
+below). Turning on substitution is the next paper, not a way to hide them.
 \end{abstract}
 
 \tableofcontents
@@ -78,7 +79,8 @@ This note is that prior claim (Gate~0 / paper P1). It does four things.
       (\S\ref{sec:vs-agrimate}).
 \item Score locked parameters on 2007/08, 2010/11, and the 2022 Ukraine-war
       window (\S\ref{sec:results}--\S\ref{sec:ukraine}), substitution off
-      and strategy off.
+      and strategy off, including country choropleths of the AMIS diary
+      and LOWESS harvest (\S\ref{sec:maps}).
 \item Place those scores next to TWIST and Agrimate on objects they
       actually published (\S\ref{sec:compare}).
 \end{enumerate}
@@ -104,6 +106,15 @@ hindcast is identified the way Agrimate identifies it, plus a documented
 US maize ethanol leftover. We do not claim a textbook competitive-storage
 equilibrium, a gallon-by-gallon ethanol series, or Agrimate's private CPI
 price path.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_roles_2008.png}
+\caption{Wheat 2007--08, the object world prices average over: who is on
+the AMIS diary versus who had a LOWESS harvest shortfall ($\le -8\%$).
+Purple is both. More maps in \S\ref{sec:maps}.}
+\label{fig:g0-roles}
+\end{figure}
 
 \subsection{A short glossary}
 
@@ -404,20 +415,14 @@ same locked AMIS diary, LOWESS harvest scalars, and scored CSVs. They are
 not a new calibration.
 
 \subsection{Country maps}
+\label{sec:maps}
+
+The roles map is Fig.~\ref{fig:g0-roles} (opening pages). Intensity,
+harvest anomalies, use versus PSD, and the 2010 shipment bite follow.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{fig_gate0_map_wheat_roles_2008}
-\caption{Wheat 2007--08: who is on the AMIS diary versus who had a LOWESS
-harvest shortfall ($\le -8\%$). Purple is both. The United States is a
-named node that did neither. Grey is Rest-of-World. This is the object
-world prices average over.}
-\label{fig:g0-roles}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{fig_gate0_map_wheat_amis_2008}
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_amis_2008.png}
 \caption{Wheat AMIS intensity, 2007--08: maximum diary $\tau$ on the
 24-step clock. Argentina, India, and Kazakhstan sit at the top of the
 scale; Russia and Ukraine are on the diary at lower intensity. Not an
@@ -427,7 +432,7 @@ endogenous game.}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{fig_gate0_map_rice_amis_2008}
+\includegraphics[width=\textwidth]{fig_gate0_map_rice_amis_2008.png}
 \caption{Rice AMIS intensity, 2007--08. India and Vietnam (and Egypt)
 carry the diary. That is why 2008 rice is an own-ban episode, not a
 clean wheat$\to$rice substitution test --- Gate~1 will need this map.}
@@ -436,7 +441,7 @@ clean wheat$\to$rice substitution test --- Gate~1 will need this map.}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{fig_gate0_map_wheat_harvest_2010}
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_harvest_2010.png}
 \caption{Wheat LOWESS harvest anomaly, 2010. Kazakhstan and Russia are
 the shortfall. This is the production-led year in the attribution table.
 Compare 2007 (Fig.~\ref{fig:g0-h07}) where the spatial pattern is
@@ -446,7 +451,7 @@ different.}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{fig_gate0_map_wheat_harvest_2007}
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_harvest_2007.png}
 \caption{Wheat LOWESS harvest anomaly, 2007. The 2007/08 price spike is
 still restriction-led in the isolated-leg table; harvest is not empty,
 but it is not the 2010 map.}
@@ -590,7 +595,7 @@ rationing.}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{fig_gate0_map_wheat_cons_2008}
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_cons_2008.png}
 \caption{Wheat 2008 calendar-year use, official matched, versus PSD
 (model/PSD). Cool is on the bar; warm is under. The world mean
 $\times 0.92$ is an average of this map --- including named nodes that
@@ -634,7 +639,7 @@ Calendar 2010 model exports remain $\times 2.39$ versus PSD (4.0~MMT).}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{fig_gate0_map_wheat_bite_2010}
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_bite_2010.png}
 \caption{Wheat 2010 AMIS shipment bite: official matched minus
 harvest-only, calendar-year MMT. Negative means the diary cut that
 node's cleared exports. Offer cuts can exceed shipment cuts when demand
