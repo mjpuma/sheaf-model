@@ -1,14 +1,17 @@
 # Gate 2 beta
 
-Exporter Russia wheat. Synthetic 2007 harvest ×0.5. AMIS off. Illustrative types: `gov_stu`=0.48, `fs_stock_weight`=12, `tau_on`=0.6, `stock_ratio_trigger`=0.85. s_gov = 18.13 MMT.
+Players Russia, Kazakhstan. Synthetic 2007 Russia harvest ×0.5; Kazakhstan harvest unchanged. AMIS off. Illustrative types: `gov_stu`=0.48, `fs_stock_weight`=12, `tau_on`=0.6, `stock_ratio_trigger`=0.85. s_gov (Russia) = 18.13 MMT.
 
 Gate 0 and Gate 1 were **not** re-run. Clock: `diagnostics/GAME_CLOCK.md`.
 
 ### Headey path (headline)
 
-- Calm fortnights on: **0** / 24
-- Shock fortnights on: **12** / 24 (min S/S_calm = 0.45)
-- Shock shipments 3.27 → 3.25 MMT
+- Russia calm on: **0** / 24; shock on: **12** / 24 (first step 12, min S/S_calm = 0.45)
+- Kazakhstan calm on: **0** / 24; shock on: **6** / 24 (first step 13, min S/S_calm = 0.76) — no own harvest cut
+- Russia shipments 3.27 → 3.25 MMT
+- Kazakhstan shipments 6.66 → 6.28 MMT
+
+Cascade is **harvest diversion** (Kazakhstan’s open-path S/S_calm already below r after Russia’s harvest fails), not sequential ban-on-ban IBR. Ukraine is on the market but does not play.
 
 ### Nested year-open-loop BR (diagnostic)
 
@@ -18,9 +21,11 @@ Gate 0 and Gate 1 were **not** re-run. Clock: `diagnostics/GAME_CLOCK.md`.
 - [PASS] nested year: calm τ* = 0
 - [PASS] nested year: shock τ* > 0
 - [PASS] nested year: shock τ* cuts shipments vs τ=0
-- [PASS] Headey path: calm τ_t = 0
-- [PASS] Headey path: shock some τ_t > 0
-- [PASS] Headey path: cuts shipments vs open
+- [PASS] Headey: calm all players τ_t = 0
+- [PASS] Headey: shock Russia some τ_t > 0
+- [PASS] Headey: shock Kazakhstan some τ_t > 0 (no own harvest cut)
+- [PASS] Headey: Kazakhstan lags or ties Russia
+- [PASS] Headey: Russia cuts shipments vs open
 
 Not scored against 2008/10 AMIS. See `diagnostics/GATE2_PLAN.md`.
 
