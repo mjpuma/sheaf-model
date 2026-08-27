@@ -19,9 +19,10 @@ Nash is a TWIST-era prototype. It is not run here.
 \begin{frame}{Illustrative knobs --- not AMIS estimates}
 \matchbanner{PolicyKnobs docstring}{dynamic\_policy.py:19--49}
 
+{\scriptsize
+\renewcommand{\arraystretch}{0.95}
 \begin{center}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{lll}
+\begin{tabular}{@{}lll@{}}
 \toprule
 Knob & Default & Role \\
 \midrule
@@ -33,11 +34,10 @@ Knob & Default & Role \\
 \texttt{stock\_ratio\_trigger} & $0.85$ & $S_t/S^{\mathrm{calm}}_t$ threshold \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{center}}
 
-Locked after the qualitative calm/shock flip was visible. Not estimated
-from AMIS or crisis prices. AMIS is \textbf{off}. Substitution is
-\textbf{off}. Gate~0/1 are not re-run.
+{\scriptsize Locked after the calm/shock flip was visible. Not estimated
+from AMIS or crisis prices. AMIS off. Substitution off. Gate~0/1 not re-run.}
 \bubbles{All four type knobs are illustrative. Class: not literature, not structural.}
 {\texttt{gov\_stu} dimensionless; buffer in MMT; $\tau$ dimensionless.}
 {\texttt{PolicyKnobs}; \texttt{GATE2\_PLAN.md}.}
@@ -79,12 +79,12 @@ play.
 \end{frame}
 
 \begin{frame}{Hard bars --- all PASS}
-\begin{center}
-\includegraphics[width=0.78\textwidth]{fig_gate2_headey_tau.png}
-\end{center}
+\fitfig[0.24\paperheight]{fig_gate2_headey_tau.png}
 
-\renewcommand{\arraystretch}{1.1}
-\begin{tabular}{lccc}
+{\scriptsize
+\renewcommand{\arraystretch}{0.95}
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
 \toprule
 Player & calm on & shock on & first step / min $S/S^{\mathrm{calm}}$ \\
 \midrule
@@ -92,9 +92,10 @@ Russia & $0/24$ & $12/24$ & step 12 / $0.45$ \\
 Kazakhstan & $0/24$ & $6/24$ & step 13 / $0.76$ \\
 \bottomrule
 \end{tabular}
+\end{center}}
 
-Russia shipments $3.27\to 3.25$~MMT. Nested year BR: calm $\tau^\star=0$,
-shock $\tau^\star=0.6$.
+{\scriptsize Russia shipments $3.27\to 3.25$~MMT.
+Nested year BR: calm $\tau^\star=0$, shock $\tau^\star=0.6$.}
 \end{frame}
 
 \begin{frame}{The cascade is harvest diversion, not ban-on-ban}
@@ -115,9 +116,7 @@ disclosure: this beta is not ban-on-ban contagion.
 \end{frame}
 
 \begin{frame}{Roles on the map}
-\begin{center}
-\includegraphics[width=0.78\textwidth]{fig_gate2_map_roles.png}
-\end{center}
+\fitfig[0.62\paperheight]{fig_gate2_map_roles.png}
 {\scriptsize Who plays, who is shocked, who is on the market and silent.
 Not a 2008 who-restricted map.}
 \end{frame}

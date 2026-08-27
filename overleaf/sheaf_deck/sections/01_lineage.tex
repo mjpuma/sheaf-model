@@ -39,17 +39,16 @@ Those are design choices (\textbf{E}), disclosed. They are not bugs.
 \end{frame}
 
 \begin{frame}{Three gates, one stack}
-\begin{center}
-\includegraphics[width=0.72\textwidth]{fig1_gate0_prices.png}
-\end{center}
+\fitfig[0.50\paperheight]{fig1_gate0_prices.png}
 {\scriptsize Gate~0 wheat/rice/maize, 2006--11, Pink Sheet in real 2010 USD.
 Harvest anomalies alone miss the 2008 rice spike; AMIS produces it.
 Substitution is off in this figure.}
 \end{frame}
 
 \begin{frame}{What each gate is allowed to claim}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{lp{0.72\textwidth}}
+{\scriptsize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}lp{0.74\textwidth}@{}}
 \toprule
 Gate~0 & Can a 24-step single-crop market, substitution off, AMIS prescribed,
          hindcast crisis prices? \textbf{Accepted.} \\
@@ -60,11 +59,11 @@ Gate~2 $\beta$ & Can two exporters, same slow type, stay open in climatology
          and can a harvest failure at one turn the neighbour on?
          \textbf{Not a 2008 score.} \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 
-\vspace{0.8em}
-Do not re-run Gate~0 or Gate~1 to host the game
-(\texttt{diagnostics/GAME\_CLOCK.md}).
+\vspace{0.4em}
+{\scriptsize Do not re-run Gate~0 or Gate~1 to host the game
+(\texttt{diagnostics/GAME\_CLOCK.md}).}
 \end{frame}
 
 \begin{frame}{The node set}

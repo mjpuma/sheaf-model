@@ -35,23 +35,23 @@ World-aggregate series remain useful for a long LOWESS history
 \end{frame}
 
 \begin{frame}{FAOSTAT E0 --- network structure only}
-\divbanner{README \S8 $A_{ij}$, $S_{ij}$ from FAOSTAT E0}{data\_faostat.py:21--23, 185--190}
+\divbanner{README \S8 $A_{ij}$, $S_{ij}$ from FAOSTAT E0}{data\_faostat.py:21--23}
 
-The module docstring is explicit: absolute E0 magnitudes are
-\textbf{unit-agnostic}. Wheat 2006--07 aggregated to SHEAF nodes sums to
-$4.786\times 10^{14}$ --- not MMT.
+Absolute E0 magnitudes are \textbf{unit-agnostic}
+($4.786\times 10^{14}$ for wheat 2006--07 nodes --- not MMT).
 
+{\small
 \[
 A_{ij} = \frac{E_{ij}}{\sum_k E_{ik}}, \quad
 S_{ij} = \frac{E_{ij}}{\sum_k E_{kj}}, \quad A_{ii}=S_{ii}=0.
 \]
+}
 
-\texttt{rescale\_to\_total()} exists and is \textbf{never called} on the
-Gate~0 path. Only shares enter \texttt{\_bilateral\_clear}.
-\bubbles{$A$, $S$ are structural shares. No trade-volume scale on the spine.}
-{Dimensionless. Rows of $A$ and columns of $S$ sum to 1 (or 0 if no trade).}
-{FoodTradeNetwork \texttt{inputs\_processed/} E0, copied 2026-08-24.
-Window used by Gate~0: 2006--2007 Avg. \texttt{data/faostat\_network/PROVENANCE.txt}.}
+\texttt{rescale\_to\_total()} exists and is never called on Gate~0.
+Only shares enter \texttt{\_bilateral\_clear}.
+\bubbles{$A$, $S$ structural shares. No trade-volume scale on the spine.}
+{Dimensionless. $A$ rows and $S$ columns sum to 1 (or 0).}
+{FoodTradeNetwork E0, copied 2026-08-24. Window: 2006--2007 Avg.}
 \end{frame}
 
 \begin{frame}{Vietnam rice E0 is a documented data repair}
@@ -92,13 +92,15 @@ $\mathrm{real}_{m,y} = \mathrm{nominal}_{m,y}\times
 \end{frame}
 
 \begin{frame}{AMIS --- quantity cuts on the spine, not \$/t}
-\matchbanner{README \S8 $\tau_{i,t}\in[0,1]$}{dynamic\_crop.py:43--50, 325--356}
+\matchbanner{README \S8 $\tau_{i,t}\in[0,1]$}{dynamic\_crop.py:43--50}
 
-Gate~0 maps OECD/AMIS policy labels to \textbf{offer cuts}:
+Gate~0 maps AMIS labels to \textbf{offer cuts} (max if overlapping).
+USA, EU, Canada, Thailand, Nigeria are not in the map.
 
+{\scriptsize
+\renewcommand{\arraystretch}{0.95}
 \begin{center}
-\renewcommand{\arraystretch}{1.1}
-\begin{tabular}{lc}
+\begin{tabular}{@{}lc@{}}
 \toprule
 AMIS label & $\tau$ \\
 \midrule
@@ -110,14 +112,10 @@ Licensing requirement & 0.25 \\
 Customs-clearance restriction & 0.15 \\
 \bottomrule
 \end{tabular}
-\end{center}
-
-Overlapping measures keep the \textbf{max}. Unmapped AMIS countries are
-ignored (USA, EU, Canada, Thailand, Nigeria are not in the map).
-\bubbles{The map is structural (Agrimate-style). Not fit per crisis.}
-{Dimensionless fraction of \emph{offers}. Not a specific-tax in \$/t.}
-{OECD Database on Export Restrictions / AMIS Policy Database,
-vendored 2026-08-21. \texttt{data/amis\_policies/PROVENANCE.txt}.}
+\end{center}}
+\bubbles{Map is structural (Agrimate-style). Not fit per crisis.}
+{Dimensionless fraction of \emph{offers}. Not a \$/t tax.}
+{OECD / AMIS Policy Database, vendored 2026-08-21.}
 \end{frame}
 
 \begin{frame}{The leftover AMIS map is a different object}

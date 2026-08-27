@@ -14,12 +14,17 @@
 \setbeamertemplate{footline}[frame number]
 \setbeamerfont{title}{size=\large}
 \setbeamerfont{frametitle}{size=\normalsize}
+% Do not insert a section-title slide: page numbers then match the
+% one-claim-per-slide count.
+\AtBeginSection{}
+\addtobeamertemplate{frametitle}{\vspace*{-0.35ex}}{\vspace*{-0.8ex}}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \DeclareUnicodeCharacter{03B7}{$\eta$}
 \usepackage{amsmath,amssymb,bm}
 \usepackage{booktabs}
+\usepackage{tabularx}
 \usepackage{graphicx}
 \usepackage{tikz}
 \usetikzlibrary{positioning,shapes.callouts,calc}
@@ -33,38 +38,42 @@
 \newcommand{\matchbanner}[2]{%
 \begin{tikzpicture}
 \node[anchor=west, fill=green!12, draw=green!50!black, rounded corners=2pt,
-      inner sep=3.5pt, font=\scriptsize, text width=0.94\textwidth,
-      align=left] {$\checkmark$~\textbf{Match.} Claim: #1 \hfill Code: \texttt{#2}};
-\end{tikzpicture}}
+      inner sep=2.2pt, font=\tiny, text width=0.88\textwidth,
+      align=left] {$\checkmark$~\textbf{Match.} #1 \quad{\ttfamily #2}};
+\end{tikzpicture}\par\vspace{0.25em}}
 \newcommand{\divbanner}[2]{%
 \begin{tikzpicture}
 \node[anchor=west, fill=red!12, draw=red!60!black, rounded corners=2pt,
-      inner sep=3.5pt, font=\scriptsize, text width=0.94\textwidth,
-      align=left] {$\times$~\textbf{Diverge.} Claim: #1 \hfill Code: \texttt{#2}};
-\end{tikzpicture}}
+      inner sep=2.2pt, font=\tiny, text width=0.88\textwidth,
+      align=left] {$\times$~\textbf{Diverge.} #1 \quad{\ttfamily #2}};
+\end{tikzpicture}\par\vspace{0.25em}}
 \newcommand{\leftoverbanner}[2]{%
 \begin{tikzpicture}
 \node[anchor=west, fill=gray!15, draw=gray!60, rounded corners=2pt,
-      inner sep=3.5pt, font=\scriptsize, text width=0.94\textwidth,
-      align=left] {$\circ$~\textbf{Leftover host} (not the crisis path). Claim: #1 \hfill Code: \texttt{#2}};
-\end{tikzpicture}}
+      inner sep=2.2pt, font=\tiny, text width=0.88\textwidth,
+      align=left] {$\circ$~\textbf{Leftover.} #1 \quad{\ttfamily #2}};
+\end{tikzpicture}\par\vspace{0.25em}}
 
 % --- three callout bubbles: parameter / unit / source ---------------------
 \newcommand{\bubbles}[3]{%
-\vspace{0.3em}
+\vspace{0.15em}
 \begin{center}
-\begin{tikzpicture}[node distance=0.35cm]
-\node[draw=blue!60, fill=blue!8, rounded corners=4pt, inner sep=5pt,
-      text width=0.29\textwidth, align=left, font=\scriptsize]
+\begin{tikzpicture}[node distance=0.18cm]
+\node[draw=blue!60, fill=blue!8, rounded corners=3pt, inner sep=3pt,
+      text width=0.28\textwidth, align=left, font=\tiny]
       (p) {\textbf{\textcolor{blue!70!black}{Parameter}}\\#1};
-\node[draw=teal!70!black, fill=teal!8, rounded corners=4pt, inner sep=5pt,
-      text width=0.29\textwidth, align=left, font=\scriptsize, right=of p]
+\node[draw=teal!70!black, fill=teal!8, rounded corners=3pt, inner sep=3pt,
+      text width=0.28\textwidth, align=left, font=\tiny, right=of p]
       (u) {\textbf{\textcolor{teal!60!black}{Unit}}\\#2};
-\node[draw=orange!80!black, fill=orange!10, rounded corners=4pt, inner sep=5pt,
-      text width=0.29\textwidth, align=left, font=\scriptsize, right=of u]
+\node[draw=orange!80!black, fill=orange!10, rounded corners=3pt, inner sep=3pt,
+      text width=0.28\textwidth, align=left, font=\tiny, right=of u]
       (s) {\textbf{\textcolor{orange!70!black}{Source}}\\#3};
 \end{tikzpicture}
 \end{center}}
+% Cap height against the paper, not leftover textheight (frametitle
+% is taken from textheight, so a 0.6\textheight PNG still overflows).
+\newcommand{\fitfig}[2][0.46\paperheight]{%
+\begin{center}\vspace{-0.2em}\includegraphics[height=#1,width=0.90\textwidth,keepaspectratio]{#2}\end{center}}
 
 \title{SHEAF from first principles}
 \subtitle{Equation, assumption, unit, and source --- for a joint sitting with Agrimate}

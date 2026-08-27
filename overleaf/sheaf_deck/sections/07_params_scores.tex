@@ -1,12 +1,10 @@
 \section{Locked parameters and Gate 0 scores}
 
 \begin{frame}{CropParams --- literature vs reduced-form}
-From \texttt{default\_crop\_params()} / \texttt{GATE0\_PARAMETERIZATION.md} \S3.
-
-\begin{center}
-\scriptsize
-\renewcommand{\arraystretch}{1.12}
-\begin{tabular}{lrrrll}
+{\tiny
+\renewcommand{\arraystretch}{0.82}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}lrrrll@{}}
 \toprule
 Parameter & Wheat & Maize & Rice & Class & Role \\
 \midrule
@@ -24,30 +22,26 @@ $\alpha,\theta,\gamma,\beta$ & \multicolumn{3}{c}{$0.15 / 0.70 / 1.25 / 0.18$} &
 $\alpha_r$ & $0.80$ & $0.80$ & $0.80$ & reduced-form & rival markup \\
 $\phi$ & $0.55$ & $0.50$ & $0.55$ & reduced-form & harvest foresight \\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabular}}
 
-Reduced-form knobs are sign-constrained and \textbf{shared across years}.
-They are not fit crisis-by-crisis. Do not retune them in this sitting.
+{\scriptsize From \texttt{default\_crop\_params()}. Reduced-form knobs are
+sign-constrained and shared across years. Do not retune in this sitting.}
 \end{frame}
 
 \begin{frame}{Gate 0 wheat --- locked score}
-\begin{center}
-\includegraphics[width=0.62\textwidth]{fig_gate0_wheat_diagnostics.png}
-\end{center}
-{\scriptsize Official P1 matched: harvest + AMIS + mean flex.
-\texttt{diagnostics/gate0\_wheat\_report.md}.}
-
-corr(full) $=+0.720$. Hikes: 2007/08 $\times 2.27$ vs obs $\times 1.82$
-(restriction-led: $\tau\times 1.70 >$ shocks $\times 1.20$); 2010/11
-$\times 1.45$ vs obs $\times 1.16$ (production-led: shocks $\times 1.85 >
-\tau\times 1.36$). MY-end stocks $\times 1.02$ vs PSD (May).
+\fitfig[0.36\paperheight]{fig_gate0_wheat_diagnostics.png}
+{\scriptsize Official P1: harvest + AMIS + mean flex.
+\texttt{diagnostics/gate0\_wheat\_report.md}.
+corr(full) $=+0.720$. 2007/08 $\times 2.27$ vs obs $\times 1.82$
+(restriction-led); 2010/11 $\times 1.45$ vs obs $\times 1.16$
+(production-led). MY-end stocks $\times 1.02$ vs PSD (May).}
 \end{frame}
 
 \begin{frame}{Gate 0 maize and rice --- locked scores}
-\scriptsize
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{lcccc}
+{\scriptsize
+\renewcommand{\arraystretch}{1.0}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
  & corr(full) & 2007/08 full / obs & 2010/11 full / obs & MY-end vs PSD \\
 \midrule
@@ -55,12 +49,13 @@ wheat & $+0.72$ & $\times 2.27 / \times 1.82$ & $\times 1.45 / \times 1.16$ & $\
 maize & $+0.71$ & $\times 1.97 / \times 1.84$ & $\times 1.70 / \times 1.44$ & $\times 1.08$ (Aug) \\
 rice  & $+0.68$ & $\times 1.72 / \times 1.84$ & $\times 0.82 / \times 0.79$ & $\times 1.05$ (Aug) \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 
-\vspace{0.6em}
+\vspace{0.4em}
+{\scriptsize
 Maize 2007/08 is \textbf{demand-led} (industrial), not harvest-led.
 Rice 2007/08 is \textbf{restriction-led} ($\tau\times 1.75$). Isolated
-maize $\tau$ must not \emph{cut} world price (assert floor $0$).
+maize $\tau$ must not \emph{cut} world price (assert floor $0$).}
 \end{frame}
 
 \begin{frame}{Disclosed Gate 0 leftovers (not hidden knobs)}
@@ -83,9 +78,7 @@ retune list.
 \end{frame}
 
 \begin{frame}{Who banned, who harvested --- 2008 wheat}
-\begin{center}
-\includegraphics[width=0.78\textwidth]{fig_gate0_map_wheat_roles_2008.png}
-\end{center}
+\fitfig[0.62\paperheight]{fig_gate0_map_wheat_roles_2008.png}
 {\scriptsize AMIS on the diary, not chosen. Gate~0 does not ask who
 \emph{would} restrict.}
 \end{frame}

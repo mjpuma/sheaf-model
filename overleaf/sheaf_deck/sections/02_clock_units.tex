@@ -36,9 +36,11 @@ STEPS\_PER\_YEAR = 24''.}
 \begin{frame}{Canonical units}
 \matchbanner{core.py docstring; README \S8}{core.py:40, data\_usda.py:36}
 
-\begin{center}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{lll}
+{\scriptsize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.38\textwidth}
+  >{\raggedright\arraybackslash}p{0.28\textwidth}
+  >{\raggedright\arraybackslash}X@{}}
 \toprule
 Object & Unit in the model & Conversion \\
 \midrule
@@ -47,12 +49,10 @@ Prices, asks & real USD / tonne & Pink Sheet MUV, 2010 base \\
 Export cut $\tau$ on the spine & dimensionless fraction of offers & AMIS label $\to$ $\{0.95,0.70,\ldots\}$ \\
 Export tax in \texttt{core.py} & USD / tonne wedge & leftover; not Gate~0 \\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabularx}}
 \bubbles{\texttt{\_KT\_TO\_MMT = 1e-3} is structural accounting.}
-{1000~MT (PSD raw) $\to$ MMT. Prices already \$/mt in the Pink Sheet extract.}
-{\texttt{sheaf/data\_usda.py:36, 74--77, 225--228}. Provenance:
-\texttt{data/usda\_psd/PROVENANCE.txt}.}
+{1000~MT (PSD raw) $\to$ MMT. Prices already \$/mt.}
+{\texttt{data\_usda.py:36, 74--77}. \texttt{data/usda\_psd/PROVENANCE.txt}.}
 \end{frame}
 
 \begin{frame}{A worked unit check}
