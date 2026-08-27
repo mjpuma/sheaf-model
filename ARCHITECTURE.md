@@ -135,10 +135,12 @@ detailed diagnostics **before** substitution or Level 2. See
 6. Multi-commodity substitution on the sub-annual spine — **paused** until
    step 5 is green for wheat, maize, and rice. (`dynamic_grains` / spillover
    remain a prototype only.)
-7. Endogenous restriction **actions** on the 24-step spine (Level 2) —
+7. Endogenous restriction **actions** on the 24-step spine —
    types slow, Headey clock. Gate 0 hard bars are green; **do not re-run
-   P1 or P3** to say this (`diagnostics/GAME_CLOCK.md`).
-   `sheaf/dynamic_policy.py` is the beta; `core.py` IBR stays a leftover.
+   the hindcast or the substitution band** to say this
+   (`diagnostics/GAME_CLOCK.md`). `sheaf/dynamic_policy.py` is a
+   one-player mechanism check; next is a second player. `core.py` IBR
+   stays a leftover.
 
 Commands:
 ```bash

@@ -1,21 +1,23 @@
 # Gate 1 handoff (read this first)
 
-**Date:** 2026-08-26. Experiments **E0–E8** are done. P3 draft is written.
-Do not re-run the σ band or E5/E6 unless reproducing. Do not pick σ*.
-P4 proper / P5 are not this paper; the P4 beta protocol is
-`diagnostics/GATE2_PLAN.md`. Headey clock: `diagnostics/GAME_CLOCK.md`.
-**Do not re-run Gate 0 or Gate 1** to host the game.
+**Date:** 2026-08-27. Experiments **E0–E8** are done. Substitution draft
+is written. Do not re-run the σ band or E5/E6 unless reproducing. Do not
+pick σ*. The game is a **layer** on the Gate 0 spine, not papers “P4”
+and “P5” (`diagnostics/PAPER_STACK.md`). Headey clock:
+`diagnostics/GAME_CLOCK.md`. **Do not re-run Gate 0 or Gate 1** to host
+the game.
 
 Living Overleaf note: `overleaf/gate1_substitution/` (zip that folder).
-**P3 draft to upload:** `overleaf/gate1_whitepaper/` (zip that folder).
+**Substitution draft to upload:** `overleaf/gate1_whitepaper/` (zip that folder).
 Protocol twin: this file + `diagnostics/GATE1_PLAN.md`.
-Paper stack: `diagnostics/PAPER_STACK.md` (P1 accepted; P3 draft written;
-P4 beta on the 24-step Headey clock; P4 proper / P5 later).
 
 ## What the new agent should do
 
-**Stop** unless asked to revise the P3 draft, or asked for the Gate 2
-policy beta (`diagnostics/GATE2_PLAN.md`).
+**Stop** on substitution unless asked to revise that draft.
+
+If asked for the game: `diagnostics/GAME_CLOCK.md` then
+`diagnostics/GATE2_PLAN.md`. Next model step is **more than one
+government** on that clock (cascade), still not a 2008 score.
 
 The writeup is `overleaf/gate1_whitepaper/`. Frozen claim still lives in
 `overleaf/gate1_substitution/sections/claim.tex` (unchanged). Optional
@@ -34,10 +36,11 @@ cd overleaf && zip -r gate1_whitepaper.zip gate1_whitepaper -x "*.DS_Store"
 - Densify `{0, 0.3, 0.6}`
 - Retune Gate 0 `CropParams`, warehouse, asks, or `RHO`
 - Unpause `sheaf/dynamic_grains.py` / `scripts/score_subannual_spillover.py`
-- Start P4 proper (cooperative/club) or P5 (tipping), or P2 (endogenous
-  network). The P4 **beta** is a separate, already-scoped mechanism check
-  (`diagnostics/GATE2_PLAN.md`); do not turn it into a 2008/10 score or
-  a multi-country Nash. Do not re-run Gate 0 or Gate 1 (`GAME_CLOCK.md`).
+- Start a “club” or “tipping” writeup, or an endogenous-network paper.
+  The game beta is a mechanism check (`diagnostics/GATE2_PLAN.md`); do
+  not turn it into a 2008/10 score. Do not re-run Gate 0 or Gate 1
+  (`GAME_CLOCK.md`). Next model step, if asked, is a **second player**
+  on the Headey clock — still not a new manuscript name.
 - Graft annual Slutsky `M_i` / `OWN_ELAST` into the 24-step spine
 - Commit `assets/SHEAF_model_walkthrough.pptx`
 - Push unless asked

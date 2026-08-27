@@ -1,6 +1,8 @@
 # Gate 2 beta: endogenous export cuts on the two-week crisis spine
 
-**Date:** 2026-08-27. Paper **P4 beta**, not P4 proper and not P5.
+**Date:** 2026-08-27. Mechanism check on the Gate 0 spine — not a new
+paper title. “P4/P5” were research questions, not a queue
+(`diagnostics/PAPER_STACK.md`).
 **Clock:** `diagnostics/GAME_CLOCK.md` (Headey 2011).
 **Host:** Gate 0 24-step wheat market in `sheaf/dynamic_crop.py`.
 **Not the host:** annual SPE + IBR in `sheaf/core.py` (`demo.py`) — that
@@ -43,12 +45,14 @@ has dates.
 
 ## What this beta is not
 
-- P4 cooperative / “just enough” / club of the willing
-- P5 tipping, importer panic procurement, or Japan-style reserve
+- A standalone “policy paper” or “tipping paper”
+- Cooperative / “just enough” / club of the willing (same layer, different
+  objective — later, if ever)
+- Tipping, importer panic procurement, or Japan-style reserve
   *announcements* (Headey has those; we do not, yet)
-- Multi-country Nash on either host
+- Multi-country Nash (that is the **next model step**, still not a 2008 score)
 - Substitution (Gate 1). Do not pick σ*
-- An AMIS hindcast. Official P1/P3 scoring paths stay `use_amis=True`
+- An AMIS hindcast. Official Gate 0 / Gate 1 scoring paths stay `use_amis=True`
 - Unpausing `sheaf/dynamic_grains.py`
 - A split domestic versus export ask inside the market clear
 - Scoring who restricted in 2008 or 2010
@@ -111,7 +115,8 @@ intensity is what `tau_on` copies.
 1. **Calm ⇒ τ_t = 0** every step (and nested year τ\* = 0).
 2. **Shock ⇒ some τ_t > 0** (and nested year τ\* > 0).
 3. **Those cuts reduce shipments** vs the open shock path.
-4. **P1 identity:** `run_crop_dynamics` defaults unchanged.
+4. **`run_crop_dynamics` defaults unchanged** (AMIS still on when this
+   module is not called).
 
 ## Code
 
@@ -123,5 +128,6 @@ intensity is what `tau_on` copies.
 | `scripts/score_gate2_beta.py` | calm vs shock + path figure |
 | `tests/test_gate2_policy_beta.py` | hard bars |
 
-Do not start P5. Do not estimate knobs on 2008. Do not retune CropParams.
+Do not estimate knobs on 2008. Do not retune CropParams.
 Do not re-run Gate 0 or Gate 1 for this note.
+**Next:** a second exporter (cascade), still synthetic.

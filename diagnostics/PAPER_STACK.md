@@ -1,58 +1,59 @@
-# Long-term paper stack (collaborator feedback, 2026-08-24)
+# Research questions (not a paper queue)
 
-Feedback from Kilian / Christian (and related) on uses of SHEAF. This is the
-**destination**. Gate 0 / crisis P1 is **accepted** (white paper
-`overleaf/gate0_whitepaper/`). P3 substitution draft is **written**
-(`overleaf/gate1_whitepaper/`). A **P4 beta** (one exporter, Headey-clock `τ_t` on the Gate 0 spine,
-illustrative types, not a 2008/10 score) lives in
-`diagnostics/GATE2_PLAN.md` and `diagnostics/GAME_CLOCK.md`. That is not
-P4 proper and not P5. **Do not re-run Gate 0 or Gate 1** for this layer.
-Do not skip to cooperative/club (P4) or tipping (P5), or an endogenous
-network (P2).
+Kilian / Christian (and related) listed **uses** of SHEAF — hindcast,
+substitution, policy, tipping, endogenous network. Those are questions
+the model might answer. They are **not** five papers that must be
+written in order, and they are not a license to skip the market.
 
-## Papers
+What actually exists as writeups:
 
-| ID | Question | Now / next / later |
+| Note | Question it answers | Status |
 |---|---|---|
-| **P1** | Reproduce observed **price, consumption, and trade** over crisis years (then decades) | **Crisis Gate 0 done.** Agrimate bar 2006–11 + Ukraine-war 2021–23 prices. Consumption and AMIS shipment *signs* scored; leftover *levels* are disclosed, not retuned. Decades after crises remain a later P1 expansion. |
-| **P3** | Empirically validate **wheat–maize–rice substitution** vs 2007/08 spillovers | **E0–E8 done.** Claim frozen. Draft: `overleaf/gate1_whitepaper/`. Handoff: `diagnostics/GATE1_HANDOFF.md`. Living note: `overleaf/gate1_substitution/`. Do not retune, densify σ, or pick σ*. |
-| **Cal** | Constrain behavioral + strategic parameters | **Alongside P1–P3.** See below. Kilian’s point stands: extra behavior needs a plan, not a grid search on crises. |
-| **P4** | Policy: exporters restrict *just enough* for domestic food security, minimizing importer harm; **club of the willing** if not all join | **P4 beta** (mechanism check): one exporter vs the Gate 0 market, **types slow / actions `τ_t` on the 24-step clock** (Headey 2011). Nested year-open-loop BR is a diagnostic. Protocol `diagnostics/GATE2_PLAN.md`, clock `diagnostics/GAME_CLOCK.md`. **P4 proper** (cooperative / club) remains after that. Not “who restricted in 2010.” **Do not re-run P1 or P3.** |
-| **P5** | Game theory: cooperation vs protectionism; **social tipping** | **After P4 setup.** Vary cooperation / food-security weights. Current IBR is non-cooperative only. |
-| **P2** | Does a realistic network **emerge** from costs and prices without prescribing FAOSTAT E0? | **Later, optional.** Gate 0 **prescribes** Armington on FAOSTAT E0. Say so in P1. P2 is a different paper. |
+| Gate 0 (`overleaf/gate0_whitepaper/`) | Can the 24-step market, substitution off and AMIS prescribed, hindcast crisis prices? | **Accepted.** |
+| Gate 1 (`overleaf/gate1_whitepaper/`) | Does turning substitution on spill in the right direction without breaking Gate 0? | **Draft written.** Claim frozen. Do not pick σ*. |
+| Gate 2 beta (`diagnostics/GATE2_PLAN.md`) | Can one exporter, on that same spine, cut inside the year when a harvest fails and stay open in climatology? | **Mechanism check.** Illustrative types. Not a 2008 score. Clock: `diagnostics/GAME_CLOCK.md`. |
 
-Compliment (theory-aligned, spillovers, restriction game, fast iteration) describes
-the **stack**, not a license to skip P1.
+Everything else below is a **question**, not a manuscript name. Any of
+them might end up as a section, an appendix, a later note, or never.
 
-## Calibration plan (honest)
+## Open questions (downgraded)
+
+| Question | What it is | What it is not |
+|---|---|---|
+| **Who restricts, and when?** | Positive game on the 24-step spine (Headey 2011): types slow, actions `τ_t`. Train on one window, score another — if we ever estimate. | Not an annual Nash in `core.py`. Not “write paper P4.” The beta is a one-player mechanism check only. |
+| **Just enough / club of the willing?** | A *normative* variant of the same layer: restrict for domestic food security while limiting importer harm; what if only some join. | Not a separate model. Same host, different objective. Later, if ever. |
+| **Cooperation vs protectionism / tipping?** | Comparative statics on types (food-security vs cooperation weights). | Not a third paper by default. Still sub-annual actions. |
+| **Does the network emerge?** | Trade shares from costs and prices instead of FAOSTAT E0. | Optional. Gate 0 **prescribes** Armington on E0; say so. Not required for the hindcast or the game. |
+| **Decades, not just crises?** | Extend the Gate 0 hindcast beyond 2006–11 / 2021–23. | An expansion of the same note, not a new product line. |
+| **Calibration** | Which knobs are structural, literature, or estimated (and on what hold-out). Kilian: extra behavior needs a plan, not a grid search on crises. | Alongside the notes we already have. Not its own paper unless it has to be. |
+
+**Do not re-run Gate 0 or Gate 1** to host the game. Headey does not
+change CropParams or σ.
+
+## Calibration (honest, still)
 
 | Layer | What | How constrained | Not allowed |
 |---|---|---|---|
-| Gate 0 / P1 | `CropParams`: ε literature; STU literature; η, ω, κ, ask gains **reduced-form sign-constrained** | Shared across years; **not** fit per crisis. Official hindcast = Agrimate split (harvest ± AMIS, mean flex). USA maize industrial = structural RFS residual. | Crisis dummies; 2008-only κ |
-| P3 | Cross-price / `subst_scale` | Literature own-price; substitution strength from 2007/08 **held-out** grain or from independent estimates | Fitting all three crises jointly then claiming validation |
-| Level 2 / P4–P5 | Food-security weights, price triggers, cooperation | **Train** on one crisis window, **score** the other (or pooled structural). P4 may use labeled illustrative knobs for a mechanism paper | Estimating the game on the same episode used as the result |
+| Gate 0 market | `CropParams`: ε literature; STU literature; η, ω, κ, ask gains **reduced-form sign-constrained** | Shared across years; **not** fit per crisis. Official hindcast = Agrimate split (harvest ± AMIS, mean flex). USA maize industrial = structural RFS residual. | Crisis dummies; 2008-only κ |
+| Substitution | Cross-price / `subst_scale` | Literature own-price; band `{0, 0.3, 0.6}`, not a 2008 fit | Fitting all three crises jointly then claiming validation |
+| Game types | Food-security weights, ratio trigger, `tau_on`, cooperation | Labeled illustrative for a mechanism check; if estimated, train on one window and score the other | Estimating the game on the same episode used as the result |
 
-Reduced-form `CropParams` and illustrative `sheaf/calibration.py` are **not**
-an estimated model. A P4 policy paper can still run if P1 is credible and the
-appendix lists what was not estimated.
+## What is next
 
-## Sequence (do not skip)
+Not “start P4” or “start P5.” Those labels were the confusion.
 
-```
-P1  Gate 0 crisis hindcast  ✓  (2006–11 + Ukraine-war prices; leftovers disclosed)
-        ↓
-P3  Substitution on this spine   ✓  **E8: P3 draft written** (`overleaf/gate1_whitepaper/`)
-        ↓
-Cal Written: structural / literature / estimated; train/hold-out for the game
-        ↓
-P4 beta  Headey-clock τ_t on the Gate 0 spine (illustrative types)  ← `diagnostics/GAME_CLOCK.md`
-P4  Cooperative τ vs Nash; club of the willing (illustrative OK)  ← **not now**
-P5  Tipping: cooperation vs food-security weights (still sub-annual actions)
-        ↓
-P2  Endogenous network (optional; not required for P1/P3/P4)
-```
+**Next model step:** more than one government on the Headey clock. The
+one-player beta cannot produce a cascade (Ukraine’s cut spilling onto
+Russia; Thai exports absorbing diverted demand; a stock *announcement*
+substituting for a ban). Still synthetic, still not a 2008/10 score,
+still on `sheaf/dynamic_crop.py`. Importer procurement is the same
+layer, not a new product.
 
-## Gate 0 official split (P1 scoring)
+**Next writing step, if any:** zip and upload the two notes that exist
+(Gate 0, Gate 1). Do not invent a third title for the beta until the
+cascade exists.
+
+## Gate 0 official split (scoring)
 
 Agrimate Figs. 3–4 / G.1–G.2:
 
@@ -60,17 +61,17 @@ Agrimate Figs. 3–4 / G.1–G.2:
 2. production anomalies only
 3. harvest + AMIS (`use_demand=False` except USA maize industrial)
 
-Year-by-year world food/feed PSD is a **sensitivity**, not the headline series.
-P1 also reports: world consumption vs PSD, MY-end stocks vs PSD (world and
-world excluding China; rice also excluding India), exporter
-shipment signs under AMIS (key restrictors, with vs without AMIS; optional
-PSD export signs). Not FAOSTAT bilateral crisis volumes or 28-region trade
-maps. Agrimate Fig. 3 is model-implied withheld grain, not observed trade.
+Year-by-year world food/feed PSD is a **sensitivity**, not the headline
+series. Gate 0 also reports: world consumption vs PSD, MY-end stocks vs
+PSD (world and world excluding China; rice also excluding India),
+exporter shipment signs under AMIS. Not FAOSTAT bilateral crisis
+volumes or 28-region trade maps. Agrimate Fig. 3 is model-implied
+withheld grain, not observed trade.
 
 ## Explicitly not Gate 0
 
-- P2 endogenous network
-- P3 substitution fitting
-- P4/P5 cooperative / tipping game (those actions still belong on the
-  24-step spine, not annual SPE)
+- Endogenous network (FAOSTAT E0 is prescribed)
+- Fitting substitution on joint W/R/M crises
+- Endogenous restriction *actions* (those belong on this spine later;
+  they are not a reason to re-run Gate 0)
 - Fitting Agrimate’s private price series

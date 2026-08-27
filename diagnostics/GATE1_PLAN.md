@@ -3,7 +3,7 @@
 **Status:** E0–E8 done (2026-08-26). P3 draft written:
 `overleaf/gate1_whitepaper/`. Band scored; E5 leftover classified;
 E6 2022 hold-out scored; P3 claim frozen; consumption diagnostic scored.
-**No σ\***. **Game off on this paper.** **P3 next: stop.** Do not
+**No σ\***. **Game off in this note.** **Substitution: stop.** Do not
 re-run this band to host the game. Crisis game is types slow / `τ_t` on
 the Gate 0 spine (`diagnostics/GAME_CLOCK.md`), not annual `core.py` Nash.
 **Handoff for a new agent:** `diagnostics/GATE1_HANDOFF.md` (read first).
@@ -188,8 +188,8 @@ confounded; rice 2010 no co-spike**. Verification protocol per `CLAUDE.md`.
 
 ## Explicitly not Gate 1
 
-- Level 2 / P4–P5 export **actions** (Headey clock on the Gate 0 spine;
+- Endogenous restriction **actions** (Headey clock on the Gate 0 spine;
   not a reason to re-run this band; annual `core.py` Nash is leftover)
-- P2 endogenous network
+- Endogenous network (FAOSTAT E0 is prescribed)
 - Linear Slutsky \(M_i\) in `sheaf/core.py` (annual SPE prototype; different demand)
 - Fitting Agrimate’s CPI series

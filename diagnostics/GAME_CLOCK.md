@@ -13,15 +13,18 @@ Gate 0 or Gate 1.
 
 | Layer | Substitution | Game | Why a re-run would be wasted |
 |---|---|---|---|
-| **Gate 0 / P1** | off | off (AMIS diary) | Headey is why the diary is first-order and why the market is sub-annual. He does not change `CropParams`, harvest calendars, LOWESS shocks, Armington E0, or the AMIS→cut map. Official scores in `diagnostics/gate0_*_report.md` stay the scores. |
-| **Gate 1 / P3** | on (`σ ∈ {0, 0.3, 0.6}`) | off | Headey’s wheat→rice demand surge is *motivation* that grains spill. It is not a reason to densify `σ`, pick `σ*`, graft annual Slutsky `M_i` onto the spine, or unpause `dynamic_grains.py`. The frozen claim in `overleaf/gate1_whitepaper/` stands. |
+| **Gate 0** | off | off (AMIS diary) | Headey is why the diary is first-order and why the market is sub-annual. He does not change `CropParams`, harvest calendars, LOWESS shocks, Armington E0, or the AMIS→cut map. Official scores in `diagnostics/gate0_*_report.md` stay the scores. |
+| **Gate 1** | on (`σ ∈ {0, 0.3, 0.6}`) | off | Headey’s wheat→rice demand surge is *motivation* that grains spill. It is not a reason to densify `σ`, pick `σ*`, graft annual Slutsky `M_i` onto the spine, or unpause `dynamic_grains.py`. The frozen claim in `overleaf/gate1_whitepaper/` stands. |
 
 Re-running those scripts would reproduce the same tables. Do not treat
-this clock note as a new P1 or P3 experiment.
+this clock note as a new hindcast or substitution experiment.
 
-**What does get a run:** the Gate 2 policy beta on the 24-step spine
-(`python3 scripts/score_gate2_beta.py`). Official P1/P3 paths remain
+**What does get a run:** the policy beta on the 24-step spine
+(`python3 scripts/score_gate2_beta.py`). Official Gate 0 / Gate 1 paths remain
 `use_amis=True` and do not call `sheaf/dynamic_policy.py`.
+
+**Next:** more than one government on this clock (cascade). Still
+synthetic. Still not a 2008 score. Not a new paper title.
 
 ## Two timescales
 
@@ -72,8 +75,9 @@ crisis game do not.
   year). The Headey object is a **state-contingent** `τ_{i,t}` that can
   turn on and off inside the year.
 - **Not yet:** multi-country Nash, importer procurement, Japan-style
-  reserve *announcements*, cooperative club (P4 proper), tipping (P5).
-  Headey has those; the beta does not.
+  reserve *announcements*, club-of-the-willing / tipping variants.
+  Headey has the cascade; the beta is one player. That cascade is the
+  next model step, not a new manuscript.
 
 ## Trigger that does not fight the harvest calendar
 

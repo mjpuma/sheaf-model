@@ -11,10 +11,11 @@ SHEAF fills.
 
 ## Gate 0 — Agrimate-aligned reproduction first
 
-**Gate 0 is green** (per-crop asserts PASS; official P1 scores in
+**Gate 0 is green** (per-crop asserts PASS; official scores in
 `diagnostics/gate0_*_report.md`; writeup `overleaf/gate0_whitepaper/`).
-Nothing in Level-2 (endogenous game) proceeds until **P3 substitution** has
-been run on that spine. Do not retune Gate 0 leftovers with crisis knobs.
+Substitution has its own note (Gate 1). The endogenous game is a
+**layer on this spine**, not a sequel paper that waits on a queue.
+Do not retune Gate 0 leftovers with crisis knobs.
 
 **Clock (locked):** **24 time steps per year** (~15.2 days), matching Agrimate
 (Kuhla et al. 2025 §4.1). Not annual. Not 26 fortnights by default — see
@@ -67,13 +68,15 @@ governments choose **actions** `τ_{i,t}` on that clock, and keep **types**
 (food-security weights, who plays) slow — Headey (2011), not the annual
 Nash in `sheaf/core.py`. Fit types on a declared training window, then
 score restrictors / timing / severity / prices on a **held-out** window.
-A P4 beta with labeled illustrative knobs is a mechanism check, not that
-score (`diagnostics/GAME_CLOCK.md`). Neither Agrimate (restrictions
+The one-player beta with labeled illustrative knobs is a mechanism check,
+not that score (`diagnostics/GAME_CLOCK.md`). Neither Agrimate (restrictions
 exogenous) nor a no-strategy model can be evaluated on the same margin.
 
-**Gate 0 and Gate 1 do not need to be re-run** to host this layer: P1 is
-substitution off / game off (AMIS diary); P3 is substitution on / game
-off. Headey does not change CropParams or σ.
+**Gate 0 and Gate 1 do not need to be re-run** to host this layer: Gate 0 is
+substitution off / game off (AMIS diary); Gate 1 is substitution on / game
+off. Headey does not change CropParams or σ. Collaborator “P4/P5”
+questions are variants of this layer, not extra papers
+(`diagnostics/PAPER_STACK.md`).
 
 **Bonus — multi-commodity.** 2007/08 is the natural substitution test: rice spiked
 on its own export-ban panic (India, Vietnam) partly linked to wheat. Agrimate runs
@@ -81,23 +84,21 @@ each grain separately and does not model cross-commodity substitution; SHEAF run
 them jointly, so the cross-grain linkage is a signal the separate runs cannot
 produce.
 
-## Paper stack (long-term; collaborator feedback 2026-08-24)
+## Research questions (not a paper queue)
 
-Full write-up: [`diagnostics/PAPER_STACK.md`](diagnostics/PAPER_STACK.md).
+Collaborator feedback listed *uses* of SHEAF, not five manuscripts.
+Full note: [`diagnostics/PAPER_STACK.md`](diagnostics/PAPER_STACK.md).
 
-| ID | Question | When |
-|---|---|---|
-| **P1** | Hindcast price, **consumption**, and **trade** (crises, later decades) | Gate 0 **now**. Network is **prescribed** FAOSTAT E0. |
-| **P3** | Empirical wheat–maize–rice substitution | After P1 per crop |
-| **Cal** | Constrain reduced-form + game parameters (train/hold-out) | Alongside; not crisis-by-crisis fitting |
-| **P4** | Cooperative export restrictions / club of the willing | After P1; **crisis game is on the 24-step spine** (Headey clock). Illustrative knobs OK if labeled. Annual `core.py` Nash is not this paper. |
-| **P5** | Cooperation vs protectionism tipping | After P4 setup. Still sub-annual actions; types slow. |
-| **P2** | Endogenous trade network (no prescribed E0) | Later optional paper — **not** Gate 0 |
+Gate 0 (hindcast) and Gate 1 (substitution) are the writeups that exist.
+“Who restricts,” “just enough / club,” “tipping,” and “emergent network”
+are questions that may share a note, become an appendix, or never stand
+alone. They are not a sequence. Level 2 in this file is the **positive**
+game on the 24-step spine (“who restricted, when?”). Normative variants
+(club, tipping) are the same layer with a different objective. Do not
+re-run Gate 0 or Gate 1 to start them (`diagnostics/GAME_CLOCK.md`).
 
-Level 2 in this file is the **positive** game (“who restricted?”). P4/P5 are
-**normative / comparative-static** variants of the same **24-step** layer.
-Do not treat them as Gate 0, and do not re-run Gate 0 or Gate 1 to start
-them (`diagnostics/GAME_CLOCK.md`).
+**Next:** more than one government on that clock — still a mechanism
+check, not a 2008 score, not a new title.
 
 ## Data alignment
 

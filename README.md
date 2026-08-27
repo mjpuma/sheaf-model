@@ -490,9 +490,9 @@ If the path matches the twin (calm), $p^\star_t=p_0$ by construction
 
 `assert_twin_identity`, `assert_amis_raises_price`, `assert_amis_cuts_exports`,
 `assert_no_spring_spike` — run by `scripts/score_subannual_crop.py --crop …`.
-Paper stack (P1 accepted; P3 draft written; crisis game on the 24-step
-spine, types slow / actions fast): `diagnostics/PAPER_STACK.md`,
-`diagnostics/GAME_CLOCK.md`.
+Questions the model might answer (hindcast, substitution, who restricts,
+club, tipping, network) — not a queue of papers:
+`diagnostics/PAPER_STACK.md`. Clock: `diagnostics/GAME_CLOCK.md`.
 Agrimate-style figures: `python scripts/make_agrimate_comparison.py`.
 
 ### References
