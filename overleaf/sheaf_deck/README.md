@@ -1,0 +1,36 @@
+# SHEAF first-principles Beamer deck
+
+Zip **this folder** (`main.tex`, `refs.bib`, `sections/`, `figures/`,
+`tables/`, `verify_claims.py`) and upload to Overleaf:
+New Project $\to$ Upload Project. Compile **pdfLaTeX + BibTeX**.
+
+From the repository root:
+
+```
+cd overleaf && zip -r sheaf_deck.zip sheaf_deck -x "*.DS_Store" -x "*verify_claims.py"
+```
+
+(`verify_claims.py` is a repo-root runnable; it does not need to go to
+Overleaf.)
+
+## What this is
+
+A long, one-claim-per-slide walkthrough of SHEAF for a joint sitting with
+the Agrimate authors. Every equation is grounded in `README.md` and the
+live hosts (`sheaf/dynamic_crop.py`, `dynamic_coupled.py`,
+`dynamic_policy.py`). `sheaf/core.py` is labelled leftover.
+
+Red banners are README/code divergences. Both sides are shown. The
+companion script:
+
+```
+python3 overleaf/sheaf_deck/verify_claims.py
+```
+
+re-derives the banners (39 OK, 6 documented divergences, 0 failures on
+the branch that ships this folder).
+
+## What this is not
+
+Not a retune of `CropParams` or $\sigma$. Not a 2008 who-restricts score.
+Not an unpause of `dynamic_grains.py`.

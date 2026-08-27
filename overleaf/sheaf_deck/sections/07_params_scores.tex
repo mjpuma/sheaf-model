@@ -1,0 +1,91 @@
+\section{Locked parameters and Gate 0 scores}
+
+\begin{frame}{CropParams --- literature vs reduced-form}
+From \texttt{default\_crop\_params()} / \texttt{GATE0\_PARAMETERIZATION.md} \S3.
+
+\begin{center}
+\scriptsize
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{lrrrll}
+\toprule
+Parameter & Wheat & Maize & Rice & Class & Role \\
+\midrule
+$\varepsilon$ & $-0.15$ & $-0.25$ & $-0.20$ & literature & food/feed demand \\
+\texttt{stu\_target} & $0.20$ & $0.16$ & $0.18$ & literature & safety $s_i$ \\
+\texttt{max\_stu} & $0.28$ & $0.18$ & $0.22$ & literature & carry ceiling \\
+\texttt{pipeline} & 12 & 12 & 0 & structural & working stocks \\
+$\lambda$, $\lambda_W$ & $0.08$ & $0.08$ & $0.08$ & reduced-form & rebuild / overflow \\
+$\eta$ & $1.00$ & $0.85$ & $0.95$ & reduced-form & scarcity inverse elast. \\
+$\rho$ (smooth) & $0.65$ & $0.65$ & $0.65$ & reduced-form & AR price \\
+$\omega$ & $0.70$ & $0.80$ & $0.72$ & reduced-form & ask weight in $p^\star$ \\
+$\kappa_u$ & $2.5$ & $2.5$ & $2.5$ & reduced-form & unmet \\
+$\kappa_b$ & $4.0$ & $4.0$ & $4.5$ & reduced-form & blockage \\
+$\alpha,\theta,\gamma,\beta$ & \multicolumn{3}{c}{$0.15 / 0.70 / 1.25 / 0.18$} & reduced-form & asks \\
+$\alpha_r$ & $0.80$ & $0.80$ & $0.80$ & reduced-form & rival markup \\
+$\phi$ & $0.55$ & $0.50$ & $0.55$ & reduced-form & harvest foresight \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Reduced-form knobs are sign-constrained and \textbf{shared across years}.
+They are not fit crisis-by-crisis. Do not retune them in this sitting.
+\end{frame}
+
+\begin{frame}{Gate 0 wheat --- locked score}
+\begin{center}
+\includegraphics[width=0.62\textwidth]{fig_gate0_wheat_diagnostics.png}
+\end{center}
+{\scriptsize Official P1 matched: harvest + AMIS + mean flex.
+\texttt{diagnostics/gate0\_wheat\_report.md}.}
+
+corr(full) $=+0.720$. Hikes: 2007/08 $\times 2.27$ vs obs $\times 1.82$
+(restriction-led: $\tau\times 1.70 >$ shocks $\times 1.20$); 2010/11
+$\times 1.45$ vs obs $\times 1.16$ (production-led: shocks $\times 1.85 >
+\tau\times 1.36$). MY-end stocks $\times 1.02$ vs PSD (May).
+\end{frame}
+
+\begin{frame}{Gate 0 maize and rice --- locked scores}
+\scriptsize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lcccc}
+\toprule
+ & corr(full) & 2007/08 full / obs & 2010/11 full / obs & MY-end vs PSD \\
+\midrule
+wheat & $+0.72$ & $\times 2.27 / \times 1.82$ & $\times 1.45 / \times 1.16$ & $\times 1.02$ (May) \\
+maize & $+0.71$ & $\times 1.97 / \times 1.84$ & $\times 1.70 / \times 1.44$ & $\times 1.08$ (Aug) \\
+rice  & $+0.68$ & $\times 1.72 / \times 1.84$ & $\times 0.82 / \times 0.79$ & $\times 1.05$ (Aug) \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.6em}
+Maize 2007/08 is \textbf{demand-led} (industrial), not harvest-led.
+Rice 2007/08 is \textbf{restriction-led} ($\tau\times 1.75$). Isolated
+maize $\tau$ must not \emph{cut} world price (assert floor $0$).
+\end{frame}
+
+\begin{frame}{Disclosed Gate 0 leftovers (not hidden knobs)}
+These are in \texttt{GATE0\_PARAMETERIZATION.md} \S6. They are not a
+retune list.
+
+\begin{itemize}
+\item Wheat 2007/08 still high ($\times 2.27$ vs $\times 1.82$).
+\item Wheat 2010 hike ratio is production-led after LOWESS.
+\item Wheat 2006/07 still $\times 1.46$ vs obs $\sim\times 0.95$.
+\item Maize 2010/11 a bit high ($\times 1.70$ vs $\times 1.44$).
+\item Country stock \emph{levels}: world MY-end matches; many exporters sit
+      on the global safety floor. $\Delta$stock signs $\approx$ coin-flip.
+\item World ex-China maize $\times 1.49$ (China MY is September, world bar
+      is August).
+\item Consumption path is flat/down (mean flex $+$ $\varepsilon<0$) while
+      PSD use rises. Wheat corr $-0.17$, maize $-0.64$, rice $-0.74$.
+\item $\tau$ cuts \textbf{offers}; shipments are demand-constrained.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Who banned, who harvested --- 2008 wheat}
+\begin{center}
+\includegraphics[width=0.78\textwidth]{fig_gate0_map_wheat_roles_2008.png}
+\end{center}
+{\scriptsize AMIS on the diary, not chosen. Gate~0 does not ask who
+\emph{would} restrict.}
+\end{frame}

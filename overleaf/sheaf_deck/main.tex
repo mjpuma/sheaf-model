@@ -1,0 +1,103 @@
+% SHEAF first-principles walkthrough for Agrimate colleagues.
+% Overleaf: zip this folder (main.tex, refs.bib, sections/, figures/, tables/)
+% and upload. Compile with pdfLaTeX + BibTeX.
+%
+% Grounding: README.md Sections 1-8 vs live code
+%   sheaf/dynamic_crop.py, dynamic_coupled.py, dynamic_policy.py
+%   (crisis host) and sheaf/core.py (TWIST-era annual prototype).
+% Protocol: CLAUDE.md --- locate claim, locate implementation, match,
+% then put that match on the slide. If they diverge, show both.
+\documentclass[11pt,aspectratio=169]{beamer}
+\usetheme{Madrid}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamerfont{title}{size=\large}
+\setbeamerfont{frametitle}{size=\normalsize}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{03B7}{$\eta$}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes.callouts,calc}
+\usepackage[round,authoryear]{natbib}
+\usepackage{hyperref}
+
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue}
+\graphicspath{{figures/}}
+\bibliographystyle{apalike}
+
+% --- match / diverge banners ----------------------------------------------
+\newcommand{\matchbanner}[2]{%
+\begin{tikzpicture}
+\node[anchor=west, fill=green!12, draw=green!50!black, rounded corners=2pt,
+      inner sep=3.5pt, font=\scriptsize, text width=0.94\textwidth,
+      align=left] {$\checkmark$~\textbf{Match.} Claim: #1 \hfill Code: \texttt{#2}};
+\end{tikzpicture}}
+\newcommand{\divbanner}[2]{%
+\begin{tikzpicture}
+\node[anchor=west, fill=red!12, draw=red!60!black, rounded corners=2pt,
+      inner sep=3.5pt, font=\scriptsize, text width=0.94\textwidth,
+      align=left] {$\times$~\textbf{Diverge.} Claim: #1 \hfill Code: \texttt{#2}};
+\end{tikzpicture}}
+\newcommand{\leftoverbanner}[2]{%
+\begin{tikzpicture}
+\node[anchor=west, fill=gray!15, draw=gray!60, rounded corners=2pt,
+      inner sep=3.5pt, font=\scriptsize, text width=0.94\textwidth,
+      align=left] {$\circ$~\textbf{Leftover host} (not the crisis path). Claim: #1 \hfill Code: \texttt{#2}};
+\end{tikzpicture}}
+
+% --- three callout bubbles: parameter / unit / source ---------------------
+\newcommand{\bubbles}[3]{%
+\vspace{0.3em}
+\begin{center}
+\begin{tikzpicture}[node distance=0.35cm]
+\node[draw=blue!60, fill=blue!8, rounded corners=4pt, inner sep=5pt,
+      text width=0.29\textwidth, align=left, font=\scriptsize]
+      (p) {\textbf{\textcolor{blue!70!black}{Parameter}}\\#1};
+\node[draw=teal!70!black, fill=teal!8, rounded corners=4pt, inner sep=5pt,
+      text width=0.29\textwidth, align=left, font=\scriptsize, right=of p]
+      (u) {\textbf{\textcolor{teal!60!black}{Unit}}\\#2};
+\node[draw=orange!80!black, fill=orange!10, rounded corners=4pt, inner sep=5pt,
+      text width=0.29\textwidth, align=left, font=\scriptsize, right=of u]
+      (s) {\textbf{\textcolor{orange!70!black}{Source}}\\#3};
+\end{tikzpicture}
+\end{center}}
+
+\title{SHEAF from first principles}
+\subtitle{Equation, assumption, unit, and source --- for a joint sitting with Agrimate}
+\author{Working deck (not a paper)}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\vspace{-1.2em}
+\begin{center}
+{\scriptsize Crisis host: \texttt{sheaf/dynamic\_crop.py} + \texttt{dynamic\_coupled.py} + \texttt{dynamic\_policy.py}.\\
+Annual leftover: \texttt{sheaf/core.py}. Lineage: TWIST $\to$ Agrimate $\to$ SHEAF.}
+\end{center}
+\end{frame}
+
+\input{sections/00_howto}
+\input{sections/01_lineage}
+\input{sections/02_clock_units}
+\input{sections/03_data}
+\input{sections/04_harvest}
+\input{sections/05_demand_lean}
+\input{sections/06_trade_price}
+\input{sections/07_params_scores}
+\input{sections/08_gate1}
+\input{sections/09_gate2}
+\input{sections/10_annual}
+\input{sections/11_divergences}
+
+\begin{frame}[allowframebreaks]{References}
+\bibliography{refs}
+\end{frame}
+
+\end{document}

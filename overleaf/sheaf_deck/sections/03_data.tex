@@ -1,0 +1,166 @@
+\section{Source data}
+
+\begin{frame}{USDA PSD --- production, consumption, stocks}
+\matchbanner{README \S7 / \S8}{data\_usda.load\_psd\_country}
+
+Crisis-host quantities come from the FAS bulk, not from FAOSTAT food-balance
+residuals, and not from \texttt{calibration.DATA}.
+
+\[
+Q_{i,y},\; C_{i,y},\; R_{i,y}^{\mathrm{end}} \quad\text{in MMT}.
+\]
+
+\texttt{RestOfWorld} is the residual of the \emph{same} PSD country extract:
+world sum minus named nodes, floored at 0
+(\texttt{dynamic\_crop.\_psd\_annual:250--254}).
+\bubbles{No free parameter. RoW is an accounting identity.}
+{1000~MT raw $\to$ MMT.}
+{USDA FAS PSD Online, commodities Wheat / Rice, Milled / Corn.
+Vintage 2026-08-21. \texttt{data/usda\_psd/PROVENANCE.txt}.}
+\end{frame}
+
+\begin{frame}{Do not score consumption on \texttt{load\_crop\_world}}
+The world-aggregate CSVs in \texttt{data/usda\_world/} omit the EU as a
+node and are a different USDA aggregate. Official P1 consumption bars use
+the \textbf{country-sum} of \texttt{load\_psd\_country}, not
+\texttt{load\_crop\_world} (README \S8; \texttt{GATE0\_PARAMETERIZATION.md}
+\S6).
+
+World-aggregate series remain useful for a long LOWESS history
+(1960--2025) and for \texttt{crisis\_forcing} on the leftover annual host.
+\bubbles{Scoring choice is structural, not a knob.}
+{MMT.}
+{\texttt{data/usda\_world/}: AgRichter/PSD, refreshed 2026-01-21.
+\texttt{data/usda\_psd/}: FAS bulk 2026-08-21.}
+\end{frame}
+
+\begin{frame}{FAOSTAT E0 --- network structure only}
+\divbanner{README \S8 $A_{ij}$, $S_{ij}$ from FAOSTAT E0}{data\_faostat.py:21--23, 185--190}
+
+The module docstring is explicit: absolute E0 magnitudes are
+\textbf{unit-agnostic}. Wheat 2006--07 aggregated to SHEAF nodes sums to
+$4.786\times 10^{14}$ --- not MMT.
+
+\[
+A_{ij} = \frac{E_{ij}}{\sum_k E_{ik}}, \quad
+S_{ij} = \frac{E_{ij}}{\sum_k E_{kj}}, \quad A_{ii}=S_{ii}=0.
+\]
+
+\texttt{rescale\_to\_total()} exists and is \textbf{never called} on the
+Gate~0 path. Only shares enter \texttt{\_bilateral\_clear}.
+\bubbles{$A$, $S$ are structural shares. No trade-volume scale on the spine.}
+{Dimensionless. Rows of $A$ and columns of $S$ sum to 1 (or 0 if no trade).}
+{FoodTradeNetwork \texttt{inputs\_processed/} E0, copied 2026-08-24.
+Window used by Gate~0: 2006--2007 Avg. \texttt{data/faostat\_network/PROVENANCE.txt}.}
+\end{frame}
+
+\begin{frame}{Vietnam rice E0 is a documented data repair}
+\matchbanner{GATE0\_PARAMETERIZATION \S2.4}{dynamic\_crop.py:439--465}
+
+Crisis-window rice files (2006--07, 2010--11) have a \textbf{zero Vietnam
+export row}. The code copies Vietnam's destination mix from 2019--21 and
+scales the row to 12\% of that crisis-window matrix sum (order-of-magnitude
+world-rice-export share).
+
+This is a hole in the vendored E0, not a 2008 price knob. After repair,
+Vietnam's $A$ row sums to 1. Verified.
+\bubbles{\texttt{\_VNM\_RICE\_EXPORT\_SHARE = 0.12} is a data repair,
+labelled as such. Not fit to 2008.}
+{Dimensionless shares.}
+{FAOSTAT rice E0 2006--07 (hole) + 2019--21 mix.
+\texttt{dynamic\_crop.py:439--465}.}
+\end{frame}
+
+\begin{frame}{Pink Sheet --- the price target}
+\matchbanner{README \S8 $p_0$, scoring}{data\_usda.load\_price\_series\_monthly}
+
+\[
+p_0 = \text{mean real Pink Sheet in the start year (default 2006)}.
+\]
+
+Series: Wheat US HRW; Rice Thai 5\%; Maize. Default column
+\texttt{price\_real\_2010\_usd\_mt}.
+
+Monthly real prices are \textbf{not} in the Pink Sheet monthly workbook.
+The fetch script does
+$\mathrm{real}_{m,y} = \mathrm{nominal}_{m,y}\times
+(\mathrm{annual\ real}_y / \mathrm{annual\ nom}_y)$.
+\bubbles{$p_0$ is a numeraire, not estimated. Ukraine-war window uses 2021 means.}
+{Constant 2010 USD per metric tonne. Deflator: World Bank MUV.}
+{World Bank CMO Pink Sheet, downloaded 2026-08-23.
+\texttt{data/world\_prices/PROVENANCE.txt}.}
+\end{frame}
+
+\begin{frame}{AMIS --- quantity cuts on the spine, not \$/t}
+\matchbanner{README \S8 $\tau_{i,t}\in[0,1]$}{dynamic\_crop.py:43--50, 325--356}
+
+Gate~0 maps OECD/AMIS policy labels to \textbf{offer cuts}:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lc}
+\toprule
+AMIS label & $\tau$ \\
+\midrule
+Export prohibition & 0.95 \\
+Export quota & 0.70 \\
+Export tax & 0.50 \\
+Minimum export price & 0.35 \\
+Licensing requirement & 0.25 \\
+Customs-clearance restriction & 0.15 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Overlapping measures keep the \textbf{max}. Unmapped AMIS countries are
+ignored (USA, EU, Canada, Thailand, Nigeria are not in the map).
+\bubbles{The map is structural (Agrimate-style). Not fit per crisis.}
+{Dimensionless fraction of \emph{offers}. Not a specific-tax in \$/t.}
+{OECD Database on Export Restrictions / AMIS Policy Database,
+vendored 2026-08-21. \texttt{data/amis\_policies/PROVENANCE.txt}.}
+\end{frame}
+
+\begin{frame}{The leftover AMIS map is a different object}
+\leftoverbanner{data\_usda.amis\_tau\_schedule}{data\_usda.py:351--373}
+
+The same AMIS file is also mapped to \textbf{\$/t wedges} for the annual
+SPE leftover (\texttt{\_AMIS\_TAU\_AGRIMATE}: ban $=500$, tax $=150$, \ldots).
+That mapping is what \texttt{LEVEL1\_INTERROGATION.md} used. It is
+\textbf{not} applied by \texttt{dynamic\_crop.amis\_export\_cuts}.
+
+If you see $\tau=500$ in a conversation about SHEAF, you are looking at
+the leftover host.
+\bubbles{Two maps, one diary. Spine = fraction. Leftover = \$/t.}
+{Spine: $[0,1]$. Leftover: \$/t.}
+{\texttt{dynamic\_crop.\_AMIS\_CUT} vs \texttt{data\_usda.\_AMIS\_TAU\_AGRIMATE}.}
+\end{frame}
+
+\begin{frame}{Crop calendars}
+\matchbanner{README \S8 harvest calendars}{seasonal.py:44--65, data/crop\_calendars/}
+
+Annual production is spread with \textbf{triangular} month weights inside
+each country's harvest window, then split equally across the two
+half-months. Weights sum to 1 (verified, max $|{\sum w-1}|=2\times10^{-16}$).
+
+Nodes with negligible production still carry a placeholder window (e.g.\
+Thailand wheat). Missing calendar row $\to$ uniform 24-step weights.
+\bubbles{Windows are structural. Shape is triangular, not uniform ---
+Agrimate-style concentration mid-season.}
+{Dimensionless shares of annual MMT.}
+{Hand-curated from USDA FAS crop-calendar charts.
+\texttt{data/crop\_calendars/PROVENANCE.txt}. Prototype, not a SAGE grid.}
+\end{frame}
+
+\begin{frame}{Marketing-year end months}
+PSD ending stocks are \textbf{local marketing-year} carry, not calendar
+December. Scoring world wheat in May and maize in August is the USDA FAS
+convention, not Agrimate's 28-region grouping.
+
+\texttt{sheaf/marketing\_years.py} stores per-node overrides (India wheat
+MY-end = March; Argentina wheat = November; China maize = September).
+Unlisted nodes fall back to the crop default.
+\bubbles{Scoring month is structural. Not a tightness knob.}
+{Calendar month $1$--$12$.}
+{USDA FAS \emph{Grain: World Markets and Trade} convention.
+\texttt{marketing\_years.py:17--68}.}
+\end{frame}

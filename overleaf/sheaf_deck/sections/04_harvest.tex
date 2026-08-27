@@ -1,0 +1,85 @@
+\section{Harvest forcing}
+
+\begin{frame}{Climatology is the score-window mean seasonal path}
+\matchbanner{README \S8}{dynamic\_crop.prepare\_crop\_run:786--787}
+
+\[
+H^{\mathrm{seas}}_{i,t}
+= \bar H_i \cdot w_{i,t},
+\qquad
+\bar H_i = \frac{1}{Y}\sum_{y\in\text{score window}} Q_{i,y},
+\]
+
+with $w_{i,t}$ the calendar weight for that step (sums to 1 over the year).
+The twin uses this path. Treatment harvest is \textbf{not} raw PSD year
+totals laid on the same calendar.
+\bubbles{$\bar H_i$ is data. $w_{i,t}$ is the calendar.}
+{$H$: MMT / step. $\bar H$: MMT / year.}
+{USDA PSD country production, score window (default 2006--11).
+\texttt{seasonal.harvest\_path}.}
+\end{frame}
+
+\begin{frame}{Treatment harvest is climatology $\times$ LOWESS}
+\matchbanner{README \S8}{dynamic\_crop.py:325--329, data\_usda.detrend\_anomalies}
+
+\[
+H_{i,y}^{\mathrm{ann}} = \bar H_i \cdot (1+a_{i,y}),
+\qquad
+a_{i,y} = \frac{Y_{i,y}-\hat Y_{i,y}}{\hat Y_{i,y}}.
+\]
+
+$\hat Y$ is a per-country LOWESS trend on a padded PSD history
+(\texttt{hist\_pad=12} years, \texttt{window\_years=10}, tricube local
+linear --- Agrimate's method, hand-rolled in \texttt{\_lowess}, not
+\texttt{statsmodels}). \texttt{shock\_mode=full} keeps surpluses.
+\bubbles{\texttt{window\_years=10} is Agrimate's choice. Not fit to 2008.}
+{Anomaly $a$ dimensionless. $H$ MMT/year then spread to MMT/step.}
+{\texttt{data\_usda.detrend\_anomalies}; Agrimate detrending.
+\texttt{dynamic\_crop.\_harvest\_anomaly\_scalars}.}
+\end{frame}
+
+\begin{frame}{Why not the in-sample mean}
+\matchbanner{README \S8 ``Why this matters''}{verify\_claims.py check\_lowess}
+
+World wheat 2006 versus the 2006--11 \emph{mean} is $-8.9\%$. Versus
+LOWESS it is $-4.4\%$. The README's ``$-9\%$ vs that mean but only $-4\%$
+vs LOWESS'' is the same fact.
+
+An in-sample mean is contaminated by post-2008 yield growth. The model then
+treats 2006/07 as a crash (false May spike) and under-weights 2010 (Russia
+drought sits near a boom-inflated mean). Signed anomalies versus trend
+isolate \emph{shocks}, not secular growth.
+\bubbles{Forcing identity is structural. Do not replace LOWESS with
+in-sample $z$-scores to ``fix'' 2006.}
+{Percent of trend, not percent of 2006--11 mean.}
+{Reproduced: world PSD wheat, \texttt{detrend\_anomalies} on 1994--2011.}
+\end{frame}
+
+\begin{frame}{Foresight harvest is a blend}
+\matchbanner{README \S8 $H^{\mathrm{exp}}$}{dynamic\_crop.py:561--565}
+
+\[
+H^{\mathrm{exp}}_{i,t}
+= \phi\, H_{i,t} + (1-\phi)\, H^{\mathrm{seas}}_{i,t}.
+\]
+
+$\phi$ is reduced-form (\texttt{foresight\_phi}: wheat/rice $0.55$, maize
+$0.50$). Agents see a mixture of the realized (shocked) harvest and the
+seasonal climatology --- finite foresight, not rational expectations.
+\bubbles{$\phi\in[0,1]$, reduced-form, locked in \texttt{CropParams}.
+Not estimated on 2008.}
+{$H$ in MMT/step.}
+{\texttt{CropParams.foresight\_phi}; \texttt{GATE0\_PARAMETERIZATION.md} table.}
+\end{frame}
+
+\begin{frame}{Lean horizon is a \emph{world} clock}
+\matchbanner{README \S8 $h_t$; seasonal.steps\_to\_harvest\_pulse}{seasonal.py:163--189}
+
+$h_t$ is the number of steps until cumulative \textbf{world} future harvest
+reaches $12\%$ of mean annual world $H$ (cap 24). All countries share the
+same lean clock (NH summer pulse). Verified range on 2006--07 wheat:
+$h_t\in[1,14]$.
+\bubbles{\texttt{harvest\_pulse\_frac=0.12} structural. \texttt{MAX\_LEAN\_STEPS=24}.}
+{$h_t$ in steps (dimensionless).}
+{\texttt{seasonal.steps\_to\_harvest\_pulse}. World path = \texttt{H.sum(axis=0)}.}
+\end{frame}

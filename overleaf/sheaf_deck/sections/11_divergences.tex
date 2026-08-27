@@ -1,0 +1,68 @@
+\section{Documented divergences and sitting checklist}
+
+\begin{frame}{Six divergences --- none silently picked}
+These are the red banners, collected. \texttt{verify\_claims.py} prints
+the same list (39 OK, 6 divergences, 0 failures).
+
+\begin{enumerate}
+\item FAOSTAT E0 magnitudes are unit-agnostic; only shares are used.
+\item Lean gap $L$: README sums $k=1..h_t$; code sums $k=0..h_t$.
+\item Scarcity $f$ is undefined in README; code uses a state-dependent shift.
+\item Warehouse $W$: README matches code; \texttt{GATE0\_PARAMETERIZATION}
+      \S2.3 displayed equation is stale.
+\item Gate~2 cascade is harvest diversion, not ban-on-ban IBR.
+\item Annual $M$: diagonal-dominance wording fails after symmetrisation;
+      PD still holds on the calibration.
+\end{enumerate}
+
+Classification: \textbf{G} (documentation) for 1--4 and 6; \textbf{E/G}
+for 5 (the mechanism is disclosed in \texttt{GATE2\_PLAN.md}, easy to
+misread as sequential Nash).
+\end{frame}
+
+\begin{frame}{What we would like Agrimate colleagues to stress}
+Not ``is this Deaton--Laroque?'' --- we have not claimed that.
+
+\begin{enumerate}
+\item Is the 24-step ask-dominated market a fair cousin of Agrimate's
+      commercial layer, or a different object we should name more
+      carefully?
+\item Is an offer-cut $\tau$ the right translation of AMIS, versus
+      Agrimate's edge shutdown?
+\item Is Jacobi isoelastic $\eta$ the substitution you would put on this
+      spine, versus a nested CES / AIDS at the country?
+\item Is climatology-relative $S/S^{\mathrm{calm}}$ the right Headey
+      trigger, or do you want importer procurement and announcements
+      before any who-restricts score?
+\item Which of the six divergences is a real disagreement with the
+      economics, versus a README that needs to catch up to the code?
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Reproduce}
+From the repository root (after \texttt{pip install -r requirements.txt}):
+
+\begin{verbatim}
+python3 overleaf/sheaf_deck/verify_claims.py
+\end{verbatim}
+
+Re-derives every match/diverge banner. Does not retune, does not write
+scores, does not unpause \texttt{dynamic\_grains.py}.
+
+Official locked scores remain:
+
+\texttt{diagnostics/gate0\_\{wheat,maize,rice\}\_report.md},
+\texttt{gate1\_report.md}, \texttt{gate2\_beta\_report.md}.
+
+Overleaf: zip \texttt{overleaf/sheaf\_deck/} and compile pdfLaTeX + BibTeX.
+\end{frame}
+
+\begin{frame}{One-sentence summary}
+SHEAF's crisis model is a 24-step, ask-dominated, single-world-price
+market with AMIS offer cuts (Gate~0), Jacobi isoelastic cross-grain
+demand on that locked spine (Gate~1, no $\sigma^\star$), and a
+Headey-clock climatology-relative $\tau_t$ whose two-player cascade is
+harvest diversion (Gate~2 beta). The annual SPE plus year-Nash in
+\texttt{core.py} is still in the tree. It is the TWIST leftover. It is
+not what we are asking you to certify as 2007/08.
+\end{frame}

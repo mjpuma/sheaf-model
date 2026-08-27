@@ -1,0 +1,208 @@
+\section{Annual leftover (README \S1--\S6 / \texttt{core.py})}
+
+\begin{frame}{This section is the leftover host}
+\leftoverbanner{README \S1--\S6}{sheaf/core.py}
+
+Everything from here through the $\sigma=0$ proposition is what
+\texttt{demo.py} runs. Crisis hindcasts do \textbf{not} use it. We still
+walk it, because Agrimate colleagues will ask, and because README \S1--\S6
+is written as if it were the model.
+
+Units here are also MMT and \$/t. The clock is \textbf{annual}. $\tau$ is
+a specific tax in \$/t, not an offer cut. Demand is linear Slutsky, not
+isoelastic.
+\end{frame}
+
+\begin{frame}{Linear demand and the benefit potential}
+\leftoverbanner{README \S1}{core.py:88, 79--87}
+
+\[
+D_i = a_i - M_i p_i,
+\qquad
+p_i = M_i^{-1}(a_i - D_i),
+\]
+\[
+W_i(D_i) = (M_i^{-1}a_i)^\top D_i - \tfrac12 D_i^\top M_i^{-1} D_i,
+\qquad
+\nabla_{D_i} W_i = p_i,
+\]
+\[
+CS_i = W_i(D_i) - p_i^\top D_i.
+\]
+
+$M_i$ symmetric positive-definite $\Rightarrow$ $W_i$ strictly concave
+$\Rightarrow$ the QP is well-posed. Code: \texttt{DemandSystem.surplus}.
+\bubbles{$M_i$ constructed next slide. \texttt{subst\_scale} default $0.6$ on this host.}
+{$D$: MMT/year. $p$: \$/t. $W$: (\$/t)$\times$MMT.}
+{\texttt{core.build\_demand\_system}; README \S1.}
+\end{frame}
+
+\begin{frame}{Construction of $M_i$}
+\leftoverbanner{README \S1}{core.py:111--130}
+
+\[
+b_g = -\varepsilon_g \frac{D_{0,g}}{p_{0,g}}>0,
+\qquad
+S_{gh}=\sigma\rho_{gh}\sqrt{b_g b_h}\ (g\neq h),\quad S_{gg}=0,
+\]
+\[
+\text{row-cap: if }\sum_h S_{gh}\ge 0.95 b_g\text{ then rescale},
+\quad
+S\leftarrow\sqrt{S\circ S^\top},
+\quad
+M=\mathrm{diag}(b)-S,
+\quad
+a=D_0+M p_0.
+\]
+
+README says ``symmetrised'' and ``$S=0.5(S+S^\top)$'' is the audit-prep
+question; the code uses the \textbf{geometric} mean $\sqrt{S\circ S^\top}$,
+not the arithmetic mean. On SHEAF's calibration both are well-defined.
+\bubbles{$\sigma=\mathtt{subst\_scale}$. $\varepsilon$ here is \texttt{OWN\_ELAST}=$(-0.25,-0.20,-0.30)$, \emph{not} CropParams.}
+{$b$: MMT / (\$/t). $M$: same. $a$: MMT.}
+{\texttt{calibration.OWN\_ELAST}, \texttt{P0}, \texttt{RHO}; \texttt{core.py:126}.}
+\end{frame}
+
+\begin{frame}{$M\succ 0$ on the calibration; diagonal dominance is lost}
+\leftoverbanner{README \S1 ``strict diagonal dominance $\Rightarrow M\succ 0$''}{core.py:121--128}
+
+After the geometric-mean step, several nodes \textbf{lose} strict diagonal
+dominance at $\sigma=0.6$ (USA margin $-1.07\times 10^{-3}$) while remaining
+positive definite (min eigenvalue $1.95\times 10^{-3}$, $\mathrm{cond}(M)\le 231$).
+
+The PD claim \textbf{holds} on all 18 calibration nodes at
+$\sigma\in\{0,0.3,0.6,0.9\}$. $20{,}000$ random draws ($G=2..5$, $b$ over
+six orders of magnitude, $\sigma$ $0.1$--$10$) produced no negative
+eigenvalue. The \emph{guarantee via diagonal dominance} is what fails;
+PD of $M$ on this construction appears to survive anyway. Category
+\textbf{G} on the dominance wording, \textbf{H} on PD for SHEAF's $M$.
+\bubbles{No extra cap after symmetrisation.}
+{Eigenvalues of $M$: MMT/(\$/t).}
+{\texttt{verify\_claims.py} section 8.}
+\end{frame}
+
+\begin{frame}{Market QP}
+\leftoverbanner{README \S2}{core.SpatialEquilibrium.solve}
+
+\[
+\max_{D\ge 0,\, f\ge 0}
+\sum_i W_i(D_i) - \sum_{g,i,j} K^g_{ij} f^g_{ij}
+\]
+\[
+A^g_i + \sum_k f^g_{ki} - \sum_k f^g_{ik} - D^g_i = 0,
+\quad
+f^g_{ii}=0,
+\]
+\[
+K^g_{ij} = c_{ij}\phi_g\psi_{ij} + \tau^g_i + m^g_j.
+\]
+
+$c_{ij}$ is haversine $\times 0.0025 + 8$ (\$/t). $\phi$ is
+\texttt{FREIGHT\_MULT}. Solver fallback CLARABEL $\to$ SCS $\to$ OSQP;
+status must be \texttt{optimal} (not merely $D.\mathrm{value}$ not None).
+\bubbles{$\tau$ here is \$/t, not an offer fraction.}
+{$f$: MMT/year. $K$: \$/t.}
+{\texttt{core.py:292--351}; \texttt{calibration.\_haversine}.}
+\end{frame}
+
+\begin{frame}{KKT / spatial arbitrage}
+\leftoverbanner{README \S2 Enke--Samuelson}{QP KKT, not separately coded}
+
+At an optimum the multiplier on the balance is the recovered inverse-demand
+price, and complementary slackness is
+
+\[
+p^g_j - p^g_i \le K^g_{ij},
+\qquad
+f^g_{ij}\bigl(K^g_{ij}-(p^g_j-p^g_i)\bigr)=0.
+\]
+
+Grain moves only when the gap covers delivered cost. An export tax raises
+every route out of $i$. This is the insulation mechanism on the leftover
+host. The crisis host insulates by cutting \textbf{offers}, not by a $K$ wedge.
+\bubbles{No extra KKT parameter.}
+{\$ / t on the gap.}
+{README \S2; cvxpy KKT of the QP in \texttt{SpatialEquilibrium.solve}.}
+\end{frame}
+
+\begin{frame}{Competitive storage --- lagged price, disclosed}
+\leftoverbanner{README \S3}{core.market\_responsive\_storage}
+
+\[
+p^e = p^{\mathrm{prev}} + \kappa\bigl(p^{\mathrm{target}}-p^{\mathrm{prev}}\bigr),
+\quad
+s = \frac{p^e}{1+r}-p^{\mathrm{prev}},
+\]
+\[
+\Delta^{\mathrm{mkt}}
+=
+\begin{cases}
+\gamma(s-\theta\,\mathrm{sgn}\,s) & |s|>\theta,\\
+0 & |s|\le\theta,
+\end{cases}
+\quad\text{clipped to }[-R,\,\bar R-R].
+\]
+
+$p^{\mathrm{ref}}$ is last year's realised price --- a one-period lag,
+disclosed, not simultaneous TWIST/Agrimate storage. Not Deaton--Laroque
+RE. Category \textbf{E}.
+\bubbles{$r=0.05$, $\kappa=0.5$, $\theta=\mathtt{mkt\_cost}=8$ \$/t default.}
+{$\Delta$: MMT/year. $s$: \$/t.}
+{\texttt{core.py:195--206, 474--478}.}
+\end{frame}
+
+\begin{frame}{Government buffer on the leftover host}
+\leftoverbanner{README \S3}{core.strategic\_storage}
+
+Quantity-leg shortfall after normal baseline trade:
+
+\[
+\Sigma = D_0 - A^{\mathrm{pre-gov}} - \max(D_0-Q_0,0).
+\]
+
+Release in crisis ($p^{\mathrm{ref}}>p^{\mathrm{trig}}$ or $\Sigma>0$);
+rebuild toward $\vartheta D_0$ in calm. Structural importers are calm at
+$\xi=1$. This rule is \textbf{not} the Gate~2 Headey gate.
+\bubbles{\texttt{gov\_release\_frac=0.5}, \texttt{gov\_build\_frac=0.10}.}
+{$\Delta^{\mathrm{gov}}$: MMT/year.}
+{\texttt{core.py:209--237}.}
+\end{frame}
+
+\begin{frame}{Annual export-restriction game}
+\leftoverbanner{README \S4}{core.ExportRestrictionGame}
+
+\[
+\mathcal{W}_i
+= CS_i + \underbrace{p_i\cdot Q_i}_{\Pi_i\text{ uses baseline }Q}
+- \sum_g w_{i,g}(p_{i,g}-\bar p_{i,g})_+^2
++ \zeta \tau_i\cdot X_i.
+\]
+
+Nash by iterated best response on a grid $\{0,\ldots,\bar\tau\}$
+(default $\bar\tau=120$ \$/t, \texttt{grid=13}, \texttt{max\_iters=3},
+\texttt{tol=3} \$/t). Non-concave $\mathcal{W}$ $\Rightarrow$ approximate /
+discretised equilibrium, as README says.
+
+Producer income uses unshocked $Q$, not realised sales --- intentional
+prototype weight. Stress gate: game plays only if
+$\max p > \mu p^{\mathrm{norm}}$ ($\mu=1.12$).
+\bubbles{$w_{i,g}$, $\bar p_{i,g}$ from illustrative \texttt{DATA}. $\zeta=0$ default.}
+{$\tau$: \$/t. $\mathcal{W}$: (\$/t)$\times$MMT.}
+{\texttt{core.py:357--421, 505--521}.}
+\end{frame}
+
+\begin{frame}{README \S6 proposition --- holds on this host}
+\leftoverbanner{README \S6}{core.build\_demand\_system at $\sigma=0$}
+
+If $\sigma=0$ (equivalently $\rho\equiv 0$), $S=0$ and $M_i=\mathrm{diag}(b)$
+exactly (verified $\max|M_{\mathrm{off}}|=0$). $W_i$ separates, the QP
+splits into $G$ independent SPEs, and $\mathcal{W}_i$ decouples. That is
+the TWIST/Agrimate-style limit of the \textbf{annual} host.
+
+The live-host analogue is Gate~1's $\sigma=0$ identity, already shown.
+\texttt{demo.py} measures substitution spillover on this leftover host
+(Black Sea wheat shock). It is not a 2007/08 hindcast.
+\bubbles{\texttt{build\_countries(substitution=False)} sets $\sigma=0$.}
+{Same units as \S1.}
+{\texttt{verify\_claims.py} PD section; \texttt{demo.py}.}
+\end{frame}

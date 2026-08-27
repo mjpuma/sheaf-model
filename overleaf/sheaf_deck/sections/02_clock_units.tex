@@ -1,0 +1,75 @@
+\section{Clock and units}
+
+\begin{frame}{The crisis clock is 24 steps per year}
+\matchbanner{README \S8: $T_y=24$, $\Delta t \approx 15.2$ days}{calendar24.py:12--13}
+
+\[
+T_y = 24, \qquad \Delta t = \frac{365.25}{24} = 15.21875~\text{days}.
+\]
+
+Exactly two steps per calendar month: \texttt{year\_step} $= 2(\mathrm{month}-1)+\mathrm{half}$,
+\texttt{half}\ $\in\{0,1\}$. Midpoints sit near day 8 and day 23.
+
+A 2006--2011 run is $6\times 24 = 144$ steps. Verified:
+\texttt{n\_steps(2006,2011)=144}.
+\bubbles{$T_y$ is structural (Agrimate \S4.1). Not a fitted frequency.}
+{Time: dimensionless step index $t$. Calendar: (year, month, half).}
+{\texttt{sheaf/calendar24.py}. Agrimate \citep{kuhla2025} \S4.1.
+\texttt{ARCHITECTURE.md} locks 24, not 26 fortnights.}
+\end{frame}
+
+\begin{frame}{Why 24, not 26 fortnights}
+A true fortnight calendar (26.09 steps/year) does not tile months. Pink
+Sheet targets and AMIS start/end dates are monthly. Scoring a 26-step path
+against a monthly series requires an extra month$\leftrightarrow$step map
+that Agrimate does not use.
+
+SHEAF therefore uses Agrimate's 24. A 26-step sensitivity is allowed only
+with that map written down (\texttt{ARCHITECTURE.md}). It is not the
+default and is not scored here.
+\bubbles{No free parameter. Clock is a lineage choice.}
+{24 steps / calendar year.}
+{Agrimate \S4.1; \texttt{ARCHITECTURE.md} ``SHEAF policy: default
+STEPS\_PER\_YEAR = 24''.}
+\end{frame}
+
+\begin{frame}{Canonical units}
+\matchbanner{core.py docstring; README \S8}{core.py:40, data\_usda.py:36}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+Object & Unit in the model & Conversion \\
+\midrule
+Production, consumption, stocks, trade & million tonnes (MMT) & PSD $\times 10^{-3}$ \\
+Prices, asks & real USD / tonne & Pink Sheet MUV, 2010 base \\
+Export cut $\tau$ on the spine & dimensionless fraction of offers & AMIS label $\to$ $\{0.95,0.70,\ldots\}$ \\
+Export tax in \texttt{core.py} & USD / tonne wedge & leftover; not Gate~0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\bubbles{\texttt{\_KT\_TO\_MMT = 1e-3} is structural accounting.}
+{1000~MT (PSD raw) $\to$ MMT. Prices already \$/mt in the Pink Sheet extract.}
+{\texttt{sheaf/data\_usda.py:36, 74--77, 225--228}. Provenance:
+\texttt{data/usda\_psd/PROVENANCE.txt}.}
+\end{frame}
+
+\begin{frame}{A worked unit check}
+\matchbanner{USA wheat 2008 production}{data\_usda.load\_psd\_country}
+
+Raw PSD bulk, United States, Wheat, Market Year 2008,
+\texttt{Production} $= 68363$ (thousand metric tonnes).
+
+\[
+68.363~\mathrm{MMT} = 68363 \times 10^{-3}.
+\]
+
+\texttt{load\_psd\_country("wheat", country="USA")} returns $68.363$.
+Verified in \texttt{verify\_claims.py}.
+\bubbles{No scale knob. If this factor were $1$, every stock and harvest
+would be a thousand times too large.}
+{MMT / year on the annual table; MMT / step after $/24$ or calendar weights.}
+{USDA FAS PSD Online bulk ZIP, \texttt{psd\_grains\_country\_year.csv},
+downloaded 2026-08-21.}
+\end{frame}

@@ -1,0 +1,78 @@
+\section*{How to read this deck}
+
+\begin{frame}{One claim per slide}
+This sitting is not a sales pitch. It is a joint audit with the Agrimate
+authors of what SHEAF actually computes.
+
+\begin{itemize}
+\item Each slide states \textbf{one claim}.
+\item The equation is the one in the README, or the one in the code, or
+      both if they differ.
+\item Three bubbles: \textbf{parameter} (what is free / locked),
+      \textbf{unit}, \textbf{source} (which file, which vintage).
+\item Green banner = README and code match. Red banner = they diverge;
+      both are shown; we do not silently pick one.
+\item Grey banner = the annual SPE leftover in \texttt{sheaf/core.py}.
+      It is still in the repository. It is \textbf{not} the 2007/08 host.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The verification protocol (from \texttt{CLAUDE.md})}
+For every suspected mismatch we did, in order:
+
+\begin{enumerate}
+\item Locate the mathematical claim (README equation or docstring).
+\item Locate the implementation (file and line).
+\item Compare, symbol by symbol where feasible.
+\item Attempt a numerical counterexample.
+\item Attempt to prove the implementation correct on its own terms.
+\item Only then classify.
+\end{enumerate}
+
+Classification is not ``wrong vs right vs Agrimate.'' Categories:
+\textbf{A} math error, \textbf{B} coding bug, \textbf{C} numerical,
+\textbf{D} economic simplification, \textbf{E} modeling philosophy,
+\textbf{F} empirical gap, \textbf{G} documentation, \textbf{H} holds.
+
+A departure from Deaton--Laroque is \textbf{E}, not \textbf{A}, if SHEAF
+never claimed that equilibrium.
+\end{frame}
+
+\begin{frame}{What we will not do in this sitting}
+\begin{itemize}
+\item Do not retune \texttt{CropParams} or $\sigma$.
+\item Do not unpause \texttt{sheaf/dynamic\_grains.py}.
+\item Do not re-score 2008 as a who-restricts contest.
+\item Do not graft the annual Slutsky $M_i$ into the 24-step spine.
+\item Do not treat \texttt{core.py} iterated best response as the crisis game.
+\item Do not dumb the language down. Agrimate colleagues read equations.
+\end{itemize}
+
+Numbers quoted as scores are from the locked diagnostics reports. They
+are not being refit here. A companion script
+\texttt{overleaf/sheaf\_deck/verify\_claims.py} re-derives the
+match/diverge banners (39 OK, 6 documented divergences, 0 failures on
+this branch).
+\end{frame}
+
+\begin{frame}{Two hosts, one repository}
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lll}
+\toprule
+Layer & Crisis host (this sitting) & Leftover \\
+\midrule
+Clock & 24 steps / year & 1 step / year \\
+Market & \texttt{dynamic\_crop.py} & \texttt{core.SpatialEquilibrium} \\
+Substitution & \texttt{dynamic\_coupled.py} isoelastic $\eta$ & linear $D=a-Mp$ \\
+Policy & \texttt{dynamic\_policy.py} $\tau_t$ & \texttt{ExportRestrictionGame} \\
+Restrictions in Gate~0 & AMIS quantity cuts & AMIS $\$/t$ wedges \\
+Hindcast & \texttt{score\_subannual\_crop.py} & \texttt{demo.py} (not a hindcast) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.6em}
+README ``Mathematical formulation'' \S1--\S6 describes the leftover.
+\S8 describes the crisis host. Gate~0 / Gate~1 / Gate~2 sit on \S8.
+\end{frame}

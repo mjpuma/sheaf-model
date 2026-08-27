@@ -1,0 +1,155 @@
+\section{Gate 2 --- Headey-clock actions}
+
+\begin{frame}{Types are slow; actions are fortnightly}
+\matchbanner{GAME\_CLOCK.md; Headey 2011}{dynamic\_policy.py:1--7}
+
+\citet{headey2011} objects that sit on dates, not marketing years: export
+restrictions, import surges, stock-release \emph{announcements}. Gate~2
+beta implements only the first, as a climatology-relative stock gate.
+
+Characteristic government types (how much a government cares about
+domestic food) can be sticky. The decision $\tau_t$ is not. Conflating
+them into one annual tax is what \texttt{core.py} still does. That annual
+Nash is a TWIST-era prototype. It is not run here.
+\bubbles{Knobs below are illustrative types. They do not flip every step.}
+{Time: 24-step wheat spine. $\tau_t\in[0,1]$.}
+{\citet{headey2011}; \texttt{diagnostics/GAME\_CLOCK.md}.}
+\end{frame}
+
+\begin{frame}{Illustrative knobs --- not AMIS estimates}
+\matchbanner{PolicyKnobs docstring}{dynamic\_policy.py:19--49}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lll}
+\toprule
+Knob & Default & Role \\
+\midrule
+\texttt{players} & (Russia, Kazakhstan) & who can choose $\tau_t$ \\
+\texttt{harvest\_mult} & $0.50$ on Russia, 2007 & synthetic harvest \\
+\texttt{gov\_stu} & $0.48$ & gov buffer / annual use \\
+\texttt{fs\_stock\_weight} & $12$ & nested-year BR only \\
+\texttt{tau\_on} & $0.6$ & intensity when the gate is on \\
+\texttt{stock\_ratio\_trigger} & $0.85$ & $S_t/S^{\mathrm{calm}}_t$ threshold \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Locked after the qualitative calm/shock flip was visible. Not estimated
+from AMIS or crisis prices. AMIS is \textbf{off}. Substitution is
+\textbf{off}. Gate~0/1 are not re-run.
+\bubbles{All four type knobs are illustrative. Class: not literature, not structural.}
+{\texttt{gov\_stu} dimensionless; buffer in MMT; $\tau$ dimensionless.}
+{\texttt{PolicyKnobs}; \texttt{GATE2\_PLAN.md}.}
+\end{frame}
+
+\begin{frame}{The crisis object is a ratio, not an absolute floor}
+\matchbanner{GAME\_CLOCK.md $S_{i,t}/S^{\mathrm{calm}}_{i,t}$}{dynamic\_policy.climatology\_relative\_cuts}
+
+\[
+\tau_{i,t}
+=
+\begin{cases}
+\tau^{\mathrm{on}} & \text{if } t\text{ in the shock year and }
+S^{\mathrm{open}}_{i,t}/S^{\mathrm{calm}}_{i,t} < r,\\
+0 & \text{otherwise.}
+\end{cases}
+\]
+
+An absolute stock floor fires every hungry season even in climatology
+(the harvest calendar already drives the trough below
+\texttt{stu\_target}$\times C$). The ratio against the same calendar step
+in a normal year is what distinguishes a crisis from a sawtooth.
+\bubbles{$r=0.85$, $\tau^{\mathrm{on}}=0.6$: illustrative.}
+{$S$ MMT; ratio dimensionless.}
+{\texttt{dynamic\_policy.py:128--185}. Two-pass: open path, then cuts.}
+\end{frame}
+
+\begin{frame}{Two-pass: open, then cuts}
+The Gate~0 market loop is not rewritten. Pass 1: simulate the shocked
+harvest with $\tau\equiv 0$ (open path) and the climatology harvest.
+Pass 2: apply $\tau_t$ from the ratio, simulate again.
+
+Only \texttt{exporter} (Russia) gets the synthetic harvest $\times 0.50$.
+Kazakhstan's harvest is unchanged. Ukraine is on the market and does not
+play.
+\bubbles{Two-pass is a protocol, not a parameter.}
+{Harvest multiplier dimensionless.}
+{\texttt{simulate\_headey}; \texttt{shock\_year\_harvest}.}
+\end{frame}
+
+\begin{frame}{Hard bars --- all PASS}
+\begin{center}
+\includegraphics[width=0.78\textwidth]{fig_gate2_headey_tau.png}
+\end{center}
+
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lccc}
+\toprule
+Player & calm on & shock on & first step / min $S/S^{\mathrm{calm}}$ \\
+\midrule
+Russia & $0/24$ & $12/24$ & step 12 / $0.45$ \\
+Kazakhstan & $0/24$ & $6/24$ & step 13 / $0.76$ \\
+\bottomrule
+\end{tabular}
+
+Russia shipments $3.27\to 3.25$~MMT. Nested year BR: calm $\tau^\star=0$,
+shock $\tau^\star=0.6$.
+\end{frame}
+
+\begin{frame}{The cascade is harvest diversion, not ban-on-ban}
+\divbanner{a sequential IBR reading}{GATE2\_PLAN.md; verify\_claims.py}
+
+Kazakhstan's \textbf{open-path} trough is already $0.757<0.85$ \emph{before}
+any Russian $\tau$ is applied. With Russia's cuts on, Kazakhstan's trough
+\emph{rises} to $0.807$.
+
+The neighbour fires because Russia's missing harvest diverted import
+pressure onto a leaner stock path at Kazakhstan, not because Kazakhstan
+best-responded to Russia's ban. Ukraine's open min ratio is $0.86$ (does
+not fire). That is Headey's cascade in miniature, and it is also a
+disclosure: this beta is not ban-on-ban contagion.
+\bubbles{No extra contagion parameter. The ratio is sufficient.}
+{Ratio dimensionless.}
+{\texttt{verify\_claims.py} section 11; \texttt{gate2\_beta\_report.md}.}
+\end{frame}
+
+\begin{frame}{Roles on the map}
+\begin{center}
+\includegraphics[width=0.78\textwidth]{fig_gate2_map_roles.png}
+\end{center}
+{\scriptsize Who plays, who is shocked, who is on the market and silent.
+Not a 2008 who-restricted map.}
+\end{frame}
+
+\begin{frame}{Nested-year BR is a diagnostic, not the crisis object}
+\leftoverbanner{welfare() year-mean stock vs s\_gov}{dynamic\_policy.py:87--117}
+
+\[
+\mathcal{W}
+= \underbrace{\sum_{t\in y} p_t X_{i,t}}_{\text{export revenue}}
+- \alpha \bigl(\max(0, s^{\mathrm{gov}}-\bar S_{i,y})\bigr)^2.
+\]
+
+$s^{\mathrm{gov}}=\mathtt{gov\_stu}\times C_i^{\mathrm{ann}}=18.13$~MMT for
+Russia vs Gate~0 competitive safety $7.55$~MMT. World $p$ does not enter
+the penalty. Grid $\{0,0.3,0.6,0.9\}$; shock BR interior at $0.6$.
+
+This nested BR is how $\tau^{\mathrm{on}}$ was locked. The live action
+rule is the Headey gate, not this annual loop.
+\bubbles{$\alpha=12$, \texttt{gov\_stu}=0.48: illustrative.}
+{Revenue: (\$/t)$\times$MMT. Penalty: same units after $\alpha$.}
+{\texttt{grid\_best\_response}; \texttt{gate2\_beta\_score.csv}.}
+\end{frame}
+
+\begin{frame}{What Gate 2 beta does not claim}
+\begin{itemize}
+\item Not who banned in 2008 or 2010.
+\item Not sequential fortnight Nash.
+\item Not importer scramble or Japan-style reserve announcements.
+\item Not a split domestic vs export price.
+\item Not a retune of CropParams or $\sigma$.
+\item Ukraine harvest does not cascade onto Russia (Russia is too fat);
+      Kazakhstan was locked as the neighbour for that reason. Disclosed.
+\end{itemize}
+\end{frame}

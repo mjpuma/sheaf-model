@@ -1,0 +1,203 @@
+\section{Demand, lean cover, offers}
+
+\begin{frame}{Flex vs industrial use}
+\matchbanner{README \S8 $C^{\mathrm{flex}}, C^{\mathrm{ind}}$}{dynamic\_crop.\_demand\_blocks}
+
+\[
+C_{i,y} = C^{\mathrm{flex}}_{i,y} + C^{\mathrm{ind}}_{i,y}.
+\]
+
+Industrial (inelastic) is empty except USA maize:
+
+\[
+C^{\mathrm{ind}}_{\mathrm{USA,y}}
+= \min\Bigl(C_{\mathrm{USA,y}},\;
+\max\bigl(0,\; \mathrm{FSI}_{\mathrm{USA,y}}
+- \overline{\mathrm{FSI}}_{\mathrm{USA},2000\text{--}04}\bigr)\Bigr).
+\]
+
+That residual is the RFS-era FSI surge (77 MMT in 2005 $\to$ 163 MMT in
+2010; feed fell). Wheat FSI is flat; rice has no FSI attribute in PSD.
+China FSI is not treated as ethanol.
+\bubbles{\texttt{industrial\_nodes=("USA",)} for maize only. Structural identification, not gallons.}
+{MMT / year, then $/24$ to MMT/step.}
+{USDA PSD use-split \texttt{psd\_grains\_use\_split.csv} (Feed + FSI).
+\texttt{ind\_base\_years=(2000,2004)}.}
+\end{frame}
+
+\begin{frame}{Isoelastic food/feed demand}
+\matchbanner{README \S8 $d_{i,t}$}{dynamic\_crop.py:579--581}
+
+\[
+d_{i,t}
+= C^{\mathrm{flex}}_{i,t}\,\Bigl(\frac{p_t}{p_0}\Bigr)^{\varepsilon}
++ C^{\mathrm{ind}}_{i,t}.
+\]
+
+Own-price $\varepsilon<0$ from \texttt{CropParams.elast}: wheat $-0.15$,
+rice $-0.20$, maize $-0.25$. Industrial does not respond to $p_t$.
+There is \textbf{one} world $p_t$ per crop, not a domestic CPI.
+\bubbles{$\varepsilon$ literature-scale, locked. Not estimated on 2008.}
+{$d$: MMT/step. $p$: real 2010 \$/t. $\varepsilon$: dimensionless.}
+{\texttt{default\_crop\_params}. GATE0\_PARAMETERIZATION table, class
+``literature''.}
+\end{frame}
+
+\begin{frame}{Official P1 demand flags}
+Official matched split is \textbf{mean flex} + industrial on + harvest
+$\pm$ AMIS:
+
+\begin{center}
+\texttt{use\_demand=False}, \quad
+\texttt{use\_industrial=True} (maize), \quad
+\texttt{use\_shocks=True}, \quad
+\texttt{use\_amis=True}.
+\end{center}
+
+Twin demand is mean flex, $C^{\mathrm{ind}}=0$, $\tau\equiv 0$, seasonal
+$H$. Year-by-year food/feed (\texttt{use\_demand=True}) is a sensitivity,
+not the headline series. Gate~1 \texttt{run\_coupled\_dynamics} defaults
+to the same official flags.
+\bubbles{These flags are the P1 scoring protocol, not hidden knobs.}
+{Same units as $C$.}
+{\texttt{PAPER\_STACK.md} official split; \texttt{prepare\_crop\_run}.}
+\end{frame}
+
+\begin{frame}{Lean gap --- README and code disagree on the window}
+\divbanner{README \S8: $L=\max(0,\sum_{k=1}^{h_t} C - \sum_{k=1}^{h_t} H^{\mathrm{exp}})$}
+{dynamic\_crop.py:585--588}
+
+Code (and the comment at line 584) includes the \textbf{current} step:
+
+\[
+L_{i,t}^{\mathrm{code}}
+= \max\bigl(0,\;
+C^{\mathrm{ahead}}_{i,t}+C_{i,t}
+- H^{\mathrm{ahead}}_{i,t}-H^{\mathrm{exp}}_{i,t}\bigr).
+\]
+
+That is $\sum_{k=0}^{h_t}$, not $\sum_{k=1}^{h_t}$.
+\texttt{rolling\_ahead} sums $t+1,\ldots,t+h_t$; adding $C_t$ and
+$H^{\mathrm{exp}}_t$ brings in $k=0$.
+
+On 2006--07 wheat, $\max|L^{\mathrm{code}}-L^{\mathrm{README}}|=15.47$~MMT
+($15.9\%$ of $\max L$). The \textbf{code} is internally consistent with
+its comment. The README equation is missing the current step.
+\bubbles{$L$ is a state. $\lambda$ (next slide) is the only reduced-form speed.}
+{MMT of cover through the horizon.}
+{Implementation: \texttt{dynamic\_crop.py:585--588}. Claim: README \S8.}
+\end{frame}
+
+\begin{frame}{Target stock}
+\matchbanner{README \S8 $T_{i,t}=L_{i,t}+s_i$}{dynamic\_crop.py:589}
+
+\[
+s_i = \mathtt{stu\_target}\cdot C_i^{\mathrm{ann}},
+\qquad
+T_{i,t} = L_{i,t} + s_i.
+\]
+
+\texttt{stu\_target}: wheat $0.20$, maize $0.16$, rice $0.18$ (literature,
+USDA world STU order $0.15$--$0.25$). This is \textbf{competitive safety},
+not the Gate~2 government buffer.
+\bubbles{\texttt{stu\_target} literature, locked. One world STU per crop ---
+country commercial carry is therefore sold down. Disclosed leftover.}
+{$s$, $T$: MMT.}
+{\texttt{CropParams.stu\_target}; \texttt{prepare\_crop\_run:746}.}
+\end{frame}
+
+\begin{frame}{Purchase demand}
+\matchbanner{README \S8 $D_{i,t}$}{dynamic\_crop.py:591--595}
+
+\[
+D_{i,t}
+= \underbrace{\max(0,\, d_{i,t}-\mathrm{avail}_{i,t})}_{\text{food gap}}
++ \lambda \max\bigl(0,\, T_{i,t}-\max(0,\mathrm{avail}_{i,t}-d_{i,t})\bigr).
+\]
+
+$\mathrm{avail}_{i,t}=S_{i,t}+H_{i,t}$. $\lambda=\mathtt{rebuild\_lambda}=0.08$
+on all three crops (reduced-form partial adjustment, $\approx 12\%$/month
+toward the lean target). Not a storage Euler equation.
+\bubbles{$\lambda=0.08$ reduced-form, shared, locked. Not fit per crisis.}
+{$D$: MMT/step of import demand (food gap + rebuild).}
+{\texttt{dynamic\_crop.py:591--595}; \texttt{CropParams.rebuild\_lambda}.}
+\end{frame}
+
+\begin{frame}{Export offers}
+\matchbanner{README \S8 $O_{i,t}$}{dynamic\_crop.py:596}
+
+\[
+O_{i,t}
+= \max\bigl(0,\, \mathrm{avail}_{i,t}-d_{i,t}-T_{i,t}\bigr)\,(1-\tau_{i,t}).
+\]
+
+AMIS (Gate~0) or Headey $\tau_t$ (Gate~2) multiplies \textbf{offers}, not
+cleared shipments. Shipments are then demand-constrained by the Armington
+clear --- that is why Russia Aug--Dec 2010 offers go to $\times 0.11$ while
+ships only go to $\times 0.79$.
+\bubbles{$\tau$ is the policy instrument. Offers, not a tax in the $K$ of \S2.}
+{$O$: MMT/step. $\tau$: dimensionless.}
+{\texttt{dynamic\_crop.py:596}; AMIS map or \texttt{dynamic\_policy}.}
+\end{frame}
+
+\begin{frame}{Carry capacity $W$ --- README matches code; a diagnostics note does not}
+\divbanner{GATE0\_PARAMETERIZATION \S2.3 displayed equation}{dynamic\_crop.py:614--618}
+
+Code and README \S8:
+
+\[
+W_{i,t}
+= \mathtt{max\_stu}\, C_i^{\mathrm{ann}}
++ \mathtt{pipeline\_max\_steps}\cdot C_i^{\mathrm{ann}}/24
++ \mathbf{1}_{\{\mathrm{pipeline}>0\}} H_{i,t}.
+\]
+
+\texttt{GATE0\_PARAMETERIZATION.md} \S2.3 still displays
+$\max(\mathtt{max\_stu}\,C,\,1.5 s)+ \cdots + H_{i,t}$ (always adding
+harvest, and a $1.5s$ floor). The \emph{prose} of that same subsection
+already retracts both. Rice $\mathtt{pipeline}=0$ so monsoon $H_t$ is
+\textbf{not} padded into $W$ (else it is stored as silos).
+
+Worked: India rice, code $W=19.07$~MMT vs the stale displayed equation
+$27.90$~MMT.
+\bubbles{\texttt{max\_stu} literature; \texttt{pipeline\_max\_steps} structural
+(12 wheat/maize $=6$ months; 0 rice).}
+{$W$: MMT.}
+{README \S8 and \texttt{dynamic\_crop.py:614--618} match. Diagnostics note
+equation is stale.}
+\end{frame}
+
+\begin{frame}{Soft warehouse clip and stock update}
+\matchbanner{README \S8 warehouse\_lambda}{dynamic\_crop.py:607--623}
+
+\[
+C^{\mathrm{used}}_{i,t}
+= \min\bigl(d_{i,t},\, \max(0, \mathrm{avail}-O^{\mathrm{shipped}}+ \mathrm{received})\bigr),
+\]
+\[
+S_{i,t+1}
+= \max(0, \mathrm{avail}-O^{\mathrm{shipped}}-C^{\mathrm{used}}+\mathrm{received})
+- \lambda_W \max(0, S-W).
+\]
+
+$\lambda_W=\mathtt{warehouse\_lambda}=0.08$ (defaults to rebuild $\lambda$).
+A one-step hard clip incinerated $\sim 10\%$ of wheat/maize harvest and
+starved lean-season offers. Soft clip leaves $W$ as an attractor.
+\bubbles{$\lambda_W$ reduced-form, locked to $\lambda$.}
+{$S$: MMT of stocks at end of step.}
+{\texttt{dynamic\_crop.py:607--623}.}
+\end{frame}
+
+\begin{frame}{Opening stocks}
+Opening $S_{i,0}$ is PSD ending stocks in \texttt{stock\_seed\_year} (default
+2005), clipped to $\max(\mathtt{max\_stu}\,C,\, 1.5 s)$, then optionally
+spun up for \texttt{spin\_up\_years=2} on climatology harvest, mean flex,
+no industrial, no AMIS.
+
+The spin-up is a numerical convenience so 2006 does not start from a raw
+MY-end snapshot. The twin is then simulated from that same spun stock.
+\bubbles{\texttt{spin\_up\_years=2} structural protocol.}
+{MMT.}
+{\texttt{prepare\_crop\_run:759--784}. PSD ending stocks via
+\texttt{\_ending\_stocks}.}
+\end{frame}

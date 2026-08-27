@@ -1,0 +1,145 @@
+\section{Gate 1 --- isoelastic substitution}
+
+\begin{frame}{Dual demand host --- do not graft $M_i$ onto the spine}
+\matchbanner{GATE1\_PLAN.md: Gate 1 is not README \S1}{dynamic\_coupled.cross\_price\_eta}
+
+README \S1 is a linear Slutsky system $D_i=a_i-M_i p_i$ on the
+\textbf{annual leftover}. Gate~1 does not use it.
+
+Gate~1 multiplies Gate~0 flex demand by a Jacobi factor from all three
+world prices. Industrial/ethanol still does not substitute. CropParams
+stay locked. $\sigma\in\{0,0.3,0.6\}$ is a pre-declared band, not an
+estimate. There is no $\sigma^\star$.
+\bubbles{$\sigma$ is the only new scale. $RHO$ stays the illustrative matrix in \texttt{calibration.py}.}
+{$\sigma$ dimensionless. $\eta_{gh}$ dimensionless (elasticities).}
+{\texttt{sheaf/dynamic\_coupled.py}; \texttt{diagnostics/GATE1\_PLAN.md}.}
+\end{frame}
+
+\begin{frame}{Cross-price exponents}
+\matchbanner{GATE1 math / code\_map}{dynamic\_coupled.py:30--54}
+
+\[
+\eta_{gg} = \varepsilon_g
+\quad\text{(from \texttt{CropParams.elast})},
+\qquad
+\eta_{gh} = \sigma\,\rho_{gh}\,|\varepsilon_g|
+\quad (g\neq h).
+\]
+
+\texttt{RHO} (wheat, rice, maize):
+
+\[
+\rho =
+\begin{pmatrix}
+0 & 0.30 & 0.40 \\
+0.30 & 0 & 0.20 \\
+0.40 & 0.20 & 0
+\end{pmatrix}.
+\]
+
+Wheat$\leftrightarrow$maize is the strongest pair (feed). Own $\varepsilon$
+are Gate~0's, not \texttt{calibration.OWN\_ELAST} (those are $-0.25,-0.20,-0.30$
+on the leftover host --- a second documented split).
+\bubbles{$\rho_{gh}$ illustrative, frozen. $\sigma$ band $\{0,0.3,0.6\}$.}
+{Dimensionless.}
+{\texttt{calibration.RHO}; \texttt{cross\_price\_eta}. Verified matrix at $\sigma=0.6$:
+next slide.}
+\end{frame}
+
+\begin{frame}{Worked $\eta$ at the reported band}
+\matchbanner{cross\_price\_eta vs GATE1 whitepaper table}{verify\_claims.py check\_eta}
+
+At $\sigma=0.6$ (rows/cols: wheat, rice, maize):
+
+\[
+\eta =
+\begin{pmatrix}
+-0.150 & +0.027 & +0.036 \\
++0.036 & -0.200 & +0.024 \\
++0.060 & +0.030 & -0.250
+\end{pmatrix}.
+\]
+
+At $\sigma=0$, off-diagonals are exactly 0 (verified). Flex demand then
+collapses to Gate~0's $(p/p_0)^{\varepsilon}$.
+\bubbles{No extra parameter beyond $\sigma$ and frozen $\rho$.}
+{Each $\eta_{gh}$ is an elasticity (dimensionless).}
+{Reproduced by \texttt{cross\_price\_eta(0.6)}. Own diagonal = CropParams, not OWN\_ELAST.}
+\end{frame}
+
+\begin{frame}{Jacobi step}
+\matchbanner{dynamic\_coupled.\_simulate\_coupled docstring}{dynamic\_coupled.py:112--217}
+
+Each step $t$:
+
+\begin{enumerate}
+\item $\mathrm{fac} = \exp(\eta \log(p/p_0))$ for the three world prices
+      (all three from the \emph{start} of the step).
+\item Each crop runs the Gate~0 market with
+      $d^g = C^{\mathrm{flex},g}\cdot\mathrm{fac}_g + C^{\mathrm{ind},g}$.
+\item Each crop updates its own $p^g$ exactly as Gate~0.
+\end{enumerate}
+
+Networks, AMIS, harvest, warehouses, asks remain per-crop. Coupling is
+\textbf{only} through flex demand. Jacobi, not Gauss--Seidel: within a
+step, rice does not see the already-updated wheat price.
+\bubbles{Jacobi is a numerical protocol, not a parameter.}
+{fac dimensionless; $p$ real 2010 \$/t.}
+{\texttt{dynamic\_coupled.py:113--114, 121}.}
+\end{frame}
+
+\begin{frame}{Identity: $\sigma=0$ recovers Gate~0}
+\matchbanner{README \S6 spirit; GATE1 hard bar 1}{dynamic\_coupled.assert\_subst0\_matches\_gate0}
+
+Coupled $\sigma=0$ monthly prices vs three independent
+\texttt{run\_crop\_dynamics} paths:
+
+\[
+\max \frac{|p^{\mathrm{coupled}}-p^{\mathrm{solo}}|}{\max(|p^{\mathrm{solo}}|,1)}
+= 5.7\times 10^{-16}
+\]
+
+across wheat, rice, maize (bar is $0.5\%$). This is the Gate~1 analogue of
+README \S6's proposition, on the \textbf{live} host, not on the annual QP.
+\bubbles{No parameter. This is an identity assert.}
+{Relative price error, dimensionless.}
+{\texttt{verify\_claims.py} section 10; \texttt{assert\_subst0\_matches\_gate0}.}
+\end{frame}
+
+\begin{frame}{Gate 1 locked band --- prices}
+\begin{center}
+\includegraphics[width=0.72\textwidth]{fig_gate1_substitution.png}
+\end{center}
+{\scriptsize \texttt{diagnostics/gate1\_report.md}. Official split.}
+
+Spillover sign 2007/08 vs $\sigma=0$: rice $\times 1.018$ / $\times 1.039$,
+maize $\times 1.042$ / $\times 1.085$ at $\sigma=0.3$ / $0.6$ --- PASS.
+Wheat stays restriction-led in 2008 and production-led in 2010 at every
+reported $\sigma$. Isolated rice AMIS still carries $\sim 97$--$104\%$ of
+the 2008 rice hike.
+\end{frame}
+
+\begin{frame}{Soft leftover: maize 2010 at $\sigma=0.6$}
+\begin{center}
+\includegraphics[width=0.70\textwidth]{fig_gate1_e5_maize.png}
+\end{center}
+
+Maize 2010 hike $\times 1.70\to\times 1.15$ at $\sigma=0.6$ (obs $\times 1.44$).
+E5: zeroing $\rho_{\mathrm{wm}}$ restores $87\%$; freezing the rice path
+restores $2\%$. This is a higher 2009 base after the 2008 wheat--maize
+spillover, not a lower 2011 peak. Do not pick $\sigma^\star$ on this bar.
+\end{frame}
+
+\begin{frame}{What Gate 1 does not claim}
+\begin{itemize}
+\item It does not estimate $\sigma$.
+\item It does not turn on the export game.
+\item It does not fix Gate~0 consumption leftovers.
+\item It does not produce a spatial substitution fingerprint at the
+      country level that looks like Agrimate's cross-region plots ---
+      there is one world price, so $\Delta C$ from substitution is nearly
+      uniform in $p$.
+\item 2022 rice drifts the wrong way ($\times 0.99\to\times 1.18$ vs obs
+      $\times 0.91$). Disclosed. Not a retune target.
+\end{itemize}
+\end{frame}
