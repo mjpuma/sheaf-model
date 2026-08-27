@@ -119,11 +119,12 @@ def test_gov_buffer_is_not_gate0_safety(prep, knobs):
 
 def test_headey_calm_is_open(prep, knobs, headey_calm):
     _res, cuts, meta = headey_calm
-    i = prep.countries.index(knobs.exporter)
     sl = year_slice(prep, knobs.shock_year)
-    assert float(cuts[i, sl].max()) == 0.0
-    assert meta["n_year"] == 0
-    assert np.allclose(cuts[i], 0.0)
+    for name in knobs.players:
+        i = prep.countries.index(name)
+        assert float(cuts[i, sl].max()) == 0.0
+        assert meta["by_player"][name]["n_year"] == 0
+        assert np.allclose(cuts[i], 0.0)
 
 
 def test_headey_shock_turns_on_inside_the_year(prep, knobs, headey_shock):
@@ -141,3 +142,46 @@ def test_headey_shock_turns_on_inside_the_year(prep, knobs, headey_shock):
 def test_headey_cuts_shock_shipments(headey_shock):
     _res, _cuts, meta = headey_shock
     assert meta["closed_exports"] < meta["open_exports"]
+
+
+def test_cascade_kazakhstan_fires_without_own_harvest(prep, knobs, shock_harvest,
+                                                      headey_shock):
+    """Neighbor restricts after Russia's harvest fails; own H is climatology."""
+    assert "Kazakhstan" in knobs.players
+    i_kz = prep.countries.index("Kazakhstan")
+    sl = year_slice(prep, knobs.shock_year)
+    assert np.allclose(shock_harvest[i_kz], prep.H[i_kz])
+    _res, cuts, meta = headey_shock
+    kz = meta["by_player"]["Kazakhstan"]
+    ru = meta["by_player"]["Russia"]
+    assert kz["n_year"] > 0
+    assert ru["n_year"] > 0
+    assert float(cuts[i_kz, sl].max()) == knobs.tau_on
+
+
+def test_cascade_kazakhstan_lags_or_ties_russia(headey_shock):
+    ru = headey_shock[2]["by_player"]["Russia"]
+    kz = headey_shock[2]["by_player"]["Kazakhstan"]
+    assert ru["first_on"] is not None
+    assert kz["first_on"] is not None
+    assert kz["first_on"] >= ru["first_on"]
+
+
+def test_ukraine_is_not_a_player(prep, knobs, headey_shock):
+    """Ukraine absorbs diverted demand but does not play (ratio stays above r)."""
+    assert "Ukraine" not in knobs.players
+    i = prep.countries.index("Ukraine")
+    _res, cuts, _meta = headey_shock
+    assert np.allclose(cuts[i], 0.0)
+
+
+def test_kazakhstan_fires_even_if_russia_does_not_play(prep, knobs, shock_harvest):
+    """Open-path diversion: KZ fires with Russia off the player list."""
+    solo = PolicyKnobs(players=("Kazakhstan",), exporter=knobs.exporter)
+    _, cuts, meta = simulate_headey(prep, shock_harvest, solo)
+    i_kz = prep.countries.index("Kazakhstan")
+    i_ru = prep.countries.index("Russia")
+    sl = year_slice(prep, knobs.shock_year)
+    assert meta["by_player"]["Kazakhstan"]["n_year"] > 0
+    assert float(cuts[i_kz, sl].max()) == knobs.tau_on
+    assert np.allclose(cuts[i_ru], 0.0)

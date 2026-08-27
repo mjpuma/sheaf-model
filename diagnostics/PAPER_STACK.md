@@ -11,7 +11,7 @@ What actually exists as writeups:
 |---|---|---|
 | Gate 0 (`overleaf/gate0_whitepaper/`) | Can the 24-step market, substitution off and AMIS prescribed, hindcast crisis prices? | **Accepted.** |
 | Gate 1 (`overleaf/gate1_whitepaper/`) | Does turning substitution on spill in the right direction without breaking Gate 0? | **Draft written.** Claim frozen. Do not pick σ*. |
-| Gate 2 beta (`diagnostics/GATE2_PLAN.md`) | Can one exporter, on that same spine, cut inside the year when a harvest fails and stay open in climatology? | **Mechanism check.** Illustrative types. Not a 2008 score. Clock: `diagnostics/GAME_CLOCK.md`. |
+| Gate 2 beta (`diagnostics/GATE2_PLAN.md`) | Can two exporters, sharing a type, stay open in climatology, and can a harvest failure at one produce a cut at the neighbor who did not lose harvest? | **Mechanism check.** Illustrative types. Harvest diversion, not ban-on-ban IBR. Not a 2008 score. Clock: `diagnostics/GAME_CLOCK.md`. |
 
 Everything else below is a **question**, not a manuscript name. Any of
 them might end up as a section, an appendix, a later note, or never.
@@ -20,7 +20,7 @@ them might end up as a section, an appendix, a later note, or never.
 
 | Question | What it is | What it is not |
 |---|---|---|
-| **Who restricts, and when?** | Positive game on the 24-step spine (Headey 2011): types slow, actions `τ_t`. Train on one window, score another — if we ever estimate. | Not an annual Nash in `core.py`. Not “write paper P4.” The beta is a one-player mechanism check only. |
+| **Who restricts, and when?** | Positive game on the 24-step spine (Headey 2011): types slow, actions `τ_t`. Train on one window, score another — if we ever estimate. | Not an annual Nash in `core.py`. Not “write paper P4.” The beta is a two-player mechanism check (harvest diversion), not that score. |
 | **Just enough / club of the willing?** | A *normative* variant of the same layer: restrict for domestic food security while limiting importer harm; what if only some join. | Not a separate model. Same host, different objective. Later, if ever. |
 | **Cooperation vs protectionism / tipping?** | Comparative statics on types (food-security vs cooperation weights). | Not a third paper by default. Still sub-annual actions. |
 | **Does the network emerge?** | Trade shares from costs and prices instead of FAOSTAT E0. | Optional. Gate 0 **prescribes** Armington on E0; say so. Not required for the hindcast or the game. |
@@ -40,18 +40,14 @@ change CropParams or σ.
 
 ## What is next
 
-Not “start P4” or “start P5.” Those labels were the confusion.
+The two-player cascade is in (`sheaf/dynamic_policy.py`: Russia harvest
+shock, Kazakhstan neighbor, same types). Still synthetic, still not a
+2008 score.
 
-**Next model step:** more than one government on the Headey clock. The
-one-player beta cannot produce a cascade (Ukraine’s cut spilling onto
-Russia; Thai exports absorbing diverted demand; a stock *announcement*
-substituting for a ban). Still synthetic, still not a 2008/10 score,
-still on `sheaf/dynamic_crop.py`. Importer procurement is the same
-layer, not a new product.
-
-**Next writing step, if any:** zip and upload the two notes that exist
-(Gate 0, Gate 1). Do not invent a third title for the beta until the
-cascade exists.
+Further on this layer, if anything: an importer-side scramble, or a
+stock *announcement* that can substitute for a cut. Those are Headey
+too. They are not a new manuscript name. Zip-and-upload of the Gate 0
+and Gate 1 notes is the writing next step, if any.
 
 ## Gate 0 official split (scoring)
 

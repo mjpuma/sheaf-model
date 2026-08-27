@@ -23,8 +23,10 @@ this clock note as a new hindcast or substitution experiment.
 (`python3 scripts/score_gate2_beta.py`). Official Gate 0 / Gate 1 paths remain
 `use_amis=True` and do not call `sheaf/dynamic_policy.py`.
 
-**Next:** more than one government on this clock (cascade). Still
-synthetic. Still not a 2008 score. Not a new paper title.
+**Cascade (in):** Russia harvest ×0.50, Kazakhstan neighbor, same types.
+Harvest diversion, not ban-on-ban IBR. Still synthetic. Still not a
+2008 score. Not a new paper title. Further on this layer, if anything:
+an importer scramble or a stock *announcement*.
 
 ## Two timescales
 
@@ -74,10 +76,12 @@ crisis game do not.
   grid BR is a **nested mechanism check** (one intensity for a shock
   year). The Headey object is a **state-contingent** `τ_{i,t}` that can
   turn on and off inside the year.
-- **Not yet:** multi-country Nash, importer procurement, Japan-style
-  reserve *announcements*, club-of-the-willing / tipping variants.
-  Headey has the cascade; the beta is one player. That cascade is the
-  next model step, not a new manuscript.
+- **Two players (in):** Russia (harvest shock) and Kazakhstan (neighbor,
+  no own harvest cut), same types. The cascade is harvest diversion
+  onto the leaner neighbor, not sequential ban-on-ban IBR. Ukraine is
+  on the market but does not play (too fat to fire). **Not yet:**
+  multi-country Nash, importer procurement, Japan-style reserve
+  *announcements*, club-of-the-willing / tipping variants.
 
 ## Trigger that does not fight the harvest calendar
 
@@ -96,10 +100,12 @@ fixed; the path of `τ_t` moves.
 
 ## Hard bars (beta)
 
-1. Climatology harvest ⇒ `τ_t = 0` every step (ratio ≡ 1).
-2. Synthetic harvest cut ⇒ `τ_t > 0` on some steps.
-3. Those cuts reduce that exporter’s shipments vs the open shock path.
-4. `run_crop_dynamics` still defaults AMIS on when this module is not
+1. Climatology harvest ⇒ `τ_t = 0` every step, every player (ratio ≡ 1).
+2. Russia harvest ×0.50 ⇒ Russia some `τ_t > 0`.
+3. Kazakhstan some `τ_t > 0` with **no** Kazakh harvest cut.
+4. Kazakhstan’s first on-step ≥ Russia’s (neighbor lags or ties).
+5. Russia’s cuts reduce Russia’s shipments vs the open shock path.
+6. `run_crop_dynamics` still defaults AMIS on when this module is not
    called.
 
 Not scored against who banned in 2008. See `diagnostics/GATE2_PLAN.md`.

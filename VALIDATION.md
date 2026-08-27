@@ -68,8 +68,9 @@ governments choose **actions** `τ_{i,t}` on that clock, and keep **types**
 (food-security weights, who plays) slow — Headey (2011), not the annual
 Nash in `sheaf/core.py`. Fit types on a declared training window, then
 score restrictors / timing / severity / prices on a **held-out** window.
-The one-player beta with labeled illustrative knobs is a mechanism check,
-not that score (`diagnostics/GAME_CLOCK.md`). Neither Agrimate (restrictions
+The two-player beta (Russia harvest, Kazakhstan neighbor) with labeled
+illustrative knobs is a mechanism check, not that score
+(`diagnostics/GAME_CLOCK.md`). Neither Agrimate (restrictions
 exogenous) nor a no-strategy model can be evaluated on the same margin.
 
 **Gate 0 and Gate 1 do not need to be re-run** to host this layer: Gate 0 is
@@ -97,8 +98,9 @@ game on the 24-step spine (“who restricted, when?”). Normative variants
 (club, tipping) are the same layer with a different objective. Do not
 re-run Gate 0 or Gate 1 to start them (`diagnostics/GAME_CLOCK.md`).
 
-**Next:** more than one government on that clock — still a mechanism
-check, not a 2008 score, not a new title.
+**Cascade (in):** two governments on that clock, harvest diversion, still
+a mechanism check, not a 2008 score, not a new title. Further, if
+anything: importer scramble or stock announcement.
 
 ## Data alignment
 

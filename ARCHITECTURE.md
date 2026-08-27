@@ -139,8 +139,8 @@ detailed diagnostics **before** substitution or Level 2. See
    types slow, Headey clock. Gate 0 hard bars are green; **do not re-run
    the hindcast or the substitution band** to say this
    (`diagnostics/GAME_CLOCK.md`). `sheaf/dynamic_policy.py` is a
-   one-player mechanism check; next is a second player. `core.py` IBR
-   stays a leftover.
+   two-player mechanism check (Russia harvest, Kazakhstan neighbor;
+   harvest diversion). `core.py` IBR stays a leftover.
 
 Commands:
 ```bash

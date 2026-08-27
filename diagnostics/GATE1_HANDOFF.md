@@ -16,8 +16,9 @@ Protocol twin: this file + `diagnostics/GATE1_PLAN.md`.
 **Stop** on substitution unless asked to revise that draft.
 
 If asked for the game: `diagnostics/GAME_CLOCK.md` then
-`diagnostics/GATE2_PLAN.md`. Next model step is **more than one
-government** on that clock (cascade), still not a 2008 score.
+`diagnostics/GATE2_PLAN.md`. Two-player cascade is **in** (Russia
+harvest, Kazakhstan neighbor). Still not a 2008 score. Further, if
+anything: importer scramble or stock announcement — not a new title.
 
 The writeup is `overleaf/gate1_whitepaper/`. Frozen claim still lives in
 `overleaf/gate1_substitution/sections/claim.tex` (unchanged). Optional
@@ -39,8 +40,9 @@ cd overleaf && zip -r gate1_whitepaper.zip gate1_whitepaper -x "*.DS_Store"
 - Start a “club” or “tipping” writeup, or an endogenous-network paper.
   The game beta is a mechanism check (`diagnostics/GATE2_PLAN.md`); do
   not turn it into a 2008/10 score. Do not re-run Gate 0 or Gate 1
-  (`GAME_CLOCK.md`). Next model step, if asked, is a **second player**
-  on the Headey clock — still not a new manuscript name.
+  (`GAME_CLOCK.md`). Two-player cascade is in. Further on this layer, if
+  asked: importer scramble or stock announcement — still not a new
+  manuscript name.
 - Graft annual Slutsky `M_i` / `OWN_ELAST` into the 24-step spine
 - Commit `assets/SHEAF_model_walkthrough.pptx`
 - Push unless asked

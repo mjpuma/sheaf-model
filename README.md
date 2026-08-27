@@ -66,7 +66,9 @@ SHEAF has two related formulations. **Crisis work uses (2).**
    **LOWESS anomaly**. Gate 1 puts isoelastic substitution on this spine.
    Gate 2 puts **state-contingent** export cuts on this spine
    (`sheaf/dynamic_policy.py`): types are slow, actions `τ_t` respond to
-   conditions (Headey 2011). Clock lock: `diagnostics/GAME_CLOCK.md`.
+   conditions (Headey 2011). Two players share a type (Russia harvest
+   shock, Kazakhstan neighbor); the cascade is harvest diversion, not
+   ban-on-ban IBR. Clock lock: `diagnostics/GAME_CLOCK.md`.
 
    Run wheat, maize, and rice **separately** first
    (`scripts/score_subannual_crop.py --crop …`). Those official P1

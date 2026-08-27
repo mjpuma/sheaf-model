@@ -12,18 +12,17 @@ not re-run.**
 
 ## Question
 
-Can one exporter, facing the locked Gate 0 market, choose a
-**state-contingent** export cut `τ_t` such that a harvest shortfall at
-home produces restrictions *inside the year*, and a calm harvest does
-not?
+Can **two** exporters, sharing the same slow type, choose state-contingent
+`τ_t` so that a harvest shortfall at one of them produces a restriction
+at the **neighbor who did not lose harvest**, while climatology keeps
+both open?
 
-That is a mechanism check. It is **not** “who banned in 2008/10.” The
-knobs are illustrative on purpose.
+That is Headey’s cascade in miniature (pressure on remaining Black Sea
+exporters). It is **not** “who banned in 2008/10.” Knobs stay
+illustrative.
 
-A nested year-open-loop grid BR (one intensity for all 24 fortnights of
-the shock year) remains as a diagnostic: it asks what single τ they
-would pick if they had to. It is not Headey’s object. Headey’s object
-has dates.
+One-player nested year-open-loop grid BR remains as a diagnostic on the
+shocked exporter.
 
 ## Two timescales
 
@@ -35,13 +34,18 @@ has dates.
 
 ## What this beta is
 
-- **One player versus the market**, not Nash among several exporters.
+- **Two players, same type:** Russia (synthetic harvest ×0.50) and
+  Kazakhstan (climatology harvest). Ukraine is on the market but does
+  not play — on this host a Ukraine-only harvest cut does not lean
+  Russia enough to fire the stock-ratio gate (Russia is fat). The
+  neighbor who *does* fire is the leaner one.
 - **State-contingent** `τ_t`: two-pass (open path, then cuts). Shock
   year only. Intensity `tau_on` is a type, not re-optimized every step.
-- **Illustrative** knobs, locked after the qualitative flip.
-- Forcing is a **synthetic** harvest cut on the exporter, on top of
-  climatology. Historical 2010 Russia is not the score.
-- Nested **year-open-loop** grid BR still scored.
+- The cascade here is **harvest diversion**, not ban-on-ban IBR:
+  Kazakhstan’s stocks fall because Russia’s harvest fails and demand
+  spills, even before Russia’s `τ_t` is applied. Disclose that.
+- **Illustrative** knobs.
+- Nested **year-open-loop** grid BR still scored on Russia.
 
 ## What this beta is not
 
@@ -49,8 +53,8 @@ has dates.
 - Cooperative / “just enough” / club of the willing (same layer, different
   objective — later, if ever)
 - Tipping, importer panic procurement, or Japan-style reserve
-  *announcements* (Headey has those; we do not, yet)
-- Multi-country Nash (that is the **next model step**, still not a 2008 score)
+  *announcements* (Headey has those; we do not)
+- Sequential fortnight IBR / a proven Nash among many exporters
 - Substitution (Gate 1). Do not pick σ*
 - An AMIS hindcast. Official Gate 0 / Gate 1 scoring paths stay `use_amis=True`
 - Unpausing `sheaf/dynamic_grains.py`
@@ -99,10 +103,11 @@ intensity is what `tau_on` copies.
 | Knob | Value | Class |
 |---|---|---|
 | Crop | wheat | structural (Gate 0) |
-| Exporter | Russia | illustration |
+| Exporter (harvest shock) | Russia | illustration |
+| Players | Russia, Kazakhstan | illustration; same types |
 | Years | 2006–2008 | short window |
 | Shock year | 2007 | synthetic |
-| Harvest multiplier | 0.50 on Russia, shock year only | illustration |
+| Harvest multiplier | 0.50 on **Russia only** | illustration |
 | AMIS / LOWESS / flex | off / off / mean | identification |
 | `gov_stu` (φ) | 0.48 | illustrative type |
 | `fs_stock_weight` (α) | 12 | illustrative type |
@@ -112,11 +117,12 @@ intensity is what `tau_on` copies.
 
 ## Hard bars
 
-1. **Calm ⇒ τ_t = 0** every step (and nested year τ\* = 0).
-2. **Shock ⇒ some τ_t > 0** (and nested year τ\* > 0).
-3. **Those cuts reduce shipments** vs the open shock path.
-4. **`run_crop_dynamics` defaults unchanged** (AMIS still on when this
-   module is not called).
+1. **Calm ⇒ τ_t = 0** for every player (and nested year τ\* = 0).
+2. **Russia harvest ×0.50 ⇒ Russia some τ_t > 0.**
+3. **Kazakhstan some τ_t > 0** with **no** Kazakh harvest cut.
+4. **Kazakhstan’s first on-step ≥ Russia’s** (neighbor lags or ties).
+5. **Russia’s cuts reduce Russia’s shipments** vs the open shock path.
+6. **`run_crop_dynamics` defaults unchanged.**
 
 ## Code
 
@@ -130,4 +136,3 @@ intensity is what `tau_on` copies.
 
 Do not estimate knobs on 2008. Do not retune CropParams.
 Do not re-run Gate 0 or Gate 1 for this note.
-**Next:** a second exporter (cascade), still synthetic.

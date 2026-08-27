@@ -1,8 +1,10 @@
-"""Gate 2 beta: one exporter chooses export cuts on the Gate 0 24-step spine.
+"""Gate 2 beta: governments choose export cuts on the Gate 0 24-step spine.
 
 Types (who plays, buffer, intensity) are slow. Actions ``τ_t`` respond to
-the crisis path. Not the annual SPE game in ``sheaf/core.py`` (TWIST-era
-leftover). Headey (2011) is the clock. See diagnostics/GAME_CLOCK.md.
+the crisis path. Default players: Russia (harvest shock) and Kazakhstan
+(neighbor, no own harvest cut). Not the annual SPE game in
+``sheaf/core.py``. Headey (2011) is the clock.
+See diagnostics/GAME_CLOCK.md.
 """
 from __future__ import annotations
 
@@ -25,7 +27,8 @@ class PolicyKnobs:
     fortnight.
     """
     crop: str = "wheat"
-    exporter: str = "Russia"
+    exporter: str = "Russia"          # harvest shock + nested year BR
+    players: tuple[str, ...] = ("Russia", "Kazakhstan")
     start_year: int = 2006
     end_year: int = 2008
     shock_year: int = 2007
@@ -124,35 +127,60 @@ def prepare_beta(knobs: PolicyKnobs | None = None) -> CropPrep:
 
 def climatology_relative_cuts(prep: CropPrep, harvest: np.ndarray,
                               knobs: PolicyKnobs) -> tuple[np.ndarray, dict]:
-    """State-contingent τ_t from stocks vs a normal year at the same step.
+    """State-contingent τ_t for every player, from stocks vs a normal year.
 
     Two-pass (open path, then cuts). Does not rewrite the Gate 0 market
     loop. Restricts to the shock year. Climatology harvest ⇒ ratio ≡ 1
-    ⇒ τ_t = 0. Headey persistence (bans last months) is the on-path
-    cluster, not a second estimated knob.
+    ⇒ τ_t = 0. Players share types; only ``exporter`` gets the synthetic
+    harvest cut. A neighbor who fires did not need their own harvest
+    failure — that is the cascade (Headey: pressure on remaining
+    Black Sea exporters).
     """
-    i = exporter_index(prep, knobs.exporter)
     sl = year_slice(prep, knobs.shock_year)
     res_calm = simulate_prep(prep, harvest=prep.H)
     res_open = simulate_prep(prep, harvest=harvest)
-    s_calm = np.asarray(res_calm.stock[i], float)
-    s_open = np.asarray(res_open.stock[i], float)
-    ratio = s_open / np.maximum(s_calm, 1e-9)
-    on = np.zeros(ratio.shape[0], dtype=bool)
-    on[sl] = ratio[sl] < float(knobs.stock_ratio_trigger)
     cuts = np.array(prep.cuts, float, copy=True)
-    cuts[i] = np.maximum(cuts[i], np.where(on, float(knobs.tau_on), 0.0))
+    by_player: dict[str, dict] = {}
+    on_any = np.zeros(res_open.stock.shape[1], dtype=bool)
+    for name in knobs.players:
+        i = exporter_index(prep, name)
+        s_calm = np.asarray(res_calm.stock[i], float)
+        s_open = np.asarray(res_open.stock[i], float)
+        ratio = s_open / np.maximum(s_calm, 1e-9)
+        on = np.zeros(ratio.shape[0], dtype=bool)
+        on[sl] = ratio[sl] < float(knobs.stock_ratio_trigger)
+        cuts[i] = np.maximum(cuts[i], np.where(on, float(knobs.tau_on), 0.0))
+        on_any |= on
+        first = int(np.argmax(on[sl])) if on[sl].any() else None
+        if first is not None and not on[sl][first]:
+            first = None
+        by_player[name] = dict(
+            n_year=int(np.sum(on[sl])),
+            min_ratio=float(ratio[sl].min()),
+            mean_ratio=float(ratio[sl].mean()),
+            first_on=first,
+            open_exports=float(res_open.exports[i, sl].sum()),
+            open_mean_stock=float(s_open[sl].mean()),
+            ratio=ratio,
+            on=on,
+        )
+    # Primary-player aliases so one-player callers keep working.
+    primary = knobs.exporter if knobs.exporter in by_player else knobs.players[0]
+    p0 = by_player[primary]
     meta = dict(
-        n_on=int(on.sum()),
-        n_year=int(np.sum(on[sl])),
-        min_ratio=float(ratio[sl].min()),
-        mean_ratio=float(ratio[sl].mean()),
+        n_on=int(on_any.sum()),
+        n_year=p0["n_year"],
+        min_ratio=p0["min_ratio"],
+        mean_ratio=p0["mean_ratio"],
         tau_on=float(knobs.tau_on),
         trigger=float(knobs.stock_ratio_trigger),
-        ratio=ratio,
-        on=on,
-        open_exports=float(res_open.exports[i, sl].sum()),
-        open_mean_stock=float(s_open[sl].mean()),
+        ratio=p0["ratio"],
+        on=p0["on"],
+        open_exports=p0["open_exports"],
+        open_mean_stock=p0["open_mean_stock"],
+        by_player=by_player,
+        players=tuple(knobs.players),
+        primary=primary,
     )
     return cuts, meta
 
@@ -161,11 +189,16 @@ def simulate_headey(prep: CropPrep, harvest: np.ndarray,
                     knobs: PolicyKnobs) -> tuple[CropSimResult, np.ndarray, dict]:
     cuts, meta = climatology_relative_cuts(prep, harvest, knobs)
     res = simulate_prep(prep, cuts=cuts, harvest=harvest)
-    i = exporter_index(prep, knobs.exporter)
     sl = year_slice(prep, knobs.shock_year)
-    meta["closed_exports"] = float(res.exports[i, sl].sum())
-    meta["closed_mean_stock"] = float(res.stock[i, sl].mean())
-    meta["max_tau"] = float(cuts[i, sl].max())
+    for name, p in meta["by_player"].items():
+        i = exporter_index(prep, name)
+        p["closed_exports"] = float(res.exports[i, sl].sum())
+        p["closed_mean_stock"] = float(res.stock[i, sl].mean())
+        p["max_tau"] = float(cuts[i, sl].max())
+    primary = meta["primary"]
+    meta["closed_exports"] = meta["by_player"][primary]["closed_exports"]
+    meta["closed_mean_stock"] = meta["by_player"][primary]["closed_mean_stock"]
+    meta["max_tau"] = meta["by_player"][primary]["max_tau"]
     return res, cuts, meta
 
 

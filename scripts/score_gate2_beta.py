@@ -83,25 +83,39 @@ def main() -> None:
 
     _, cuts_calm, meta_calm = simulate_headey(prep, H_calm, knobs)
     _, cuts_shock, meta_shock = simulate_headey(prep, H_shock, knobs)
+    kz = "Kazakhstan"
+    ru_c = meta_calm["by_player"][knobs.exporter]
+    ru_s = meta_shock["by_player"][knobs.exporter]
+    kz_c = meta_calm["by_player"][kz]
+    kz_s = meta_shock["by_player"][kz]
+    i_kz = exporter_index(prep, kz)
 
     x0 = next(r["sum_exports"] for r in rows_shock if r["tau"] == 0.0)
     xstar = next(r["sum_exports"] for r in rows_shock if r["tau"] == tau_shock)
+    calm_all_off = all(
+        meta_calm["by_player"][n]["n_year"] == 0 for n in knobs.players)
     bars = [
         ("nested year: calm τ* = 0", tau_calm == 0.0),
         ("nested year: shock τ* > 0", tau_shock > 0.0),
         ("nested year: shock τ* cuts shipments vs τ=0", xstar < x0),
-        ("Headey path: calm τ_t = 0", float(cuts_calm[i, sl].max()) == 0.0),
-        ("Headey path: shock some τ_t > 0", meta_shock["max_tau"] > 0.0),
-        ("Headey path: cuts shipments vs open",
-         meta_shock["closed_exports"] < meta_shock["open_exports"]),
+        ("Headey: calm all players τ_t = 0", calm_all_off),
+        ("Headey: shock Russia some τ_t > 0", ru_s["max_tau"] > 0.0),
+        ("Headey: shock Kazakhstan some τ_t > 0 (no own harvest cut)",
+         kz_s["n_year"] > 0),
+        ("Headey: Kazakhstan lags or ties Russia",
+         kz_s["first_on"] is not None and ru_s["first_on"] is not None
+         and kz_s["first_on"] >= ru_s["first_on"]),
+        ("Headey: Russia cuts shipments vs open",
+         ru_s["closed_exports"] < ru_s["open_exports"]),
     ]
 
     print(f"knobs: {knobs}")
     print(f"s_gov = {s_gov:.3f} MMT  (φ={knobs.gov_stu:g} × C_ann)")
     print(f"nested year  calm τ* = {tau_calm:g}  shock τ* = {tau_shock:g}")
-    print(f"Headey path  calm on={meta_calm['n_year']}  "
-          f"shock on={meta_shock['n_year']}/24  "
-          f"min ratio={meta_shock['min_ratio']:.3f}")
+    print(f"Headey Russia  calm on={ru_c['n_year']}  shock on={ru_s['n_year']}/24  "
+          f"first={ru_s['first_on']}  min ratio={ru_s['min_ratio']:.3f}")
+    print(f"Headey Kazakhstan  calm on={kz_c['n_year']}  shock on={kz_s['n_year']}/24  "
+          f"first={kz_s['first_on']}  min ratio={kz_s['min_ratio']:.3f}")
     print(tab.to_string(index=False, float_format=lambda x: f"{x:.4g}"))
     for name, ok in bars:
         print(f"  [{'PASS' if ok else 'FAIL'}] {name}")
@@ -126,16 +140,18 @@ def main() -> None:
     plt.close(fig)
 
     steps = list(range(STEPS_PER_YEAR))
-    fig2, ax = plt.subplots(figsize=(8.2, 3.8))
-    ax.step(steps, cuts_calm[i, sl], where="mid", color="0.55",
-            label="calm τ_t")
+    fig2, ax = plt.subplots(figsize=(8.4, 4.0))
     ax.step(steps, cuts_shock[i, sl], where="mid", color="#c0392b",
-            label="shock τ_t")
-    ax.set_ylim(-0.05, max(knobs.tau_on, 0.9) + 0.1)
+            label=f"Russia τ_t (harvest ×{knobs.harvest_mult:g})")
+    ax.step(steps, cuts_shock[i_kz, sl], where="mid", color="#2471a3",
+            label="Kazakhstan τ_t (no harvest cut)")
+    ax.step(steps, cuts_calm[i, sl], where="mid", color="0.75",
+            ls=":", label="calm (both)")
+    ax.set_ylim(-0.05, max(knobs.tau_on, 0.9) + 0.15)
     ax.set_xlabel(f"fortnight in {knobs.shock_year}")
     ax.set_ylabel("τ_t (export cut)")
-    ax.set_title("Headey-clock actions: climatology-relative stock gate "
-                 "(not an AMIS hindcast)")
+    ax.set_title("Cascade: Russia harvest shock, both play the same type "
+                 "(not AMIS)")
     ax.legend(fontsize=8)
     fig2.tight_layout()
     fig2.savefig(FIGS / "fig_gate2_headey_tau.png", dpi=140)
@@ -146,23 +162,34 @@ def main() -> None:
     lines = [
         "# Gate 2 beta",
         "",
-        f"Exporter {knobs.exporter} wheat. Synthetic {knobs.shock_year} "
-        f"harvest ×{knobs.harvest_mult:g}. AMIS off. Illustrative types: "
+        f"Players {', '.join(knobs.players)}. Synthetic {knobs.shock_year} "
+        f"{knobs.exporter} harvest ×{knobs.harvest_mult:g}; Kazakhstan harvest "
+        f"unchanged. AMIS off. Illustrative types: "
         f"`gov_stu`={knobs.gov_stu:g}, `fs_stock_weight`="
         f"{knobs.fs_stock_weight:g}, `tau_on`={knobs.tau_on:g}, "
         f"`stock_ratio_trigger`={knobs.stock_ratio_trigger:g}. "
-        f"s_gov = {s_gov:.2f} MMT.",
+        f"s_gov (Russia) = {s_gov:.2f} MMT.",
         "",
         "Gate 0 and Gate 1 were **not** re-run. Clock: "
         "`diagnostics/GAME_CLOCK.md`.",
         "",
         "### Headey path (headline)",
         "",
-        f"- Calm fortnights on: **{meta_calm['n_year']}** / 24",
-        f"- Shock fortnights on: **{meta_shock['n_year']}** / 24 "
-        f"(min S/S_calm = {meta_shock['min_ratio']:.2f})",
-        f"- Shock shipments {meta_shock['open_exports']:.2f} → "
-        f"{meta_shock['closed_exports']:.2f} MMT",
+        f"- Russia calm on: **{ru_c['n_year']}** / 24; shock on: "
+        f"**{ru_s['n_year']}** / 24 (first step {ru_s['first_on']}, "
+        f"min S/S_calm = {ru_s['min_ratio']:.2f})",
+        f"- Kazakhstan calm on: **{kz_c['n_year']}** / 24; shock on: "
+        f"**{kz_s['n_year']}** / 24 (first step {kz_s['first_on']}, "
+        f"min S/S_calm = {kz_s['min_ratio']:.2f}) — no own harvest cut",
+        f"- Russia shipments {ru_s['open_exports']:.2f} → "
+        f"{ru_s['closed_exports']:.2f} MMT",
+        f"- Kazakhstan shipments {kz_s['open_exports']:.2f} → "
+        f"{kz_s['closed_exports']:.2f} MMT",
+        "",
+        "Cascade is **harvest diversion** (Kazakhstan’s open-path "
+        "S/S_calm already below r after Russia’s harvest fails), not "
+        "sequential ban-on-ban IBR. Ukraine is on the market but does "
+        "not play.",
         "",
         "### Nested year-open-loop BR (diagnostic)",
         "",
