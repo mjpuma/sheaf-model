@@ -86,8 +86,11 @@ This note is that prior claim (Gate~0 / paper P1). It does four things.
 A supplement maps every equation to functions in
 \texttt{sheaf/dynamic\_crop.py} (\S\ref{sec:code}). An older annual
 market-clearing program in \texttt{sheaf/core.py} (spatial price equilibrium
-plus a government export game) is the host for later papers. It is not run
-here~\citep{takayama1971,samuelson1952}.
+plus a once-per-year export game) is a leftover prototype from when the
+market itself was annual. It is not the crisis game and it is not run
+here~\citep{takayama1971,samuelson1952,headey2011}. The crisis game, when
+it is switched on, lives on this 24-step spine: types are slow, actions
+$\tau_t$ respond to conditions.
 
 \textbf{What is switched off.} Consumers cannot substitute wheat for rice
 or maize. Export cuts are a historical diary, not a choice governments
@@ -152,11 +155,18 @@ read as a test of substitution.
 
 Food-trade fragility work~\citep{puma2015} motivates looking at who buys
 from whom. Export restrictions as a way to keep domestic prices down are
-why the AMIS diary exists~\citep{headey2011,martin2012,wright2011}. A
-full spatial price equilibrium~\citep{enke1951,samuelson1952,takayama1971}
-is the annual market layer SHEAF will return to; Gate~0 instead matches
-offers to usual suppliers every fortnight, because that is the clock
-Agrimate uses.
+why the AMIS diary exists~\citep{headey2011,martin2012,wright2011}.
+Headey (2011) is also why those restrictions, import surges, and stock
+\emph{announcements} have dates rather than marketing years: India and
+Vietnam in October 2007, Thailand discussing a ban in March 2008, Japan
+allowed to re-export rice stocks in May. Characteristic government types
+can be sticky; the actions are not. The annual spatial price
+equilibrium~\citep{enke1951,samuelson1952,takayama1971} remains a
+prototype on \texttt{sheaf/core.py}. Gate~0 matches offers to usual
+suppliers every fortnight, because that is the clock Agrimate uses and
+the clock Headey's events occupy. Later papers that let governments
+\emph{choose} $\tau$ do it on this spine, not by returning to an annual
+Nash. They do not require Gate~0 to be re-run.
 
 \section{How Gate~0 differs from Agrimate}
 \label{sec:vs-agrimate}

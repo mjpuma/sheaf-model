@@ -1,13 +1,26 @@
 # Gate 2 beta
 
-Exporter Russia wheat. Synthetic 2007 harvest ×0.5. AMIS off. Illustrative `gov_stu`=0.48, `fs_stock_weight`=12. Government buffer s_gov = 18.13 MMT.
+Exporter Russia wheat. Synthetic 2007 harvest ×0.5. AMIS off. Illustrative types: `gov_stu`=0.48, `fs_stock_weight`=12, `tau_on`=0.6, `stock_ratio_trigger`=0.85. s_gov = 18.13 MMT.
+
+Gate 0 and Gate 1 were **not** re-run. Clock: `diagnostics/GAME_CLOCK.md`.
+
+### Headey path (headline)
+
+- Calm fortnights on: **0** / 24
+- Shock fortnights on: **12** / 24 (min S/S_calm = 0.45)
+- Shock shipments 3.27 → 3.25 MMT
+
+### Nested year-open-loop BR (diagnostic)
 
 - Calm τ* = **0**
 - Shock τ* = **0.6**
 
-- [PASS] calm τ* = 0
-- [PASS] shock τ* > 0
-- [PASS] shock τ* cuts shipments vs τ=0
+- [PASS] nested year: calm τ* = 0
+- [PASS] nested year: shock τ* > 0
+- [PASS] nested year: shock τ* cuts shipments vs τ=0
+- [PASS] Headey path: calm τ_t = 0
+- [PASS] Headey path: shock some τ_t > 0
+- [PASS] Headey path: cuts shipments vs open
 
 Not scored against 2008/10 AMIS. See `diagnostics/GATE2_PLAN.md`.
 
@@ -23,4 +36,4 @@ Not scored against 2008/10 AMIS. See `diagnostics/GATE2_PLAN.md`.
 | shock | 0.9 | 425.5 | 468.5 | 43.0 | 16.23 | 6.44 | 268.8 | 1.88 |
 
 Table: `diagnostics/gate2_beta_score.csv`.
-Figure: `figures/fig_gate2_beta_welfare.png`.
+Figures: `figures/fig_gate2_beta_welfare.png`, `figures/fig_gate2_headey_tau.png`.

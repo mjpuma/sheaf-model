@@ -14,6 +14,7 @@ from sheaf.dynamic_policy import (
     grid_best_response,
     prepare_beta,
     shock_year_harvest,
+    simulate_headey,
     year_slice,
 )
 
@@ -42,6 +43,16 @@ def shock_harvest(prep, knobs):
 @pytest.fixture(scope="module")
 def shock_br(prep, knobs, shock_harvest):
     return grid_best_response(prep, shock_harvest, knobs)
+
+
+@pytest.fixture(scope="module")
+def headey_calm(prep, knobs):
+    return simulate_headey(prep, prep.H, knobs)
+
+
+@pytest.fixture(scope="module")
+def headey_shock(prep, knobs, shock_harvest):
+    return simulate_headey(prep, shock_harvest, knobs)
 
 
 def test_run_crop_dynamics_still_defaults_amis_on():
@@ -104,3 +115,29 @@ def test_gov_buffer_is_not_gate0_safety(prep, knobs):
     s_gov = gov_buffer(prep, knobs)
     assert s_gov == pytest.approx(knobs.gov_stu * float(prep.C_ann[i]))
     assert s_gov > float(prep.safety[i])
+
+
+def test_headey_calm_is_open(prep, knobs, headey_calm):
+    _res, cuts, meta = headey_calm
+    i = prep.countries.index(knobs.exporter)
+    sl = year_slice(prep, knobs.shock_year)
+    assert float(cuts[i, sl].max()) == 0.0
+    assert meta["n_year"] == 0
+    assert np.allclose(cuts[i], 0.0)
+
+
+def test_headey_shock_turns_on_inside_the_year(prep, knobs, headey_shock):
+    _res, cuts, meta = headey_shock
+    i = prep.countries.index(knobs.exporter)
+    sl = year_slice(prep, knobs.shock_year)
+    assert meta["max_tau"] > 0.0
+    assert 0 < meta["n_year"] <= 24
+    assert np.allclose(cuts[i, sl][cuts[i, sl] > 0], knobs.tau_on)
+    mask = np.ones(cuts.shape[1], dtype=bool)
+    mask[sl] = False
+    assert np.allclose(cuts[i, mask], 0.0)
+
+
+def test_headey_cuts_shock_shipments(headey_shock):
+    _res, _cuts, meta = headey_shock
+    assert meta["closed_exports"] < meta["open_exports"]

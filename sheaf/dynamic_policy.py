@@ -1,7 +1,8 @@
-"""Gate 2 beta: one exporter chooses a discrete export cut on the Gate 0 spine.
+"""Gate 2 beta: one exporter chooses export cuts on the Gate 0 24-step spine.
 
-Illustrative food-security knobs. Not estimated. Not the annual SPE game
-in ``sheaf/core.py``. See diagnostics/GATE2_PLAN.md.
+Types (who plays, buffer, intensity) are slow. Actions ``τ_t`` respond to
+the crisis path. Not the annual SPE game in ``sheaf/core.py`` (TWIST-era
+leftover). Headey (2011) is the clock. See diagnostics/GAME_CLOCK.md.
 """
 from __future__ import annotations
 
@@ -15,10 +16,13 @@ from .dynamic_crop import CropPrep, CropSimResult, prepare_crop_run, simulate_pr
 
 @dataclass(frozen=True)
 class PolicyKnobs:
-    """Illustrative. Not estimated from AMIS or crisis prices.
+    """Illustrative types. Not estimated from AMIS or crisis prices.
 
-    ``gov_stu`` and ``fs_stock_weight`` were locked after the qualitative
-    calm/shock flip was visible on this host. They are not AMIS estimates.
+    ``gov_stu``, ``fs_stock_weight``, ``tau_on``, and
+    ``stock_ratio_trigger`` were locked after the qualitative calm/shock
+    flip was visible on this host. They are not AMIS estimates. Actions
+    ``τ_t`` are implied by the path; these knobs do not change every
+    fortnight.
     """
     crop: str = "wheat"
     exporter: str = "Russia"
@@ -34,6 +38,12 @@ class PolicyKnobs:
     # that shock BR stays interior (ToT); large enough that the shock path
     # carries a visible food-security penalty.
     fs_stock_weight: float = 12.0
+    # Intensity applied on fortnights the Headey gate is on. Slow type;
+    # locked from the year-open-loop nested BR (interior τ*=0.6).
+    tau_on: float = 0.6
+    # Cut when open-path S_t / climatology S_t falls below this. Absolute
+    # stock floors fire every hungry season even in calm years.
+    stock_ratio_trigger: float = 0.85
 
 
 def year_slice(prep: CropPrep, year: int) -> slice:
@@ -110,6 +120,53 @@ def prepare_beta(knobs: PolicyKnobs | None = None) -> CropPrep:
         knobs.crop, start_year=knobs.start_year, end_year=knobs.end_year,
         use_amis=False, use_shocks=False, use_demand=False,
         use_industrial=False)
+
+
+def climatology_relative_cuts(prep: CropPrep, harvest: np.ndarray,
+                              knobs: PolicyKnobs) -> tuple[np.ndarray, dict]:
+    """State-contingent τ_t from stocks vs a normal year at the same step.
+
+    Two-pass (open path, then cuts). Does not rewrite the Gate 0 market
+    loop. Restricts to the shock year. Climatology harvest ⇒ ratio ≡ 1
+    ⇒ τ_t = 0. Headey persistence (bans last months) is the on-path
+    cluster, not a second estimated knob.
+    """
+    i = exporter_index(prep, knobs.exporter)
+    sl = year_slice(prep, knobs.shock_year)
+    res_calm = simulate_prep(prep, harvest=prep.H)
+    res_open = simulate_prep(prep, harvest=harvest)
+    s_calm = np.asarray(res_calm.stock[i], float)
+    s_open = np.asarray(res_open.stock[i], float)
+    ratio = s_open / np.maximum(s_calm, 1e-9)
+    on = np.zeros(ratio.shape[0], dtype=bool)
+    on[sl] = ratio[sl] < float(knobs.stock_ratio_trigger)
+    cuts = np.array(prep.cuts, float, copy=True)
+    cuts[i] = np.maximum(cuts[i], np.where(on, float(knobs.tau_on), 0.0))
+    meta = dict(
+        n_on=int(on.sum()),
+        n_year=int(np.sum(on[sl])),
+        min_ratio=float(ratio[sl].min()),
+        mean_ratio=float(ratio[sl].mean()),
+        tau_on=float(knobs.tau_on),
+        trigger=float(knobs.stock_ratio_trigger),
+        ratio=ratio,
+        on=on,
+        open_exports=float(res_open.exports[i, sl].sum()),
+        open_mean_stock=float(s_open[sl].mean()),
+    )
+    return cuts, meta
+
+
+def simulate_headey(prep: CropPrep, harvest: np.ndarray,
+                    knobs: PolicyKnobs) -> tuple[CropSimResult, np.ndarray, dict]:
+    cuts, meta = climatology_relative_cuts(prep, harvest, knobs)
+    res = simulate_prep(prep, cuts=cuts, harvest=harvest)
+    i = exporter_index(prep, knobs.exporter)
+    sl = year_slice(prep, knobs.shock_year)
+    meta["closed_exports"] = float(res.exports[i, sl].sum())
+    meta["closed_mean_stock"] = float(res.stock[i, sl].mean())
+    meta["max_tau"] = float(cuts[i, sl].max())
+    return res, cuts, meta
 
 
 def grid_best_response(prep: CropPrep, harvest: np.ndarray,

@@ -34,20 +34,23 @@ establish that any of them diverge.
 
 SHEAF (Substitution, Heterogeneous agents, Equilibrium, And Fragility) is a
 country-level, multi-commodity, game-theoretic network model of global grain
-trade. It couples three layers each period: a spatial price equilibrium
-(concave QP, Takayama–Judge/Samuelson), a strategic export-restriction game
-among governments (iterated best response), and a storage layer (competitive
-+ government buffer stocks). Cross-commodity substitution (wheat/rice/maize
-linked on the demand side) is the model's stated distinguishing feature:
-zeroing it collapses SHEAF into G independent single-commodity models (the
-TWIST/Agrimate-style limit — see README §6).
+trade. **Crisis validation does not use the annual SPE as its heartbeat.**
+The locked crisis market is the Gate 0 24-step spine
+(`sheaf/dynamic_crop.py`). Cross-commodity substitution (Gate 1) sits on
+that spine. The crisis game is **types slow, actions `τ_t` on that same
+clock** (Headey 2011; `diagnostics/GAME_CLOCK.md`) — not an annual Nash.
+`sheaf/core.py` remains the TWIST-era annual prototype (spatial QP +
+year-IBR + storage) and the object of the original README §§1–7
+correspondence claim. Gate 0 and Gate 1 scores are not re-run because
+the game clock was stated.
 
-The full mathematical formulation is written out in
-[README.md](README.md) ("Mathematical formulation" section, §1–§7) and is
-claimed to match the implementation in `sheaf/core.py` symbol-for-symbol.
-**Whether that correspondence (README equations ↔ code) holds is a primary
-verification target** — to be established affirmatively or not, not assumed
-in either direction.
+The annual formulation is written out in [README.md](README.md)
+("Mathematical formulation" section, §§1–7) and is claimed to match
+`sheaf/core.py` symbol-for-symbol. **Whether that correspondence
+(README annual equations ↔ `core.py`) holds is a primary verification
+target for that prototype** — to be established affirmatively or not,
+not assumed in either direction. Do not treat `core.py` as the 2007/08
+game.
 
 [VALIDATION.md](VALIDATION.md) documents an intended two-level empirical
 validation plan (Level 1: reproduce Agrimate's 2007/08 and 2010/11 hindcast
@@ -85,7 +88,7 @@ single 487-line module.
 
 | Path | Role | Notes |
 |---|---|---|
-| `sheaf/core.py` | **Model core** — demand system, spatial equilibrium (QP), storage rules, export-restriction game, `SheafModel` orchestrator | The audit's center of gravity. See "Core module internals" below for a section-by-section map. |
+| `sheaf/core.py` | **Annual SPE prototype** — demand system, spatial equilibrium (QP), storage rules, year-IBR export game, `SheafModel`. Crisis heartbeat is `dynamic_crop.py`; crisis game is `dynamic_policy.py`. This file remains the audit's original center of gravity for README §§1–7. |
 | `sheaf/calibration.py` | Prototype dataset: 17 named countries + a Rest-of-World residual node, hand-entered production/consumption/elasticities | Explicitly labeled "illustrative" in its own docstring, not presented as a production calibration. `build_countries()` is the entry point. |
 | `sheaf/data_usda.py` | USDA PSD adapter: loads world-aggregate crop series, LOWESS detrending (hand-rolled, not `statsmodels`), stock-to-use ratios, crisis-forcing multipliers | Feeds production-shock forcing for hindcasts. |
 | `sheaf/data_faostat.py` | FAOSTAT bilateral trade adapter: loads E0 matrices, resolves ISO3 via a country-conversion table + hardcoded aliases, aggregates to SHEAF's node set | Network *structure* only — its module docstring explains why production/reserves are deliberately sourced elsewhere (FAOSTAT stocks are a food-balance residual). |

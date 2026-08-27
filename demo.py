@@ -1,18 +1,18 @@
 """
-demo.py -- SHEAF prototype demonstration.
+demo.py -- annual SPE prototype demonstration (not a crisis hindcast).
 
 Runs a Black Sea wheat shock (Russia -40%, Ukraine -50% wheat) through the
-three-grain model under two regimes:
+three-grain **annual** model under two regimes:
 
-    * substitution ON  -- the full SHEAF model; grain markets couple.
+    * substitution ON  -- the full annual SPE prototype; grain markets couple.
     * substitution OFF -- cross-price terms zeroed; the markets decouple into
       independent single-commodity problems (the TWIST/Agrimate-style limit).
 
-The comparison is the headline result: with substitution, a wheat shock spills
-into the rice and maize markets and the optimal wheat export restrictions change,
-because buyers can escape into another grain. Without it, the wheat shock stays
-walled off in the wheat market -- which is exactly what reviewers say is wrong
-with single-commodity strategic-trade models.
+This is ``sheaf/core.py``, one tax per year. The crisis market is the Gate 0
+24-step spine; the crisis game is types slow / actions τ_t on that spine
+(Headey 2011). See diagnostics/GAME_CLOCK.md. Crisis scores:
+``scripts/score_subannual_crop.py`` (P1) and ``scripts/score_gate1.py`` (P3)
+--- do not re-run them because this demo exists.
 
 Outputs: sheaf_results.csv and four PNG figures.
 """

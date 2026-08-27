@@ -125,7 +125,10 @@ corr wheat/rice ≳ +0.5, maize > 0; world MY-end STU on PSD (~×1.0–1.1).
 ## Explicit non-goals of Gate 0 (still out of scope)
 
 - Fitting substitution scales on joint W/R/M crises (P3).
-- Endogenous restriction Nash / IBR, cooperative club, or tipping (Level 2 / P4–P5).
+- Endogenous restriction **actions** (those belong on this 24-step spine
+  after P1, Headey clock — not a reason to re-run Gate 0). Cooperative
+  club / tipping remain P4/P5.
+- Annual SPE Nash in `sheaf/core.py` as the 2007/08 game (leftover).
 - Endogenous trade network without FAOSTAT E0 (P2).
 - Replacing Pink Sheet with Agrimate’s private series (use published Pink Sheet).
 - Crisis-specific knobs (e.g. boost κ only in 2008).

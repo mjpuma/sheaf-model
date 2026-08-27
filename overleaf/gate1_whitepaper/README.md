@@ -28,4 +28,5 @@ Copied from `overleaf/gate1_substitution/figures/` and, if the optional
 consumption diagnostic was run, from `figures/fig_gate1_consumption.png`.
 
 Do not retune `CropParams`, densify σ, unpause `sheaf/dynamic_grains.py`,
-or start the export game from this paper.
+or re-run this paper to host the export game. The crisis game is types
+slow / τ_t on the Gate 0 spine (`diagnostics/GAME_CLOCK.md`).

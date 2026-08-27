@@ -1,13 +1,21 @@
 """
 sheaf.core
 ==========
-SHEAF -- Substitution, Heterogeneous agents, Equilibrium, And Fragility.
+Annual SPE prototype — leftover from when the market itself was annual
+(TWIST). Crisis hindcasts and the crisis game do **not** use this module.
 
-A country-level, multi-commodity network model of global grain trade that couples
-a spatial price equilibrium with strategic government behaviour AND cross-commodity
-substitution. It generalises the single-commodity strategic-trade model (in the
-spirit of PIK's TWIST / Agrimate) along the dimension reviewers keep attacking:
-there is more than one grain, and buyers substitute between them.
+Gate 0 market: ``sheaf/dynamic_crop.py`` (24 steps/year).
+Gate 1 substitution: ``sheaf/dynamic_coupled.py``.
+Crisis game (types slow, actions τ_t): ``sheaf/dynamic_policy.py``.
+Clock: ``diagnostics/GAME_CLOCK.md`` (Headey 2011).
+
+What follows is still a country-level, multi-commodity network that couples
+a spatial price equilibrium with strategic government behaviour AND
+cross-commodity substitution. It generalises the single-commodity
+strategic-trade model (TWIST / Agrimate) along the dimension reviewers
+keep attacking: there is more than one grain, and buyers substitute
+between them. ``demo.py`` runs this prototype. It is not a 2007/08
+hindcast.
 
 Three coupled ideas:
 
@@ -22,10 +30,9 @@ Three coupled ideas:
 
   * STRATEGIC layer -- exporters choose export-tax-equivalents tau (a ban ~ high
     tau), per commodity, to maximise national welfare. Nash is approximated by
-    iterated best response over the market layer. Substitution flattens the
-    residual demand each exporter faces (buyers can escape into another grain),
-    which reshapes the optimal restriction -- an interaction neither a no-strategy
-    model (TWIST) nor a no-substitution model (Agrimate) can produce.
+    iterated best response over the market layer. This is **one tax per
+    year**. Headey (2011) is why the crisis object is instead a
+    state-contingent cut on the 24-step spine.
 
   * STORAGE -- market-responsive (competitive) reserves and strategic government
     buffer stocks adjust available supply each period before the market clears.
@@ -348,7 +355,11 @@ class SpatialEquilibrium:
 # 5. Strategic layer: multi-commodity export-restriction game
 # ----------------------------------------------------------------------------
 class ExportRestrictionGame:
-    """Exporters choose per-grain export taxes to maximise national welfare:
+    """Annual prototype: exporters choose per-grain export taxes.
+
+    One τ per year. Crisis actions are ``τ_t`` on the Gate 0 spine
+    (``sheaf/dynamic_policy.py``; Headey 2011). Do not treat this class
+    as the 2007/08 game.
 
         W_i = consumer_surplus_i + producer_income_i - food_security_penalty_i
         CS_i        = sum over the demand-system surplus (cross-substitution aware)

@@ -1,6 +1,8 @@
 """SHEAF -- Substitution, Heterogeneous agents, Equilibrium, And Fragility.
 
-A multi-commodity, game-theoretic network model of global grain trade.
+Crisis heartbeat: 24-step Gate 0 spine (``dynamic_crop``), optional
+substitution (``dynamic_coupled``), Headey-clock actions
+(``dynamic_policy``). ``core`` is the leftover annual SPE prototype.
 """
 from .core import (
     DemandSystem, build_demand_system, Country,

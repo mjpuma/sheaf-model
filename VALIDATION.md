@@ -61,16 +61,19 @@ core. Honest ceiling under the *old* annual SPE clock: annual magnitudes only,
 not Agrimate's bi-weekly dynamics — **that clock is retired for Gate 0**; see
 ARCHITECTURE.md (24 steps/yr). Temporal resolution is where SHEAF now competes.
 
-**Level 2 — endogenous restriction calibration (SHEAF's unique test).** Drive SHEAF
-with production anomalies *only*, switch the strategic game on, and let it choose
-restrictions. **Fit** food-security weights and price triggers so the model
-reproduces the observed cascade on a declared training window, then score
-restrictors / timing / severity / prices on a **held-out** window (or pooled
-structural parameters — see audit Finding P7-F4). This is a calibration-and-
-identification exercise, not an a-priori prediction claim. Neither Agrimate
-(restrictions exogenous) nor a no-strategy model can be evaluated on the same
-margin. Acquiring AMIS timelines and per-country PSD remains a prerequisite;
-the shipped repo does not yet run this pipeline end-to-end.
+**Level 2 — endogenous restriction calibration (SHEAF's unique test).**
+Drive the **Gate 0 24-step spine** with production anomalies *only*, let
+governments choose **actions** `τ_{i,t}` on that clock, and keep **types**
+(food-security weights, who plays) slow — Headey (2011), not the annual
+Nash in `sheaf/core.py`. Fit types on a declared training window, then
+score restrictors / timing / severity / prices on a **held-out** window.
+A P4 beta with labeled illustrative knobs is a mechanism check, not that
+score (`diagnostics/GAME_CLOCK.md`). Neither Agrimate (restrictions
+exogenous) nor a no-strategy model can be evaluated on the same margin.
+
+**Gate 0 and Gate 1 do not need to be re-run** to host this layer: P1 is
+substitution off / game off (AMIS diary); P3 is substitution on / game
+off. Headey does not change CropParams or σ.
 
 **Bonus — multi-commodity.** 2007/08 is the natural substitution test: rice spiked
 on its own export-ban panic (India, Vietnam) partly linked to wheat. Agrimate runs
@@ -87,13 +90,14 @@ Full write-up: [`diagnostics/PAPER_STACK.md`](diagnostics/PAPER_STACK.md).
 | **P1** | Hindcast price, **consumption**, and **trade** (crises, later decades) | Gate 0 **now**. Network is **prescribed** FAOSTAT E0. |
 | **P3** | Empirical wheat–maize–rice substitution | After P1 per crop |
 | **Cal** | Constrain reduced-form + game parameters (train/hold-out) | Alongside; not crisis-by-crisis fitting |
-| **P4** | Cooperative export restrictions / club of the willing | After P1; illustrative knobs OK if labeled |
-| **P5** | Cooperation vs protectionism tipping | After P4 setup |
+| **P4** | Cooperative export restrictions / club of the willing | After P1; **crisis game is on the 24-step spine** (Headey clock). Illustrative knobs OK if labeled. Annual `core.py` Nash is not this paper. |
+| **P5** | Cooperation vs protectionism tipping | After P4 setup. Still sub-annual actions; types slow. |
 | **P2** | Endogenous trade network (no prescribed E0) | Later optional paper — **not** Gate 0 |
 
 Level 2 in this file is the **positive** game (“who restricted?”). P4/P5 are
-**normative / comparative-static** variants of the same layer. Do not treat
-them as Gate 0.
+**normative / comparative-static** variants of the same **24-step** layer.
+Do not treat them as Gate 0, and do not re-run Gate 0 or Gate 1 to start
+them (`diagnostics/GAME_CLOCK.md`).
 
 ## Data alignment
 
