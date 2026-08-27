@@ -8,6 +8,10 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{amsmath,amssymb}
+\usepackage[utf8]{inputenc}
+% pdfLaTeX cannot typeset U+03B7 inside \texttt. Math $\eta$ is preferred;
+% this maps any leftover Unicode eta so the project still compiles.
+\DeclareUnicodeCharacter{03B7}{$\eta$}
 \usepackage[round,authoryear]{natbib}
 \usepackage{hyperref}
 \usepackage{caption}
