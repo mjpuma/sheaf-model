@@ -131,7 +131,9 @@ intensity is what `tau_on` copies.
 | `diagnostics/GAME_CLOCK.md` | Headey clock; Gate 0/1 do not re-run |
 | `diagnostics/GATE2_PLAN.md` | this file |
 | `sheaf/dynamic_policy.py` | types, year BR, state-contingent τ_t |
-| `scripts/score_gate2_beta.py` | calm vs shock + path figure |
+| `scripts/score_gate2_beta.py` | calm vs shock + path figure + choropleths |
+| `sheaf/maps.py` | Natural Earth 110m choropleths (regular score) |
+| `overleaf/gate2_assessment/` | assessment note to zip for Overleaf |
 | `tests/test_gate2_policy_beta.py` | hard bars |
 
 Do not estimate knobs on 2008. Do not retune CropParams.

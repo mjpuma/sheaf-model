@@ -1,0 +1,49 @@
+\section{Supplement: which equation lives in which function}
+\label{sec:code}
+
+Function names are the stable map. Nothing in \texttt{sheaf/core.py}
+(annual SPE leftover) and nothing in \texttt{sheaf/dynamic\_grains.py}
+(paused) is run here. Gate~0 and Gate~1 scoring paths stay
+\texttt{use\_amis=True} and do not call \texttt{dynamic\_policy}.
+
+\begin{center}
+\small
+\begin{tabular}{llp{0.46\textwidth}}
+\toprule
+Eq.\ / object & Function & Notes \\
+\midrule
+This note's run &
+\texttt{scripts/score\_gate2\_beta.py} &
+hard bars, path figure, three choropleths \\
+Types &
+\texttt{PolicyKnobs} &
+illustrative; not an AMIS estimate \\
+Harvest shock &
+\texttt{shock\_year\_harvest} &
+Russia, shock year only \\
+Ratio gate~\eqref{eq:tau} &
+\texttt{climatology\_relative\_cuts} &
+two-pass; all \texttt{players} \\
+Closed path &
+\texttt{simulate\_headey} &
+\texttt{simulate\_prep} with those cuts \\
+Nested \(W\)~\eqref{eq:W} &
+\texttt{welfare}, \texttt{grid\_best\_response} &
+year-mean buffer; diagnostic \\
+Market &
+\texttt{sheaf/dynamic\_crop.py}
+\texttt{simulate\_prep} &
+locked \texttt{CropParams}; AMIS off \\
+Choropleths &
+\texttt{sheaf/maps.py} &
+Natural Earth 110m; \texttt{SHEAF\_NODE\_MAP} \\
+Tests &
+\texttt{tests/test\_gate2\_policy\_beta.py},
+\texttt{tests/test\_maps.py} &
+bars + map helper \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Reproduce: \texttt{python3 scripts/score\_gate2\_beta.py}. Do not re-run
+\texttt{score\_subannual\_crop.py} or \texttt{score\_gate1.py} for this note.

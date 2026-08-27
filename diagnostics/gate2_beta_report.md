@@ -10,6 +10,8 @@ Gate 0 and Gate 1 were **not** re-run. Clock: `diagnostics/GAME_CLOCK.md`.
 - Kazakhstan calm on: **0** / 24; shock on: **6** / 24 (first step 13, min S/S_calm = 0.76) — no own harvest cut
 - Russia shipments 3.27 → 3.25 MMT
 - Kazakhstan shipments 6.66 → 6.28 MMT
+- Ukraine open min S/S_calm = 0.86 (not a player; above r=0.85)
+- Kazakhstan closed min S/S_calm = 0.81 (open 0.76; cuts raise the trough)
 
 Cascade is **harvest diversion** (Kazakhstan’s open-path S/S_calm already below r after Russia’s harvest fails), not sequential ban-on-ban IBR. Ukraine is on the market but does not play.
 
@@ -41,4 +43,5 @@ Not scored against 2008/10 AMIS. See `diagnostics/GATE2_PLAN.md`.
 | shock | 0.9 | 425.5 | 468.5 | 43.0 | 16.23 | 6.44 | 268.8 | 1.88 |
 
 Table: `diagnostics/gate2_beta_score.csv`.
-Figures: `figures/fig_gate2_beta_welfare.png`, `figures/fig_gate2_headey_tau.png`.
+Figures: `figures/fig_gate2_beta_welfare.png`, `figures/fig_gate2_headey_tau.png`, `figures/fig_gate2_ratios.png`, `figures/fig_gate2_map_roles.png`, `figures/fig_gate2_map_on.png`, `figures/fig_gate2_map_ratio.png`.
+Assessment note: `overleaf/gate2_assessment/`.

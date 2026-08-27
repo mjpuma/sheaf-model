@@ -11,7 +11,7 @@ What actually exists as writeups:
 |---|---|---|
 | Gate 0 (`overleaf/gate0_whitepaper/`) | Can the 24-step market, substitution off and AMIS prescribed, hindcast crisis prices? | **Accepted.** |
 | Gate 1 (`overleaf/gate1_whitepaper/`) | Does turning substitution on spill in the right direction without breaking Gate 0? | **Draft written.** Claim frozen. Do not pick σ*. |
-| Gate 2 beta (`diagnostics/GATE2_PLAN.md`) | Can two exporters, sharing a type, stay open in climatology, and can a harvest failure at one produce a cut at the neighbor who did not lose harvest? | **Mechanism check.** Illustrative types. Harvest diversion, not ban-on-ban IBR. Not a 2008 score. Clock: `diagnostics/GAME_CLOCK.md`. |
+| Gate 2 beta (`overleaf/gate2_assessment/`) | Can two exporters, sharing a type, stay open in climatology, and can a harvest failure at one produce a cut at the neighbor who did not lose harvest? | **Assessment note.** Illustrative types. Harvest diversion, not ban-on-ban IBR. Choropleths in the regular score. Not a 2008 score. Clock: `diagnostics/GAME_CLOCK.md`. |
 
 Everything else below is a **question**, not a manuscript name. Any of
 them might end up as a section, an appendix, a later note, or never.
@@ -42,7 +42,9 @@ change CropParams or σ.
 
 The two-player cascade is in (`sheaf/dynamic_policy.py`: Russia harvest
 shock, Kazakhstan neighbor, same types). Still synthetic, still not a
-2008 score.
+2008 score. Assessment note to mark up:
+`overleaf/gate2_assessment/` (zip that folder). Choropleths are part of
+the regular Gate 2 score (`sheaf/maps.py`).
 
 Further on this layer, if anything: an importer-side scramble, or a
 stock *announcement* that can substitute for a cut. Those are Headey

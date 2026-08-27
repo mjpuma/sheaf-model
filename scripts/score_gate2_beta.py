@@ -2,22 +2,26 @@
 """Gate 2 beta: Russia wheat, Headey-clock actions, nested year BR.
 
 Does not score AMIS / 2008 / 2010. Does not re-run Gate 0 or Gate 1.
+Choropleths (who / fortnights on / stock ratio) are part of every run.
 See diagnostics/GAME_CLOCK.md and diagnostics/GATE2_PLAN.md.
 """
 from __future__ import annotations
 
+import shutil
 import sys
 from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from sheaf.calendar24 import STEPS_PER_YEAR
+from sheaf.dynamic_crop import simulate_prep
 from sheaf.dynamic_policy import (
     PolicyKnobs,
     exporter_index,
@@ -28,9 +32,11 @@ from sheaf.dynamic_policy import (
     simulate_headey,
     year_slice,
 )
+from sheaf.maps import plot_categories, plot_choropleth, safe_min_ratio
 
 DIAG = ROOT / "diagnostics"
 FIGS = ROOT / "figures"
+WP_FIGS = ROOT / "overleaf" / "gate2_assessment" / "figures"
 
 
 def _table(rows: list[dict], scenario: str) -> pd.DataFrame:
@@ -82,13 +88,25 @@ def main() -> None:
     tab.to_csv(DIAG / "gate2_beta_score.csv", index=False)
 
     _, cuts_calm, meta_calm = simulate_headey(prep, H_calm, knobs)
-    _, cuts_shock, meta_shock = simulate_headey(prep, H_shock, knobs)
+    res_closed, cuts_shock, meta_shock = simulate_headey(prep, H_shock, knobs)
+    res_calm = simulate_prep(prep, harvest=H_calm)
+    res_open = simulate_prep(prep, harvest=H_shock)
     kz = "Kazakhstan"
+    ua = "Ukraine"
     ru_c = meta_calm["by_player"][knobs.exporter]
     ru_s = meta_shock["by_player"][knobs.exporter]
     kz_c = meta_calm["by_player"][kz]
     kz_s = meta_shock["by_player"][kz]
     i_kz = exporter_index(prep, kz)
+    i_ua = exporter_index(prep, ua)
+
+    def _min_ratio(res, idx) -> float:
+        s = np.asarray(res.stock[idx, sl], float)
+        c = np.asarray(res_calm.stock[idx, sl], float)
+        return float((s / np.maximum(c, 1e-9)).min())
+
+    ua_open_min = _min_ratio(res_open, i_ua)
+    kz_closed_min = _min_ratio(res_closed, i_kz)
 
     x0 = next(r["sum_exports"] for r in rows_shock if r["tau"] == 0.0)
     xstar = next(r["sum_exports"] for r in rows_shock if r["tau"] == tau_shock)
@@ -116,6 +134,8 @@ def main() -> None:
           f"first={ru_s['first_on']}  min ratio={ru_s['min_ratio']:.3f}")
     print(f"Headey Kazakhstan  calm on={kz_c['n_year']}  shock on={kz_s['n_year']}/24  "
           f"first={kz_s['first_on']}  min ratio={kz_s['min_ratio']:.3f}")
+    print(f"Ukraine open min ratio={ua_open_min:.3f}  "
+          f"KZ closed min ratio={kz_closed_min:.3f}")
     print(tab.to_string(index=False, float_format=lambda x: f"{x:.4g}"))
     for name, ok in bars:
         print(f"  [{'PASS' if ok else 'FAIL'}] {name}")
@@ -157,6 +177,57 @@ def main() -> None:
     fig2.savefig(FIGS / "fig_gate2_headey_tau.png", dpi=140)
     plt.close(fig2)
 
+    fig3, ax = plt.subplots(figsize=(8.4, 4.2))
+    for name, color, res, ls, lab in (
+            ("Russia", "#c0392b", res_open, "-", "Russia open"),
+            ("Kazakhstan", "#2471a3", res_open, "-", "Kazakhstan open"),
+            ("Ukraine", "#7d3c98", res_open, "-", "Ukraine open (not a player)"),
+            ("Kazakhstan", "#2471a3", res_closed, "--", "Kazakhstan closed"),
+    ):
+        j = exporter_index(prep, name)
+        ratio = (np.asarray(res.stock[j, sl], float)
+                 / np.maximum(np.asarray(res_calm.stock[j, sl], float), 1e-9))
+        ax.plot(steps, ratio, color=color, ls=ls, label=lab)
+    ax.axhline(knobs.stock_ratio_trigger, color="0.35", ls=":",
+               label=f"trigger r={knobs.stock_ratio_trigger:g}")
+    ax.set_xlabel(f"fortnight in {knobs.shock_year}")
+    ax.set_ylabel(r"$S_t / S^{\mathrm{calm}}_t$")
+    ax.set_title("Open-path stock ratios after Russia harvest ×0.50 "
+                 "(closed Kazakhstan dashed)")
+    ax.legend(fontsize=7, ncol=2)
+    fig3.tight_layout()
+    fig3.savefig(FIGS / "fig_gate2_ratios.png", dpi=140)
+    plt.close(fig3)
+
+    named = [c for c in prep.countries if c != "RestOfWorld"]
+    roles = {}
+    n_on = {}
+    open_min = {}
+    for name in named:
+        if name == knobs.exporter:
+            roles[name] = "harvest shock"
+        elif name in knobs.players:
+            roles[name] = "player (no harvest cut)"
+        else:
+            roles[name] = "on market, not playing"
+        j = exporter_index(prep, name)
+        open_min[name] = safe_min_ratio(
+            res_open.stock[j, sl], res_calm.stock[j, sl])
+        n_on[name] = int(meta_shock["by_player"][name]["n_year"]) if name in meta_shock["by_player"] else 0
+    plot_categories(
+        roles, FIGS / "fig_gate2_map_roles.png",
+        title="Who plays (same type; not AMIS, not 2008)")
+    plot_choropleth(
+        n_on, FIGS / "fig_gate2_map_on.png",
+        title=f"Fortnights on in {knobs.shock_year} (of 24)",
+        label="fortnights with τ_t = τ_on",
+        cmap="YlOrRd", vmin=0, vmax=24)
+    plot_choropleth(
+        open_min, FIGS / "fig_gate2_map_ratio.png",
+        title="Open-path min $S_t/S^{\\mathrm{calm}}_t$ after Russia harvest ×0.50",
+        label=r"min $S/S^{\mathrm{calm}}$",
+        cmap="RdYlBu", vmin=0.40, vmax=1.05, vcenter=knobs.stock_ratio_trigger)
+
     bar_lines = "\n".join(
         f"- [{'PASS' if ok else 'FAIL'}] {name}" for name, ok in bars)
     lines = [
@@ -185,6 +256,10 @@ def main() -> None:
         f"{ru_s['closed_exports']:.2f} MMT",
         f"- Kazakhstan shipments {kz_s['open_exports']:.2f} → "
         f"{kz_s['closed_exports']:.2f} MMT",
+        f"- Ukraine open min S/S_calm = {ua_open_min:.2f} (not a player; "
+        f"above r={knobs.stock_ratio_trigger:g})",
+        f"- Kazakhstan closed min S/S_calm = {kz_closed_min:.2f} "
+        f"(open {kz_s['min_ratio']:.2f}; cuts raise the trough)",
         "",
         "Cascade is **harvest diversion** (Kazakhstan’s open-path "
         "S/S_calm already below r after Russia’s harvest fails), not "
@@ -204,11 +279,26 @@ def main() -> None:
         "",
         "Table: `diagnostics/gate2_beta_score.csv`.",
         "Figures: `figures/fig_gate2_beta_welfare.png`, "
-        "`figures/fig_gate2_headey_tau.png`.",
+        "`figures/fig_gate2_headey_tau.png`, "
+        "`figures/fig_gate2_ratios.png`, "
+        "`figures/fig_gate2_map_roles.png`, "
+        "`figures/fig_gate2_map_on.png`, "
+        "`figures/fig_gate2_map_ratio.png`.",
+        "Assessment note: `overleaf/gate2_assessment/`.",
     ]
     (DIAG / "gate2_beta_report.md").write_text("\n".join(lines) + "\n")
-    print(f"wrote {FIGS / 'fig_gate2_beta_welfare.png'}")
-    print(f"wrote {FIGS / 'fig_gate2_headey_tau.png'}")
+    WP_FIGS.mkdir(parents=True, exist_ok=True)
+    fig_names = (
+        "fig_gate2_beta_welfare.png", "fig_gate2_headey_tau.png",
+        "fig_gate2_ratios.png", "fig_gate2_map_roles.png",
+        "fig_gate2_map_on.png", "fig_gate2_map_ratio.png",
+    )
+    for name in fig_names:
+        shutil.copy2(FIGS / name, WP_FIGS / name)
+        print(f"wrote {FIGS / name}")
+    print(f"copied figures → {WP_FIGS}")
+    print(f"Ukraine open min ratio={ua_open_min:.3f}  "
+          f"KZ closed min ratio={kz_closed_min:.3f}")
 
 
 if __name__ == "__main__":

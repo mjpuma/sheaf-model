@@ -1,0 +1,23 @@
+\begin{center}
+\small
+\captionof{table}{Hard bars. All PASS on \texttt{python3 scripts/score\_gate2\_beta.py}
+and \texttt{pytest tests/test\_gate2\_policy\_beta.py}.}
+\label{tab:bars}
+\begin{tabular}{lc}
+\toprule
+Bar & \\
+\midrule
+nested year: calm \(\tau^\star=0\) & PASS \\
+nested year: shock \(\tau^\star>0\) & PASS \\
+nested year: shock \(\tau^\star\) cuts shipments vs \(\tau=0\) & PASS \\
+Headey: calm all players \(\tau_t=0\) & PASS \\
+Headey: shock Russia some \(\tau_t>0\) & PASS \\
+Headey: shock Kazakhstan some \(\tau_t>0\) (no own harvest cut) & PASS \\
+Headey: Kazakhstan lags or ties Russia & PASS \\
+Headey: Russia cuts shipments vs open & PASS \\
+Kazakhstan fires even if Russia is not a player & PASS \\
+\texttt{run\_crop\_dynamics} still defaults AMIS on & PASS \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{0.6em}

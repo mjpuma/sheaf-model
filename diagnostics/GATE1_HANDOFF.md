@@ -17,8 +17,8 @@ Protocol twin: this file + `diagnostics/GATE1_PLAN.md`.
 
 If asked for the game: `diagnostics/GAME_CLOCK.md` then
 `diagnostics/GATE2_PLAN.md`. Two-player cascade is **in** (Russia
-harvest, Kazakhstan neighbor). Still not a 2008 score. Further, if
-anything: importer scramble or stock announcement — not a new title.
+harvest, Kazakhstan neighbor). Assessment note:
+`overleaf/gate2_assessment/` (zip that folder). Still not a 2008 score.
 
 The writeup is `overleaf/gate1_whitepaper/`. Frozen claim still lives in
 `overleaf/gate1_substitution/sections/claim.tex` (unchanged). Optional
