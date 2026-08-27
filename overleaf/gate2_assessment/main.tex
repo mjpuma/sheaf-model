@@ -1,0 +1,308 @@
+% SHEAF Gate 2 beta --- assessment note (not a 2008 score, not a paper title).
+% Overleaf: zip this folder and upload (New Project → Upload Project).
+% Compile with pdfLaTeX + BibTeX. Protocol: ../../diagnostics/GATE2_PLAN.md
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{amsmath,amssymb}
+\usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{03B7}{$\eta$}
+\usepackage[round,authoryear]{natbib}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{setspace}
+\setstretch{1.08}
+
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue}
+\graphicspath{{figures/}}
+\bibliographystyle{apalike}
+
+\title{SHEAF Gate~2 beta: Headey-clock export cuts\\
+(an assessment note, not a 2008 score)}
+\author{Working note (not a journal submission)}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Gate~0 locked a 24-step wheat market with historical export cuts taken from a
+diary. Gate~1 turned on substitution and left that diary in place. This note
+asks whether \emph{two} exporters, sharing one slow type, can choose
+state-contingent cuts \(\tau_t\) on that same spine so that a harvest failure
+at one of them produces a restriction at a neighbour who did not lose harvest,
+while climatology keeps both open. That is Headey's cascade in miniature
+\citep{headey2011}. Types do not flip every fortnight; actions do. Knobs are
+illustrative. AMIS is off. Substitution is off. Gate~0 and Gate~1 are not
+re-run. The cascade that appears is \textbf{harvest diversion}, not
+sequential ban-on-ban best response: Kazakhstan's open-path stock ratio is
+already below the trigger before Russia's \(\tau_t\) is applied, and applying
+those cuts \emph{raises} Kazakhstan's trough rather than lowering it. Ukraine
+is on the market and does not play. Choropleths of who plays, how many
+fortnights they are on, and open-path \(S/S^{\mathrm{calm}}\) are part of the
+regular score, not an afterthought.
+\end{abstract}
+
+\tableofcontents
+\vspace{1em}
+
+\section{What you are assessing}
+\label{sec:scope}
+
+This is not a new manuscript name, and it is not ``who banned in 2008.''
+It is a mechanism check. The question, in one sentence:
+
+\begin{quote}
+Can two exporters, sharing the same slow type, stay open in a normal year
+and can a harvest shortfall at one of them turn the \emph{other} one on,
+on Headey's two-week clock?
+\end{quote}
+
+Three objects in \citet{headey2011} sit on dates, not marketing years:
+export restrictions, import surges, and stock-release \emph{announcements}.
+This beta implements only the first, and only as a climatology-relative
+stock gate. The second and third are listed under ``not yet''
+(\S\ref{sec:decide}). Characteristic government types (how much a government
+cares about domestic food) can be sticky. The decision is not. Conflating
+them into one annual tax is what the leftover host in
+\texttt{sheaf/core.py} still does. That annual Nash is a TWIST-era prototype
+\citep{schewe2017,takayama1971,samuelson1952}. It is not run here.
+
+\paragraph{What is switched on.}
+State-contingent \(\tau_{i,t}\) for Russia and Kazakhstan on the Gate~0
+wheat spine. A synthetic Russia harvest \(\times 0.50\) in 2007.
+Illustrative types: buffer, intensity, trigger.
+
+\paragraph{What stays off.}
+Substitution. AMIS. Estimation on 2008/10. A split domestic versus export
+ask. Sequential fortnight Nash. Importer panic procurement. Japan-style
+announcements. Gate~0 \texttt{CropParams} and Gate~1 \(\sigma\) are not
+touched.
+
+\paragraph{Maps.}
+Every score of this layer draws choropleths of the node set
+(\S\ref{sec:maps}). If a later score has no map of \emph{who} moved and
+\emph{what state} moved them, it is incomplete.
+
+\section{Clock}
+\label{sec:clock}
+
+Headey's events have dates. Vietnam and India restrict rice in October 2007;
+Egypt and China in January 2008; India/Vietnam/Cambodia tighten in March;
+Thailand's new government \emph{discusses} a ban that same month; Japan is
+allowed to re-export rice stocks in May (the grain reportedly never ships;
+the announcement is the move). Import surges sit on the same clock
+\citep{headey2011,martin2012,wright2011}.
+
+Split it:
+
+\begin{center}
+\small
+\begin{tabular}{llp{0.52\textwidth}}
+\toprule
+Object & Clock & What it is \\
+\midrule
+Type & years / regimes & Who plays, \(\varphi\), \(\tau^{\mathrm{on}}\),
+trigger \(r\), food-security weight. Moves with elections, not fortnights. \\
+Action & fortnights & \(\tau_{i,t}\) on, off, or announced. Responds to
+stocks relative to a normal year at the same calendar step. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Agrimate takes the restriction schedule as given~\citep{kuhla2025}. SHEAF's
+destination is to let governments choose. Gate~0 first isolated that
+contribution with AMIS prescribed~\citep{amis_oecd}. This beta is the first
+time the \emph{choice} sits on Agrimate's 24-step clock.
+
+\section{Host (and why bans are not contagion here)}
+\label{sec:host}
+
+The market is Gate~0 wheat: 24 steps/year, Armington on FAOSTAT \(E_0\),
+ask-dominated world price, withheld grain stays as stock. There is
+\textbf{one} world/ask price per crop. A ban does not create a cheaper
+domestic CPI. World \(p\) does not enter the food-security term --- a
+world-price penalty would punish the government for the spike the ban
+itself causes.
+
+That host limitation is why the cascade below is harvest diversion.
+Demand that Russia no longer harvests spills onto neighbours
+\emph{before} anyone cuts. Russia's subsequent \(\tau_t\) holds grain as
+stock and slightly \emph{relieves} the neighbour. Ban-on-ban iterated best
+response would need a different state variable, or a split ask. Do not
+pretend this beta computed that.
+
+\input{sections/math}
+
+\section{Scenario and knobs}
+\label{sec:knobs}
+
+\input{tables/knobs}
+
+Players share a type. Only Russia loses harvest. Kazakhstan is the neighbour
+who fires on this host because the prototype stock path is leaner, not
+because 2007/08 ``chose Kazakhstan.'' Ukraine is on the market and does
+not play: a Ukraine-only harvest \(\times 0.50\) does not lean Russia
+enough to cross \(r\) (Russia is fat), and Russia's harvest does not push
+Ukraine's open min ratio under \(r\) (0.86 versus 0.85). Who fires is who
+is lean. Disclose that.
+
+\section{Maps (regular score, not decoration)}
+\label{sec:maps}
+
+Figure~\ref{fig:map-roles} is the player list. Figure~\ref{fig:map-on} is
+the action. Figure~\ref{fig:map-ratio} is the state that turned the action
+on. Rest-of-world is residual fill; EU is dissolved from
+\texttt{SHEAF\_NODE\_MAP}. Geometry is Natural Earth 1:110m (public domain).
+These three panels are written by \texttt{scripts/score\_gate2\_beta.py}
+every run, via \texttt{sheaf/maps.py}. Later scores of this layer should
+keep that trio (who / how long / what state), not invent a new visual
+language each time.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate2_map_roles}
+\caption{Who plays. Russia is the harvest shock. Kazakhstan shares the type
+and has climatology harvest. Ukraine and the other named wheat nodes are on
+the market and do not play. Not AMIS; not 2008.}
+\label{fig:map-roles}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate2_map_on}
+\caption{Fortnights with \(\tau_t=\tau^{\mathrm{on}}\) in 2007 (of 24).
+Russia 12; Kazakhstan 6; everyone else 0. Calm (not shown) is identically
+zero.}
+\label{fig:map-on}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate2_map_ratio}
+\caption{Open-path minimum \(S_t/S^{\mathrm{calm}}_t\) after Russia's
+harvest \(\times 0.50\). Colour scale diverges at the trigger \(r=0.85\):
+cool is above (stay open), warm is below (gate on). Kazakhstan is already
+warm before any \(\tau\) is applied. Ukraine sits just on the cool side of
+the trigger. Nodes that stock out in climatology are unpainted --- the
+ratio is not defined there, and painting them as zero would look like a
+crash they did not have.}
+\label{fig:map-ratio}
+\end{figure}
+
+\section{Path results}
+\label{sec:results}
+
+\input{tables/path}
+\input{tables/diversion}
+
+Calm: ratio \(\equiv 1\), both players \(\tau_t=0\). Shock: Russia on from
+fortnight 12 through 23; Kazakhstan from 13, then off, then on again
+19--23 (Fig.~\ref{fig:tau}). Kazakhstan's first on-step lags Russia by one
+fortnight. Kazakhstan still fires if Russia is dropped from the player
+list --- the open-path ratio is already below \(r\).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{fig_gate2_headey_tau}
+\caption{Headey-path \(\tau_t\) in 2007. Calm (dotted) is zero. Intensity
+\(\tau^{\mathrm{on}}=0.6\) is a type, copied from the nested year grid,
+not re-optimised each step.}
+\label{fig:tau}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{fig_gate2_ratios}
+\caption{Open-path stock ratios (Russia, Kazakhstan, Ukraine) and
+Kazakhstan's \emph{closed} path (dashed). The closed trough is
+\emph{higher} (0.81 versus 0.76): Russia's cuts do not further lean
+Kazakhstan. Horizontal line is \(r=0.85\).}
+\label{fig:ratios}
+\end{figure}
+
+Russia's Headey-path shipments fall 3.27\(\to\)3.25~MMT. The bar passes.
+The bite is tiny because cuts hit the back half of the year, when
+Russia's remaining exportable surplus is already thin. The nested
+year-open-loop diagnostic (one \(\tau\) for the whole shock year) cuts
+more: 3.27\(\to\)3.04 at \(\tau^\star=0.6\) (Fig.~\ref{fig:welfare},
+Table~\ref{tab:welfare}). Do not confuse the two.
+
+\input{tables/welfare}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate2_beta_welfare}
+\caption{Nested year-open-loop grid (diagnostic only). Calm
+\(\tau^\star=0\); shock \(\tau^\star=0.6\). Not the Headey path; not AMIS.}
+\label{fig:welfare}
+\end{figure}
+
+\input{tables/bars}
+
+\section{What the bars establish, and what they do not}
+\label{sec:claim}
+
+\paragraph{Can claim.}
+On this host, with these illustrative types: climatology keeps both
+exporters open; a Russia-only harvest \(\times 0.50\) turns Russia on for
+half the year and Kazakhstan on for a quarter, with no Kazakh harvest cut;
+the neighbour lags or ties; the neighbour's gate is the open-path stock
+ratio (harvest diversion).
+
+\paragraph{Must disclose.}
+Knobs were locked after a qualitative calm/shock flip was visible, not
+estimated. The cascade is not ban contagion: closed-path min ratio for
+Kazakhstan is 0.81 against open 0.76. Who fires is who is lean (Kazakhstan),
+not who Headey names next (Ukraine's open min is 0.86). Russia's
+Headey-path shipment cut is 0.02~MMT. One world price; withheld grain is
+stock; no cheaper domestic CPI. Dual host versus annual
+\texttt{core.py} welfare (consumer surplus at node prices).
+
+\paragraph{Must not claim.}
+That this is who restricted in 2007/08 or 2010/11. That types are
+identified. That a Nash among many exporters was computed. That substitution
+spilled (it is off). That Gate~0 leftovers were patched. That a third
+exporter, or an announcement, is already in.
+
+\section{What to decide}
+\label{sec:decide}
+
+Mark these. They are the assessment, not a backlog of papers.
+
+\begin{enumerate}
+\item \textbf{Is harvest diversion enough of Headey's cascade?}
+      If the scientific object is pressure on remaining Black Sea exporters
+      after a harvest fails, this beta has it. If the object is ban-on-ban
+      contagion, this host cannot do it without a market change (split ask,
+      or a state other than \(S/S^{\mathrm{calm}}\)). Adding a third player
+      will not create contagion here.
+\item \textbf{Is a 0.02~MMT Headey-path bite a problem?}
+      The bar is a sign check. A crisis narrative needs a bigger action, a
+      different intensity rule, or honesty that year-open-loop \(\tau\) is
+      doing the shipment work.
+\item \textbf{Is ``who is lean'' the right neighbour?}
+      Kazakhstan fires; Ukraine does not. Fine for a mechanism check. Fatal
+      if the player list is treated as history.
+\item \textbf{Same type for both players: enough?}
+      Headey's governments did not share a personality. Heterogeneous types
+      are a later knob, not a prerequisite for this check.
+\item \textbf{Next development, if any?}
+      An importer scramble or a stock \emph{announcement}
+      \citep{headey2011}. Still synthetic. Still not estimated on 2008.
+      Zip-and-upload of Gate~0 and Gate~1 is the writing next step, if any.
+\end{enumerate}
+
+Do not: retune \texttt{CropParams} or \(\rho\); densify \(\sigma\); unpause
+\texttt{sheaf/dynamic\_grains.py}; graft annual Slutsky \(M_i\) onto the
+spine; put the crisis game back in \texttt{core.py}; re-run Gate~0 or
+Gate~1.
+
+\input{sections/code_map}
+
+\bibliography{refs}
+\end{document}

@@ -1,0 +1,9 @@
+Natural Earth 1:110m Admin 0 — Countries
+Source: nvkelso/natural-earth-vector
+  https://github.com/nvkelso/natural-earth-vector
+  geojson/ne_110m_admin_0_countries.geojson
+License: public domain (Natural Earth)
+Fetched: 2026-08-27
+Used only for SHEAF node choropleths (SHEAF_NODE_MAP ISO3 → named nodes;
+everything else Rest-of-World). Not a political statement; 110m is a
+cartographic convenience.

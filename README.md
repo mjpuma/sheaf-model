@@ -29,9 +29,16 @@ dynamics are still missing:
    that overstates own-grain spikes and misses the other markets. In SHEAF the
    no-substitution case is a *special limit* (`σ = 0`), not the model.
 
-Both sit on a **trade network** cleared each period. Cross-grain substitution and the
-endogenous game stay blocked until the per-crop Gate 0 spine is green
-(`diagnostics/PAPER_STACK.md`).
+Both sit on a **trade network** cleared each **fortnight** (Gate 0: 24
+steps/year). Crisis papers keep substitution and the game as separate
+switches: Gate 0 is both off (AMIS diary); Gate 1 is substitution on,
+game off; the crisis game is types slow / actions on that same 24-step
+clock (`diagnostics/GAME_CLOCK.md`). Headey (2011) is the guiding
+account of why those actions have dates, not marketing years. The
+annual SPE in `sheaf/core.py` is a leftover prototype from when the
+market itself was annual (TWIST). It is still run by `demo.py`. It is
+**not** the 2007/08 object and **not** a reason to re-run Gate 0 or
+Gate 1.
 
 ![harvest shocks versus export restrictions, 2006–11](figures/fig1_gate0_prices.png)
 
@@ -39,27 +46,37 @@ endogenous game stay blocked until the per-crop Gate 0 spine is green
 alone miss the 2008 rice spike and understate 2007/08 wheat; adding observed export
 restrictions (AMIS) produces both. That is why SHEAF has a strategic layer —
 restrictions are first-order, not a residual. Agrimate takes those restrictions as
-given; SHEAF's next step is to let exporters choose them. Substitution is the other
-missing piece, and is still off in this figure.*
+given; SHEAF's next step is to let exporters choose them **on that same
+two-week clock**. Characteristic government types (how much they care
+about domestic food) can be sticky; the decision is not. Substitution is
+the other missing piece, and is still off in this figure. Gate 0 does
+not need to be re-run to say that.
 
 ## Mathematical formulation
 
-SHEAF has two related formulations:
+SHEAF has two related formulations. **Crisis work uses (2).**
 
-1. **Annual multi-commodity SPE + export game** (`sheaf/core.py`, §§1–6) — the
-   original market / strategic / storage layers.
-2. **Gate 0 per-crop sub-annual spine** (`sheaf/dynamic_crop.py`, §8) — Agrimate-aligned
-   24-step/year bilateral stock–trade dynamics with **ask-dominated** world prices.
-   Harvest forcing is climatology × **LOWESS anomaly** (not raw PSD year totals;
-   in-sample means turn post-2008 yield growth into a fake 2006 crash — §8).
+1. **Annual multi-commodity SPE + export game** (`sheaf/core.py`, §§1–6) —
+   the original TWIST-era market / strategic / storage layers. One tax per
+   year, node prices from a Takayama–Judge QP. `demo.py` still runs this.
+   It is a prototype, not the crisis game.
+2. **Gate 0 per-crop sub-annual spine** (`sheaf/dynamic_crop.py`, §8) —
+   Agrimate-aligned 24-step/year bilateral stock–trade dynamics with
+   **ask-dominated** world prices. Harvest forcing is climatology ×
+   **LOWESS anomaly**. Gate 1 puts isoelastic substitution on this spine.
+   Gate 2 puts **state-contingent** export cuts on this spine
+   (`sheaf/dynamic_policy.py`): types are slow, actions `τ_t` respond to
+   conditions (Headey 2011). Two players share a type (Russia harvest
+   shock, Kazakhstan neighbor); the cascade is harvest diversion, not
+   ban-on-ban IBR. Clock lock: `diagnostics/GAME_CLOCK.md`.
+
    Run wheat, maize, and rice **separately** first
-   (`scripts/score_subannual_crop.py --crop …`). Cross-grain substitution and
-   Level 2 are blocked until all three single-crop Gate 0 reports are green
-   (`diagnostics/GATE0_PER_CROP_PLAN.md`).
+   (`scripts/score_subannual_crop.py --crop …`). Those official P1
+   scores are frozen; Headey is not a reason to re-run them.
 
-Crisis validation (Gate 0) uses §8. The annual SPE remains a reference / outer
-diagnostic and the multi-commodity / Level-2 host. Symbols are defined in the
-notation tables of each subsection.
+Crisis validation (Gate 0) uses §8 with AMIS prescribed and the game
+**off**. The annual SPE is a reference / outer diagnostic, not the
+Level-2 host.
 
 ### Notation (annual SPE layers, §§1–5)
 
@@ -197,7 +214,17 @@ $$\Delta^{\mathrm{gov},g}_i =
 
 ### 4. Strategic layer: export-restriction game
 
-Each exporting government chooses a non-negative export-tax-equivalent vector
+> **Crisis clock (Headey 2011).** Governments in 2007/08 did not pick one
+> tax for a marketing year. India and Vietnam restricted rice in October;
+> Thailand *discussed* a ban in March 2008; Japan’s May stock-release
+> *announcement* (the grain reportedly never shipped) is credited with
+> turning prices. Types can be sticky. Actions are sub-annual. The live
+> layer is `sheaf/dynamic_policy.py` on the Gate 0 spine
+> (`diagnostics/GAME_CLOCK.md`). The annual Nash below is the leftover
+> prototype in `sheaf/core.py`.
+
+Each exporting government in the **annual prototype** chooses a
+non-negative export-tax-equivalent vector
 $\tau_i = (\tau^g_i)_g$ (a ban corresponds to a large $\tau$) to maximise national
 welfare, taking other governments' choices as given:
 
@@ -245,7 +272,9 @@ $R_{t+1} = \max(0,\ R_t + \Delta_t)$. Shocks enter as $\xi^g_i(t)$ and chokepoin
 multipliers $\psi_{ij}(t)$.
 
 **Gate 0 crisis hindcasts do not use this annual clock.** They use the 24-step/year
-spine in §8 (`ARCHITECTURE.md`).
+spine in §8 (`ARCHITECTURE.md`). **The crisis game does not use it either.**
+Types stay slow; `τ_{i,t}` lives on that spine (`diagnostics/GAME_CLOCK.md`).
+Do not re-run Gate 0 or Gate 1 because this paragraph changed.
 
 ### 6. The single-commodity models as a limiting case
 
@@ -463,7 +492,9 @@ If the path matches the twin (calm), $p^\star_t=p_0$ by construction
 
 `assert_twin_identity`, `assert_amis_raises_price`, `assert_amis_cuts_exports`,
 `assert_no_spring_spike` — run by `scripts/score_subannual_crop.py --crop …`.
-Paper stack (P1 now; substitution / game later): `diagnostics/PAPER_STACK.md`.
+Questions the model might answer (hindcast, substitution, who restricts,
+club, tipping, network) — not a queue of papers:
+`diagnostics/PAPER_STACK.md`. Clock: `diagnostics/GAME_CLOCK.md`.
 Agrimate-style figures: `python scripts/make_agrimate_comparison.py`.
 
 ### References
@@ -492,7 +523,7 @@ Agrimate-style figures: `python scripts/make_agrimate_comparison.py`.
 - Falkendal, T., Otto, C., Schewe, J., Jägermeyr, J., Konar, M., Kummu, M., Watkins, B., & Puma, M. J. (2021). Grain export restrictions during COVID-19 risk food insecurity in many low- and middle-income countries. *Nature Food*, 2(1), 11–14. https://doi.org/10.1038/s43016-020-00211-7
 - Kuhla, K., Kubiczek, P., & Otto, C. (2025). Understanding agricultural market dynamics in times of crisis: the dynamic agent-based network model Agrimate. *Ecological Economics*, 231, 108546. https://doi.org/10.1016/j.ecolecon.2025.108546
 
-*Note on the TWIST/Agrimate lineage.* TWIST (Trade With Storage; Schewe et al. 2017, applied in Falkendal et al. 2021) reproduces annual world wheat prices from a stylised price–supply curve but does not resolve the trade network or export restrictions. Agrimate (Kuhla et al. 2025) adds a dynamic agent-based network with commercial and strategic stockholding and hindcasts 2007/08 and 2010/11, taking export restrictions as an exogenous AMIS schedule. Both are single-commodity. SHEAF exists to put **endogenous strategy** (governments choose restrictions) and **cross-grain substitution** on that network — see Gate 0 above for why restrictions are first-order, and §6 for the zero-substitution limit.
+*Note on the TWIST/Agrimate lineage.* TWIST (Trade With Storage; Schewe et al. 2017, applied in Falkendal et al. 2021) reproduces annual world wheat prices from a stylised price–supply curve but does not resolve the trade network or export restrictions. Agrimate (Kuhla et al. 2025) adds a dynamic agent-based network with commercial and strategic stockholding and hindcasts 2007/08 and 2010/11, taking export restrictions as an exogenous AMIS schedule. Both are single-commodity. SHEAF exists to put **endogenous strategy** (governments choose restrictions) and **cross-grain substitution** on that network. Headey (2011) is the account of *when* those restrictions and import surges happen — months, not years — so the crisis game belongs on Agrimate’s 24-step clock, not on TWIST’s annual SPE. Gate 0 is why restrictions are first-order, with AMIS still prescribed; §6 is the zero-substitution limit.
 
 ## Quick start
 
@@ -502,10 +533,12 @@ python demo.py
 ```
 
 The demo runs a Black Sea wheat shock (Russia −40%, Ukraine −50%) under two
-regimes — substitution on (full annual SPE) and off (single-commodity limit) — plus a
-no-shock counterfactual for each, and writes `sheaf_results.csv` and four figures
-(including `figures/fig1_coupling.png`, the substitution spillover illustration).
-Crisis hindcasts use the Gate 0 spine, not this demo: `scripts/score_subannual_crop.py`.
+regimes — substitution on (full **annual SPE prototype**) and off (single-commodity
+limit) — plus a no-shock counterfactual for each, and writes `sheaf_results.csv`
+and four figures (including `figures/fig1_coupling.png`). That demo is **not**
+the crisis hindcast and **not** the Headey-clock game. Crisis hindcasts:
+`scripts/score_subannual_crop.py`. Crisis policy beta:
+`scripts/score_gate2_beta.py`.
 
 Minimal use in code:
 
@@ -521,10 +554,16 @@ df = model.run(periods=12, shocks={5: shock_matrix, 6: shock_matrix})
 
 ```
 sheaf/
-  core.py          # demand system, spatial equilibrium, export game, storage, orchestrator
-  calibration.py   # the 3-grain prototype dataset (swap this for real data)
-demo.py            # Black Sea shock scenario + figures
-figures/           # generated example figures
+  dynamic_crop.py     # Gate 0 24-step market (crisis heartbeat)
+  dynamic_coupled.py  # Gate 1 isoelastic substitution on that spine
+  dynamic_policy.py   # Gate 2: slow types, Headey-clock τ_t
+  core.py             # leftover annual SPE + year-Nash prototype (demo.py)
+  calibration.py      # illustrative 3-grain dataset + policy archetypes (types)
+demo.py               # Black Sea shock on the annual prototype
+scripts/score_subannual_crop.py  # official P1 (do not re-run for the game clock)
+scripts/score_gate1.py           # official P3 band (do not re-run for the game clock)
+scripts/score_gate2_beta.py      # policy beta on the 24-step spine
+diagnostics/GAME_CLOCK.md        # Headey clock lock
 ```
 
 ## Extending it
@@ -545,15 +584,18 @@ figures/           # generated example figures
 
 ## Caveats
 
-This is a **prototype**. Gate 0 (`sheaf/dynamic_crop.py`) now runs 2006–11
-per-crop hindcasts against Pink Sheet with AMIS restrictions prescribed; that is
-P1, not an estimated game. The annual SPE calibration in `sheaf/calibration.py`
-is order-of-magnitude realistic but illustrative — do not read the magnitudes as
-estimates. Demand and supply there are linear, production is short-run inelastic
-within a period, and Nash is an iterated-best-response approximation on a discrete
-tax grid (`game_grid=13` by default, ~10 $/t steps). Private storage uses lagged
-prices by design. Cross-grain substitution and the endogenous restriction game
-remain blocked until Gate 0 is green (`diagnostics/PAPER_STACK.md`).
+This is a **prototype**. Gate 0 (`sheaf/dynamic_crop.py`) runs 2006–11
+per-crop hindcasts against Pink Sheet with AMIS restrictions prescribed;
+that is P1, **accepted**, and is not re-run because the game clock was
+stated. Gate 1 puts substitution on that spine with the game still off;
+the P3 draft is written and is not re-run either (`diagnostics/GAME_CLOCK.md`).
+The annual SPE calibration in `sheaf/calibration.py` is order-of-magnitude
+realistic but illustrative — do not read the magnitudes as estimates.
+Demand and supply there are linear, production is short-run inelastic
+within a period, and Nash is an iterated-best-response approximation on a
+discrete tax grid. That annual Nash is a leftover, not the 2007/08 game.
+On the crisis spine, types are illustrative; actions `τ_t` are
+state-contingent and not scored against who banned in 2008.
 
 ## License
 

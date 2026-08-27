@@ -84,14 +84,21 @@ targets; it is not the Gate 0 clock.
    substitution in demand and an endogenous restriction layer for Level 2.
 4. **Level 1:** impose AMIS restrictions as quantity cuts (ban≈95%, tax≈50%)
    or equivalent, not only mild annual $/t wedges.
-5. **Level 2:** endogenous restriction game on the same sub-annual clock
-   (held-out identification — after Gate 0).
+5. **Level 2:** endogenous restriction **actions** on the same sub-annual
+   clock. **Types** (food-security weights, who plays) are slow;
+   **actions** `τ_{i,t}` respond to conditions — Headey (2011), not an
+   annual Nash leftover. See `diagnostics/GAME_CLOCK.md`. Held-out
+   identification comes after Gate 0; Gate 0 and Gate 1 are **not**
+   re-run to host that game.
 
 ### Keep from current SHEAF
 
 - Multi-commodity demand / substitution as the differentiator vs Agrimate.
 - Node set + USDA/AMIS/Pink Sheet data plumbing (re-timed to steps).
 - Export-restriction *idea*; re-host on sub-annual information sets.
+  `sheaf/core.py` keeps the annual prototype (`demo.py`). It is not the
+  crisis game. Headey (2011) is the clock: India/Vietnam October,
+  Thailand-in-March *discussing* a ban, Japan-in-May announcing stocks.
 
 ## Gate 0 (rewritten)
 
@@ -128,8 +135,12 @@ detailed diagnostics **before** substitution or Level 2. See
 6. Multi-commodity substitution on the sub-annual spine — **paused** until
    step 5 is green for wheat, maize, and rice. (`dynamic_grains` / spillover
    remain a prototype only.)
-7. Endogenous restriction game (Level 2) — **blocked** until per-crop Gate 0 hard
-   bars are green.
+7. Endogenous restriction **actions** on the 24-step spine —
+   types slow, Headey clock. Gate 0 hard bars are green; **do not re-run
+   the hindcast or the substitution band** to say this
+   (`diagnostics/GAME_CLOCK.md`). `sheaf/dynamic_policy.py` is a
+   two-player mechanism check (Russia harvest, Kazakhstan neighbor;
+   harvest diversion). `core.py` IBR stays a leftover.
 
 Commands:
 ```bash
@@ -145,5 +156,8 @@ python scripts/score_subannual_crop.py --crop rice
 - Kuhla, K., Kubiczek, P., Otto, C. (2025). Understanding agricultural market
   dynamics in times of crisis: the dynamic agent-based network model Agrimate.
   *Ecological Economics* 231, 108546. §4.1 (24 steps/yr), §5 (monthly hindcast).
+- Headey, D. (2011). Rethinking the global food crisis: The role of trade
+  shocks. *Food Policy* 36(2), 136–146. Monthly export volumes, dated
+  restrictions, import surges, announcement effects — the crisis game clock.
 - Sacks et al. (2010) / SAGE crop calendars; USDA FAS crop calendar charts.
 - Otto et al. acclimate (disequilibrium network lineage).

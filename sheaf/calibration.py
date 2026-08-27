@@ -127,9 +127,11 @@ def build_countries(substitution: bool = True, policy_pool: str | None = None,
 
     policy_pool:
       None  — use hand-set fs_w / p_target from DATA (default).
-      "archetype" — collapse to ~4 structural food-security archetypes
-        (open exporter, restrictive exporter, rice specialist, non-player)
-        to improve Level-2 identification (audit P7-F4).
+      "archetype" — collapse to ~4 structural food-security **types**
+        (open exporter, restrictive exporter, rice specialist, non-player).
+        These are slow preferences, not fortnightly actions. The crisis
+        game's actions live on the 24-step spine
+        (``sheaf/dynamic_policy.py``; Headey 2011).
 
     quantities:
       "illustrative" — hand-entered DATA prod/cons (default; demo path).

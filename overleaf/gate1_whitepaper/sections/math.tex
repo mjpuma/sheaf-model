@@ -89,11 +89,16 @@ An older annual market-clearing program in \texttt{sheaf/core.py} uses a
 linear Slutsky system \(D=a-Mp\) with own-price vector
 \texttt{calibration.OWN\_ELAST} (wheat \(-0.25\), rice \(-0.20\), maize
 \(-0.30\)) and a constructed positive-definite \(M_i\). That host is not
-run here. Switching Gate~1 own-price \(\varepsilon\) to
+run here. It is also not the crisis \emph{game}: Headey (2011) is why
+export bans, import surges, and stock announcements have dates, so
+actions \(\tau_t\) belong on this 24-step spine
+(\texttt{sheaf/dynamic\_policy.py}), with government \emph{types} slow.
+Switching Gate~1 own-price \(\varepsilon\) to
 \texttt{OWN\_ELAST} would break the \(\sigma=0\) identity against Gate~0.
 The cross form~\eqref{eq:cross} is a constant-elasticity overlay: the
 demand Jacobian is not Slutsky-symmetric. Paper P3 is isoelastic food/feed
-on the 24-step spine. It is not README~\S1.
+on the 24-step spine. It is not README~\S1. It does not need to be
+re-run to host the game.
 
 \subsection{What is not in this layer}
 

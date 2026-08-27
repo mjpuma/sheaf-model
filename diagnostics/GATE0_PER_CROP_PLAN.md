@@ -103,7 +103,7 @@ Twin / climatology baseline pass `use_industrial=False`.
 Year-by-year world food/feed is a sensitivity. Also score consumption vs PSD
 and AMIS exporter shipment signs — not Pink Sheet alone.
 
-Long-term papers P2–P5 and the calibration plan:
+Long-term *questions* (not a paper queue) and the calibration plan:
 [`PAPER_STACK.md`](PAPER_STACK.md).
 
 ## Multi-agent Gate 0 (diagnosis vs implementation)
@@ -124,8 +124,11 @@ corr wheat/rice ≳ +0.5, maize > 0; world MY-end STU on PSD (~×1.0–1.1).
 
 ## Explicit non-goals of Gate 0 (still out of scope)
 
-- Fitting substitution scales on joint W/R/M crises (P3).
-- Endogenous restriction Nash / IBR, cooperative club, or tipping (Level 2 / P4–P5).
-- Endogenous trade network without FAOSTAT E0 (P2).
+- Fitting substitution on joint W/R/M crises (that is Gate 1, already drafted).
+- Endogenous restriction **actions** (those belong on this 24-step spine
+  later, Headey clock — not a reason to re-run Gate 0). Club / tipping
+  are variants of that layer, not extra manuscripts.
+- Annual SPE Nash in `sheaf/core.py` as the 2007/08 game (leftover).
+- Endogenous trade network without FAOSTAT E0.
 - Replacing Pink Sheet with Agrimate’s private series (use published Pink Sheet).
 - Crisis-specific knobs (e.g. boost κ only in 2008).

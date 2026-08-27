@@ -4,8 +4,8 @@
 This appendix is for readers who want to find the code. Line numbers refer
 to \texttt{sheaf/dynamic\_crop.py} in the commit that ships with this note.
 They will drift; function names are the stable map. Nothing in
-\texttt{sheaf/core.py} (the annual market program, substitution across
-grains, or the export-restriction game) is run by the hindcasts here.
+\texttt{sheaf/core.py} (the annual market program, leftover year-Nash
+prototype --- not the crisis game) is run by the hindcasts here.
 
 \subsection{Entry points}
 
@@ -86,7 +86,9 @@ not calendar December \\
 \begin{itemize}
 \item \texttt{DemandSystem} / \texttt{subst\_scale} in \texttt{sheaf/core.py}
       --- substitution off.
-\item \texttt{ExportRestrictionGame} --- $\tau$ is AMIS, not a best response.
+\item \texttt{ExportRestrictionGame} --- not run. Gate~0 $\tau$ is AMIS.
+      The crisis game, when on, is \texttt{dynamic\_policy.py} on this
+      spine (Headey clock), not year-IBR in \texttt{core.py}.
 \item \texttt{SpatialEquilibrium} QP (CLARABEL/SCS/OSQP) --- Gate~0 clears
       by Armington min, not a Takayama--Judge program.
 \item \texttt{market\_responsive\_storage} / \texttt{strategic\_storage} in
@@ -103,7 +105,10 @@ python scripts/score_subannual_crop.py --crop rice
 python scripts/make_agrimate_comparison.py
 python scripts/score_ukraine_war.py
 python scripts/assemble_whitepaper.py
+python scripts/score_whitepaper_maps.py
 \end{verbatim}
+
+Choropleths: \texttt{sheaf/maps.py}. Maps do not retune \texttt{CropParams}.
 
 Zip \texttt{overleaf/gate0\_whitepaper/} and upload to Overleaf
 (New Project $\to$ Upload Project). Do not upload gitignored Agrimate PDFs.

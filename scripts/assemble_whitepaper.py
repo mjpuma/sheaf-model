@@ -42,6 +42,13 @@ GATE0 = [
     "fig_gate0_wheat_diagnostics.png",
     "fig_gate0_maize_diagnostics.png",
     "fig_gate0_rice_diagnostics.png",
+    "fig_gate0_map_wheat_roles_2008.png",
+    "fig_gate0_map_wheat_amis_2008.png",
+    "fig_gate0_map_rice_amis_2008.png",
+    "fig_gate0_map_wheat_harvest_2007.png",
+    "fig_gate0_map_wheat_harvest_2010.png",
+    "fig_gate0_map_wheat_bite_2010.png",
+    "fig_gate0_map_wheat_cons_2008.png",
 ]
 
 

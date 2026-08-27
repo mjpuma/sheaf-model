@@ -1,18 +1,24 @@
 # Gate 1 handoff (read this first)
 
-**Date:** 2026-08-26. Experiments **E0–E8** are done. P3 draft is written.
-Do not re-run the σ band or E5/E6 unless reproducing. Do not start the
-export game. Do not pick σ*.
+**Date:** 2026-08-27. Experiments **E0–E8** are done. Substitution draft
+is written. Do not re-run the σ band or E5/E6 unless reproducing. Do not
+pick σ*. The game is a **layer** on the Gate 0 spine, not papers “P4”
+and “P5” (`diagnostics/PAPER_STACK.md`). Headey clock:
+`diagnostics/GAME_CLOCK.md`. **Do not re-run Gate 0 or Gate 1** to host
+the game.
 
 Living Overleaf note: `overleaf/gate1_substitution/` (zip that folder).
-**P3 draft to upload:** `overleaf/gate1_whitepaper/` (zip that folder).
+**Substitution draft to upload:** `overleaf/gate1_whitepaper/` (zip that folder).
 Protocol twin: this file + `diagnostics/GATE1_PLAN.md`.
-Paper stack: `diagnostics/PAPER_STACK.md` (P1 accepted; P3 draft written;
-P4–P5 later).
 
 ## What the new agent should do
 
-**Stop** unless asked to revise the P3 draft.
+**Stop** on substitution unless asked to revise that draft.
+
+If asked for the game: `diagnostics/GAME_CLOCK.md` then
+`diagnostics/GATE2_PLAN.md`. Two-player cascade is **in** (Russia
+harvest, Kazakhstan neighbor). Assessment note:
+`overleaf/gate2_assessment/` (zip that folder). Still not a 2008 score.
 
 The writeup is `overleaf/gate1_whitepaper/`. Frozen claim still lives in
 `overleaf/gate1_substitution/sections/claim.tex` (unchanged). Optional
@@ -22,7 +28,9 @@ it is not a retune target.
 Zip for Overleaf:
 
 ```
+cd overleaf && zip -r gate0_whitepaper.zip gate0_whitepaper -x "*.DS_Store"
 cd overleaf && zip -r gate1_whitepaper.zip gate1_whitepaper -x "*.DS_Store"
+cd overleaf && zip -r gate2_assessment.zip gate2_assessment -x "*.DS_Store"
 ```
 
 ## What the new agent must not do
@@ -31,7 +39,12 @@ cd overleaf && zip -r gate1_whitepaper.zip gate1_whitepaper -x "*.DS_Store"
 - Densify `{0, 0.3, 0.6}`
 - Retune Gate 0 `CropParams`, warehouse, asks, or `RHO`
 - Unpause `sheaf/dynamic_grains.py` / `scripts/score_subannual_spillover.py`
-- Start P4–P5 (export game) or P2 (endogenous network)
+- Start a “club” or “tipping” writeup, or an endogenous-network paper.
+  The game beta is a mechanism check (`diagnostics/GATE2_PLAN.md`); do
+  not turn it into a 2008/10 score. Do not re-run Gate 0 or Gate 1
+  (`GAME_CLOCK.md`). Two-player cascade is in. Further on this layer, if
+  asked: importer scramble or stock announcement — still not a new
+  manuscript name.
 - Graft annual Slutsky `M_i` / `OWN_ELAST` into the 24-step spine
 - Commit `assets/SHEAF_model_walkthrough.pptx`
 - Push unless asked
