@@ -49,6 +49,7 @@ def test_plot_choropleth_and_categories(tmp_path: Path):
         tmp_path / "ratio.png",
         title="test ratio", label="min S/S_calm",
         cmap="RdYlBu", vmin=0.4, vmax=1.05, vcenter=0.85)
+    assert p1.is_file() and p1.stat().st_size > 1000
     assert p2.is_file() and p2.stat().st_size > 1000
     assert safe_min_ratio([1.0, 2.0], [1.0, 2.0]) == 1.0
     assert safe_min_ratio([0.0, 1.0], [0.0, 1.0]) is None

@@ -28,7 +28,9 @@ it is not a retune target.
 Zip for Overleaf:
 
 ```
+cd overleaf && zip -r gate0_whitepaper.zip gate0_whitepaper -x "*.DS_Store"
 cd overleaf && zip -r gate1_whitepaper.zip gate1_whitepaper -x "*.DS_Store"
+cd overleaf && zip -r gate2_assessment.zip gate2_assessment -x "*.DS_Store"
 ```
 
 ## What the new agent must not do

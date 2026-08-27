@@ -134,6 +134,8 @@ def plot_choropleth(
     if vmax <= vmin:
         vmax = vmin + 1e-9
     if vcenter is not None:
+        vmin = min(float(vmin), float(vcenter) - 1e-6)
+        vmax = max(float(vmax), float(vcenter) + 1e-6)
         norm = TwoSlopeNorm(vcenter=vcenter, vmin=vmin, vmax=vmax)
     else:
         norm = Normalize(vmin=vmin, vmax=vmax)

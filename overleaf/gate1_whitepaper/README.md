@@ -26,6 +26,8 @@ sitting). **This folder is the writeup to upload.** Frozen claim:
 
 Copied from `overleaf/gate1_substitution/figures/` and, if the optional
 consumption diagnostic was run, from `figures/fig_gate1_consumption.png`.
+Country choropleths: `python3 scripts/score_whitepaper_maps.py`
+(`fig_gate1_map_dc_{wheat,rice,maize}_2008.png`).
 
 Do not retune `CropParams`, densify σ, unpause `sheaf/dynamic_grains.py`,
 or re-run this paper to host the export game. The crisis game is types

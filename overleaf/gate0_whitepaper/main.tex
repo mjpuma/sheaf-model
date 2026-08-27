@@ -399,7 +399,59 @@ year has no fake spring price spike.
 
 Headline numbers are the official matched run: harvest shocks plus the real
 bans, average food-and-feed, US maize ethanol on. Isolated harvest-only and
-bans-only runs are how we say who carried the spike.
+bans-only runs are how we say who carried the spike. Country maps use the
+same locked AMIS diary, LOWESS harvest scalars, and scored CSVs. They are
+not a new calibration.
+
+\subsection{Country maps}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_roles_2008}
+\caption{Wheat 2007--08: who is on the AMIS diary versus who had a LOWESS
+harvest shortfall ($\le -8\%$). Purple is both. The United States is a
+named node that did neither. Grey is Rest-of-World. This is the object
+world prices average over.}
+\label{fig:g0-roles}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_amis_2008}
+\caption{Wheat AMIS intensity, 2007--08: maximum diary $\tau$ on the
+24-step clock. Argentina, India, and Kazakhstan sit at the top of the
+scale; Russia and Ukraine are on the diary at lower intensity. Not an
+endogenous game.}
+\label{fig:g0-w-amis}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate0_map_rice_amis_2008}
+\caption{Rice AMIS intensity, 2007--08. India and Vietnam (and Egypt)
+carry the diary. That is why 2008 rice is an own-ban episode, not a
+clean wheat$\to$rice substitution test --- Gate~1 will need this map.}
+\label{fig:g0-r-amis}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_harvest_2010}
+\caption{Wheat LOWESS harvest anomaly, 2010. Kazakhstan and Russia are
+the shortfall. This is the production-led year in the attribution table.
+Compare 2007 (Fig.~\ref{fig:g0-h07}) where the spatial pattern is
+different.}
+\label{fig:g0-h10}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_harvest_2007}
+\caption{Wheat LOWESS harvest anomaly, 2007. The 2007/08 price spike is
+still restriction-led in the isolated-leg table; harvest is not empty,
+but it is not the 2010 map.}
+\label{fig:g0-h07}
+\end{figure}
 
 \subsection{World prices}
 
@@ -511,8 +563,8 @@ Kuhla et al.\ Figs.~6--7.}
 Russia's share of Egypt's wheat receipts drops in 2010/11 under AMIS. That
 is the Agrimate Figs.~5--7 object we can compute on 17+RoW nodes. We do
 not reproduce their 28-region 2007 maps; node-level production and
-stock-change signs versus PSD are the substitute (figures in the Agrimate
-companion folder).
+stock-change signs versus PSD are the substitute, plus the choropleths
+in \S\ref{sec:results} (who banned, who lost harvest, shipment bite).
 
 \subsection{Stocks, consumption, shipments}
 
@@ -534,6 +586,16 @@ isoelastic) versus country-sum PSD. 2006 is $\times 1.00$; the path then
 falls while PSD rises. The gap is the demand system, not warehouse
 rationing.}
 \label{fig:cons-wheat}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_cons_2008}
+\caption{Wheat 2008 calendar-year use, official matched, versus PSD
+(model/PSD). Cool is on the bar; warm is under. The world mean
+$\times 0.92$ is an average of this map --- including named nodes that
+are thin. Not a warehouse retune target.}
+\label{fig:g0-cons-map}
 \end{figure}
 
 World MY-end stocks are on the PSD bar (wheat $\times 1.02$, maize
@@ -568,6 +630,16 @@ Ratio $<1$ means the restriction cut that node. $\tau$ always cuts
 Russia Aug--Dec 2010 offers fall to $\times 0.11$; shipments to $\times 0.79$.
 Calendar 2010 model exports remain $\times 2.39$ versus PSD (4.0~MMT).}
 \label{fig:ship-wheat}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate0_map_wheat_bite_2010}
+\caption{Wheat 2010 AMIS shipment bite: official matched minus
+harvest-only, calendar-year MMT. Negative means the diary cut that
+node's cleared exports. Offer cuts can exceed shipment cuts when demand
+already binds.}
+\label{fig:g0-bite}
 \end{figure}
 
 The sign check that Gate~0 owns is offer-side. Russia 2010, Argentina May

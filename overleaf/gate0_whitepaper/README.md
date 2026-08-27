@@ -33,6 +33,7 @@ python scripts/score_subannual_crop.py --crop rice
 python scripts/make_agrimate_comparison.py
 python scripts/score_ukraine_war.py
 python scripts/assemble_whitepaper.py
+python scripts/score_whitepaper_maps.py   # choropleths; not a retune
 ```
 
 `assemble_whitepaper.py` copies PDFs/PNGs into `figures/`. Tables under
