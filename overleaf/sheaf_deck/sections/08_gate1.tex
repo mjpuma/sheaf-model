@@ -1,6 +1,7 @@
 \section{Gate 1 --- isoelastic substitution}
 
 \begin{frame}[label=gate1]{Dual demand host --- do not graft $M_i$ onto the spine}
+\topic{Gate~1: isoelastic $\eta$ on the 24-step spine. Not leftover $M_i$.}
 \matchbanner{GATE1\_PLAN.md: Gate 1 is not README \S1}{dynamic\_coupled.cross\_price\_eta}
 
 README \S1 is a linear Slutsky system $D_i=a_i-M_i p_i$ on the
@@ -16,6 +17,7 @@ estimate. There is no $\sigma^\star$.
 \end{frame}
 
 \begin{frame}{Cross-price exponents}
+\topic{$\eta_{gg}=\varepsilon_g$, $\eta_{gh}=\sigma\rho_{gh}|\varepsilon_g|$.}
 \matchbanner{GATE1 math / code\_map}{dynamic\_coupled.py:30--54}
 
 \[
@@ -47,6 +49,7 @@ next slide.}
 \end{frame}
 
 \begin{frame}{Worked $\eta$ at the reported band}
+\topic{$\eta$ matrix at $\sigma=0.6$ (wheat, rice, maize).}
 \matchbanner{cross\_price\_eta vs GATE1 whitepaper table}{verify\_claims.py check\_eta}
 
 At $\sigma=0.6$ (rows/cols: wheat, rice, maize):
@@ -68,6 +71,7 @@ collapses to Gate~0's $(p/p_0)^{\varepsilon}$.
 \end{frame}
 
 \begin{frame}{Jacobi step}
+\topic{$\mathrm{fac}=\exp(\eta\log(p/p_0))$, then Gate~0 $d^g$ per crop.}
 \matchbanner{dynamic\_coupled.\_simulate\_coupled docstring}{dynamic\_coupled.py:112--217}
 
 Each step $t$:
@@ -89,6 +93,7 @@ step, rice does not see the already-updated wheat price.
 \end{frame}
 
 \begin{frame}{Identity: $\sigma=0$ recovers Gate~0}
+\topic{$\sigma=0$: coupled $p$ $=$ solo Gate~0 $p$ (machine precision).}
 \matchbanner{README \S6 spirit; GATE1 hard bar 1}{dynamic\_coupled.assert\_subst0\_matches\_gate0}
 
 Coupled $\sigma=0$ monthly prices vs three independent
@@ -107,6 +112,7 @@ README \S6's proposition, on the \textbf{live} host, not on the annual QP.
 \end{frame}
 
 \begin{frame}{Gate 1 locked band --- prices}
+\topic{$p_t$ at $\sigma\in\{0,0.3,0.6\}$: spillover sign, wheat leadership.}
 \fitfig[0.34\paperheight]{fig_gate1_substitution.png}
 {\scriptsize \texttt{diagnostics/gate1\_report.md}. Official split.
 Spillover 2007/08 vs $\sigma=0$: rice $\times 1.018$ / $\times 1.039$,
@@ -117,6 +123,7 @@ the 2008 rice hike.}
 \end{frame}
 
 \begin{frame}{Soft leftover: maize 2010 at $\sigma=0.6$}
+\topic{Maize 2010 hike leftover. Do not pick $\sigma^\star$ on this bar.}
 \fitfig[0.42\paperheight]{fig_gate1_e5_maize.png}
 {\scriptsize Maize 2010 hike $\times 1.70\to\times 1.15$ at $\sigma=0.6$
 (obs $\times 1.44$). E5: zeroing $\rho_{\mathrm{wm}}$ restores $87\%$;
@@ -125,6 +132,7 @@ wheat--maize spillover, not a lower 2011 peak. Do not pick $\sigma^\star$.}
 \end{frame}
 
 \begin{frame}{What Gate 1 does not claim}
+\topic{Scope: no $\sigma^\star$, no game, no spatial CES fingerprint.}
 \begin{itemize}
 \item It does not estimate $\sigma$.
 \item It does not turn on the export game.

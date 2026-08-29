@@ -1,6 +1,7 @@
 \section{Bilateral clear and world price}
 
 \begin{frame}{Ask-reweighted destinations}
+\topic{$\tilde A_{ij}\propto A_{ij}(p_0/q_{i,t})^{\gamma}$. Cheap asks steal share.}
 \matchbanner{README \S8 $\tilde A_{ij}$}{dynamic\_crop.\_ask\_reweight\_dest}
 
 \[
@@ -16,6 +17,7 @@ steal destination share. $q_{i,0}=p_0$.
 \end{frame}
 
 \begin{frame}{Armington min-clear plus residual pool}
+\topic{$\mathrm{ship}_{ij}=\min(O_i\tilde A_{ij},\,D_j S_{ij})$, then $\nu$ pool.}
 \matchbanner{README \S8 $\mathrm{ship}_{ij}$}{dynamic\_crop.\_bilateral\_clear}
 
 Preferred links:
@@ -35,6 +37,7 @@ Gate~1 cross-grain $\sigma$.
 \end{frame}
 
 \begin{frame}{Fill rates update asks}
+\topic{$q_{i,t+1}$: fill, blockage $b_t$, mean-reversion to $p$.}
 \matchbanner{README \S8 $q_{i,t+1}$}{dynamic\_crop.py:625--636}
 
 \[
@@ -60,6 +63,7 @@ leftover $\Rightarrow$ cut. $\alpha_r=0$ recovers the own-fill law
 \end{frame}
 
 \begin{frame}{Rival markup $\alpha_r$ is a floor, not a 2008 fit}
+\topic{$\alpha_r$: survivors mark up when preferred sources are blocked.}
 \matchbanner{GATE0\_PARAMETERIZATION $\alpha_r$ note}{dynamic\_crop.py:631--634}
 
 $\alpha_r=0.80$ is the Agrimate oligopolist channel: survivors mark up
@@ -73,6 +77,7 @@ $\alpha_r=0$ recovers the own-fill law. Not fit to 2008 peaks.
 \end{frame}
 
 \begin{frame}{Locked grain is not world-accessible}
+\topic{$\mathrm{locked}_t$, $\mathrm{free}_t$: withheld surplus is not abundance.}
 \matchbanner{README \S8 $\mathrm{locked}_t$}{dynamic\_crop.py:639--643}
 
 \[
@@ -92,6 +97,7 @@ shortage without a ban looking cheap.
 \end{frame}
 
 \begin{frame}{Unmet anomaly and blockage}
+\topic{$u_t$, $\Delta u_t$, $b_t$: tightness vs the twin.}
 \matchbanner{README \S8 $u_t$, $b_t$, $\Delta u_t$}{dynamic\_crop.py:646--648, 627--630}
 
 \[
@@ -108,6 +114,7 @@ path-matched twin (seasonal $H$, mean flex, no industrial, $\tau\equiv 0$).
 \end{frame}
 
 \begin{frame}{Scarcity ratio --- README writes $f$; code builds a shift}
+\topic{$r_t=(\mathrm{twin}+\mathrm{shift})/(\mathrm{free}+\mathrm{shift})$. No named $f$.}
 \divbanner{README \S8 $r_t=(F^{\mathrm{twin}}+f)/(\mathrm{free}+f)$}{dynamic\_crop.py:661--663}
 
 Code:
@@ -129,6 +136,7 @@ undefined; the code is a floor that keeps $r_t$ defined and calm-stable.
 \end{frame}
 
 \begin{frame}{Scarcity price, blend, smoother}
+\topic{$p^{\mathrm{scar}}$, $p^\star=\omega p^{\mathrm{tr}}+(1-\omega)p^{\mathrm{scar}}$, $p_t$ AR.}
 \matchbanner{README \S8 $p^{\mathrm{scar}}$, $p^\star$, $p_t$}{dynamic\_crop.py:668--680}
 
 If calm ($\mathrm{free}=F^{\mathrm{twin}}$, $\Delta u=0$, $b=0$): $p^\star=p_0$.
@@ -154,6 +162,7 @@ clipped to $[60, 1200]$ \$/t. $\eta$ is symmetric in surplus and shortage
 \end{frame}
 
 \begin{frame}{Calm identity holds to machine precision}
+\topic{Assert: no shock, no AMIS $\Rightarrow$ $p_t\equiv p_0$, $\mathrm{free}\equiv F^{\mathrm{twin}}$.}
 \matchbanner{README \S8 \texttt{assert\_twin\_identity}}{dynamic\_crop.py:900--917}
 
 Wheat neither-path (no harvest shock, no AMIS, mean flex, no industrial):
@@ -175,6 +184,7 @@ loose relative to what the code actually delivers.
 \end{frame}
 
 \begin{frame}{One world price, by construction}
+\topic{One $p_t$ per crop. No domestic CPI. Category \textbf{E}.}
 There is no split domestic vs export ask. A ban withholds grain as stock
 and marks it locked; it does \textbf{not} create a cheaper domestic CPI.
 That is why Gate~2 welfare cannot put world $p$ in the food-security term

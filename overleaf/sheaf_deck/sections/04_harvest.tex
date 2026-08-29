@@ -1,6 +1,7 @@
 \section{Harvest forcing}
 
 \begin{frame}{Climatology is the score-window mean seasonal path}
+\topic{$H^{\mathrm{seas}}_{i,t}=\bar H_i\,w_{i,t}$. Twin harvest.}
 \matchbanner{README \S8}{dynamic\_crop.prepare\_crop\_run:786--787}
 
 \[
@@ -20,6 +21,7 @@ totals laid on the same calendar.
 \end{frame}
 
 \begin{frame}{Treatment harvest is climatology $\times$ LOWESS}
+\topic{$H^{\mathrm{ann}}=\bar H(1+a)$, $a=(Y-\hat Y)/\hat Y$.}
 \matchbanner{README \S8}{dynamic\_crop.py:325--329, data\_usda.detrend\_anomalies}
 
 \[
@@ -39,6 +41,7 @@ linear --- Agrimate's method, hand-rolled in \texttt{\_lowess}, not
 \end{frame}
 
 \begin{frame}{Why not the in-sample mean}
+\topic{Anomaly $a$: vs LOWESS trend, not vs 2006--11 mean.}
 \matchbanner{README \S8 ``Why this matters''}{verify\_claims.py check\_lowess}
 
 World wheat 2006 versus the 2006--11 \emph{mean} is $-8.9\%$. Versus
@@ -56,6 +59,7 @@ in-sample $z$-scores to ``fix'' 2006.}
 \end{frame}
 
 \begin{frame}{Foresight harvest is a blend}
+\topic{$H^{\mathrm{exp}}=\phi H+(1-\phi)H^{\mathrm{seas}}$.}
 \matchbanner{README \S8 $H^{\mathrm{exp}}$}{dynamic\_crop.py:561--565}
 
 \[
@@ -73,6 +77,7 @@ Not estimated on 2008.}
 \end{frame}
 
 \begin{frame}{Lean horizon is a \emph{world} clock}
+\topic{$h_t$: steps until 12\% of mean world harvest arrives.}
 \matchbanner{README \S8 $h_t$; seasonal.steps\_to\_harvest\_pulse}{seasonal.py:163--189}
 
 $h_t$ is the number of steps until cumulative \textbf{world} future harvest
