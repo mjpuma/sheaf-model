@@ -1,7 +1,7 @@
 \section{Gate 2 --- Headey-clock actions}
 
 \begin{frame}[label=gate2]{Types are slow; actions are fortnightly}
-\topic{Object: $\tau_t$ each step. Types (knobs) do not flip every $t$.}
+\topic{Governments can keep a sticky type; the export cut itself is chosen every two weeks.}
 \matchbanner{GAME\_CLOCK.md; Headey 2011}{dynamic\_policy.py:1--7}
 
 \citet{headey2011} objects that sit on dates, not marketing years: export
@@ -18,7 +18,7 @@ Nash is a TWIST-era prototype. It is not run here.
 \end{frame}
 
 \begin{frame}{Illustrative knobs --- not AMIS estimates}
-\topic{\texttt{PolicyKnobs}: players, $r$, $\tau^{\mathrm{on}}$, harvest mult. Not estimated.}
+\topic{The Gate~2 knobs are illustrative types, not estimates from AMIS or 2008 prices.}
 \matchbanner{PolicyKnobs docstring}{dynamic\_policy.py:19--49}
 
 {\scriptsize
@@ -46,7 +46,7 @@ from AMIS or crisis prices. AMIS off. Substitution off. Gate~0/1 not re-run.}
 \end{frame}
 
 \begin{frame}{The crisis object is a ratio, not an absolute floor}
-\topic{$\tau_{i,t}=\tau^{\mathrm{on}}$ iff $S^{\mathrm{open}}/S^{\mathrm{calm}}<r$ in the shock year.}
+\topic{A country restricts when its stocks are thin relative to a normal year, not versus a fixed floor.}
 \matchbanner{GAME\_CLOCK.md $S_{i,t}/S^{\mathrm{calm}}_{i,t}$}{dynamic\_policy.climatology\_relative\_cuts}
 
 \[
@@ -69,7 +69,7 @@ in a normal year is what distinguishes a crisis from a sawtooth.
 \end{frame}
 
 \begin{frame}{Two-pass: open, then cuts}
-\topic{Pass 1: $\tau\equiv 0$ (open $S$). Pass 2: apply $\tau_t$ from the ratio.}
+\topic{First simulate the shock with trade open; then apply cuts from that open stock path.}
 The Gate~0 market loop is not rewritten. Pass 1: simulate the shocked
 harvest with $\tau\equiv 0$ (open path) and the climatology harvest.
 Pass 2: apply $\tau_t$ from the ratio, simulate again.
@@ -83,7 +83,7 @@ play.
 \end{frame}
 
 \begin{frame}{Hard bars --- all PASS}
-\topic{Calm $\tau=0$; shock Russia/KZ on. Nested-year BR diagnostic.}
+\topic{The hard tests: nobody restricts in a normal year; Russia and Kazakhstan do after the shock.}
 \fitfig[0.24\paperheight]{fig_gate2_headey_tau.png}
 
 {\scriptsize
@@ -104,7 +104,7 @@ Nested year BR: calm $\tau^\star=0$, shock $\tau^\star=0.6$.}
 \end{frame}
 
 \begin{frame}{The cascade is harvest diversion, not ban-on-ban}
-\topic{KZ open-path $S/S^{\mathrm{calm}}$ already $<r$ before Russian $\tau$.}
+\topic{Kazakhstan is already thin from the missing Russian harvest, before Russia bans.}
 \divbanner{a sequential IBR reading}{GATE2\_PLAN.md; verify\_claims.py}
 \fitfig[0.30\paperheight]{fig_gate2_ratios.png}
 {\scriptsize Open-path KZ trough $0.757<0.85$ \emph{before} any Russian
@@ -116,14 +116,14 @@ $\tau$. Closed raises that trough to $0.807$. Ukraine open min $0.86$
 \end{frame}
 
 \begin{frame}{Roles on the map}
-\topic{Who plays, who is shocked, who is silent. Not a 2008 map.}
+\topic{Who can choose a cut, who gets the harvest shock, who is on the market and silent.}
 \fitfig[0.62\paperheight]{fig_gate2_map_roles.png}
 {\scriptsize Who plays, who is shocked, who is on the market and silent.
 Not a 2008 who-restricted map.}
 \end{frame}
 
 \begin{frame}{Nested-year BR is a diagnostic, not the crisis object}
-\topic{$\mathcal{W}$: year export revenue $-$ stock shortfall. Not live $\tau_t$.}
+\topic{A year-level welfare check used to lock the cut intensity --- not the live fortnight rule.}
 \leftoverbanner{welfare() year-mean stock vs s\_gov}{dynamic\_policy.py:87--117}
 
 \[
@@ -144,7 +144,7 @@ rule is the Headey gate, not this annual loop.
 \end{frame}
 
 \begin{frame}{What Gate 2 beta does not claim}
-\topic{Scope: not 2008 who-banned, not fortnight Nash, not importer scramble.}
+\topic{What this beta does not claim: not 2008 who-banned, not a fortnight Nash, not importer scramble.}
 \begin{itemize}
 \item Not who banned in 2008 or 2010.
 \item Not sequential fortnight Nash.

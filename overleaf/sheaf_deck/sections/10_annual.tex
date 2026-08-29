@@ -1,7 +1,7 @@
 \section{Annual leftover (README \S1--\S6 / \texttt{core.py})}
 
 \begin{frame}[label=leftover]{This section is the leftover host}
-\topic{Annual SPE $+$ year-Nash in \texttt{core.py}. Skip unless \S1--\S6.}
+\topic{The old annual model. Skip unless the question is README sections 1--6.}
 \leftoverbanner{README \S1--\S6}{sheaf/core.py}
 
 \textbf{Skip unless the question is README \S1--\S6.}
@@ -17,7 +17,7 @@ isoelastic.
 \end{frame}
 
 \begin{frame}{Linear demand and the benefit potential}
-\topic{$D=a-Mp$, potential $W_i$, consumer surplus. Leftover host.}
+\topic{Annual leftover demand: linear in prices, with a consumer-surplus potential.}
 \leftoverbanner{README \S1}{core.py:88, 79--87}
 
 \[
@@ -42,7 +42,7 @@ $\Rightarrow$ the QP is well-posed. Code: \texttt{DemandSystem.surplus}.
 \end{frame}
 
 \begin{frame}{Construction of $M_i$}
-\topic{$M=\mathrm{diag}(b)-S$ after row-cap and geometric symmetrisation.}
+\topic{How the leftover demand-slope matrix is built from elasticities.}
 \leftoverbanner{README \S1}{core.py:111--130}
 
 \[
@@ -69,7 +69,7 @@ not the arithmetic mean. On SHEAF's calibration both are well-defined.
 \end{frame}
 
 \begin{frame}{$M\succ 0$ on the calibration; diagonal dominance is lost}
-\topic{$M\succ 0$ holds; dominance wording fails after symmetrisation.}
+\topic{That matrix is still positive definite on the calibration; the README's dominance proof is not.}
 \leftoverbanner{README \S1 ``strict diagonal dominance $\Rightarrow M\succ 0$''}{core.py:121--128}
 
 After the geometric-mean step, several nodes \textbf{lose} strict diagonal
@@ -88,7 +88,7 @@ PD of $M$ on this construction appears to survive anyway. Category
 \end{frame}
 
 \begin{frame}{Market QP}
-\topic{$\max\sum W_i-\sum K f$ s.t.\ balance. $\tau$ here is \$/t.}
+\topic{The leftover market: a yearly spatial QP. An export tax here is dollars per tonne.}
 \leftoverbanner{README \S2}{core.SpatialEquilibrium.solve}
 
 \[
@@ -113,7 +113,7 @@ status must be \texttt{optimal} (not merely $D.\mathrm{value}$ not None).
 \end{frame}
 
 \begin{frame}{KKT / spatial arbitrage}
-\topic{$p_j-p_i\le K_{ij}$, complementary slackness on $f_{ij}$.}
+\topic{Grain moves on a leftover route only if the price gap covers shipping plus the tax.}
 \leftoverbanner{README \S2 Enke--Samuelson}{QP KKT, not separately coded}
 
 At an optimum the multiplier on the balance is the recovered inverse-demand
@@ -134,7 +134,7 @@ host. The crisis host insulates by cutting \textbf{offers}, not by a $K$ wedge.
 \end{frame}
 
 \begin{frame}{Competitive storage --- lagged price, disclosed}
-\topic{$\Delta^{\mathrm{mkt}}$ from lagged $p^{\mathrm{prev}}$. Not Deaton--Laroque RE.}
+\topic{Leftover commercial storage uses last year's price, not a rational-expectations storage equilibrium.}
 \leftoverbanner{README \S3}{core.market\_responsive\_storage}
 
 \[
@@ -161,7 +161,7 @@ RE. Category \textbf{E}.
 \end{frame}
 
 \begin{frame}{Government buffer on the leftover host}
-\topic{$\Delta^{\mathrm{gov}}$ release/rebuild. Not the Gate~2 Headey gate.}
+\topic{Leftover government buffer: release in a crisis, rebuild in calm. Not the Gate~2 rule.}
 \leftoverbanner{README \S3}{core.strategic\_storage}
 
 Quantity-leg shortfall after normal baseline trade:
@@ -179,7 +179,7 @@ $\xi=1$. This rule is \textbf{not} the Gate~2 Headey gate.
 \end{frame}
 
 \begin{frame}{Annual export-restriction game}
-\topic{Year IBR on $\tau$ in \$/t. Not the crisis $\tau_t$.}
+\topic{The leftover export game: an annual tax in dollars per tonne, not the fortnight cut.}
 \leftoverbanner{README \S4}{core.ExportRestrictionGame}
 
 \[
@@ -203,7 +203,7 @@ $\max p > \mu p^{\mathrm{norm}}$ ($\mu=1.12$).
 \end{frame}
 
 \begin{frame}{README \S6 proposition --- holds on this host}
-\topic{$\sigma=0$: leftover QP splits. Live analogue is Gate~1 identity.}
+\topic{On the leftover host, turning substitution off splits the yearly problem into three separate markets.}
 \leftoverbanner{README \S6}{core.build\_demand\_system at $\sigma=0$}
 
 If $\sigma=0$ (equivalently $\rho\equiv 0$), $S=0$ and $M_i=\mathrm{diag}(b)$

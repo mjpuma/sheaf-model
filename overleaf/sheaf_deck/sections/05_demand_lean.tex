@@ -1,7 +1,7 @@
 \section{Demand, lean cover, offers}
 
 \begin{frame}[label=spine]{One step on the spine}
-\topic{Sequence at $t$: $\mathrm{avail}\to d\to L,T\to D,O\to\mathrm{ship}\to S\to p$.}
+\topic{What happens in one two-week step, in order: grain on hand, demand, trade, stocks, price.}
 \matchbanner{README \S8 sequencing}{dynamic\_crop.\_simulate\_window:577--681}
 
 \begin{center}
@@ -35,7 +35,7 @@ Gate~2 writes $\tau_t$ \emph{before} box~4. The market loop is not rewritten.}
 \end{frame}
 
 \begin{frame}{Flex vs industrial use}
-\topic{$C=C^{\mathrm{flex}}+C^{\mathrm{ind}}$. Industrial: USA maize FSI only.}
+\topic{Use splits into price-sensitive food/feed and inelastic industrial (USA maize ethanol).}
 \matchbanner{README \S8 $C^{\mathrm{flex}}, C^{\mathrm{ind}}$}{dynamic\_crop.\_demand\_blocks}
 
 \[
@@ -61,7 +61,7 @@ China FSI is not treated as ethanol.
 \end{frame}
 
 \begin{frame}{Isoelastic food/feed demand}
-\topic{$d_{i,t}=C^{\mathrm{flex}}(p_t/p_0)^{\varepsilon}+C^{\mathrm{ind}}$.}
+\topic{How food/feed use responds to the world price this step.}
 \matchbanner{README \S8 $d_{i,t}$}{dynamic\_crop.py:579--581}
 
 \[
@@ -80,7 +80,7 @@ There is \textbf{one} world $p_t$ per crop, not a domestic CPI.
 \end{frame}
 
 \begin{frame}{Official P1 demand flags}
-\topic{Scoring flags: mean flex, industrial on, shocks on, AMIS on.}
+\topic{Which demand switches are on for the official hindcast (and which are not).}
 Official matched split is \textbf{mean flex} + industrial on + harvest
 $\pm$ AMIS:
 
@@ -101,7 +101,7 @@ to the same official flags.
 \end{frame}
 
 \begin{frame}{Lean gap --- README and code disagree on the window}
-\topic{$L_{i,t}$: cover through $h_t$. Code includes $k=0$; README starts at $k=1$.}
+\topic{How much extra grain a country wants on hand until the next harvest pulse.}
 \divbanner{README \S8: $L=\max(0,\sum_{k=1}^{h_t} C - \sum_{k=1}^{h_t} H^{\mathrm{exp}})$}
 {dynamic\_crop.py:585--588}
 
@@ -127,7 +127,7 @@ its comment. The README equation is missing the current step.
 \end{frame}
 
 \begin{frame}{Target stock}
-\topic{$T_{i,t}=L_{i,t}+s_i$, $s_i=\mathtt{stu\_target}\,C_i^{\mathrm{ann}}$.}
+\topic{Target stocks: that lean cover plus a fixed safety buffer.}
 \matchbanner{README \S8 $T_{i,t}=L_{i,t}+s_i$}{dynamic\_crop.py:589}
 
 \[
@@ -146,7 +146,7 @@ country commercial carry is therefore sold down. Disclosed leftover.}
 \end{frame}
 
 \begin{frame}{Purchase demand}
-\topic{$D_{i,t}$: food gap $+$ $\lambda$ rebuild toward $T$.}
+\topic{Import demand this step: the food shortfall plus a slow rebuild toward the target.}
 \matchbanner{README \S8 $D_{i,t}$}{dynamic\_crop.py:591--595}
 
 \[
@@ -164,7 +164,7 @@ toward the lean target). Not a storage Euler equation.
 \end{frame}
 
 \begin{frame}{Export offers}
-\topic{$O_{i,t}=(1-\tau_{i,t})\,\max(0,\mathrm{avail}-d-T)$.}
+\topic{Export offers: surplus above food and the stock target, then cut by the restriction.}
 \matchbanner{README \S8 $O_{i,t}$}{dynamic\_crop.py:596}
 
 \[
@@ -182,7 +182,7 @@ ships only go to $\times 0.79$.
 \end{frame}
 
 \begin{frame}{Carry capacity $W$ --- README matches code; a diagnostics note does not}
-\topic{$W_{i,t}$: carry ceiling $+$ pipeline. Stale note vs code.}
+\topic{Warehouse capacity: how much stock a country is allowed to carry.}
 \divbanner{GATE0\_PARAMETERIZATION \S2.3 displayed equation}{dynamic\_crop.py:614--618}
 
 Code and README \S8:
@@ -210,7 +210,7 @@ equation is stale.}
 \end{frame}
 
 \begin{frame}{Soft warehouse clip and stock update}
-\topic{$S_{i,t+1}$ and $\lambda_W$ overflow drain toward $W$.}
+\topic{How stocks update at the end of the step, including a soft drain of overflow.}
 \matchbanner{README \S8 warehouse\_lambda}{dynamic\_crop.py:607--623}
 
 \[
@@ -232,7 +232,7 @@ starved lean-season offers. Soft clip leaves $W$ as an attractor.
 \end{frame}
 
 \begin{frame}{Opening stocks}
-\topic{$S_{i,0}$: PSD seed year, clip, optional 2-year spin-up.}
+\topic{Where opening stocks come from, and the two-year warm-up before 2006.}
 Opening $S_{i,0}$ is PSD ending stocks in \texttt{stock\_seed\_year} (default
 2005), clipped to $\max(\mathtt{max\_stu}\,C,\, 1.5 s)$, then optionally
 spun up for \texttt{spin\_up\_years=2} on climatology harvest, mean flex,

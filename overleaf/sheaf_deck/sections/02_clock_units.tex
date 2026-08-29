@@ -1,7 +1,7 @@
 \section{Clock and units}
 
 \begin{frame}{The crisis clock is 24 steps per year}
-\topic{$T_y=24$, $\Delta t=365.25/24$ days. Index $t$.}
+\topic{Time in the crisis model: 24 steps per year, about two weeks each.}
 \matchbanner{README \S8: $T_y=24$, $\Delta t \approx 15.2$ days}{calendar24.py:12--13}
 
 \[
@@ -20,7 +20,7 @@ A 2006--2011 run is $6\times 24 = 144$ steps. Verified:
 \end{frame}
 
 \begin{frame}{Why 24, not 26 fortnights}
-\topic{Clock choice: tiles months. Not a fitted frequency.}
+\topic{Why 24 steps, not a true 26-fortnight calendar.}
 A true fortnight calendar (26.09 steps/year) does not tile months. Pink
 Sheet targets and AMIS start/end dates are monthly. Scoring a 26-step path
 against a monthly series requires an extra month$\leftrightarrow$step map
@@ -36,7 +36,7 @@ STEPS\_PER\_YEAR = 24''.}
 \end{frame}
 
 \begin{frame}{Canonical units}
-\topic{MMT, real \$/t, $\tau\in[0,1]$ on the spine.}
+\topic{Units: million tonnes, dollars per tonne, and export cuts as fractions.}
 \matchbanner{core.py docstring; README \S8}{core.py:40, data\_usda.py:36}
 
 {\scriptsize
@@ -59,7 +59,7 @@ Export tax in \texttt{core.py} & USD / tonne wedge & leftover; not Gate~0 \\
 \end{frame}
 
 \begin{frame}{A worked unit check}
-\topic{$Q_{\mathrm{USA},2008}$: PSD $68363\times 10^{-3}=68.363$~MMT.}
+\topic{One worked example: USDA reports thousand tonnes; the model uses million tonnes.}
 \matchbanner{USA wheat 2008 production}{data\_usda.load\_psd\_country}
 
 Raw PSD bulk, United States, Wheat, Market Year 2008,

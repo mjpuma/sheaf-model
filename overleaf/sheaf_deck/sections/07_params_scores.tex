@@ -1,7 +1,7 @@
 \section{Locked parameters and Gate 0 scores}
 
 \begin{frame}[label=cropparams]{CropParams --- literature vs reduced-form}
-\topic{Locked $\varepsilon$, STU, $\lambda$, $\eta$, $\rho$, $\omega$, $\kappa$, $\alpha$, $\phi$. Do not retune.}
+\topic{The locked parameter table: which knobs are literature, which are reduced-form.}
 {\scriptsize Literature: $\varepsilon$, STU. Structural: pipeline.
 Reduced-form: $\lambda,\eta,\rho,\omega,\kappa,\alpha,\phi$ --- locked,
 shared across years. Do not retune.}
@@ -30,7 +30,7 @@ $\phi$ & $0.55$ & $0.50$ & $0.55$ & reduced-form & harvest foresight \\
 \end{frame}
 
 \begin{frame}[label=gate0scores]{Gate 0 wheat --- locked score}
-\topic{Wheat $p_t$: corr, 2008/2010 hike ratios, MY-end stocks.}
+\topic{Official wheat hindcast: price correlation, the two crisis hikes, ending stocks.}
 \fitfig[0.36\paperheight]{fig_gate0_wheat_diagnostics.png}
 {\scriptsize Official P1: harvest + AMIS + mean flex.
 \texttt{diagnostics/gate0\_wheat\_report.md}.
@@ -40,7 +40,7 @@ corr(full) $=+0.720$. 2007/08 $\times 2.27$ vs obs $\times 1.82$
 \end{frame}
 
 \begin{frame}{Gate 0 maize and rice --- locked scores}
-\topic{Maize / rice $p_t$: same score table as wheat.}
+\topic{The same official scores for maize and rice.}
 {\scriptsize
 \renewcommand{\arraystretch}{1.0}
 \setlength{\tabcolsep}{4pt}
@@ -62,7 +62,7 @@ maize $\tau$ must not \emph{cut} world price (assert floor $0$).}
 \end{frame}
 
 \begin{frame}{Disclosed Gate 0 leftovers (not hidden knobs)}
-\topic{Known residuals: prices, stocks, consumption path. Not a retune list.}
+\topic{What still does not match history, and is left as a leftover --- not a retune list.}
 These are in \texttt{GATE0\_PARAMETERIZATION.md} \S6. They are not a
 retune list.
 
@@ -81,7 +81,7 @@ retune list.
 \end{frame}
 
 \begin{frame}{Who banned, who harvested --- 2008 wheat}
-\topic{Map: AMIS $\tau$ vs harvest shock. Not who \emph{would} restrict.}
+\topic{Who had a harvest shock and who had an AMIS ban in 2008 wheat. Not who would have banned.}
 \fitfig[0.62\paperheight]{fig_gate0_map_wheat_roles_2008.png}
 {\scriptsize AMIS on the diary, not chosen. Gate~0 does not ask who
 \emph{would} restrict.}

@@ -1,7 +1,7 @@
 \section{Source data}
 
 \begin{frame}{USDA PSD --- production, consumption, stocks}
-\topic{$Q_{i,y}$, $C_{i,y}$, $R_{i,y}^{\mathrm{end}}$ in MMT. Not FAOSTAT stocks.}
+\topic{Where production, consumption, and stocks come from (USDA, million tonnes).}
 \matchbanner{README \S7 / \S8}{data\_usda.load\_psd\_country}
 
 Crisis-host quantities come from the FAS bulk, not from FAOSTAT food-balance
@@ -21,7 +21,7 @@ Vintage 2026-08-21. \texttt{data/usda\_psd/PROVENANCE.txt}.}
 \end{frame}
 
 \begin{frame}{Do not score consumption on \texttt{load\_crop\_world}}
-\topic{Scoring $C$: country-sum PSD, not the world-aggregate CSV.}
+\topic{Which USDA file we score consumption on --- not the world-total CSV.}
 The world-aggregate CSVs in \texttt{data/usda\_world/} omit the EU as a
 node and are a different USDA aggregate. Official P1 consumption bars use
 the \textbf{country-sum} of \texttt{load\_psd\_country}, not
@@ -37,7 +37,7 @@ World-aggregate series remain useful for a long LOWESS history
 \end{frame}
 
 \begin{frame}{FAOSTAT E0 is a pattern, not a trade volume}
-\topic{$A_{ij}$, $S_{ij}$ shares. $\mathrm{ship}_{ij}$ tonnes come from $O,D$.}
+\topic{Trade \emph{tonnes} come from USDA offers and demand. FAOSTAT only says who trades with whom.}
 \divbanner{README table can be read as ``E0 is tonnes''}{data\_faostat.py:21--23}
 
 \textbf{Trade volume is MMT/step}, from USDA offers $O$ and demand $D$.
@@ -63,7 +63,7 @@ That mix is what E0 contributes. The tonnes on the link come from $O,D$.
 \end{frame}
 
 \begin{frame}{Vietnam rice E0 is a documented data repair}
-\topic{$A_{\mathrm{VNM},\cdot}$ rice 2006--07 / 2010--11: zero-row repair.}
+\topic{Vietnam is missing from the crisis-window rice trade file; the code repairs that row.}
 \matchbanner{GATE0\_PARAMETERIZATION \S2.4}{dynamic\_crop.py:439--465}
 
 Crisis-window rice files (2006--07, 2010--11) have a \textbf{zero Vietnam
@@ -81,7 +81,7 @@ labelled as such. Not fit to 2008.}
 \end{frame}
 
 \begin{frame}{Pink Sheet --- the price target}
-\topic{$p_0$: mean real HRW / Thai 5\% / maize in the start year.}
+\topic{The price we score against: World Bank Pink Sheet grain prices, real 2010 dollars.}
 \matchbanner{README \S8 $p_0$, scoring}{data\_usda.load\_price\_series\_monthly}
 
 \[
@@ -102,7 +102,7 @@ $\mathrm{real}_{m,y} = \mathrm{nominal}_{m,y}\times
 \end{frame}
 
 \begin{frame}{Wheat is grain, not flour or bread}
-\topic{Commodity scope: unprocessed grain. No flour/bread/kcal tree.}
+\topic{Wheat in this model is grain, not flour or bread. Same choice as Agrimate.}
 \matchbanner{Agrimate: unprocessed grain only}{data/usda\_psd/PROVENANCE.txt}
 
 PSD wheat, HRW, and E0 \texttt{Wheat\_Avg} are \textbf{unprocessed grain}.
@@ -124,7 +124,7 @@ not this market. Category \textbf{E}.
 \end{frame}
 
 \begin{frame}{AMIS ``Wheat'' can include flour HS lines}
-\topic{$\tau$ from class Wheat (grain $+$ flour HS). Lands on grain $O$.}
+\topic{AMIS labels a flour tax as ``Wheat.'' That cut still hits grain export offers.}
 \matchbanner{aggregated CommodityClass\_Name}{dynamic\_crop.amis\_export\_cuts}
 
 Gate~0 filters the \textbf{aggregated} AMIS sheet on class
@@ -142,7 +142,7 @@ grain market. Disclosed seam, not a mill.
 \end{frame}
 
 \begin{frame}{AMIS --- quantity cuts on the spine, not \$/t}
-\topic{$\tau_{i,t}\in[0,1]$: offer cut, not a \$/t tax.}
+\topic{How an AMIS ban or tax becomes a fraction cut on export \emph{offers} (not a dollar tax).}
 \matchbanner{README \S8 $\tau_{i,t}\in[0,1]$}{dynamic\_crop.py:43--50}
 
 Gate~0 maps AMIS labels to \textbf{offer cuts} (max if overlapping).
@@ -170,7 +170,7 @@ Customs-clearance restriction & 0.15 \\
 \end{frame}
 
 \begin{frame}{The leftover AMIS map is a different object}
-\topic{Leftover $\tau$: \$/t wedges on the annual SPE. Not Gate~0.}
+\topic{A second AMIS map exists for the old annual model: dollars per tonne, not a fraction.}
 \leftoverbanner{data\_usda.amis\_tau\_schedule}{data\_usda.py:351--373}
 
 The same AMIS file is also mapped to \textbf{\$/t wedges} for the annual
@@ -186,7 +186,7 @@ the leftover host.
 \end{frame}
 
 \begin{frame}{Crop calendars}
-\topic{$w_{i,t}$: triangular harvest weights, $\sum_t w=1$.}
+\topic{How an annual harvest is spread across the 24 steps of the year.}
 \matchbanner{README \S8 harvest calendars}{seasonal.py:44--65, data/crop\_calendars/}
 
 Annual production is spread with \textbf{triangular} month weights inside
@@ -203,7 +203,7 @@ Agrimate-style concentration mid-season.}
 \end{frame}
 
 \begin{frame}{Marketing-year end months}
-\topic{Scoring month for $R^{\mathrm{end}}$: wheat May, maize August, \ldots}
+\topic{When we read ``ending stocks'': local marketing-year month, not December.}
 PSD ending stocks are \textbf{local marketing-year} carry, not calendar
 December. Scoring world wheat in May and maize in August is the USDA FAS
 convention, not Agrimate's 28-region grouping.
