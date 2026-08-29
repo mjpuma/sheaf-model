@@ -20,6 +20,11 @@ the Agrimate authors. Every equation is grounded in `README.md` and the
 live hosts (`sheaf/dynamic_crop.py`, `dynamic_coupled.py`,
 `dynamic_policy.py`). `sheaf/core.py` is labelled leftover.
 
+The sitting map (early in the deck) jumps to lineage, the one-step spine,
+CropParams, Gate 0 scores, Gate 1, Gate 2, the leftover host (skip unless
+README §§1–6 is the question), and the five Agrimate questions. Do not
+read the leftover section as the 2007/08 model.
+
 Red banners are README/code divergences. Both sides are shown. The
 companion script:
 

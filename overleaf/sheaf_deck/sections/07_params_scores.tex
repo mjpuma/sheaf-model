@@ -1,9 +1,12 @@
 \section{Locked parameters and Gate 0 scores}
 
-\begin{frame}{CropParams --- literature vs reduced-form}
+\begin{frame}[label=cropparams]{CropParams --- literature vs reduced-form}
+{\scriptsize Literature: $\varepsilon$, STU. Structural: pipeline.
+Reduced-form: $\lambda,\eta,\rho,\omega,\kappa,\alpha,\phi$ --- locked,
+shared across years. Do not retune.}
 {\tiny
-\renewcommand{\arraystretch}{0.82}
-\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{0.80}
+\setlength{\tabcolsep}{3.2pt}
 \begin{tabular}{@{}lrrrll@{}}
 \toprule
 Parameter & Wheat & Maize & Rice & Class & Role \\
@@ -23,12 +26,9 @@ $\alpha_r$ & $0.80$ & $0.80$ & $0.80$ & reduced-form & rival markup \\
 $\phi$ & $0.55$ & $0.50$ & $0.55$ & reduced-form & harvest foresight \\
 \bottomrule
 \end{tabular}}
-
-{\scriptsize From \texttt{default\_crop\_params()}. Reduced-form knobs are
-sign-constrained and shared across years. Do not retune in this sitting.}
 \end{frame}
 
-\begin{frame}{Gate 0 wheat --- locked score}
+\begin{frame}[label=gate0scores]{Gate 0 wheat --- locked score}
 \fitfig[0.36\paperheight]{fig_gate0_wheat_diagnostics.png}
 {\scriptsize Official P1: harvest + AMIS + mean flex.
 \texttt{diagnostics/gate0\_wheat\_report.md}.
@@ -63,17 +63,16 @@ These are in \texttt{GATE0\_PARAMETERIZATION.md} \S6. They are not a
 retune list.
 
 \begin{itemize}
-\item Wheat 2007/08 still high ($\times 2.27$ vs $\times 1.82$).
-\item Wheat 2010 hike ratio is production-led after LOWESS.
-\item Wheat 2006/07 still $\times 1.46$ vs obs $\sim\times 0.95$.
-\item Maize 2010/11 a bit high ($\times 1.70$ vs $\times 1.44$).
-\item Country stock \emph{levels}: world MY-end matches; many exporters sit
-      on the global safety floor. $\Delta$stock signs $\approx$ coin-flip.
-\item World ex-China maize $\times 1.49$ (China MY is September, world bar
-      is August).
-\item Consumption path is flat/down (mean flex $+$ $\varepsilon<0$) while
-      PSD use rises. Wheat corr $-0.17$, maize $-0.64$, rice $-0.74$.
-\item $\tau$ cuts \textbf{offers}; shipments are demand-constrained.
+\item \textbf{Prices.} Wheat 2008 still high ($\times 2.27$ vs $\times 1.82$);
+      2006/07 still $\times 1.46$ vs obs $\sim\times 0.95$; maize 2010 a bit
+      high ($\times 1.70$ vs $\times 1.44$). Wheat 2010 is production-led
+      after LOWESS.
+\item \textbf{Stocks.} World MY-end matches; many exporters sit on the
+      global safety floor. $\Delta$stock signs $\approx$ coin-flip.
+      World ex-China maize $\times 1.49$ (China MY September, world bar August).
+\item \textbf{Use.} Consumption flat/down (mean flex $+$ $\varepsilon<0$)
+      while PSD use rises (wheat corr $-0.17$, maize $-0.64$, rice $-0.74$).
+      $\tau$ cuts offers; shipments are demand-constrained.
 \end{itemize}
 \end{frame}
 

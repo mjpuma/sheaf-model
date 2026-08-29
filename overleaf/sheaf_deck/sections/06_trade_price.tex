@@ -52,13 +52,24 @@ q \leftarrow
 \]
 
 then clipped to $[0.45 p_0,\, 2.8 p_0]$. Sold-out $\Rightarrow$ raise ask;
-leftover $\Rightarrow$ cut. $\alpha_r=0.80$ is the Agrimate oligopolist
-channel (survivors mark up when preferred sources are blocked). Set as the
-smallest shared value at which isolated maize $\tau$ does not \emph{cut}
-world price; not fit to 2008 peaks. $\alpha_r=0$ recovers the own-fill law.
-\bubbles{$\alpha=0.15$, $\theta=0.70$, $\beta=0.18$, $\alpha_r=0.80$: reduced-form, shared, locked.}
+leftover $\Rightarrow$ cut. $\alpha_r=0$ recovers the own-fill law
+(rival term next slide).
+\bubbles{$\alpha=0.15$, $\theta=0.70$, $\beta=0.18$: reduced-form, shared, locked.}
 {$q$: real 2010 \$/t. fill, $b$: dimensionless.}
-{\texttt{dynamic\_crop.py:625--636}; \texttt{GATE0\_PARAMETERIZATION.md} $\alpha_r$ note.}
+{\texttt{dynamic\_crop.py:625--636}.}
+\end{frame}
+
+\begin{frame}{Rival markup $\alpha_r$ is a floor, not a 2008 fit}
+\matchbanner{GATE0\_PARAMETERIZATION $\alpha_r$ note}{dynamic\_crop.py:631--634}
+
+$\alpha_r=0.80$ is the Agrimate oligopolist channel: survivors mark up
+when preferred sources are blocked. It is the smallest \emph{shared}
+value at which isolated maize $\tau$ does not \emph{cut} world price.
+
+$\alpha_r=0$ recovers the own-fill law. Not fit to 2008 peaks.
+\bubbles{$\alpha_r=0.80$ reduced-form, locked, shared.}
+{Dimensionless.}
+{\texttt{CropParams.ask\_rival}; isolated-maize $\tau$ assert floor $0$.}
 \end{frame}
 
 \begin{frame}{Locked grain is not world-accessible}

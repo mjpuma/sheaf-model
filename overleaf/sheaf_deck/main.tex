@@ -27,7 +27,8 @@
 \usepackage{tabularx}
 \usepackage{graphicx}
 \usepackage{tikz}
-\usetikzlibrary{positioning,shapes.callouts,calc}
+\usetikzlibrary{positioning,shapes.callouts,calc,arrows.meta}
+\setbeamerfont{section in head/foot}{size=\tiny}
 \usepackage[round,authoryear]{natbib}
 
 \hypersetup{colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue}
@@ -38,19 +39,19 @@
 \newcommand{\matchbanner}[2]{%
 \begin{tikzpicture}
 \node[anchor=west, fill=green!12, draw=green!50!black, rounded corners=2pt,
-      inner sep=2.2pt, font=\tiny, text width=0.88\textwidth,
+      inner sep=2.2pt, font=\scriptsize, text width=0.90\textwidth,
       align=left] {$\checkmark$~\textbf{Match.} #1 \quad{\ttfamily #2}};
 \end{tikzpicture}\par\vspace{0.25em}}
 \newcommand{\divbanner}[2]{%
 \begin{tikzpicture}
 \node[anchor=west, fill=red!12, draw=red!60!black, rounded corners=2pt,
-      inner sep=2.2pt, font=\tiny, text width=0.88\textwidth,
+      inner sep=2.2pt, font=\scriptsize, text width=0.90\textwidth,
       align=left] {$\times$~\textbf{Diverge.} #1 \quad{\ttfamily #2}};
 \end{tikzpicture}\par\vspace{0.25em}}
 \newcommand{\leftoverbanner}[2]{%
 \begin{tikzpicture}
 \node[anchor=west, fill=gray!15, draw=gray!60, rounded corners=2pt,
-      inner sep=2.2pt, font=\tiny, text width=0.88\textwidth,
+      inner sep=2.2pt, font=\scriptsize, text width=0.90\textwidth,
       align=left] {$\circ$~\textbf{Leftover.} #1 \quad{\ttfamily #2}};
 \end{tikzpicture}\par\vspace{0.25em}}
 
@@ -86,8 +87,9 @@
 \titlepage
 \vspace{-1.2em}
 \begin{center}
-{\scriptsize Crisis host: \texttt{sheaf/dynamic\_crop.py} + \texttt{dynamic\_coupled.py} + \texttt{dynamic\_policy.py}.\\
-Annual leftover: \texttt{sheaf/core.py}. Lineage: TWIST $\to$ Agrimate $\to$ SHEAF.}
+{\scriptsize Crisis host: \texttt{dynamic\_crop.py} + \texttt{dynamic\_coupled.py} + \texttt{dynamic\_policy.py}.\\
+Annual leftover: \texttt{core.py}. Lineage: TWIST $\to$ Agrimate $\to$ SHEAF.\\
+\texttt{verify\_claims.py}: 39 match, 6 documented divergences, 0 failures.}
 \end{center}
 \end{frame}
 

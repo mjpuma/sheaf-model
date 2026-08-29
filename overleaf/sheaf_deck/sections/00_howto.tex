@@ -38,21 +38,37 @@ A departure from Deaton--Laroque is \textbf{E}, not \textbf{A}, if SHEAF
 never claimed that equilibrium.
 \end{frame}
 
-\begin{frame}{What we will not do in this sitting}
-\begin{itemize}
-\item Do not retune \texttt{CropParams} or $\sigma$.
-\item Do not unpause \texttt{sheaf/dynamic\_grains.py}.
-\item Do not re-score 2008 as a who-restricts contest.
-\item Do not graft the annual Slutsky $M_i$ into the 24-step spine.
-\item Do not treat \texttt{core.py} iterated best response as the crisis game.
-\item Do not dumb the language down. Agrimate colleagues read equations.
-\end{itemize}
+\begin{frame}[label=sitmap]{Sitting map}
+{\scriptsize
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{@{}p{0.48\textwidth}p{0.46\textwidth}@{}}
+\toprule
+If the question is & Go to \\
+\midrule
+Lineage / what each gate may claim
+  & \hyperlink{lineage}{\beamergotobutton{lineage}} \\
+How one fortnight actually computes
+  & \hyperlink{spine}{\beamergotobutton{one-step spine}} \\
+What is locked vs illustrative
+  & \hyperlink{cropparams}{\beamergotobutton{CropParams}} \\
+Did the market hindcast 2007/08 and 2010/11
+  & \hyperlink{gate0scores}{\beamergotobutton{Gate 0 scores}} \\
+Substitution without breaking Gate~0
+  & \hyperlink{gate1}{\beamergotobutton{Gate 1}} \\
+Endogenous $\tau_t$ (not a 2008 who-banned score)
+  & \hyperlink{gate2}{\beamergotobutton{Gate 2}} \\
+README \S1--\S6 / the annual QP
+  & \hyperlink{leftover}{\beamergotobutton{leftover --- skip}} \\
+What we want Agrimate to stress
+  & \hyperlink{questions}{\beamergotobutton{five questions}} \\
+\bottomrule
+\end{tabular}}
 
-Numbers quoted as scores are from the locked diagnostics reports. They
-are not being refit here. A companion script
-\texttt{overleaf/sheaf\_deck/verify\_claims.py} re-derives the
-match/diverge banners (39 OK, 6 documented divergences, 0 failures on
-this branch).
+\vspace{0.35em}
+{\scriptsize Do not retune \texttt{CropParams} or $\sigma$. Do not unpause
+\texttt{dynamic\_grains.py}. Do not re-score 2008 as who-restricts.
+Do not graft $M_i$ onto the spine. Do not treat \texttt{core.py} IBR as
+the crisis game. Scores are locked diagnostics, not a refit.}
 \end{frame}
 
 \begin{frame}{Two hosts, one repository}

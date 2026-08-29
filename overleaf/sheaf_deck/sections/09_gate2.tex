@@ -1,6 +1,6 @@
 \section{Gate 2 --- Headey-clock actions}
 
-\begin{frame}{Types are slow; actions are fortnightly}
+\begin{frame}[label=gate2]{Types are slow; actions are fortnightly}
 \matchbanner{GAME\_CLOCK.md; Headey 2011}{dynamic\_policy.py:1--7}
 
 \citet{headey2011} objects that sit on dates, not marketing years: export
@@ -100,16 +100,10 @@ Nested year BR: calm $\tau^\star=0$, shock $\tau^\star=0.6$.}
 
 \begin{frame}{The cascade is harvest diversion, not ban-on-ban}
 \divbanner{a sequential IBR reading}{GATE2\_PLAN.md; verify\_claims.py}
-
-Kazakhstan's \textbf{open-path} trough is already $0.757<0.85$ \emph{before}
-any Russian $\tau$ is applied. With Russia's cuts on, Kazakhstan's trough
-\emph{rises} to $0.807$.
-
-The neighbour fires because Russia's missing harvest diverted import
-pressure onto a leaner stock path at Kazakhstan, not because Kazakhstan
-best-responded to Russia's ban. Ukraine's open min ratio is $0.86$ (does
-not fire). That is Headey's cascade in miniature, and it is also a
-disclosure: this beta is not ban-on-ban contagion.
+\fitfig[0.30\paperheight]{fig_gate2_ratios.png}
+{\scriptsize Open-path KZ trough $0.757<0.85$ \emph{before} any Russian
+$\tau$. Closed raises that trough to $0.807$. Ukraine open min $0.86$
+(does not fire). Neighbour fires from harvest diversion, not ban-on-ban.}
 \bubbles{No extra contagion parameter. The ratio is sufficient.}
 {Ratio dimensionless.}
 {\texttt{verify\_claims.py} section 11; \texttt{gate2\_beta\_report.md}.}

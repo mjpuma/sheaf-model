@@ -1,5 +1,38 @@
 \section{Demand, lean cover, offers}
 
+\begin{frame}[label=spine]{One step on the spine}
+\matchbanner{README \S8 sequencing}{dynamic\_crop.\_simulate\_window:577--681}
+
+\begin{center}
+\begin{tikzpicture}[
+  box/.style={draw=blue!55!black, fill=blue!6, rounded corners=2pt,
+              font=\tiny, align=center, inner sep=2.6pt, text width=3.15cm},
+  arr/.style={-{Stealth}, thick, gray!65!black}]
+\node[box] (a) {1.\ $\mathrm{avail}=S+H$};
+\node[box, right=0.28cm of a] (d) {2.\ $d=C^{\mathrm{flex}}(p/p_0)^{\varepsilon}+C^{\mathrm{ind}}$};
+\node[box, right=0.28cm of d] (l) {3.\ $L$,\ $T=L+s$};
+\node[box, right=0.28cm of l] (o) {4.\ $D$,\ $O=(1-\tau)\,$surplus};
+\node[box, below=0.38cm of a] (s) {5.\ $\tilde A$, Armington $+$ $\nu$};
+\node[box, right=0.28cm of s] (w) {6.\ $S'$, soft clip to $W$};
+\node[box, right=0.28cm of w] (f) {7.\ locked, free};
+\node[box, right=0.28cm of f] (p) {8.\ $r$, $p^{\mathrm{scar}}$, $p^\star$, $p$};
+\draw[arr] (a) -- (d);
+\draw[arr] (d) -- (l);
+\draw[arr] (l) -- (o);
+\draw[arr] (o.south) -- ++(0,-0.14) -| (s.north);
+\draw[arr] (s) -- (w);
+\draw[arr] (w) -- (f);
+\draw[arr] (f) -- (p);
+\end{tikzpicture}
+\end{center}
+
+{\scriptsize Gate~1 multiplies flex by a Jacobi factor \emph{before} box~2.
+Gate~2 writes $\tau_t$ \emph{before} box~4. The market loop is not rewritten.}
+\bubbles{No extra sequencing parameter. This is \texttt{\_simulate\_window}.}
+{Boxes 1--7: MMT/step. Box 8: real 2010 \$/t.}
+{\texttt{sheaf/dynamic\_crop.py:577--681}.}
+\end{frame}
+
 \begin{frame}{Flex vs industrial use}
 \matchbanner{README \S8 $C^{\mathrm{flex}}, C^{\mathrm{ind}}$}{dynamic\_crop.\_demand\_blocks}
 
