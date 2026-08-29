@@ -34,24 +34,29 @@ World-aggregate series remain useful for a long LOWESS history
 \texttt{data/usda\_psd/}: FAS bulk 2026-08-21.}
 \end{frame}
 
-\begin{frame}{FAOSTAT E0 --- network structure only}
-\divbanner{README \S8 $A_{ij}$, $S_{ij}$ from FAOSTAT E0}{data\_faostat.py:21--23}
+\begin{frame}{FAOSTAT E0 is a pattern, not a trade volume}
+\divbanner{README table can be read as ``E0 is tonnes''}{data\_faostat.py:21--23}
 
-Absolute E0 magnitudes are \textbf{unit-agnostic}
-($4.786\times 10^{14}$ for wheat 2006--07 nodes --- not MMT).
+\textbf{Trade volume is MMT/step}, from USDA offers $O$ and demand $D$.
+FAOSTAT E0 is never added up as tonnes. The vendored wheat 2006--07
+matrix sums to $4.786\times 10^{14}$ --- not $\sim 120$~MMT of world
+wheat trade. So the code keeps only shares (units cancel):
 
 {\small
 \[
 A_{ij} = \frac{E_{ij}}{\sum_k E_{ik}}, \quad
-S_{ij} = \frac{E_{ij}}{\sum_k E_{kj}}, \quad A_{ii}=S_{ii}=0.
+S_{ij} = \frac{E_{ij}}{\sum_k E_{kj}}, \quad A_{ii}=S_{ii}=0,
 \]
-}
+\[
+\mathrm{ship}_{ij}
+= \min\bigl(O_{i,t}\tilde A_{ij},\, D_{j,t} S_{ij}\bigr).
+\]}
 
-\texttt{rescale\_to\_total()} exists and is never called on Gate~0.
-Only shares enter \texttt{\_bilateral\_clear}.
-\bubbles{$A$, $S$ structural shares. No trade-volume scale on the spine.}
-{Dimensionless. $A$ rows and $S$ columns sum to 1 (or 0).}
-{FoodTradeNetwork E0, copied 2026-08-24. Window: 2006--2007 Avg.}
+Egypt wheat 2006--07 sources: Russia $37\%$, USA $29\%$, EU $10\%$.
+That mix is what E0 contributes. The tonnes on the link come from $O,D$.
+\bubbles{$A$, $S$ structural. No E0 scale on the spine.}
+{Shares dimensionless. $\mathrm{ship}$, $O$, $D$: MMT/step.}
+{FoodTradeNetwork E0, 2006--2007 Avg. \texttt{\_bilateral\_clear}.}
 \end{frame}
 
 \begin{frame}{Vietnam rice E0 is a documented data repair}
