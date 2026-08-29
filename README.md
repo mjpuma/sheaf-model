@@ -562,6 +562,53 @@ then optionally spun up `spin_up_years=2` on climatology harvest, mean
 flex, no industrial, no AMIS. The $1.5s$ floor is an **opening** clip
 only; warehouse $W$ uses $\mathtt{max\_stu}\,C$ with no $1.5s$ term.
 
+#### Method of solution
+
+The crisis host does **not** solve a spatial price equilibrium, a
+complementarity problem, or a market-clearing root each step.
+`_simulate_window` evaluates an **explicit sequential map**
+$t=0,\ldots,T-1$. Lean horizons and rolling sums are computed once
+before the loop. Inside the step:
+
+1. $\mathrm{avail}_{i,t}=S_{i,t}+H_{i,t}$
+2. $d,L,T,D,O$ from closed-form algebra (isoelastic $d$ uses the
+   **incoming** $p_{t-1}$; $q_{i,t}$ is the ask inherited from $t-1$)
+3. $\tilde A$, Armington $\min$, residual pool (dense $n\times n$)
+4. consumption, stock update, soft warehouse clip
+5. ask update $\to q_{i,t+1}$
+6. $p^{\mathrm{tr}}$, $\mathrm{shift}$, $r$, $p^{\mathrm{scar}}$,
+   $p^\star$, then $p_t=\rho\,p_{t-1}+(1-\rho)\,p^\star_t$
+
+There is no inner iteration to a within-step fixed point. The
+path-matched twin is a **second** forward pass of the same map
+(mean-flex $C$, seasonal $H$, $\tau\equiv 0$). Complexity is
+$O(Tn^2)$ per crop ($n=18$). Implementation is NumPy; `cvxpy` is not
+imported on this path. **SHEAF stays in Python.** Agrimate's Julia is
+because they solve per-step agent optimizations, not because the same
+map is faster in Julia. The same map would be the same algorithm in
+either language.
+
+**Gate 1.** One Jacobi factor $\mathrm{fac}=\exp(\eta\log(p/p_0))$ from
+the three *start-of-step* world prices, then $G$ independent Gate 0
+maps. Not a simultaneous three-crop fixed point and not Gauss–Seidel.
+
+**Gate 2.** Three forward passes of the Gate 0 map (climatology, open
+shocked harvest, then shocked harvest with $\tau_t$). The ratio rule is
+a threshold, not an optimization. Nested-year grid BR is a leftover
+diagnostic for $\tau^{\mathrm{on}}$.
+
+**LOWESS** (prepare time only): tricube local linear, one $2\times 2$
+weighted least-squares solve per sample point (`data_usda._lowess`).
+
+**Leftover annual host** (`core.py`): concave QP via cvxpy
+(CLARABEL → SCS → OSQP) and year-IBR. Not the crisis object.
+
+Agrimate (Kuhla et al. 2025) is a different object: each region’s
+supplier, consumer, and purchaser solve constrained optimizations every
+step (finite-horizon expected profit; CES under budget). That is why
+their model is Julia (optional MPI). SHEAF’s crisis host does not solve
+those agent problems.
+
 #### Robustness asserts
 
 `assert_twin_identity`, `assert_amis_raises_price`, `assert_amis_cuts_exports`,

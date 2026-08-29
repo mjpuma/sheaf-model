@@ -441,6 +441,52 @@ def check_warehouse() -> None:
                "no 1.5s floor in W).")
 
 
+def check_solution_method() -> None:
+    section("13. Method of solution (explicit map, not a QP)")
+    import inspect
+
+    from sheaf import dynamic_coupled, dynamic_crop, dynamic_policy
+    from sheaf.dynamic_crop import _simulate_window
+    from sheaf.dynamic_coupled import _simulate_coupled
+    from sheaf.dynamic_policy import climatology_relative_cuts, simulate_headey
+
+    crop_src = Path(dynamic_crop.__file__).read_text()
+    win_src = inspect.getsource(_simulate_window)
+    rec_ok = ("import cvxpy" not in crop_src
+              and "cvxpy" not in win_src
+              and "for t in range(T):" in win_src)
+    record("OK" if rec_ok else "FAIL",
+           "Gate 0 is an explicit loop; cvxpy is not on this path",
+           f"dynamic_crop.py imports cvxpy={'import cvxpy' in crop_src}; "
+           f"_simulate_window has for-t loop="
+           f"{'for t in range(T):' in win_src}")
+
+    jac = inspect.getsource(_simulate_coupled)
+    fac_ok = "fac = np.exp(eta @ np.log(rel))" in jac
+    inner_ok = "while " not in jac
+    record("OK" if (fac_ok and inner_ok) else "FAIL",
+           "Gate 1 is one Jacobi factor, then G Gate 0 maps",
+           "fac = exp(eta @ log(p/p0)) from start-of-step prices; "
+           "no while-loop inside _simulate_coupled")
+
+    headey_src = inspect.getsource(simulate_headey)
+    cuts_src = inspect.getsource(climatology_relative_cuts)
+    two_pass = ("simulate_prep(prep, harvest=prep.H)" in cuts_src
+                and "simulate_prep(prep, harvest=harvest)" in cuts_src
+                and "simulate_prep(prep, cuts=cuts, harvest=harvest)" in headey_src)
+    record("OK" if two_pass else "FAIL",
+           "Gate 2 is three forward passes plus a threshold",
+           "calm map(H_seas), open map(H_shock, tau=0), "
+           "closed map(H_shock, tau_t) in simulate_headey")
+
+    from sheaf.data_usda import _lowess
+    low_src = inspect.getsource(_lowess)
+    record("OK" if "np.linalg.solve" in low_src else "FAIL",
+           "LOWESS is tricube local linear (2x2 WLS)",
+           "data_usda._lowess: tricube weights, np.linalg.solve on the "
+           "2-column design; prepare-time only")
+
+
 def main() -> int:
     check_clock()
     check_units()
@@ -454,6 +500,7 @@ def main() -> int:
     check_gate1_identity()
     check_gate2()
     check_warehouse()
+    check_solution_method()
 
     section("Summary")
     n_fail = sum(1 for t, _, _ in RESULTS if t == "FAIL")

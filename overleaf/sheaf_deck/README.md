@@ -21,9 +21,10 @@ live hosts (`sheaf/dynamic_crop.py`, `dynamic_coupled.py`,
 `dynamic_policy.py`). `sheaf/core.py` is labelled leftover.
 
 The sitting map (early in the deck) jumps to lineage, the one-step spine,
-CropParams, Gate 0 scores, Gate 1, Gate 2, the leftover host (skip unless
-README §§1–6 is the question), and the five Agrimate questions. Do not
-read the leftover section as the 2007/08 model.
+CropParams, Gate 0 scores, Gate 1, Gate 2, method of solution (explicit
+map, not a QP), the leftover host (skip unless README §§1–6 is the
+question), and the five Agrimate questions. Do not read the leftover
+section as the 2007/08 model.
 
 Green banners are README/code matches. README §8 is the crisis-host
 specification (the former documentation gaps are written there). Grey
@@ -33,7 +34,7 @@ is the leftover annual SPE. The companion script:
 python3 overleaf/sheaf_deck/verify_claims.py
 ```
 
-re-derives the banners (45 OK, 0 divergences, 0 failures on
+re-derives the banners (49 OK, 0 divergences, 0 failures on
 the branch that ships this folder).
 
 ## What this is not

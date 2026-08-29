@@ -63,6 +63,8 @@ Substitution without breaking Gate~0
   & \hyperlink{gate1}{\beamergotobutton{Gate 1}} \\
 Endogenous $\tau_t$ (not a 2008 who-banned score)
   & \hyperlink{gate2}{\beamergotobutton{Gate 2}} \\
+How the equations are computed (no QP)
+  & \hyperlink{method}{\beamergotobutton{method of solution}} \\
 README \S1--\S6 / the annual QP
   & \hyperlink{leftover}{\beamergotobutton{leftover --- skip}} \\
 What we want Agrimate to stress
@@ -91,6 +93,7 @@ Market & \texttt{dynamic\_crop.py} & \texttt{core.SpatialEquilibrium} \\
 Substitution & \texttt{dynamic\_coupled.py} isoelastic $\eta$ & linear $D=a-Mp$ \\
 Policy & \texttt{dynamic\_policy.py} $\tau_t$ & \texttt{ExportRestrictionGame} \\
 Restrictions in Gate~0 & AMIS quantity cuts & AMIS $\$/t$ wedges \\
+Method & explicit NumPy map $O(Tn^2)$ & cvxpy QP + year-IBR \\
 Hindcast & \texttt{score\_subannual\_crop.py} & \texttt{demo.py} (not a hindcast) \\
 \bottomrule
 \end{tabular}
