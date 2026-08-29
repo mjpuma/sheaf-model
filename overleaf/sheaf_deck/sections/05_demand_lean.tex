@@ -34,6 +34,22 @@ Gate~2 writes $\tau_t$ \emph{before} box~4. The market loop is not rewritten.}
 {\texttt{sheaf/dynamic\_crop.py:577--681}.}
 \end{frame}
 
+\begin{frame}{Grain on hand this step}
+\topic{What a country has available before it eats, stocks, or ships: last step's stock plus this step's harvest.}
+\matchbanner{README \S8 $\mathrm{avail}=S+H$}{dynamic\_crop.py:578}
+
+\[
+\mathrm{avail}_{i,t}=S_{i,t}+H_{i,t}.
+\]
+
+No other inflow. Imports arrive later in the same step and enter the
+stock update, not this identity. $S$ is end-of-previous-step carry
+(opening $S_0$ is the PSD clip, next section).
+\bubbles{Accounting identity. No parameter.}
+{MMT this step.}
+{\texttt{\_simulate\_window} line 578; README \S8 ``Availability.''}
+\end{frame}
+
 \begin{frame}{Flex vs industrial use}
 \topic{Use splits into price-sensitive food/feed and inelastic industrial (USA maize ethanol).}
 \matchbanner{README \S8 $C^{\mathrm{flex}}, C^{\mathrm{ind}}$}{dynamic\_crop.\_demand\_blocks}
@@ -100,30 +116,44 @@ to the same official flags.
 {\texttt{PAPER\_STACK.md} official split; \texttt{prepare\_crop\_run}.}
 \end{frame}
 
-\begin{frame}{Lean gap --- README and code disagree on the window}
-\topic{How much extra grain a country wants on hand until the next harvest pulse.}
-\divbanner{README \S8: $L=\max(0,\sum_{k=1}^{h_t} C - \sum_{k=1}^{h_t} H^{\mathrm{exp}})$}
-{dynamic\_crop.py:585--588}
-
-Code (and the comment at line 584) includes the \textbf{current} step:
+\begin{frame}{Official P1 spreads mean flex, not this year's PSD}
+\topic{How an annual consumption number becomes a two-week demand: official scores use the window-average food/feed, divided by 24.}
+\matchbanner{README \S8 official P1 step demand}{dynamic\_crop.py:750--768}
 
 \[
-L_{i,t}^{\mathrm{code}}
-= \max\bigl(0,\;
-C^{\mathrm{ahead}}_{i,t}+C_{i,t}
-- H^{\mathrm{ahead}}_{i,t}-H^{\mathrm{exp}}_{i,t}\bigr).
+\overline{C}^{\mathrm{flex}}_i
+=\frac{1}{Y}\sum_y C^{\mathrm{flex}}_{i,y},
+\qquad
+C^{\mathrm{flex}}_{i,t}
+=\overline{C}^{\mathrm{flex}}_i/24.
 \]
 
-That is $\sum_{k=0}^{h_t}$, not $\sum_{k=1}^{h_t}$.
-\texttt{rolling\_ahead} sums $t+1,\ldots,t+h_t$; adding $C_t$ and
-$H^{\mathrm{exp}}_t$ brings in $k=0$.
+Industrial (USA maize) is year-by-year FSI excess, then $/24$, when
+\texttt{use\_industrial=True}. Year-by-year food/feed
+(\texttt{use\_demand=True}) is a sensitivity. Warehouse pipeline food
+is $C_i^{\mathrm{ann}}/24$, not the shocked flex path.
+\bubbles{\texttt{use\_demand=False} is the locked official flag.}
+{$C$: MMT/step after the $/24$.}
+{\texttt{prepare\_crop\_run:750--768}; \texttt{\_annual\_to\_steps}.}
+\end{frame}
 
-On 2006--07 wheat, $\max|L^{\mathrm{code}}-L^{\mathrm{README}}|=15.47$~MMT
-($15.9\%$ of $\max L$). The \textbf{code} is internally consistent with
-its comment. The README equation is missing the current step.
+\begin{frame}{Lean gap includes this step}
+\topic{How much extra grain a country wants on hand until the next harvest pulse, counting today.}
+\matchbanner{README \S8 $L$ sums $k=0..h_t$}{dynamic\_crop.py:585--588}
+
+\[
+L_{i,t}
+= \max\bigl(0,\;
+\sum_{k=0}^{h_t} C_{i,t+k}
+-\sum_{k=0}^{h_t} H^{\mathrm{exp}}_{i,t+k}\bigr).
+\]
+
+\texttt{rolling\_ahead\_variable} sums $t+1,\ldots,t+h_t$; the current
+step is added as $C_t$ and $H^{\mathrm{exp}}_t$. The window is
+$k=0..h_t$, not a look-ahead that skips today.
 \bubbles{$L$ is a state. $\lambda$ (next slide) is the only reduced-form speed.}
 {MMT of cover through the horizon.}
-{Implementation: \texttt{dynamic\_crop.py:585--588}. Claim: README \S8.}
+{\texttt{dynamic\_crop.py:585--588}; README \S8 lean foresight.}
 \end{frame}
 
 \begin{frame}{Target stock}
@@ -181,11 +211,9 @@ ships only go to $\times 0.79$.
 {\texttt{dynamic\_crop.py:596}; AMIS map or \texttt{dynamic\_policy}.}
 \end{frame}
 
-\begin{frame}{Carry capacity $W$ --- README matches code; a diagnostics note does not}
+\begin{frame}{Carry capacity}
 \topic{Warehouse capacity: how much stock a country is allowed to carry.}
-\divbanner{GATE0\_PARAMETERIZATION \S2.3 displayed equation}{dynamic\_crop.py:614--618}
-
-Code and README \S8:
+\matchbanner{README \S8 $W$; GATE0\_PARAMETERIZATION \S2.3}{dynamic\_crop.py:614--618}
 
 \[
 W_{i,t}
@@ -194,19 +222,14 @@ W_{i,t}
 + \mathbf{1}_{\{\mathrm{pipeline}>0\}} H_{i,t}.
 \]
 
-\texttt{GATE0\_PARAMETERIZATION.md} \S2.3 still displays
-$\max(\mathtt{max\_stu}\,C,\,1.5 s)+ \cdots + H_{i,t}$ (always adding
-harvest, and a $1.5s$ floor). The \emph{prose} of that same subsection
-already retracts both. Rice $\mathtt{pipeline}=0$ so monsoon $H_t$ is
-\textbf{not} padded into $W$ (else it is stored as silos).
-
-Worked: India rice, code $W=19.07$~MMT vs the stale displayed equation
-$27.90$~MMT.
+Rice $\mathtt{pipeline}=0$ so monsoon $H_t$ is \textbf{not} padded into
+$W$ (else it is stored as silos). The $1.5s$ floor is an opening-stock
+clip only, not part of $W$.
 \bubbles{\texttt{max\_stu} literature; \texttt{pipeline\_max\_steps} structural
 (12 wheat/maize $=6$ months; 0 rice).}
 {$W$: MMT.}
-{README \S8 and \texttt{dynamic\_crop.py:614--618} match. Diagnostics note
-equation is stale.}
+{README \S8; \texttt{GATE0\_PARAMETERIZATION.md} \S2.3;
+\texttt{dynamic\_crop.py:614--618}.}
 \end{frame}
 
 \begin{frame}{Soft warehouse clip and stock update}
@@ -233,13 +256,17 @@ starved lean-season offers. Soft clip leaves $W$ as an attractor.
 
 \begin{frame}{Opening stocks}
 \topic{Where opening stocks come from, and the two-year warm-up before 2006.}
-Opening $S_{i,0}$ is PSD ending stocks in \texttt{stock\_seed\_year} (default
-2005), clipped to $\max(\mathtt{max\_stu}\,C,\, 1.5 s)$, then optionally
-spun up for \texttt{spin\_up\_years=2} on climatology harvest, mean flex,
-no industrial, no AMIS.
+\matchbanner{README \S8 opening clip}{prepare\_crop\_run:759--762}
 
-The spin-up is a numerical convenience so 2006 does not start from a raw
-MY-end snapshot. The twin is then simulated from that same spun stock.
+\[
+S_{i,0}
+=\min\bigl(R^{\mathrm{end}}_{i,\mathrm{seed}},\,
+\max(\mathtt{max\_stu}\,C_i^{\mathrm{ann}},\,1.5 s_i)\bigr),
+\]
+
+then optionally spun up \texttt{spin\_up\_years=2} on climatology harvest,
+mean flex, no industrial, no AMIS. The $1.5s$ floor is this opening clip
+only. The twin starts from the same spun stock.
 \bubbles{\texttt{spin\_up\_years=2} structural protocol.}
 {MMT.}
 {\texttt{prepare\_crop\_run:759--784}. PSD ending stocks via

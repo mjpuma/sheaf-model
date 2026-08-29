@@ -16,24 +16,49 @@ steal destination share. $q_{i,0}=p_0$.
 {\texttt{dynamic\_crop.py:488--494}; \texttt{CropParams.ask\_comp\_elast}.}
 \end{frame}
 
-\begin{frame}{Armington min-clear plus residual pool}
-\topic{How much actually ships on each link: the min of that offer and that demand, plus a leftover pool.}
-\matchbanner{README \S8 $\mathrm{ship}_{ij}$}{dynamic\_crop.\_bilateral\_clear}
-
-Preferred links:
+\begin{frame}{Armington min-clear}
+\topic{Preferred trade: each link ships the minimum of that exporter's offer to that destination and that importer's demand from that source.}
+\matchbanner{README \S8 $\mathrm{ship}^0_{ij}$}{dynamic\_crop.\_bilateral\_clear}
 
 \[
-\mathrm{ship}_{ij}
+\mathrm{ship}^0_{ij}
 = \min\bigl(O_{i,t}\tilde A_{ij},\, D_{j,t} S_{ij}\bigr).
 \]
 
-Leftover demand may take at most fraction $\nu=0.15$ from leftover offers,
-allocated by leftover-demand weights and clipped not to overfill a column.
-$\nu$ is structural residual substitution after Armington, \textbf{not}
-Gate~1 cross-grain $\sigma$.
-\bubbles{$\nu=\mathtt{residual\_subst}=0.15$ structural. Do not confuse with $\sigma$.}
+Tonnes come from $O$ and $D$ (USDA). $A$ and $S$ are FAOSTAT shares
+only. Whatever is left after this min goes to the residual pool (next
+slide).
+\bubbles{No extra parameter on the preferred links.}
 {Shipments: MMT/step.}
-{\texttt{dynamic\_crop.py:497--522}.}
+{\texttt{dynamic\_crop.py:501--503}.}
+\end{frame}
+
+\begin{frame}{Residual pool after Armington}
+\topic{After preferred links clear, leftover demand may take a fraction of leftover offers.}
+\matchbanner{README \S8 residual pool}{dynamic\_crop.py:505--520}
+
+\[
+\mathrm{offer}^{\mathrm{left}}_i
+=\max\bigl(0,O_i-\textstyle\sum_j\mathrm{ship}^0_{ij}\bigr),
+\quad
+\mathrm{demand}^{\mathrm{left}}_j
+=\max\bigl(0,D_j-\textstyle\sum_i\mathrm{ship}^0_{ij}\bigr),
+\]
+\[
+\mathrm{take}_j=\nu\,\mathrm{demand}^{\mathrm{left}}_j,
+\qquad
+\mathrm{fill}
+=\min\Bigl(1,\;
+\tfrac{\sum_i\mathrm{offer}^{\mathrm{left}}_i}{\sum_j\mathrm{take}_j}\Bigr).
+\]
+
+Leftover offers are allocated by leftover-demand weights and columns are
+clipped not to exceed $\mathrm{take}\cdot\mathrm{fill}$.
+$\nu=0.15$ is residual substitution after Armington, \textbf{not}
+Gate~1 $\sigma$.
+\bubbles{$\nu=\mathtt{residual\_subst}=0.15$ structural. Do not confuse with $\sigma$.}
+{MMT/step.}
+{\texttt{dynamic\_crop.py:505--520}; README \S8 Armington clear.}
 \end{frame}
 
 \begin{frame}{Fill rates update asks}
@@ -113,26 +138,41 @@ path-matched twin (seasonal $H$, mean flex, no industrial, $\tau\equiv 0$).
 {\texttt{dynamic\_crop.py} unmet and block; twin from \texttt{prepare\_crop\_run:803--806}.}
 \end{frame}
 
-\begin{frame}{Scarcity ratio --- README writes $f$; code builds a shift}
-\topic{The scarcity ratio: free world cover versus the twin. README writes a constant the code never names.}
-\divbanner{README \S8 $r_t=(F^{\mathrm{twin}}+f)/(\mathrm{free}+f)$}{dynamic\_crop.py:661--663}
-
-Code:
+\begin{frame}{Trade-weighted ask}
+\topic{The world price blends a trade-weighted average of exporter asks with a scarcity term. This slide is the ask average.}
+\matchbanner{README \S8 $p^{\mathrm{tr}}$}{dynamic\_crop.py:650--654}
 
 \[
-\mathrm{shift}
-= 0.05\sum_i s_i + \max\bigl(0,\, -\min(\mathrm{free}, F^{\mathrm{twin}})\bigr),
-\qquad
-r_t = \frac{F^{\mathrm{twin}}+\mathrm{shift}}{\mathrm{free}+\mathrm{shift}}.
+p^{\mathrm{tr}}_t
+=\frac{\sum_i q_{i,t}\,\mathrm{shipped}_{i,t}}{\sum_i\mathrm{shipped}_{i,t}}
 \]
 
-$f$ is never a named constant. For wheat, $0.05\sum s_i = 6.17$~MMT. The
-second term is zero unless free or twin goes negative. README's $f$ is
-undefined; the code is a floor that keeps $r_t$ defined and calm-stable.
-\bubbles{The $0.05$ is a numerical floor, not a literature elasticity.}
+if anyone ships; otherwise the incoming $p_t$. This is not a separate
+market. It is the $\omega$ weight in $p^\star$ (next slides).
+\bubbles{$\omega=\mathtt{trade\_w}$ crop-specific, locked. This slide is the
+$p^{\mathrm{tr}}$ identity.}
+{Real 2010 \$/t.}
+{\texttt{dynamic\_crop.py:650--654}.}
+\end{frame}
+
+\begin{frame}{Scarcity ratio}
+\topic{The scarcity ratio: free world cover versus the no-shock twin, with a floor so the ratio stays defined.}
+\matchbanner{README \S8 $\mathrm{shift}_t$, $r_t$}{dynamic\_crop.py:661--663}
+
+\[
+\mathrm{shift}_t
+= 0.05\sum_i s_i + \max\bigl(0,\, -\min(\mathrm{free}_t, F^{\mathrm{twin}}_t)\bigr),
+\]
+\[
+r_t = \frac{F^{\mathrm{twin}}_t+\mathrm{shift}_t}{\mathrm{free}_t+\mathrm{shift}_t}.
+\]
+
+For wheat, $0.05\sum s_i = 6.17$~MMT. The second term is zero unless
+free or twin goes negative. The $0.05$ is a numerical floor, not a
+literature elasticity.
+\bubbles{The $0.05$ is a numerical floor, locked.}
 {$r_t$ dimensionless. shift in MMT.}
-{Implementation: \texttt{dynamic\_crop.py:661--663}. Claim: README \S8
-``$r_t=(F^{\mathrm{twin}}+f)/(\mathrm{free}+f)$''.}
+{\texttt{dynamic\_crop.py:661--663}; README \S8 world price.}
 \end{frame}
 
 \begin{frame}{Scarcity price, blend, smoother}
@@ -153,8 +193,8 @@ p_t = \rho\, p_{t-1} + (1-\rho)\, p^\star_t,
 \]
 
 clipped to $[60, 1200]$ \$/t. $\eta$ is symmetric in surplus and shortage
-(muting abundance stored gluts). $p^{\mathrm{tr}}$ is the trade-weighted ask
-(or $p_{t-1}$ if no trade).
+(muting abundance stored gluts). $p^{\mathrm{tr}}$ as on the previous
+identity slide.
 \bubbles{$\omega,\eta,\kappa_u,\kappa_b,\rho$ reduced-form, crop-specific where tabled, locked. Not crisis-by-crisis.}
 {$p$: real 2010 \$/t.}
 {\texttt{CropParams}: \texttt{inv\_eta}, \texttt{trade\_w}, \texttt{unmet\_kappa},

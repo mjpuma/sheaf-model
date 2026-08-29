@@ -20,6 +20,25 @@ totals laid on the same calendar.
 \texttt{seasonal.harvest\_path}.}
 \end{frame}
 
+\begin{frame}{Calendar weights are a triangle, then split in half}
+\topic{How a harvest season becomes 24 step weights: a triangle over the harvest months, each month split across two fortnights.}
+\matchbanner{README \S8 calendar weights}{seasonal.harvest\_month\_weights}
+
+For a window of $N$ months with peak index $i_{\mathrm{peak}}$ along
+that window,
+
+\[
+w_m \propto \max\bigl(N-|i_m-i_{\mathrm{peak}}|,1\bigr)
+\]
+
+on months in the window, $0$ elsewhere. Each month is then split equally
+across its two half-month steps. Weights sum to 1 over the year.
+Verified on every node.
+\bubbles{Agrimate-style mid-season peak. Not a 2008 fit.}
+{Dimensionless shares of annual $Q$.}
+{\texttt{seasonal.py:44--82}; README \S8 ``Calendar weights.''}
+\end{frame}
+
 \begin{frame}{Treatment harvest is climatology $\times$ LOWESS}
 \topic{The shocked harvest: that average path times a trend-relative anomaly.}
 \matchbanner{README \S8}{dynamic\_crop.py:325--329, data\_usda.detrend\_anomalies}
@@ -78,13 +97,19 @@ Not estimated on 2008.}
 
 \begin{frame}{Lean horizon is a \emph{world} clock}
 \topic{How far ahead countries look when they plan stocks: until the next world harvest pulse.}
-\matchbanner{README \S8 $h_t$; seasonal.steps\_to\_harvest\_pulse}{seasonal.py:163--189}
+\matchbanner{README \S8 $h_t$}{seasonal.steps\_to\_harvest\_pulse}
 
-$h_t$ is the number of steps until cumulative \textbf{world} future harvest
-reaches $12\%$ of mean annual world $H$ (cap 24). All countries share the
-same lean clock (NH summer pulse). Verified range on 2006--07 wheat:
+\[
+h_t
+=\min\Bigl\{h\ge 1:\ 
+\sum_{k=1}^{h} H^{\mathrm{world}}_{t+k}
+\ge 0.12\,\overline{H}^{\mathrm{world}}\Bigr\},
+\]
+
+capped at 24. $H^{\mathrm{world}}=\sum_i H_i$ so every country shares
+the same lean clock (NH summer pulse). Verified range on 2006--07 wheat:
 $h_t\in[1,14]$.
 \bubbles{\texttt{harvest\_pulse\_frac=0.12} structural. \texttt{MAX\_LEAN\_STEPS=24}.}
 {$h_t$ in steps (dimensionless).}
-{\texttt{seasonal.steps\_to\_harvest\_pulse}. World path = \texttt{H.sum(axis=0)}.}
+{\texttt{seasonal.py:163--189}. World path = \texttt{H.sum(axis=0)}.}
 \end{frame}

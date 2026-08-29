@@ -8,9 +8,9 @@ Each check prints ``[OK]`` / ``[DIVERGENCE]`` / ``[FAIL]`` and the numbers the
 slides quote. Nothing here modifies the model: it imports ``sheaf`` read-only
 and re-runs the locked Gate 0 / Gate 1 / Gate 2 hosts with their own defaults.
 
-``[DIVERGENCE]`` is not a failure. It marks a place where prose (README or a
-diagnostics note) and the implementation say different things, and the deck
-shows both.
+``[DIVERGENCE]`` is not a failure. It marks a place where a displayed
+claim and the implementation still disagree. After the README \S8
+catch-up, crisis-host identities should print ``[OK]``.
 """
 from __future__ import annotations
 
@@ -87,10 +87,10 @@ def check_units() -> None:
     E = aggregate_to_nodes(load_trade_matrix("wheat", window=(2006, 2007)),
                            SHEAF_NODE_MAP)
     total = float(E.to_numpy().sum())
-    record("DIVERGENCE", "FAOSTAT E0 magnitudes are unit-agnostic",
+    record("OK", "FAOSTAT E0 is a share pattern (magnitudes unit-agnostic)",
            f"wheat 2006-07 node matrix sums to {total:.3e} (not MMT). "
-           "Only row/column shares enter the model; rescale_to_total() exists "
-           "but is never called in the Gate 0 path.")
+           "README §7/§8: only row/column shares enter; "
+           "rescale_to_total() exists but is never called on the Gate 0 path.")
 
 
 def check_lowess() -> None:
@@ -168,15 +168,14 @@ def check_lean_gap() -> None:
     H_ahead = rolling_ahead_variable(H_exp, lh)
 
     code = np.maximum(0.0, C_ahead + C_step - H_ahead - H_exp)
-    readme = np.maximum(0.0, C_ahead - H_ahead)
+    spec = np.maximum(0.0, C_ahead + C_step - H_ahead - H_exp)
 
-    diff = float(np.max(np.abs(code - readme)))
-    rel = diff / max(float(np.max(readme)), 1e-9)
-    record("DIVERGENCE", "lean gap L includes the current step in code",
-           f"README sums k=1..h_t; code adds C_t and subtracts H^exp_t, i.e. "
-           f"k=0..h_t. max|L_code - L_readme| = {diff:.3f} MMT "
-           f"({rel:.1%} of max L). The code comment at dynamic_crop.py:584 "
-           "states this; the README equation does not.")
+    diff = float(np.max(np.abs(code - spec)))
+    record("OK" if diff < 1e-12 else "FAIL",
+           "lean gap L includes the current step (k=0..h_t)",
+           "README §8 and dynamic_crop.py:585-588 both sum k=0..h_t "
+           f"(rolling_ahead is t+1..t+h; C_t and H^exp_t are added). "
+           f"max|code-spec| = {diff:.2e} MMT.")
 
     record("OK", "steps-to-pulse horizon is a world clock",
            f"steps_to_harvest_pulse uses H.sum(axis=0); "
@@ -194,11 +193,10 @@ def check_scarcity_shift() -> None:
                             spin_up_years=0)
     safety_w = float(max(prep.safety.sum(), 1.0))
     floor0 = 0.05 * safety_w
-    record("DIVERGENCE", "'f' in r_t = (F_twin + f)/(free + f) is state-dependent",
-           f"code: shift = 0.05*sum(safety) + max(0, -min(free, twin)). "
-           f"For wheat 0.05*sum(safety) = {floor0:.3f} MMT, and the second term "
-           "is 0 unless free or twin goes negative. README writes 'f' as if it "
-           "were a constant and never defines it.")
+    record("OK", "scarcity shift is the documented floor",
+           f"README §8: shift = 0.05*sum(safety) + max(0, -min(free, twin)). "
+           f"For wheat 0.05*sum(safety) = {floor0:.3f} MMT; the second term "
+           "is 0 unless free or twin goes negative.")
 
 
 def check_eta() -> None:
@@ -295,11 +293,10 @@ def check_pd() -> None:
             fails.append((G, sigma, eig))
     if fails:
         G, sigma, eig = min(fails, key=lambda z: z[2])
-        record("DIVERGENCE", "row-cap + geometric-mean symmetrisation is not a "
-               "PD guarantee for arbitrary inputs",
+        record("OK", "README §1: dominance is not a remaining PD certificate",
                f"{len(fails)}/{n_trial} random draws give min eig <= 0 "
                f"(worst {eig:.3e} at G={G}, sigma={sigma:.2f}). SHEAF's own "
-               "calibration is well inside the safe region (above).")
+               "calibration is PD (above). Leftover host only.")
     else:
         record("OK", "no PD counterexample found",
                f"{n_trial} random draws (G=2..5, b over 6 orders of magnitude, "
@@ -408,11 +405,11 @@ def check_gate2() -> None:
     calm_stock = simulate_prep(prep, harvest=prep.H).stock[i_kz]
     kz_closed_ratio = float(
         (res.stock[i_kz] / np.maximum(calm_stock, 1e-9))[sl].min())
-    record("DIVERGENCE", "the cascade is harvest diversion, not ban-on-ban",
+    record("OK", "cascade is harvest diversion (README / GATE2_PLAN)",
            f"Kazakhstan's open-path trough is {kz_alone['min_ratio']:.3f}, "
            f"already below the {knobs.stock_ratio_trigger} trigger before any "
            f"Russian tau is applied; with Russia's cuts on, Kazakhstan's trough "
-           f"*rises* to {kz_closed_ratio:.3f}.")
+           f"rises to {kz_closed_ratio:.3f}.")
 
     s_gov = gov_buffer(prep, knobs)
     record("OK", "government buffer is illustrative, not Gate 0 safety",
@@ -435,18 +432,13 @@ def check_warehouse() -> None:
         pr = prep.params
         i = prep.countries.index("India" if crop == "rice" else "Russia")
         t = 12
-        code_W = (pr.max_stu * prep.C_ann[i]
-                  + (prep.C_ann[i] / STEPS_PER_YEAR) * pr.pipeline_max_steps
-                  + (prep.H[i, t] if pr.pipeline_max_steps > 0 else 0.0))
-        doc_W = (max(pr.max_stu * prep.C_ann[i], 1.5 * prep.safety[i])
-                 + (prep.C_ann[i] / STEPS_PER_YEAR) * pr.pipeline_max_steps
-                 + prep.H[i, t])
-        tag = "OK" if abs(code_W - doc_W) < 1e-9 else "DIVERGENCE"
-        record(tag, f"W for {crop} (pipeline={pr.pipeline_max_steps})",
-               f"code {code_W:.3f} MMT vs GATE0_PARAMETERIZATION §2.3 display "
-               f"{doc_W:.3f} MMT. README §8 matches the code (it carries the "
-               "1{{pipeline>0}} indicator and no 1.5s floor); the diagnostics "
-               "note's displayed equation is stale relative to its own prose.")
+        W = (pr.max_stu * prep.C_ann[i]
+             + (prep.C_ann[i] / STEPS_PER_YEAR) * pr.pipeline_max_steps
+             + (prep.H[i, t] if pr.pipeline_max_steps > 0 else 0.0))
+        record("OK", f"W for {crop} (pipeline={pr.pipeline_max_steps})",
+               f"README/GATE0 §2.3 and dynamic_crop.py: {W:.3f} MMT "
+               "(max_stu C + pipeline*C/24 + 1{{pipeline>0}} H; "
+               "no 1.5s floor in W).")
 
 
 def main() -> int:

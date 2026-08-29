@@ -114,9 +114,9 @@ O_{i,t}=\max(0,\mathrm{avail}-d-T)\,(1-\tau_{i,t}).
 
 Warehouse at step \(t\) is
 \[
-W_{i,t}=\max(\mathtt{max\_stu}\,C_i^{\mathrm{ann}},\,1.5 s_i)
+W_{i,t}=\mathtt{max\_stu}\,C_i^{\mathrm{ann}}
 +\mathtt{pipeline\_max\_steps}\cdot C_i^{\mathrm{ann}}/24
-+H_{i,t}.
++\mathbf{1}_{\{\mathtt{pipeline}>0\}}H_{i,t}.
 \]
 The working-stock term is a **constant** cap (not shrunk as the next harvest
 approaches — that dumped grain into the lean month). `pipeline_max_steps=12`
@@ -125,8 +125,8 @@ year-round harvest, no extra working buffer). Same-step \(H_{i,t}\) pads \(W\)
 only when `pipeline_max_steps>0` (pulse intake). Rice clips toward carry:
 padding \(W\) with every monsoon step stored harvest as if it were silos.
 `seasonal_buffer_steps` is unused. Excess above \(W_{i,t}\) is **soft-clipped**
-with `warehouse_lambda` (defaults to rebuild \(\lambda\)). Capacity ceiling is
-\(\mathtt{max\_stu}\,C\) (not \(1.5s\), which accidentally sat above `max_stu`).
+with `warehouse_lambda` (defaults to rebuild \(\lambda\)). The \(1.5s\) floor
+is an **opening-stock** clip only (`prepare_crop_run`); it is not in \(W\).
 
 ### 2.4 Bilateral clear and asks (Agrimate-aligned)
 

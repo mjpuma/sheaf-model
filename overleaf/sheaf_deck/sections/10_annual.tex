@@ -68,23 +68,21 @@ not the arithmetic mean. On SHEAF's calibration both are well-defined.
 {\texttt{calibration.OWN\_ELAST}, \texttt{P0}, \texttt{RHO}; \texttt{core.py:126}.}
 \end{frame}
 
-\begin{frame}{$M\succ 0$ on the calibration; diagonal dominance is lost}
-\topic{That matrix is still positive definite on the calibration; the README's dominance proof is not.}
-\leftoverbanner{README \S1 ``strict diagonal dominance $\Rightarrow M\succ 0$''}{core.py:121--128}
+\begin{frame}{$M\succ 0$ on the calibration}
+\topic{The leftover demand matrix is positive definite on the calibration. Diagonal dominance is only a construction step.}
+\leftoverbanner{README \S1: dominance is a construction device}{core.py:121--128}
 
-After the geometric-mean step, several nodes \textbf{lose} strict diagonal
-dominance at $\sigma=0.6$ (USA margin $-1.07\times 10^{-3}$) while remaining
-positive definite (min eigenvalue $1.95\times 10^{-3}$, $\mathrm{cond}(M)\le 231$).
+Rows of $S$ are capped for dominance \emph{before} geometric-mean
+symmetrisation. After that step, several nodes lose strict diagonal
+dominance at $\sigma=0.6$ (USA margin $-1.07\times 10^{-3}$) while
+remaining positive definite (min eigenvalue $1.95\times 10^{-3}$).
 
 The PD claim \textbf{holds} on all 18 calibration nodes at
-$\sigma\in\{0,0.3,0.6,0.9\}$. $20{,}000$ random draws ($G=2..5$, $b$ over
-six orders of magnitude, $\sigma$ $0.1$--$10$) produced no negative
-eigenvalue. The \emph{guarantee via diagonal dominance} is what fails;
-PD of $M$ on this construction appears to survive anyway. Category
-\textbf{G} on the dominance wording, \textbf{H} on PD for SHEAF's $M$.
+$\sigma\in\{0,0.3,0.6,0.9\}$. README \S1 states this: dominance is not
+a remaining certificate. Leftover host --- not the crisis spine.
 \bubbles{No extra cap after symmetrisation.}
 {Eigenvalues of $M$: MMT/(\$/t).}
-{\texttt{verify\_claims.py} section 8.}
+{\texttt{verify\_claims.py} section 8; README \S1.}
 \end{frame}
 
 \begin{frame}{Market QP}
