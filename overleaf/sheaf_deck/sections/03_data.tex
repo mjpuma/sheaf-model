@@ -96,6 +96,44 @@ $\mathrm{real}_{m,y} = \mathrm{nominal}_{m,y}\times
 \texttt{data/world\_prices/PROVENANCE.txt}.}
 \end{frame}
 
+\begin{frame}{Wheat is grain, not flour or bread}
+\matchbanner{Agrimate: unprocessed grain only}{data/usda\_psd/PROVENANCE.txt}
+
+PSD wheat, HRW, and E0 \texttt{Wheat\_Avg} are \textbf{unprocessed grain}.
+No extraction rate, no kcal factor, no bread. Milling is implicit: PSD
+food/feed is grain disappearing into the country.
+
+\citet{kuhla2025} make the same omission: they ``account only for
+unprocessed grains and, thus, neglect re-exports from processed goods,
+e.g., wheat flour.''
+
+Rice is the one product conversion that already exists
+(\texttt{Rice, Milled}, not paddy). FoodTradeNetwork
+\texttt{\_PrimaryEquiv} E0 files exist; Gate~0 does not load them.
+A calorie wheat-equivalent is a different object (Roberts--Schlenker),
+not this market. Category \textbf{E}.
+\bubbles{No product-tree parameter. Do not introduce one to chase 2008.}
+{Grain MMT. Price: HRW \$/t, not a flour quote.}
+{\texttt{load\_psd\_country} wheat; \texttt{load\_trade\_matrix(..., primary\_equiv=False)}.}
+\end{frame}
+
+\begin{frame}{AMIS ``Wheat'' can include flour HS lines}
+\matchbanner{aggregated CommodityClass\_Name}{dynamic\_crop.amis\_export\_cuts}
+
+Gate~0 filters the \textbf{aggregated} AMIS sheet on class
+\texttt{Wheat} / \texttt{Rice} / \texttt{Maize}. That class includes
+grain \emph{and} flour (HS 1101; Argentina flour tax 2007--08).
+Overlapping Wheat measures keep the \textbf{max} cut.
+
+So a flour tax can tighten \textbf{grain} offers $O$, even though
+$\mathrm{ship}$ is PSD grain tonnes. Agrimate puts the same diary on a
+grain market. Disclosed seam, not a mill.
+\bubbles{Class map is structural. No HS-line weight.}
+{$\tau$ dimensionless on grain offers.}
+{OECD/AMIS DetailedDatabase HS vs AggregatedDatabase class.
+\texttt{load\_amis\_restrictions(aggregated=True)}.}
+\end{frame}
+
 \begin{frame}{AMIS --- quantity cuts on the spine, not \$/t}
 \matchbanner{README \S8 $\tau_{i,t}\in[0,1]$}{dynamic\_crop.py:43--50}
 
