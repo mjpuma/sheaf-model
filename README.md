@@ -135,8 +135,12 @@ a_i = D_{0} + M_i\, p_{0}.$$
 Here $\sigma \ge 0$ (`subst_scale`) is a global substitution strength. Off-diagonals
 of $M_i$ are $-S_{gh}\le 0$, i.e. $\partial D^g_i/\partial p^h_i = -M_{i,gh} \ge 0$
 for substitutes: a higher price of grain $h$ raises demand for grain $g$. Rows of
-$S$ are rescaled if needed to enforce strict diagonal dominance, which guarantees
-$M_i \succ 0$. The intercept calibration ensures $D_i = D_0$ at $p_i = p_0$.
+$S$ are rescaled if needed so each row is strictly diagonally dominant *before*
+the geometric-mean symmetrisation $S\leftarrow\sqrt{S\odot S^\top}$. That
+pre-symmetrisation cap is a construction device, not a remaining certificate:
+symmetrisation can lose dominance. On the illustrative calibration, $M_i$
+is still positive definite at the $\sigma$ values we use. The intercept
+calibration ensures $D_i = D_0$ at $p_i = p_0$.
 
 ### 2. Market layer: multi-commodity spatial price equilibrium
 
@@ -293,9 +297,11 @@ substitution contribution is precisely the deviation from that boundary — the 
 ### 7. From data to parameters
 
 **Gate 0 wheat spine (§8):** USDA PSD country production, consumption, and ending
-stocks (`sheaf/data_usda.py`); FAOSTAT bilateral E0 shares
-(`sheaf/data_faostat.py`); AMIS export-restriction schedules; harvest calendars in
-`data/crop_calendars/`; monthly Pink Sheet prices for scoring.
+stocks (`sheaf/data_usda.py`); FAOSTAT bilateral E0 **share pattern**
+(`sheaf/data_faostat.py`) — E0 magnitudes are unit-agnostic and are never
+used as tonnes; only row/column shares $A,S$ enter the spine; AMIS
+export-restriction schedules; harvest calendars in `data/crop_calendars/`;
+monthly Pink Sheet prices for scoring.
 
 **Annual SPE prototype:** `demo.py` / `SheafModel` still use the illustrative table
 in `sheaf/calibration.py` (optionally overlaid with USDA quantities). Own- and
@@ -318,19 +324,20 @@ for wheat, maize, and rice (`diagnostics/GATE0_PER_CROP_PLAN.md`).
 | $i,j$ | SHEAF nodes (17 named + Rest-of-World) | `calibration.DATA` |
 | $t$ | sub-annual step index | $24$ per calendar year |
 | $H_{i,t}$ | harvest inflow (MMT/step) | climatology × LOWESS anomaly × calendar |
-| $C_{i,t}$ | baseline food use (MMT/step) | PSD consumption $/24$ |
+| $C_{i,t}$ | baseline food/feed use (MMT/step) | official P1: mean-flex $/24$ |
 | $S_{i,t}$ | end-of-step stocks (MMT) | state variable |
-| $\mathrm{avail}_{i,t}$ | $S_{i,t}+H_{i,t}$ | — |
+| $\mathrm{avail}_{i,t}$ | $S_{i,t}+H_{i,t}$ | identity, every step |
 | $p_t$ | world price (\$/t) | state; smoothed |
 | $p_0$ | reference price | mean real Pink Sheet in start year |
 | $\varepsilon$ | food demand price elasticity | crop-specific (`CropParams.elast`) |
 | $\tau_{i,t}\in[0,1]$ | AMIS export quantity cut | ban $0.95$, tax $0.50$, … |
-| $A_{ij}$ | destination share of $i$'s exports to $j$ | FAOSTAT E0 (diag $0$) |
-| $S_{ij}$ | source share of $j$'s imports from $i$ | FAOSTAT E0 (diag $0$) |
+| $A_{ij}$ | destination share of $i$'s exports to $j$ | FAOSTAT E0 **row shares** (diag $0$; E0 is not tonnes) |
+| $S_{ij}$ | source share of $j$'s imports from $i$ | FAOSTAT E0 **column shares** (diag $0$) |
 | $q_{i,t}$ | exporter **ask** price (\$/t) | adapts to fill rates |
 | $\lambda$ | stock-rebuild speed per step | $0.08$ |
 | $\phi$ | weight on realized harvest in foresight | $0.55$ (maize $0.40$) |
-| $\eta$ | scarcity-price inverse elasticity | $\approx 1.0$ |
+| $\eta$ | scarcity-price inverse elasticity | $\approx 1.0$ (`inv_eta`) |
+| $\mathrm{shift}_t$ | scarcity-ratio floor | $0.05\sum_i s_i$ plus a non-negativity pad |
 | $\rho$ | price smoothing toward $p^\star$ | $0.65$ |
 | $\kappa_u,\kappa_b$ | unmet-anomaly and preferred-block weights | crop-specific |
 | $\alpha,\theta$ | ask-adjustment speed and target fill | $0.15$, $0.70$ |
@@ -360,6 +367,15 @@ where \(\hat Y\) is a per-country LOWESS trend on a padded PSD history
 (`detrend_anomalies` in `sheaf/data_usda.py`, Agrimate's method) and the
 annual total is then spread with triangular month weights.
 
+**Calendar weights.** For a harvest window of $N$ months with peak index
+$i_{\mathrm{peak}}$ along that window,
+$$
+w_m \propto \max\bigl(N-|i_m-i_{\mathrm{peak}}|,1\bigr)
+$$
+on months in the window and $0$ elsewhere; then each month is split
+equally across its two half-month steps so $\sum_t w_{i,t}=1$ over a year
+(`harvest_month_weights`, `step_weights_from_months`).
+
 **Why this matters.** An in-sample 2006–11 *mean* is contaminated by post-2008
 trend growth. World wheat 2006 is about **−9% vs that mean** but only **−4% vs
 LOWESS**. The model then treats 2006/07 as a crash (false May spike) and
@@ -375,18 +391,40 @@ surpluses as well as shortfalls.
 Rice calendars are multi-crop (kharif + rabi / early + late) except Vietnam,
 whose autumn pulse is kept so the 2008 ban still hits offers.
 
+**Availability.** At the start of every step,
+$$\mathrm{avail}_{i,t}=S_{i,t}+H_{i,t}.$$
+
+**Official P1 step demand.** Year-by-year flex is a sensitivity
+(`use_demand=True`). The locked score uses **mean flex**, split uniformly:
+$$
+\overline{C}^{\mathrm{flex}}_i=\frac{1}{Y}\sum_y C^{\mathrm{flex}}_{i,y},
+\qquad
+C^{\mathrm{flex}}_{i,t}=\overline{C}^{\mathrm{flex}}_i/24.
+$$
+Industrial (USA maize FSI excess) is year-by-year when
+`use_industrial=True`, then $/24$. Pipeline food used in $W$ is
+$C_i^{\mathrm{ann}}/24$, not the shocked flex path.
+
 #### Lean foresight and targets
 
-Let $h_t$ be steps to the next global harvest pulse (cumulative future world
-harvest $\ge 12\%$ of mean annual world $H$). Expected harvest for foresight is
-the blend
-$$H^{\mathrm{exp}}_{i,t}=\phi\,H_{i,t}+(1-\phi)\,H^{\mathrm{seas}}_{i,t},$$
-where $H^{\mathrm{seas}}$ is the mean-year seasonal path. Then
+Let $h_t$ be steps to the next global harvest pulse: the smallest $h\ge 1$
+such that cumulative **world** harvest ahead reaches $12\%$ of mean annual
+world $H$ (cap $24$; `steps_to_harvest_pulse`),
 $$
-L_{i,t}=\max\Bigl(0,\ \sum_{k=1}^{h_t} C_{i,t+k}-\sum_{k=1}^{h_t} H^{\mathrm{exp}}_{i,t+k}\Bigr),
+h_t=\min\Bigl\{h\ge 1:\ \sum_{k=1}^{h} H^{\mathrm{world}}_{t+k}
+\ge 0.12\,\overline{H}^{\mathrm{world}}\Bigr\}.
+$$
+All countries share this clock. Expected harvest for foresight is the blend
+$$H^{\mathrm{exp}}_{i,t}=\phi\,H_{i,t}+(1-\phi)\,H^{\mathrm{seas}}_{i,t},$$
+where $H^{\mathrm{seas}}$ is the mean-year seasonal path. The lean gap
+**includes the current step** ($k=0$ through $h_t$):
+$$
+L_{i,t}=\max\Bigl(0,\ \sum_{k=0}^{h_t} C_{i,t+k}-\sum_{k=0}^{h_t} H^{\mathrm{exp}}_{i,t+k}\Bigr),
 \qquad
 T_{i,t}=L_{i,t}+s_i.
 $$
+(`rolling_ahead_variable` sums $t+1,\ldots,t+h_t$; `_simulate_window`
+adds $C_{i,t}$ and $H^{\mathrm{exp}}_{i,t}$.)
 
 #### Demand, offers, and AMIS
 
@@ -441,9 +479,25 @@ scored Vietnam window is a 2008 tax. Not FAOSTAT bilateral crisis volumes.
 
 Destination shares are ask-reweighted,
 $$\tilde A_{ij}\propto A_{ij}\,(p_0/q_{i,t})^{\gamma}\quad(\text{rows renormed}),$$
-then
-$$\mathrm{ship}_{ij}=\min\bigl(O_{i,t}\tilde A_{ij},\,D_{j,t}S_{ij}\bigr),$$
-with a residual pool that can fill at most fraction $\nu$ of leftover demand.
+then preferred links clear as
+$$\mathrm{ship}^0_{ij}=\min\bigl(O_{i,t}\tilde A_{ij},\,D_{j,t}S_{ij}\bigr).$$
+Leftover offers and leftover demand form a residual pool that can fill at
+most fraction $\nu$ of leftover demand (`_bilateral_clear`):
+$$
+\mathrm{offer}^{\mathrm{left}}_i=\max\bigl(0,O_{i,t}-\textstyle\sum_j\mathrm{ship}^0_{ij}\bigr),
+\quad
+\mathrm{demand}^{\mathrm{left}}_j=\max\bigl(0,D_{j,t}-\textstyle\sum_i\mathrm{ship}^0_{ij}\bigr),
+$$
+$$
+\mathrm{take}_j=\nu\,\mathrm{demand}^{\mathrm{left}}_j,
+\qquad
+\mathrm{fill}=\min\Bigl(1,\;
+\frac{\sum_i\mathrm{offer}^{\mathrm{left}}_i}{\sum_j\mathrm{take}_j}\Bigr),
+$$
+leftover offers are allocated by leftover-demand weights
+$w_j\propto\mathrm{take}_j\cdot\mathrm{fill}$, and columns are clipped so
+no importer receives more than that cap. $\mathrm{ship}=\mathrm{ship}^0+\mathrm{ship}^1$.
+E0 never supplies the tonnes; $O$ and $D$ do.
 Fill rates update asks (sold-out $\Rightarrow$ raise ask; leftover $\Rightarrow$ cut):
 $$
 q_{i,t+1}
@@ -472,14 +526,24 @@ b_t=\frac{\sum_{i,j} S_{ij}\,\tau_{i,t}\,D_{j,t}}{\max(\sum_j D_{j,t},\epsilon)}
 \quad
 \Delta u_t=\max(0,u_t-u^{\mathrm{twin}}_t).
 $$
-Trade-weighted ask $p^{\mathrm{tr}}_t=\sum_i q_{i,t}\mathrm{shipped}_{i,t}/\sum_i\mathrm{shipped}_{i,t}$
-(or $p_t$ if no trade). Scarcity signal
+Trade-weighted ask
+$$
+p^{\mathrm{tr}}_t=\frac{\sum_i q_{i,t}\,\mathrm{shipped}_{i,t}}{\sum_i\mathrm{shipped}_{i,t}}
+$$
+(or the incoming $p_t$ if no trade). The scarcity ratio uses a
+**state-dependent floor**, not a free constant $f$:
+$$
+\mathrm{shift}_t=0.05\sum_i s_i+\max\bigl(0,\,-\min(\mathrm{free}_t,F^{\mathrm{twin}}_t)\bigr),
+\qquad
+r_t=\frac{F^{\mathrm{twin}}_t+\mathrm{shift}_t}{\mathrm{free}_t+\mathrm{shift}_t}.
+$$
+The $0.05\sum s_i$ term keeps $r_t$ defined when free cover is small; the
+second term is zero unless free or twin goes negative. Scarcity signal
 $$
 p^{\mathrm{scar}}_t=p_0\cdot r_t^{\eta_{\mathrm{eff}}}
 \cdot\bigl(1+\kappa_u\Delta u_t+\kappa_b b_t\bigr),
 $$
-with $r_t=(F^{\mathrm{twin}}_t+f)/(\mathrm{free}_t+f)$ and $\eta_{\mathrm{eff}}=\eta$
-(symmetric in surplus and shortage). Then
+with $\eta_{\mathrm{eff}}=\eta$ (symmetric in surplus and shortage). Then
 $$
 p^\star_t=\omega\,p^{\mathrm{tr}}_t+(1-\omega)\,p^{\mathrm{scar}}_t,
 \qquad
@@ -487,6 +551,63 @@ p_t=\rho\,p_{t-1}+(1-\rho)\,p^\star_t.
 $$
 If the path matches the twin (calm), $p^\star_t=p_0$ by construction
 (`assert_twin_identity`).
+
+**Opening stocks.** PSD ending stocks in `stock_seed_year` (default 2005)
+are clipped to carry,
+$$
+S_{i,0}=\min\bigl(R^{\mathrm{end}}_{i,\mathrm{seed}},\,
+\max(\mathtt{max\_stu}\,C_i^{\mathrm{ann}},\,1.5 s_i)\bigr),
+$$
+then optionally spun up `spin_up_years=2` on climatology harvest, mean
+flex, no industrial, no AMIS. The $1.5s$ floor is an **opening** clip
+only; warehouse $W$ uses $\mathtt{max\_stu}\,C$ with no $1.5s$ term.
+
+#### Method of solution
+
+The crisis host does **not** solve a spatial price equilibrium, a
+complementarity problem, or a market-clearing root each step.
+`_simulate_window` evaluates an **explicit sequential map**
+$t=0,\ldots,T-1$. Lean horizons and rolling sums are computed once
+before the loop. Inside the step:
+
+1. $\mathrm{avail}_{i,t}=S_{i,t}+H_{i,t}$
+2. $d,L,T,D,O$ from closed-form algebra (isoelastic $d$ uses the
+   **incoming** $p_{t-1}$; $q_{i,t}$ is the ask inherited from $t-1$)
+3. $\tilde A$, Armington $\min$, residual pool (dense $n\times n$)
+4. consumption, stock update, soft warehouse clip
+5. ask update $\to q_{i,t+1}$
+6. $p^{\mathrm{tr}}$, $\mathrm{shift}$, $r$, $p^{\mathrm{scar}}$,
+   $p^\star$, then $p_t=\rho\,p_{t-1}+(1-\rho)\,p^\star_t$
+
+There is no inner iteration to a within-step fixed point. The
+path-matched twin is a **second** forward pass of the same map
+(mean-flex $C$, seasonal $H$, $\tau\equiv 0$). Complexity is
+$O(Tn^2)$ per crop ($n=18$). Implementation is NumPy; `cvxpy` is not
+imported on this path. **SHEAF stays in Python.** Agrimate's Julia is
+because they solve per-step agent optimizations, not because the same
+map is faster in Julia. The same map would be the same algorithm in
+either language.
+
+**Gate 1.** One Jacobi factor $\mathrm{fac}=\exp(\eta\log(p/p_0))$ from
+the three *start-of-step* world prices, then $G$ independent Gate 0
+maps. Not a simultaneous three-crop fixed point and not Gauss–Seidel.
+
+**Gate 2.** Three forward passes of the Gate 0 map (climatology, open
+shocked harvest, then shocked harvest with $\tau_t$). The ratio rule is
+a threshold, not an optimization. Nested-year grid BR is a leftover
+diagnostic for $\tau^{\mathrm{on}}$.
+
+**LOWESS** (prepare time only): tricube local linear, one $2\times 2$
+weighted least-squares solve per sample point (`data_usda._lowess`).
+
+**Leftover annual host** (`core.py`): concave QP via cvxpy
+(CLARABEL → SCS → OSQP) and year-IBR. Not the crisis object.
+
+Agrimate (Kuhla et al. 2025) is a different object: each region’s
+supplier, consumer, and purchaser solve constrained optimizations every
+step (finite-horizon expected profit; CES under budget). That is why
+their model is Julia (optional MPI). SHEAF’s crisis host does not solve
+those agent problems.
 
 #### Robustness asserts
 

@@ -1,0 +1,131 @@
+% SHEAF first-principles walkthrough for Agrimate colleagues.
+% Overleaf: zip this folder (main.tex, refs.bib, sections/, figures/, tables/)
+% and upload. Compile with pdfLaTeX + BibTeX.
+%
+% Grounding: README.md Sections 1-8 vs live code
+%   sheaf/dynamic_crop.py, dynamic_coupled.py, dynamic_policy.py
+%   (crisis host) and sheaf/core.py (TWIST-era annual prototype).
+% Protocol: CLAUDE.md --- locate claim, locate implementation, match,
+% then put that match on the slide. README §8 is the crisis-host spec.
+\documentclass[11pt,aspectratio=169]{beamer}
+\usetheme{Madrid}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamerfont{title}{size=\large}
+\setbeamerfont{frametitle}{size=\normalsize}
+% Do not insert a section-title slide: page numbers then match the
+% one-claim-per-slide count.
+\AtBeginSection{}
+\addtobeamertemplate{frametitle}{\vspace*{-0.35ex}}{\vspace*{-0.8ex}}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{03B7}{$\eta$}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes.callouts,calc,arrows.meta}
+\setbeamerfont{section in head/foot}{size=\tiny}
+\usepackage[round,authoryear]{natbib}
+
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue}
+\graphicspath{{figures/}}
+\bibliographystyle{apalike}
+
+% One-line topic: plain English first. Symbols belong in the body.
+\newcommand{\topic}[1]{%
+\noindent{\scriptsize\textcolor{blue!60!black}{\textbf{About.} #1}}\par\vspace{0.2em}}
+% Per-slide key: every letter on the slide, meaning, and unit.
+\newcommand{\symsep}{\,--\,}
+\newcommand{\syms}[1]{%
+\par\vspace{0.35em}
+{\tiny
+\noindent\textcolor{black!68}{\textbf{Symbols.}}\par\vspace{0.12em}
+\noindent\textcolor{black!68}{#1}\par
+}\vspace{0.15em}}
+
+% --- match / diverge banners ----------------------------------------------
+\newcommand{\matchbanner}[2]{%
+\begin{tikzpicture}
+\node[anchor=west, fill=green!12, draw=green!50!black, rounded corners=2pt,
+      inner sep=2.2pt, font=\scriptsize, text width=0.90\textwidth,
+      align=left] {$\checkmark$~\textbf{Match.} #1 \quad{\ttfamily #2}};
+\end{tikzpicture}\par\vspace{0.25em}}
+\newcommand{\divbanner}[2]{%
+\begin{tikzpicture}
+\node[anchor=west, fill=red!12, draw=red!60!black, rounded corners=2pt,
+      inner sep=2.2pt, font=\scriptsize, text width=0.90\textwidth,
+      align=left] {$\times$~\textbf{Diverge.} #1 \quad{\ttfamily #2}};
+\end{tikzpicture}\par\vspace{0.25em}}
+\newcommand{\leftoverbanner}[2]{%
+\begin{tikzpicture}
+\node[anchor=west, fill=gray!15, draw=gray!60, rounded corners=2pt,
+      inner sep=2.2pt, font=\scriptsize, text width=0.90\textwidth,
+      align=left] {$\circ$~\textbf{Leftover.} #1 \quad{\ttfamily #2}};
+\end{tikzpicture}\par\vspace{0.25em}}
+
+% --- three callout bubbles: parameter / unit / source ---------------------
+\newcommand{\bubbles}[3]{%
+\vspace{0.15em}
+\begin{center}
+\begin{tikzpicture}[node distance=0.18cm]
+\node[draw=blue!60, fill=blue!8, rounded corners=3pt, inner sep=3pt,
+      text width=0.28\textwidth, align=left, font=\tiny]
+      (p) {\textbf{\textcolor{blue!70!black}{Parameter}}\\#1};
+\node[draw=teal!70!black, fill=teal!8, rounded corners=3pt, inner sep=3pt,
+      text width=0.28\textwidth, align=left, font=\tiny, right=of p]
+      (u) {\textbf{\textcolor{teal!60!black}{Unit}}\\#2};
+\node[draw=orange!80!black, fill=orange!10, rounded corners=3pt, inner sep=3pt,
+      text width=0.28\textwidth, align=left, font=\tiny, right=of u]
+      (s) {\textbf{\textcolor{orange!70!black}{Source}}\\#3};
+\end{tikzpicture}
+\end{center}}
+% Cap height against the paper, not leftover textheight (frametitle
+% is taken from textheight, so a 0.6\textheight PNG still overflows).
+\newcommand{\fitfig}[2][0.46\paperheight]{%
+\begin{center}\vspace{-0.2em}\includegraphics[height=#1,width=0.90\textwidth,keepaspectratio]{#2}\end{center}}
+
+\title{SHEAF from first principles}
+\subtitle{Equation, assumption, unit, and source --- discussion with Agrimate}
+\author{Discussion notes}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\vspace{-1.2em}
+\begin{center}
+{\scriptsize Crisis host: \texttt{dynamic\_crop.py} + \texttt{dynamic\_coupled.py} + \texttt{dynamic\_policy.py}.\\
+Annual leftover: \texttt{core.py}. Lineage: TWIST $\to$ Agrimate $\to$ SHEAF.\\
+\texttt{verify\_claims.py}: 49 match, 0 divergences, 0 failures.}
+\end{center}
+\end{frame}
+
+% Presentation order: why the model exists -> what it is -> the clock and
+% the data -> the equations in the order one step runs them -> how they are
+% solved -> what is locked and what it scored -> the two gates on top ->
+% the annual leftover -> questions.
+\input{sections/00_howto}
+\input{sections/01_lineage}
+\input{sections/01b_architecture}
+\input{sections/02_clock_units}
+\input{sections/03_data}
+\input{sections/04_harvest}
+\input{sections/05_demand_lean}
+\input{sections/06_trade_price}
+\input{sections/12_solution}
+\input{sections/07_params_scores}
+\input{sections/08_gate1}
+\input{sections/09_gate2}
+\input{sections/10_annual}
+\input{sections/11_divergences}
+
+\begin{frame}[allowframebreaks]{References}
+\bibliography{refs}
+\end{frame}
+
+\end{document}

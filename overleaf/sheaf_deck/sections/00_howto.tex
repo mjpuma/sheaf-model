@@ -1,0 +1,93 @@
+\section*{How to read this deck}
+
+\begin{frame}{One claim per slide}
+\topic{How to read the deck: one claim per slide, colour banners, three bubbles.}
+Purpose: walk through what SHEAF computes --- equation, assumption,
+unit, and source --- with the Agrimate authors. Each slide states
+\textbf{one claim}, and the equation shown \emph{is} the specification.
+
+\begin{itemize}
+\item Blue \textbf{About.} line: plain English, then the equation below.
+\item Tiny \textbf{Symbols.} line: every letter on that slide, with
+      meaning and unit.
+\item Three bubbles: \textbf{parameter} (free or locked), \textbf{unit},
+      \textbf{source} (which file, which vintage).
+\item \textbf{Green} banner: the displayed claim and the code match.
+      \textbf{Grey}: the annual SPE leftover in \texttt{sheaf/core.py},
+      still in the repository but \textbf{not} the 2007/08 host.
+      \textbf{Red} is reserved for a live disagreement --- after the
+      README catch-up, the crisis-host slides are all green.
+\end{itemize}
+\syms{\S8 the crisis-host section of \texttt{README.md} \symsep \S1--\S6 its
+annual-leftover sections \symsep Gate~0 the locked single-crop 24-step market;
+Gate~1 adds cross-grain substitution; Gate~2 adds endogenous export cuts.}
+\end{frame}
+
+\begin{frame}{The verification protocol (from \texttt{CLAUDE.md})}
+\topic{How we checked a claim against the code, and how we classify a mismatch.}
+For every suspected mismatch we did, in order:
+
+\begin{enumerate}
+\item Locate the mathematical claim (README equation or docstring).
+\item Locate the implementation (file and line).
+\item Compare, symbol by symbol where feasible.
+\item Attempt a numerical counterexample.
+\item Attempt to prove the implementation correct on its own terms.
+\item Only then classify.
+\end{enumerate}
+
+Classification is not ``wrong vs right vs Agrimate.'' Categories:
+\textbf{A} math error, \textbf{B} coding bug, \textbf{C} numerical,
+\textbf{D} economic simplification, \textbf{E} modeling philosophy,
+\textbf{F} empirical gap, \textbf{G} documentation, \textbf{H} holds.
+
+A departure from Deaton--Laroque is \textbf{E}, not \textbf{A}, if SHEAF
+never claimed that equilibrium.
+\syms{``claim'' a specific README equation, section, or docstring statement
+\symsep ``implementation'' a specific file and line range in \texttt{sheaf/}
+\symsep ``counterexample'' a concrete input or parameter set on which claim and
+code disagree numerically \symsep Deaton--Laroque the rational-expectations
+competitive-storage benchmark.}
+\end{frame}
+
+\begin{frame}[label=sitmap]{Sitting map --- and the running order}
+\topic{The rows are in deck order, so this doubles as the running order. Buttons jump to the named slides if the sitting is short.}
+{\scriptsize
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{@{}p{0.48\textwidth}p{0.46\textwidth}@{}}
+\toprule
+If the question is & Go to \\
+\midrule
+Lineage / what each gate may claim
+  & \hyperlink{lineage}{\beamergotobutton{lineage}} \\
+Which of the two hosts is the crisis model
+  & \hyperlink{hosts}{\beamergotobutton{two hosts}} \\
+How one fortnight actually computes
+  & \hyperlink{spine}{\beamergotobutton{one-step spine}} \\
+How the equations are computed (no QP)
+  & \hyperlink{method}{\beamergotobutton{method of solution}} \\
+What is locked vs illustrative
+  & \hyperlink{cropparams}{\beamergotobutton{CropParams}} \\
+Did the market hindcast 2007/08 and 2010/11
+  & \hyperlink{gate0scores}{\beamergotobutton{Gate 0 scores}} \\
+Substitution without breaking Gate~0
+  & \hyperlink{gate1}{\beamergotobutton{Gate 1}} \\
+Endogenous $\tau_t$ (not a 2008 who-banned score)
+  & \hyperlink{gate2}{\beamergotobutton{Gate 2}} \\
+README \S1--\S6 / the annual QP
+  & \hyperlink{leftover}{\beamergotobutton{leftover --- skip}} \\
+Questions for discussion
+  & \hyperlink{questions}{\beamergotobutton{five questions}} \\
+\bottomrule
+\end{tabular}}
+
+\vspace{0.35em}
+{\scriptsize Do not retune \texttt{CropParams} or $\sigma$. Do not unpause
+\texttt{dynamic\_grains.py}. Do not re-score 2008 as who-restricts.
+Do not graft $M_i$ onto the spine. Do not treat \texttt{core.py} IBR as
+the crisis game. Scores are locked diagnostics, not a refit.}
+\syms{\texttt{CropParams} the locked Gate~0 parameter set \symsep $\sigma$ Gate~1
+cross-grain substitution scale (dimensionless) \symsep $\tau_t$ export-offer cut
+(fraction in $[0,1]$) \symsep $M_i$ the \emph{annual leftover} demand-slope matrix
+(MMT per \$/t) \symsep IBR iterated best response.}
+\end{frame}
