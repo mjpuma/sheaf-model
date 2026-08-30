@@ -2,11 +2,12 @@
 
 \begin{frame}{One claim per slide}
 \topic{How to read the deck: one claim per slide, colour banners, three bubbles.}
-This sitting is not a sales pitch. It is a joint audit with the Agrimate
-authors of what SHEAF actually computes.
+Purpose: walk through what SHEAF computes --- equation, assumption,
+unit, and source --- with the Agrimate authors.
 
 \begin{itemize}
 \item Blue \textbf{About.} line: plain English, then the equation below.
+\item Tiny \textbf{Symbols.} line: each letter on that slide, with meaning and unit.
 \item Each slide states \textbf{one claim}.
 \item The equation is the one in README \S8 (crisis host) or \S1--\S6
       (leftover). That is the specification.
@@ -19,6 +20,18 @@ authors of what SHEAF actually computes.
 \item Red is reserved if a displayed claim and the code still disagree.
       After the README catch-up, the crisis-host slides are green.
 \end{itemize}
+
+\vspace{0.2em}
+{\scriptsize \textbf{Running order.} Lineage $\to$ the two hosts and the
+one-step spine $\to$ clock and units $\to$ source data $\to$ harvest
+forcing $\to$ the step's equations in the order they run $\to$ method of
+solution $\to$ locked parameters and Gate~0 scores $\to$ Gate~1 $\to$
+Gate~2 $\to$ annual leftover $\to$ questions.}
+\syms{\S8 the crisis-host section of \texttt{README.md} \symsep \S1--\S6 the
+annual-leftover sections of the same README \symsep Gate~0 the locked
+single-crop 24-step market; Gate~1 adds cross-grain substitution; Gate~2 adds
+endogenous export cuts \symsep green banner = displayed claim matches the code;
+grey = annual leftover; red = a live disagreement.}
 \end{frame}
 
 \begin{frame}{The verification protocol (from \texttt{CLAUDE.md})}
@@ -41,6 +54,11 @@ Classification is not ``wrong vs right vs Agrimate.'' Categories:
 
 A departure from Deaton--Laroque is \textbf{E}, not \textbf{A}, if SHEAF
 never claimed that equilibrium.
+\syms{``claim'' a specific README equation, section, or docstring statement
+\symsep ``implementation'' a specific file and line range in \texttt{sheaf/}
+\symsep ``counterexample'' a concrete input or parameter set on which claim and
+code disagree numerically \symsep Deaton--Laroque the rational-expectations
+competitive-storage benchmark.}
 \end{frame}
 
 \begin{frame}[label=sitmap]{Sitting map}
@@ -53,8 +71,12 @@ If the question is & Go to \\
 \midrule
 Lineage / what each gate may claim
   & \hyperlink{lineage}{\beamergotobutton{lineage}} \\
+Which of the two hosts is the crisis model
+  & \hyperlink{hosts}{\beamergotobutton{two hosts}} \\
 How one fortnight actually computes
   & \hyperlink{spine}{\beamergotobutton{one-step spine}} \\
+How the equations are computed (no QP)
+  & \hyperlink{method}{\beamergotobutton{method of solution}} \\
 What is locked vs illustrative
   & \hyperlink{cropparams}{\beamergotobutton{CropParams}} \\
 Did the market hindcast 2007/08 and 2010/11
@@ -63,11 +85,9 @@ Substitution without breaking Gate~0
   & \hyperlink{gate1}{\beamergotobutton{Gate 1}} \\
 Endogenous $\tau_t$ (not a 2008 who-banned score)
   & \hyperlink{gate2}{\beamergotobutton{Gate 2}} \\
-How the equations are computed (no QP)
-  & \hyperlink{method}{\beamergotobutton{method of solution}} \\
 README \S1--\S6 / the annual QP
   & \hyperlink{leftover}{\beamergotobutton{leftover --- skip}} \\
-What we want Agrimate to stress
+Questions for discussion
   & \hyperlink{questions}{\beamergotobutton{five questions}} \\
 \bottomrule
 \end{tabular}}
@@ -77,29 +97,8 @@ What we want Agrimate to stress
 \texttt{dynamic\_grains.py}. Do not re-score 2008 as who-restricts.
 Do not graft $M_i$ onto the spine. Do not treat \texttt{core.py} IBR as
 the crisis game. Scores are locked diagnostics, not a refit.}
-\end{frame}
-
-\begin{frame}{Two hosts, one repository}
-\topic{Two models live in this repo. Only the 24-step one is the crisis host.}
-{\scriptsize
-\renewcommand{\arraystretch}{1.05}
-\begin{center}
-\begin{tabular}{@{}lll@{}}
-\toprule
-Layer & Crisis host (this sitting) & Leftover \\
-\midrule
-Clock & 24 steps / year & 1 step / year \\
-Market & \texttt{dynamic\_crop.py} & \texttt{core.SpatialEquilibrium} \\
-Substitution & \texttt{dynamic\_coupled.py} isoelastic $\eta$ & linear $D=a-Mp$ \\
-Policy & \texttt{dynamic\_policy.py} $\tau_t$ & \texttt{ExportRestrictionGame} \\
-Restrictions in Gate~0 & AMIS quantity cuts & AMIS $\$/t$ wedges \\
-Method & explicit NumPy map $O(Tn^2)$ & cvxpy QP + year-IBR \\
-Hindcast & \texttt{score\_subannual\_crop.py} & \texttt{demo.py} (not a hindcast) \\
-\bottomrule
-\end{tabular}
-\end{center}}
-
-\vspace{0.3em}
-{\scriptsize README ``Mathematical formulation'' \S1--\S6 describes the leftover.
-\S8 describes the crisis host. Gate~0 / Gate~1 / Gate~2 sit on \S8.}
+\syms{\texttt{CropParams} the locked Gate~0 parameter set \symsep $\sigma$ Gate~1
+cross-grain substitution scale (dimensionless) \symsep $\tau_t$ export-offer cut
+(fraction in $[0,1]$) \symsep $M_i$ the \emph{annual leftover} demand-slope matrix
+(MMT per \$/t) \symsep IBR iterated best response.}
 \end{frame}

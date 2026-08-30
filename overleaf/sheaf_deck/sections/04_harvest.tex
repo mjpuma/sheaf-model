@@ -1,19 +1,26 @@
 \section{Harvest forcing}
 
 \begin{frame}{Climatology is the score-window mean seasonal path}
-\topic{The no-shock harvest path: average production, spread by the calendar.}
+\topic{The no-shock harvest path: average production, spread over the year by the crop calendar.}
 \matchbanner{README \S8}{dynamic\_crop.prepare\_crop\_run:786--787}
 
 \[
 H^{\mathrm{seas}}_{i,t}
 = \bar H_i \cdot w_{i,t},
 \qquad
-\bar H_i = \frac{1}{Y}\sum_{y\in\text{score window}} Q_{i,y},
+\bar H_i = \frac{1}{Y}\sum_{y\in\text{score window}} Q_{i,y}.
 \]
 
-with $w_{i,t}$ the calendar weight for that step (sums to 1 over the year).
-The twin uses this path. Treatment harvest is \textbf{not} raw PSD year
-totals laid on the same calendar.
+The twin run uses exactly this path. Treatment harvest is \textbf{not}
+raw PSD year totals laid on the same calendar --- that would mix trend
+growth into the shock (two slides on).
+\syms{$i$ country \symsep $t$ step within the run \symsep $y$ a marketing year
+inside the score window \symsep $Y$ how many years that window holds (default
+2006--11 $\Rightarrow Y=6$) \symsep $Q_{i,y}$ PSD production in year $y$
+(MMT/year) \symsep $\bar H_i$ its mean over the window (MMT/year)
+\symsep $w_{i,t}$ share of the annual harvest landing in step $t$
+(dimensionless, sums to 1 over a year) \symsep $H^{\mathrm{seas}}_{i,t}$
+climatology harvest (MMT/step).}
 \bubbles{$\bar H_i$ is data. $w_{i,t}$ is the calendar.}
 {$H$: MMT / step. $\bar H$: MMT / year.}
 {USDA PSD country production, score window (default 2006--11).
@@ -22,63 +29,82 @@ totals laid on the same calendar.
 
 \begin{frame}{Calendar weights are a triangle, then split in half}
 \topic{How a harvest season becomes 24 step weights: a triangle over the harvest months, each month split across two fortnights.}
-\matchbanner{README \S8 calendar weights}{seasonal.harvest\_month\_weights}
+\matchbanner{README \S8 calendar weights}{seasonal.harvest\_month\_weights:44--82}
 
-For a window of $N$ months with peak index $i_{\mathrm{peak}}$ along
-that window,
+For a harvest window of $N$ months, with the peak sitting at position
+$i_{\mathrm{peak}}$ along that window,
 
 \[
-w_m \propto \max\bigl(N-|i_m-i_{\mathrm{peak}}|,1\bigr)
+w_m \propto \max\bigl(N-|i_m-i_{\mathrm{peak}}|,\,1\bigr)
+\quad\text{on months in the window, } 0 \text{ elsewhere.}
 \]
 
-on months in the window, $0$ elsewhere. Each month is then split equally
-across its two half-month steps. Weights sum to 1 over the year.
-Verified on every node.
+Each month's weight is then split equally across its two half-month steps,
+giving the 24-step vector $w_{i,t}$. Weights sum to 1 over the year on
+every node (verified: max $|\sum_t w - 1| = 2\times 10^{-16}$ across 18
+nodes). If no \texttt{peak\_month} is given, the peak is the middle month
+of the window.
+\syms{$m$ a calendar month $1$--$12$ \symsep $w_m$ share of the annual harvest
+in month $m$ (dimensionless) \symsep $N$ number of months in the harvest window
+\symsep $i_m$ position of month $m$ along the window ($0,1,\ldots,N-1$)
+\symsep $i_{\mathrm{peak}}$ position of the peak month \symsep $w_{i,t}$ the
+resulting 24-step weight for country $i$ (dimensionless).}
 \bubbles{Agrimate-style mid-season peak. Not a 2008 fit.}
 {Dimensionless shares of annual $Q$.}
 {\texttt{seasonal.py:44--82}; README \S8 ``Calendar weights.''}
 \end{frame}
 
-\begin{frame}{Treatment harvest is climatology $\times$ LOWESS}
-\topic{The shocked harvest: that average path times a trend-relative anomaly.}
-\matchbanner{README \S8}{dynamic\_crop.py:325--329, data\_usda.detrend\_anomalies}
+\begin{frame}{Treatment harvest is climatology $\times$ LOWESS anomaly}
+\topic{The shocked harvest: that average path times a trend-relative anomaly for each country-year.}
+\matchbanner{README \S8}{dynamic\_crop.py:258--304, data\_usda.detrend\_anomalies}
 
 \[
 H_{i,y}^{\mathrm{ann}} = \bar H_i \cdot (1+a_{i,y}),
 \qquad
-a_{i,y} = \frac{Y_{i,y}-\hat Y_{i,y}}{\hat Y_{i,y}}.
+a_{i,y} = \frac{Q_{i,y}-\hat Q_{i,y}}{\hat Q_{i,y}}.
 \]
 
-$\hat Y$ is a per-country LOWESS trend on a padded PSD history
-(\texttt{hist\_pad=12} years, \texttt{window\_years=10}, tricube local
-linear --- Agrimate's method, hand-rolled in \texttt{\_lowess}, not
-\texttt{statsmodels}). \texttt{shock\_mode=full} keeps surpluses.
+$\hat Q$ is a per-country LOWESS trend fitted on a padded PSD history
+(\texttt{hist\_pad=12} years back, \texttt{window\_years=10}, tricube local
+linear --- Agrimate's method, hand-rolled in \texttt{data\_usda.\_lowess},
+not \texttt{statsmodels}). \texttt{shock\_mode="full"} keeps surpluses as
+well as shortfalls, so a bumper year lowers the price.
+\syms{$H^{\mathrm{ann}}_{i,y}$ treatment annual harvest, before the calendar
+spread (MMT/year) \symsep $\bar H_i$ climatology mean (MMT/year)
+\symsep $a_{i,y}$ signed LOWESS anomaly (dimensionless; $-0.10$ means 10\% below
+trend) \symsep $Q_{i,y}$ realised PSD production (MMT/year)
+\symsep $\hat Q_{i,y}$ its fitted LOWESS trend value (MMT/year).}
 \bubbles{\texttt{window\_years=10} is Agrimate's choice. Not fit to 2008.}
-{Anomaly $a$ dimensionless. $H$ MMT/year then spread to MMT/step.}
+{Anomaly $a$ dimensionless. $H$ MMT/year, then spread to MMT/step.}
 {\texttt{data\_usda.detrend\_anomalies}; Agrimate detrending.
 \texttt{dynamic\_crop.\_harvest\_anomaly\_scalars}.}
 \end{frame}
 
-\begin{frame}{Why not the in-sample mean}
-\topic{Why the anomaly is versus a smooth trend, not versus the 2006--11 average.}
+\begin{frame}{Why the anomaly is versus trend, not versus the in-sample mean}
+\topic{Why the anomaly is measured against a smooth trend rather than the 2006--11 average.}
 \matchbanner{README \S8 ``Why this matters''}{verify\_claims.py check\_lowess}
 
-World wheat 2006 versus the 2006--11 \emph{mean} is $-8.9\%$. Versus
-LOWESS it is $-4.4\%$. The README's ``$-9\%$ vs that mean but only $-4\%$
-vs LOWESS'' is the same fact.
+World wheat 2006 is $-8.9\%$ against the 2006--11 in-sample \emph{mean},
+but only $-4.4\%$ against its LOWESS trend. Both numbers are reproduced by
+\texttt{verify\_claims.py}; the README's ``$-9\%$ vs that mean but only
+$-4\%$ vs LOWESS'' is the same fact.
 
-An in-sample mean is contaminated by post-2008 yield growth. The model then
-treats 2006/07 as a crash (false May spike) and under-weights 2010 (Russia
-drought sits near a boom-inflated mean). Signed anomalies versus trend
-isolate \emph{shocks}, not secular growth.
+An in-sample mean is contaminated by post-2008 yield growth. The model
+would then read 2006/07 as a crash (a false May spike) and under-weight
+2010 (the Russian drought would sit near a boom-inflated mean). Signed
+anomalies against trend isolate \emph{shocks} rather than secular growth.
+\syms{$a_{i,y}$ the anomaly actually used: percent deviation from the LOWESS
+trend (dimensionless) \symsep the rejected alternative is percent deviation
+from the 2006--11 in-sample mean \symsep LOWESS: locally weighted regression,
+tricube weights on a 10-year neighbourhood.}
 \bubbles{Forcing identity is structural. Do not replace LOWESS with
 in-sample $z$-scores to ``fix'' 2006.}
-{Percent of trend, not percent of 2006--11 mean.}
+{Percent of trend, not percent of the 2006--11 mean.}
 {Reproduced: world PSD wheat, \texttt{detrend\_anomalies} on 1994--2011.}
 \end{frame}
 
 \begin{frame}{Foresight harvest is a blend}
-\topic{What agents expect this step's harvest to be: a blend of shock and climatology.}
+\topic{What agents expect this step's harvest to be: a blend of the realised shock and climatology.}
 \matchbanner{README \S8 $H^{\mathrm{exp}}$}{dynamic\_crop.py:561--565}
 
 \[
@@ -86,9 +112,16 @@ H^{\mathrm{exp}}_{i,t}
 = \phi\, H_{i,t} + (1-\phi)\, H^{\mathrm{seas}}_{i,t}.
 \]
 
-$\phi$ is reduced-form (\texttt{foresight\_phi}: wheat/rice $0.55$, maize
-$0.50$). Agents see a mixture of the realized (shocked) harvest and the
-seasonal climatology --- finite foresight, not rational expectations.
+$\phi$ is reduced-form (\texttt{CropParams.foresight\_phi}: wheat and rice
+$0.55$, maize $0.50$). Agents see a mixture of the realised (shocked)
+harvest and the seasonal climatology --- finite foresight, not rational
+expectations. $H^{\mathrm{exp}}$ is what enters the lean-cover
+calculation, so a country only partly anticipates its own bad year.
+\syms{$H^{\mathrm{exp}}_{i,t}$ expected harvest (MMT/step)
+\symsep $H_{i,t}$ realised, shocked harvest (MMT/step)
+\symsep $H^{\mathrm{seas}}_{i,t}$ climatology harvest (MMT/step)
+\symsep $\phi\in[0,1]$ weight on the realised path (dimensionless;
+$\phi=1$ is perfect foresight, $\phi=0$ is pure climatology).}
 \bubbles{$\phi\in[0,1]$, reduced-form, locked in \texttt{CropParams}.
 Not estimated on 2008.}
 {$H$ in MMT/step.}
@@ -96,20 +129,29 @@ Not estimated on 2008.}
 \end{frame}
 
 \begin{frame}{Lean horizon is a \emph{world} clock}
-\topic{How far ahead countries look when they plan stocks: until the next world harvest pulse.}
-\matchbanner{README \S8 $h_t$}{seasonal.steps\_to\_harvest\_pulse}
+\topic{How far ahead countries look when they plan stocks: until the next world harvest pulse arrives.}
+\matchbanner{README \S8 $h_t$}{seasonal.steps\_to\_harvest\_pulse:163--189}
 
 \[
 h_t
-=\min\Bigl\{h\ge 1:\ 
+=\min\Bigl\{h\ge 1:\
 \sum_{k=1}^{h} H^{\mathrm{world}}_{t+k}
 \ge 0.12\,\overline{H}^{\mathrm{world}}\Bigr\},
+\qquad
+H^{\mathrm{world}}_{t}=\sum_i H^{\mathrm{exp}}_{i,t},
 \]
 
-capped at 24. $H^{\mathrm{world}}=\sum_i H_i$ so every country shares
-the same lean clock (NH summer pulse). Verified range on 2006--07 wheat:
-$h_t\in[1,14]$.
+capped at 24 steps. Because the threshold is on the \emph{world} harvest
+path, every country shares one lean clock (the Northern-Hemisphere summer
+pulse). Verified range on 2006--07 wheat: $h_t\in[1,14]$ steps.
+\syms{$h_t$ lean horizon: steps from $t$ until enough new harvest arrives
+(dimensionless count of steps, $1\le h_t\le 24$) \symsep $H^{\mathrm{world}}_t$
+world \emph{expected} harvest that step, summed over countries (MMT/step)
+\symsep $\overline{H}^{\mathrm{world}}$ mean annual world harvest over the
+complete years in the run (MMT/year) \symsep $0.12$
+(\texttt{harvest\_pulse\_frac}) the fraction of an annual world harvest that
+counts as ``a pulse has arrived'' (dimensionless).}
 \bubbles{\texttt{harvest\_pulse\_frac=0.12} structural. \texttt{MAX\_LEAN\_STEPS=24}.}
 {$h_t$ in steps (dimensionless).}
-{\texttt{seasonal.py:163--189}. World path = \texttt{H.sum(axis=0)}.}
+{\texttt{seasonal.py:163--189}. World path is \texttt{H\_exp.sum(axis=0)}.}
 \end{frame}

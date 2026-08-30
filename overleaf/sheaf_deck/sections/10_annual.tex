@@ -14,11 +14,12 @@ Everything from here through the $\sigma=0$ proposition is what
 Units here are also MMT and \$/t. The clock is \textbf{annual}. $\tau$ is
 a specific tax in \$/t, not an offer cut. Demand is linear Slutsky, not
 isoelastic.
+\syms{Leftover clock: 1 step/year. $D,Q$ MMT/year. $p$ \$/t. $\tau$ here is a \$/t tax, not an offer fraction.}
 \end{frame}
 
 \begin{frame}{Linear demand and the benefit potential}
 \topic{Annual leftover demand: linear in prices, with a consumer-surplus potential.}
-\leftoverbanner{README \S1}{core.py:88, 79--87}
+\leftoverbanner{README \S1}{core.py:79--87}
 
 \[
 D_i = a_i - M_i p_i,
@@ -36,6 +37,7 @@ CS_i = W_i(D_i) - p_i^\top D_i.
 
 $M_i$ symmetric positive-definite $\Rightarrow$ $W_i$ strictly concave
 $\Rightarrow$ the QP is well-posed. Code: \texttt{DemandSystem.surplus}.
+\syms{$D$ consumption (MMT/year) \symsep $p$ node price (\$/t) \symsep $a$ choke demand (MMT) \symsep $M$ slope (MMT/(\$/t)) \symsep $W,CS$ surplus ((\$/t)$\times$MMT).}
 \bubbles{$M_i$ constructed next slide. \texttt{subst\_scale} default $0.6$ on this host.}
 {$D$: MMT/year. $p$: \$/t. $W$: (\$/t)$\times$MMT.}
 {\texttt{core.build\_demand\_system}; README \S1.}
@@ -60,9 +62,19 @@ M=\mathrm{diag}(b)-S,
 a=D_0+M p_0.
 \]
 
-README says ``symmetrised'' and ``$S=0.5(S+S^\top)$'' is the audit-prep
-question; the code uses the \textbf{geometric} mean $\sqrt{S\circ S^\top}$,
-not the arithmetic mean. On SHEAF's calibration both are well-defined.
+The audit-prep note asked whether the arithmetic symmetrisation
+$S\leftarrow 0.5(S+S^\top)$ preserves the construction; the code in fact
+uses the \textbf{geometric} mean $\sqrt{S\circ S^\top}$, which is what
+keeps the $0.95$ row bound. On SHEAF's calibration both are well-defined.
+\syms{$g,h$ grains \symsep $b_g$ own demand slope (MMT per \$/t, $>0$)
+\symsep $S_{gh}$ off-diagonal substitution block and $M$ the demand-slope
+matrix (both MMT per \$/t) \symsep $a$ choke demand and $D_{0}$ baseline
+consumption (MMT/year) \symsep $p_0$ reference price (\$/t)
+\symsep $\varepsilon_g$ own elasticity, $\sigma$ substitution scale,
+$\rho_{gh}$ pairwise substitutability (all dimensionless)
+\symsep $\circ$ elementwise product, $\sqrt{\cdot}$ elementwise root.
+Here $\varepsilon$ is \texttt{calibration.OWN\_ELAST}, \emph{not}
+\texttt{CropParams.elast}.}
 \bubbles{$\sigma=\mathtt{subst\_scale}$. $\varepsilon$ here is \texttt{OWN\_ELAST}=$(-0.25,-0.20,-0.30)$, \emph{not} CropParams.}
 {$b$: MMT / (\$/t). $M$: same. $a$: MMT.}
 {\texttt{calibration.OWN\_ELAST}, \texttt{P0}, \texttt{RHO}; \texttt{core.py:126}.}
@@ -72,14 +84,23 @@ not the arithmetic mean. On SHEAF's calibration both are well-defined.
 \topic{The leftover demand matrix is positive definite on the calibration. Diagonal dominance is only a construction step.}
 \leftoverbanner{README \S1: dominance is a construction device}{core.py:121--128}
 
-Rows of $S$ are capped for dominance \emph{before} geometric-mean
-symmetrisation. After that step, several nodes lose strict diagonal
-dominance at $\sigma=0.6$ (USA margin $-1.07\times 10^{-3}$) while
-remaining positive definite (min eigenvalue $1.95\times 10^{-3}$).
+Rows of $S$ are capped for dominance \emph{before} the geometric-mean
+symmetrisation. After that step some nodes do lose strict diagonal
+dominance: at $\sigma=0.6$, 11 of 18 nodes hit the $0.95$ row cap and the
+worst dominance margin is $-1.07\times 10^{-3}$ --- yet the smallest
+eigenvalue is still $+1.44\times 10^{-4}$.
 
-The PD claim \textbf{holds} on all 18 calibration nodes at
-$\sigma\in\{0,0.3,0.6,0.9\}$. README \S1 states this: dominance is not
-a remaining certificate. Leftover host --- not the crisis spine.
+So the PD claim \textbf{holds} on all 18 calibration nodes at
+$\sigma\in\{0,0.3,0.6,0.9\}$, and 20{,}000 randomised draws
+($G=2..5$, own slopes over six orders of magnitude, $\sigma\in[0.1,10]$)
+produced no counterexample. README \S1 states this: dominance is a
+construction device, not a surviving certificate. Leftover host --- not
+the crisis spine.
+\syms{$M$ leftover demand-slope matrix (MMT per \$/t) \symsep $S$ its
+off-diagonal substitution block (MMT per \$/t) \symsep $\sigma$ leftover
+substitution scale (dimensionless) \symsep $G$ number of grains \symsep
+PD = positive definite (all eigenvalues $>0$) \symsep dominance margin
+$=|M_{gg}|-\sum_{h\neq g}|M_{gh}|$, in MMT per \$/t.}
 \bubbles{No extra cap after symmetrisation.}
 {Eigenvalues of $M$: MMT/(\$/t).}
 {\texttt{verify\_claims.py} section 8; README \S1.}
@@ -105,6 +126,7 @@ K^g_{ij} = c_{ij}\phi_g\psi_{ij} + \tau^g_i + m^g_j.
 $c_{ij}$ is haversine $\times 0.0025 + 8$ (\$/t). $\phi$ is
 \texttt{FREIGHT\_MULT}. Solver fallback CLARABEL $\to$ SCS $\to$ OSQP;
 status must be \texttt{optimal} (not merely $D.\mathrm{value}$ not None).
+\syms{$D$ consumption (MMT/year) \symsep $f$ bilateral flow (MMT/year) \symsep $A$ availability (MMT) \symsep $K,c,\tau,m$ \$/t \symsep $W$ surplus.}
 \bubbles{$\tau$ here is \$/t, not an offer fraction.}
 {$f$: MMT/year. $K$: \$/t.}
 {\texttt{core.py:292--351}; \texttt{calibration.\_haversine}.}
@@ -126,6 +148,7 @@ f^g_{ij}\bigl(K^g_{ij}-(p^g_j-p^g_i)\bigr)=0.
 Grain moves only when the gap covers delivered cost. An export tax raises
 every route out of $i$. This is the insulation mechanism on the leftover
 host. The crisis host insulates by cutting \textbf{offers}, not by a $K$ wedge.
+\syms{$p$ node price (\$/t) \symsep $K$ delivered cost plus tax (\$/t) \symsep $f$ flow (MMT/year).}
 \bubbles{No extra KKT parameter.}
 {\$ / t on the gap.}
 {README \S2; cvxpy KKT of the QP in \texttt{SpatialEquilibrium.solve}.}
@@ -153,6 +176,7 @@ s = \frac{p^e}{1+r}-p^{\mathrm{prev}},
 $p^{\mathrm{ref}}$ is last year's realised price --- a one-period lag,
 disclosed, not simultaneous TWIST/Agrimate storage. Not Deaton--Laroque
 RE. Category \textbf{E}.
+\syms{$p^e,p^{\mathrm{prev}}$ \$/t \symsep $\Delta^{\mathrm{mkt}}$ private stock change (MMT/year) \symsep $R$ stock (MMT) \symsep $r,\kappa$ dimensionless \symsep $\theta$ \$/t.}
 \bubbles{$r=0.05$, $\kappa=0.5$, $\theta=\mathtt{mkt\_cost}=8$ \$/t default.}
 {$\Delta$: MMT/year. $s$: \$/t.}
 {\texttt{core.py:195--206, 474--478}.}
@@ -171,6 +195,7 @@ Quantity-leg shortfall after normal baseline trade:
 Release in crisis ($p^{\mathrm{ref}}>p^{\mathrm{trig}}$ or $\Sigma>0$);
 rebuild toward $\vartheta D_0$ in calm. Structural importers are calm at
 $\xi=1$. This rule is \textbf{not} the Gate~2 Headey gate.
+\syms{$\Sigma$ shortfall (MMT/year) \symsep $D_0,A,Q_0$ MMT/year \symsep $p^{\mathrm{ref}}$ \$/t \symsep $\Delta^{\mathrm{gov}}$ MMT/year.}
 \bubbles{\texttt{gov\_release\_frac=0.5}, \texttt{gov\_build\_frac=0.10}.}
 {$\Delta^{\mathrm{gov}}$: MMT/year.}
 {\texttt{core.py:209--237}.}
@@ -195,9 +220,10 @@ discretised equilibrium, as README says.
 Producer income uses unshocked $Q$, not realised sales --- intentional
 prototype weight. Stress gate: game plays only if
 $\max p > \mu p^{\mathrm{norm}}$ ($\mu=1.12$).
+\syms{$\mathcal{W}$ welfare \symsep $CS$ consumer surplus \symsep $p$ \$/t \symsep $Q,X$ MMT/year \symsep $\tau$ \$/t tax (not an offer fraction) \symsep $w$ \$ weights.}
 \bubbles{$w_{i,g}$, $\bar p_{i,g}$ from illustrative \texttt{DATA}. $\zeta=0$ default.}
 {$\tau$: \$/t. $\mathcal{W}$: (\$/t)$\times$MMT.}
-{\texttt{core.py:357--421, 505--521}.}
+{\texttt{core.py:357--421}; stress gate \texttt{core.py:506--512}.}
 \end{frame}
 
 \begin{frame}{README \S6 proposition --- holds on this host}
@@ -212,6 +238,7 @@ the TWIST/Agrimate-style limit of the \textbf{annual} host.
 The live-host analogue is Gate~1's $\sigma=0$ identity, already shown.
 \texttt{demo.py} measures substitution spillover on this leftover host
 (Black Sea wheat shock). It is not a 2007/08 hindcast.
+\syms{$\sigma$ leftover substitution scale. $M=\mathrm{diag}(b)$ at $\sigma=0$ (MMT/(\$/t)). Live-host analogue: Gate~1 $\sigma=0$.}
 \bubbles{\texttt{build\_countries(substitution=False)} sets $\sigma=0$.}
 {Same units as \S1.}
 {\texttt{verify\_claims.py} PD section; \texttt{demo.py}.}

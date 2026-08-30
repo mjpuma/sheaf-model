@@ -1,179 +1,210 @@
 \section{Method of solution}
 
 \begin{frame}[label=method]{The crisis host evaluates a map. It does not solve a market.}
-\topic{How the equations are computed: one forward pass of closed-form algebra, not a solver.}
-\matchbanner{README \S8 method of solution}{dynamic\_crop.\_simulate\_window}
+\topic{How the equations just shown are actually computed: one forward pass of closed-form algebra, not a solver.}
+\matchbanner{README \S8 method of solution}{dynamic\_crop.\_simulate\_window:577--686}
 
-There is no spatial QP, no complementarity problem, and no
-market-clearing root each step. \texttt{\_simulate\_window} walks
-$t=0,\ldots,T-1$ and evaluates the equations already on this deck.
+There is no spatial quadratic program, no complementarity problem, and no
+market-clearing root-find each step. \texttt{\_simulate\_window} walks
+$t=0,\ldots,T_{\mathrm{run}}-1$ and evaluates, in order, exactly the
+equations already on this deck.
 
-Incoming $p_{t-1}$ and $q_{i,t}$ enter demand and trade. The step then
-writes $q_{i,t+1}$ and $p_t$. There is no inner loop that would make
-those consistent inside the same fortnight.
+The price $p_{t-1}$ and the asks $q_{i,t}$ carried in from the previous
+step enter demand and trade; the step then writes $q_{i,t+1}$ and $p_t$.
+There is no inner loop making those mutually consistent \emph{within} one
+fortnight --- that is a deliberate choice, not an unconverged solve.
+\syms{$t$ step index \symsep $T_{\mathrm{run}}$ number of steps in the run
+($=144$ for 2006--11) \symsep $n$ country nodes ($=18$) \symsep $p_t$ world
+price (real 2010 \$/t) \symsep $q_{i,t}$ exporter $i$'s ask (real 2010 \$/t).
+Incoming to a step: $p_{t-1}$, $q_{i,t}$. Outgoing: $p_t$, $q_{i,t+1}$.}
 \bubbles{The method is the sequence. No extra numerical knob.}
-{One pass; $T$ steps, $n=18$ nodes.}
-{\texttt{dynamic\_crop.py:577--681}; README \S8 ``Method of solution.''}
+{One pass; $T_{\mathrm{run}}$ steps, $n=18$ nodes.}
+{\texttt{dynamic\_crop.py:577--686}; README \S8 ``Method of solution.''}
 \end{frame}
 
 \begin{frame}{Order of evaluation inside one step}
-\topic{The algorithm is the same eight boxes as the spine, in that order.}
-\matchbanner{README \S8 numbered map}{dynamic\_crop.py:577--681}
+\topic{The algorithm written out: the same boxes as the spine diagram, in that order, with nothing iterated.}
+\matchbanner{README \S8 numbered map}{dynamic\_crop.py:568--681}
 
 {\scriptsize
 \begin{enumerate}
-\item Lean sums $H^{\mathrm{ahead}}$, $C^{\mathrm{ahead}}$, $h_t$ are
-      precomputed \emph{once}, before the loop.
-\item $\mathrm{avail}=S+H$; $d$ from incoming $p$; $L,T,D,O$.
-\item $\tilde A$; $\mathrm{ship}^0=\min$; residual pool $\nu$.
-\item $C^{\mathrm{used}}$, $S'$, soft clip to $W$.
-\item Ask update $\to q_{t+1}$ (clipped).
+\item Lean sums $H^{\mathrm{ahead}}$, $C^{\mathrm{ahead}}$ and the horizon
+      $h_t$ are precomputed \emph{once}, before the loop starts.
+\item $\mathrm{avail}=S+H$; then $d$ from the incoming $p$; then
+      $L$, $T_{i,t}$, $D$, $O$.
+\item $\tilde A$ from the incoming asks; $\mathrm{ship}^0=\min(\cdot,\cdot)$;
+      then the residual pool with share $\nu$.
+\item $C^{\mathrm{used}}$, the stock update $S_{t+1}$, and the soft clip
+      toward $W$.
+\item Ask update $\to q_{t+1}$, then clipped to $[0.45p_0,2.8p_0]$.
 \item $p^{\mathrm{tr}}$, $\mathrm{shift}$, $r$, $p^{\mathrm{scar}}$,
-      $p^\star$; $p_t=\rho p_{t-1}+(1-\rho)p^\star$ (clipped).
+      $p^\star$, then $p_t=\rho p_{t-1}+(1-\rho)p^\star$, then clipped.
 \end{enumerate}}
 
-Every line is arithmetic or $\min/\max/\mathrm{clip}$. The only matrix
-work in the step is the $n\times n$ Armington min and the leftover-pool
-weights.
+Every line is arithmetic or $\min$ / $\max$ / $\mathrm{clip}$. The only
+matrix work inside a step is the $n\times n$ Armington minimum and the
+leftover-pool weights. There is no tolerance, no iteration count, and no
+solver status to inspect.
+\syms{$S,H,\mathrm{avail},L,T_{i,t},W$ stocks and cover (MMT) \symsep
+$d,D,O,C^{\mathrm{used}}$ flows (MMT/step) \symsep $h_t$ lean horizon (steps)
+\symsep $\tilde A$ destination shares and $\nu$ residual-pool share
+(dimensionless) \symsep $q,p,p^{\mathrm{tr}},p^{\mathrm{scar}},p^\star,p_0$
+prices (real 2010 \$/t) \symsep $r$ scarcity ratio and $\rho$ AR(1) smoother
+(dimensionless) \symsep $n=18$ nodes.}
 \bubbles{No tolerance, no iteration count, no solver status.}
 {MMT and \$/t as on the equation slides.}
 {\texttt{\_simulate\_window}; \texttt{\_bilateral\_clear}.}
 \end{frame}
 
 \begin{frame}{The twin is a second forward pass of the same map}
-\topic{The no-shock twin is not a different model. It is the same loop with seasonal harvest, mean flex, and no bans.}
+\topic{The no-shock twin is not a different model: it is the same loop with climatology harvest, mean flex demand, and no bans.}
 \matchbanner{README \S8 twin pass}{prepare\_crop\_run:803--806}
 
 \[
-(S^{\mathrm{twin}},u^{\mathrm{twin}},F^{\mathrm{twin}})
-=\texttt{\_simulate\_window}(H^{\mathrm{seas}},\,
+(S^{\mathrm{twin}},\,u^{\mathrm{twin}},\,F^{\mathrm{twin}})
+=\texttt{\_simulate\_window}\bigl(H^{\mathrm{seas}},\,
 \overline{C}^{\mathrm{flex}},\,
-C^{\mathrm{ind}}=0,\,\tau\equiv 0).
+C^{\mathrm{ind}}=0,\,\tau\equiv 0\bigr).
 \]
 
-Treatment then reads those paths as data. Calm identity
-($p^\star=p_0$ when the path matches the twin) is an algebraic
-consequence of the same map, not a fitted residual.
+The twin runs first; the treatment run then reads those paths as data. The
+calm identity ($p^\star=p_0$ whenever the treatment path matches the twin)
+is therefore an algebraic consequence of the same map, not a fitted
+residual.
+\syms{$S^{\mathrm{twin}}$ twin stocks (MMT) \symsep $u^{\mathrm{twin}}$ twin
+unmet-demand fraction (dimensionless) \symsep $F^{\mathrm{twin}}$ twin
+world-accessible free cover (MMT) \symsep $H^{\mathrm{seas}}$ climatology
+harvest (MMT/step) \symsep $\overline{C}^{\mathrm{flex}}$ window-mean food/feed
+use (MMT/step) \symsep $C^{\mathrm{ind}}$ industrial use, set to zero on the
+twin \symsep $\tau$ export cut, set to zero on the twin.}
 \bubbles{Two passes, not an extra parameter.}
 {Same units as the treatment run.}
 {\texttt{prepare\_crop\_run} twin block; \texttt{assert\_twin\_identity}.}
 \end{frame}
 
-\begin{frame}{Cost is $O(Tn^2)$ per crop. No \texttt{cvxpy} on this path}
-\topic{How heavy the crisis host is, and what it does not call.}
+\begin{frame}{Cost is $O(T_{\mathrm{run}}n^2)$ per crop. No \texttt{cvxpy} on this path}
+\topic{How heavy the crisis host is, and which libraries it does not call.}
 \matchbanner{README \S8 complexity}{dynamic\_crop.py imports}
 
-$n=18$, $T=144$ for 2006--11. Armington is a dense $n\times n$ min
-each step. That is the leading term. NumPy, no QP.
+With $n=18$ nodes and $T_{\mathrm{run}}=144$ steps for 2006--11, the
+leading term is the dense $n\times n$ Armington minimum taken once per
+step. Everything is NumPy; a full three-crop Gate 1 band runs in seconds.
 
 \texttt{sheaf/dynamic\_crop.py} does not import \texttt{cvxpy}.
-\texttt{CLARABEL} / \texttt{SCS} / \texttt{OSQP} live only in
-\texttt{core.py} (leftover annual SPE).
+\texttt{CLARABEL}, \texttt{SCS}, and \texttt{OSQP} appear only in
+\texttt{core.py}, the leftover annual SPE. Verified in
+\texttt{verify\_claims.py} section 13.
+\syms{$n=18$ country nodes \symsep $T_{\mathrm{run}}=144$ steps (2006--11)
+\symsep $O(\cdot)$ leading-order operation count \symsep the $n\times n$ object
+is the Armington shipment matrix $\mathrm{ship}_{ij}$ (MMT/step). No price
+solver is called.}
 \bubbles{No solver fallback on the crisis host.}
-{Operations: $O(Tn^2)$ per crop.}
+{Operations: $O(T_{\mathrm{run}}n^2)$ per crop.}
 {\texttt{verify\_claims.py} section 13; \texttt{dynamic\_crop.py} header
 imports.}
 \end{frame}
 
 \begin{frame}{Python vs Julia is not the method}
-\topic{Agrimate is Julia because each region solves agent optimizations every step. SHEAF's crisis host has no such problem to compile.}
+\topic{Agrimate is Julia because each region solves optimizations every step. SHEAF's crisis host has no such problem to compile.}
 \matchbanner{README \S8 vs Kuhla et al.\ 2025 \S3.2}{Agrimate src/AgrimateModel}
 
-Agrimate's model (not their input scripts) is Julia, with optional MPI.
-Each region, each step, solves three constrained problems
+Agrimate's model (as distinct from its input scripts) is Julia, with
+optional MPI. Each region, each step, solves three constrained problems
 \citep{kuhla2025}:
 
 \begin{itemize}
-\item supplier: finite-horizon expected profit (domestic + world);
-\item consumer: CES utility under budget and a quantity cap;
+\item supplier: finite-horizon expected profit (domestic $+$ world);
+\item consumer: CES utility under a budget and a quantity cap;
 \item purchaser: CES allocation of next-step demand across suppliers.
 \end{itemize}
 
 SHEAF Gate~0 replaces that commercial layer with the ask / Armington /
-scarcity map. Rewriting the map in Julia would not make it Agrimate.
-\textbf{SHEAF stays in Python.} That is a language lock, not a speed claim.
+scarcity map on the previous slides. Rewriting that map in Julia would not
+make it Agrimate. \textbf{SHEAF stays in Python.} That is a language lock,
+not a speed claim, and no runtime comparison is made here.
+\syms{Agrimate: per-step constrained optimizations (expected profit, CES
+utility, CES allocation) \symsep SHEAF Gate~0: the closed-form
+ask / Armington / scarcity map \symsep CES constant elasticity of substitution
+\symsep MPI message-passing parallelism. Same letters in the two papers,
+different objects.}
 \bubbles{Language is locked to Python. The object being solved is not Julia's.}
 {No runtime comparison is claimed.}
 {Agrimate GitLab README (Julia model, Python inputs);
 Kuhla et al.\ 2025 \S3.2.1--\S3.2.3.}
 \end{frame}
 
-\begin{frame}{Gate 1 coupling is one Jacobi multiply, then $G$ maps}
-\topic{Substitution does not open a joint three-crop solver.}
-\matchbanner{README \S8 Gate 1 method}{dynamic\_coupled.py:112--114}
-
-\[
-\mathrm{fac}_t=\exp\bigl(\eta\log(p_t/p_0)\bigr),
-\quad\text{then each crop runs Gate~0 with }
-d^g=C^{\mathrm{flex},g}\cdot\mathrm{fac}^g_t+C^{\mathrm{ind},g}.
-\]
-
-$p_t$ here is the three-vector at the \emph{start} of the step. Rice
-does not see the already-updated wheat price. No inner fixed point,
-no Gauss--Seidel sweep.
-\bubbles{Jacobi is the protocol. $\sigma$ is the only new scale.}
-{fac dimensionless.}
-{\texttt{dynamic\_coupled.\_simulate\_coupled}; Gate~1 Jacobi slide.}
-\end{frame}
-
-\begin{frame}{Gate 2 is three forward passes plus a threshold}
-\topic{Endogenous $\tau_t$ is not found by iterating a game. It is read off two stock paths.}
-\matchbanner{README \S8 Gate 2 method}{dynamic\_policy.simulate\_headey}
-
-\[
-S^{\mathrm{calm}}=\mathrm{map}(H^{\mathrm{seas}}),\quad
-S^{\mathrm{open}}=\mathrm{map}(H^{\mathrm{shock}},\tau=0),
-\]
-\[
-\tau_{i,t}=\tau^{\mathrm{on}}\cdot
-\mathbf{1}\{S^{\mathrm{open}}_{i,t}/S^{\mathrm{calm}}_{i,t}<r\}
-\quad\text{(shock year)},
-\quad
-S^{\mathrm{closed}}=\mathrm{map}(H^{\mathrm{shock}},\tau).
-\]
-
-The ratio is a threshold. Nested-year grid BR
-(\texttt{grid\_best\_response}) is a leftover diagnostic that locked
-$\tau^{\mathrm{on}}=0.6$. It is not the fortnight object.
-\bubbles{Three \texttt{simulate\_prep} calls. No IBR.}
-{Same map as Gate~0.}
-{\texttt{climatology\_relative\_cuts}; \texttt{simulate\_headey}.}
-\end{frame}
-
 \begin{frame}{The only linear algebra on the spine is LOWESS}
-\topic{Prepare-time detrending is a tiny weighted least-squares, not a market solve.}
-\matchbanner{README \S8 LOWESS}{data\_usda.\_lowess}
+\topic{Prepare-time detrending is a tiny weighted least-squares, run once, not a market solve.}
+\matchbanner{README \S8 LOWESS}{data\_usda.\_lowess:82--101}
 
-For each country-year sample point: tricube weights on a
+For each country-year sample point $i$: tricube weights $w_k$ on a
 \texttt{window\_years=10} neighbourhood, then
 
 \[
 \min_{\beta_0,\beta_1}
-\sum_k w_k\bigl(Y_k-\beta_0-\beta_1(x_k-x_i)\bigr)^2
+\sum_k w_k\bigl(Q_k-\beta_0-\beta_1(x_k-x_i)\bigr)^2
 \quad\Rightarrow\quad
-\hat Y_i=\beta_0
+\hat Q_i=\beta_0,
 \]
 
-via a $2\times 2$ \texttt{np.linalg.solve}. Agrimate's method,
-hand-rolled, not \texttt{statsmodels}. Done once in
-\texttt{prepare\_crop\_run}, not every step.
+solved as a $2\times 2$ \texttt{np.linalg.solve} on the two-column design.
+Agrimate's method, hand-rolled rather than \texttt{statsmodels}. It runs
+once inside \texttt{prepare\_crop\_run}, not every step.
+\syms{$Q_k$ PSD production in year $x_k$ (MMT/year) \symsep $x$ year index
+\symsep $w_k$ tricube neighbourhood weight (dimensionless) \symsep
+$\beta_0,\beta_1$ local intercept (MMT/year) and slope (MMT/year per year)
+\symsep $\hat Q_i$ the fitted trend value at year $x_i$ (MMT/year), which
+feeds the anomaly $a_{i,y}=(Q-\hat Q)/\hat Q$.}
 \bubbles{\texttt{window\_years=10} is Agrimate's choice.}
 {Anomaly dimensionless.}
 {\texttt{data\_usda.py:82--101}.}
 \end{frame}
 
+\begin{frame}{Gate 1 and Gate 2 add no solver either}
+\topic{Preview: substitution is one multiply per step, and the policy rule is a threshold on two stock paths. Details in their own sections.}
+\matchbanner{README \S8 Gate 1 / Gate 2 method}{dynamic\_coupled.py:112--114; dynamic\_policy.simulate\_headey}
+
+\begin{itemize}
+\item \textbf{Gate 1} scales flex demand once per step by
+      $\mathrm{fac}_t=\exp\bigl(\eta\log(p_t/p_0)\bigr)$, using the
+      three prices from the \emph{start} of the step, then runs the three
+      Gate~0 maps unchanged. Jacobi, so no inner fixed point.
+\item \textbf{Gate 2} runs the same map three times (climatology, shocked
+      with trade open, shocked with cuts on) and reads $\tau_{i,t}$ off a
+      threshold comparing the second path to the first. No iterated best
+      response on the fortnight clock.
+\end{itemize}
+
+Neither gate introduces a tolerance, an iteration count, or a solver.
+\syms{$\mathrm{fac}_t$ demand scale factor per grain (dimensionless)
+\symsep $\eta$ the $3\times3$ matrix of own- and cross-price elasticities
+(dimensionless) \symsep $p_t,p_0$ the three world prices and their references
+(real 2010 \$/t) \symsep $\tau_{i,t}$ export-offer cut (fraction)
+\symsep Jacobi: all three demands use start-of-step prices, so rice does not
+see an already-updated wheat price.}
+\bubbles{Jacobi and three-pass are protocols, not parameters.}
+{fac dimensionless; $p$ real 2010 \$/t.}
+{\texttt{dynamic\_coupled.\_simulate\_coupled}; \texttt{simulate\_headey}.}
+\end{frame}
+
 \begin{frame}{Leftover method (skip unless \S1--\S6)}
-\topic{The old annual host does use a QP. That is not how 2007/08 is computed.}
-\leftoverbanner{README \S2 / \S8 leftover method}{core.SpatialEquilibrium.solve}
+\topic{The old annual host does use a quadratic program. That is not how 2007/08 is computed.}
+\leftoverbanner{README \S2 / \S8 leftover method}{core.SpatialEquilibrium.solve:292--351}
 
-Annual SPE: one concave QP per year, cvxpy fallback
-CLARABEL $\to$ SCS $\to$ OSQP, then year-IBR on a $\tau$ grid.
-\texttt{demo.py} still runs that.
+The annual SPE solves one concave quadratic program per year through
+cvxpy, with the fallback chain CLARABEL $\to$ SCS $\to$ OSQP and a
+requirement that the reported status be \texttt{optimal}. On top of that
+sits a year-level iterated best response over a $\tau$ grid.
+\texttt{demo.py} still runs it.
 
-Crisis validation never calls it. Do not discuss CLARABEL as the
-2007/08 solver.
-\hyperlink{leftover}{\beamergotobutton{leftover QP}}
+Crisis validation never calls it. Do not discuss CLARABEL as the 2007/08
+solver.
+\hyperlink{leftover}{\beamergotobutton{leftover section}}
+\syms{Leftover objects: $D$ consumption and $f_{ij}$ bilateral flow (MMT/year)
+\symsep $p$ node price and $\tau$ export tax (\$/t) \symsep SPE spatial price
+equilibrium \symsep IBR iterated best response. The crisis host never calls
+this QP.}
 \bubbles{Grey because leftover.}
 {QP in MMT/year and \$/t.}
-{\texttt{core.py:314--351}.}
+{\texttt{core.py:292--351}.}
 \end{frame}

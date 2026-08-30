@@ -19,6 +19,11 @@ SHEAF exists to put two missing pieces on that network:
 \item \textbf{Endogenous strategy} --- governments choose restrictions.
 \item \textbf{Cross-grain substitution} --- wheat, rice, maize linked on demand.
 \end{enumerate}
+\syms{AMIS the FAO-hosted Agricultural Market Information System policy diary
+\symsep ``exogenous'' means the restriction is read from that diary
+\symsep ``endogenous'' means the model chooses it \symsep single-commodity:
+one grain, no cross-price link \symsep 24 steps per year $=$ half-month
+fortnights.}
 \end{frame}
 
 \begin{frame}{What SHEAF is \emph{not} claiming}
@@ -40,6 +45,13 @@ Deaton--Laroque storage equilibrium \citep{deaton1992,wright1982,williams1991}.
 \end{itemize}
 
 Those are design choices (\textbf{E}), disclosed. They are not bugs.
+\syms{Category \textbf{E} in the \texttt{CLAUDE.md} scheme: a difference of
+modelling philosophy, not a mathematical error (\textbf{A}) or a coding bug
+(\textbf{B}) \symsep rational-expectations competitive storage: the
+Deaton--Laroque class where storers forecast the equilibrium price
+distribution \symsep endogenous acreage: planted area responding to price
+\symsep wheat-equivalent: converting flour and products back to grain tonnes
+or kilocalories.}
 \end{frame}
 
 \begin{frame}{Gate 0 prices --- substitution off}
@@ -48,6 +60,7 @@ Those are design choices (\textbf{E}), disclosed. They are not bugs.
 {\scriptsize Wheat/rice/maize, 2006--11, Pink Sheet in real 2010 USD.
 Harvest anomalies alone miss the 2008 rice spike; AMIS produces it.
 This is Gate~0 only. Gate~1 and Gate~2 are not in the figure.}
+\syms{$p$ world price (real 2010 \$/t). Vertical axis: Pink Sheet vs model. Time: months 2006--11.}
 \end{frame}
 
 \begin{frame}{What each gate is allowed to claim}
@@ -70,6 +83,7 @@ Gate~2 $\beta$ & Can two exporters, same slow type, stay open in climatology
 \vspace{0.4em}
 {\scriptsize Do not re-run Gate~0 or Gate~1 to host the game
 (\texttt{diagnostics/GAME\_CLOCK.md}).}
+\syms{$\sigma$ substitution scale (dimensionless). $\tau$ export cut: Gate~0 AMIS fraction of offers; Gate~2 Headey fraction. Not a \$/t tax.}
 \end{frame}
 
 \begin{frame}{The node set}
@@ -87,6 +101,7 @@ EU is 27 ISO3 members in \texttt{data\_faostat.EU\_ISO3}. Quantities on the
 crisis host come from USDA PSD, not from the illustrative
 \texttt{calibration.DATA} table (that table still seeds the annual leftover
 and the \emph{names} of the nodes).
+\syms{$i,j$ country nodes (17 named + Rest-of-World). Quantities: MMT after PSD $\times 10^{-3}$.}
 \bubbles{Node names are structural.
 Illustrative prod/cons in \texttt{DATA} are \emph{not} the Gate~0 levels.}
 {Named-node production, consumption, stocks: MMT after $\times 10^{-3}$.}

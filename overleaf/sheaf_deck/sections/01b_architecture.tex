@@ -1,0 +1,76 @@
+\section{Architecture at a glance}
+
+\begin{frame}[label=hosts]{Two hosts, one repository}
+\topic{Two models live in this repo. Only the 24-step one is the crisis host; the annual one is a leftover.}
+{\scriptsize
+\renewcommand{\arraystretch}{1.05}
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Layer & Crisis host (this sitting) & Leftover \\
+\midrule
+Clock & 24 steps / year & 1 step / year \\
+Market & \texttt{dynamic\_crop.py} & \texttt{core.SpatialEquilibrium} \\
+Substitution & \texttt{dynamic\_coupled.py} isoelastic $\eta_{gh}$ & linear $D=a-Mp$ \\
+Policy & \texttt{dynamic\_policy.py} $\tau_{i,t}$ & \texttt{ExportRestrictionGame} \\
+Restrictions in Gate~0 & AMIS quantity cuts & AMIS \$/t wedges \\
+Method & explicit NumPy map $O(T_{\mathrm{run}}n^2)$ & cvxpy QP + year-IBR \\
+Hindcast & \texttt{score\_subannual\_crop.py} & \texttt{demo.py} (not a hindcast) \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+\vspace{0.3em}
+{\scriptsize README ``Mathematical formulation'' \S1--\S6 describes the leftover.
+\S8 describes the crisis host. Gate~0 / Gate~1 / Gate~2 sit on \S8.}
+\syms{$t$ step index (dimensionless) \symsep $T_{\mathrm{run}}$ steps in the whole run
+($=144$ for 2006--11) \symsep $n$ country nodes ($=18$) \symsep $g,h$ grains
+(wheat, rice, maize) \symsep $i,j$ countries \symsep $\eta_{gh}$ cross-price elasticity
+(dimensionless) \symsep $D$ consumption (MMT/year), $a$ choke demand (MMT), $M$ demand
+slope (MMT per \$/t), $p$ price (\$/t) \symsep $\tau_{i,t}$ export-offer cut (fraction in
+$[0,1]$) on the crisis host; a \$/t tax on the leftover.}
+\end{frame}
+
+\begin{frame}[label=spine]{One step on the spine}
+\topic{What happens in one two-week step, in order: grain on hand, demand, stock target, offers, trade, stock update, price. Every box is a slide later in the deck.}
+\matchbanner{README \S8 sequencing}{dynamic\_crop.\_simulate\_window:577--686}
+
+\begin{center}
+\begin{tikzpicture}[
+  box/.style={draw=blue!55!black, fill=blue!6, rounded corners=2pt,
+              font=\tiny, align=center, inner sep=2.6pt, text width=3.15cm},
+  arr/.style={-{Stealth}, thick, gray!65!black}]
+\node[box] (a) {1.\ $\mathrm{avail}=S+H$};
+\node[box, right=0.28cm of a] (d) {2.\ $d=C^{\mathrm{flex}}(p/p_0)^{\varepsilon}+C^{\mathrm{ind}}$};
+\node[box, right=0.28cm of d] (l) {3.\ $L$,\ $T_{i,t}=L+s$};
+\node[box, right=0.28cm of l] (o) {4.\ $D$,\ $O=(1-\tau)\,$surplus};
+\node[box, below=0.38cm of a] (s) {5.\ $\tilde A$, Armington $+$ pool $\nu$};
+\node[box, right=0.28cm of s] (w) {6.\ $S'$, soft clip to $W$};
+\node[box, right=0.28cm of w] (f) {7.\ locked, free};
+\node[box, right=0.28cm of f] (p) {8.\ $r$, $p^{\mathrm{scar}}$, $p^\star$, $p$};
+\draw[arr] (a) -- (d);
+\draw[arr] (d) -- (l);
+\draw[arr] (l) -- (o);
+\draw[arr] (o.south) -- ++(0,-0.14) -| (s.north);
+\draw[arr] (s) -- (w);
+\draw[arr] (w) -- (f);
+\draw[arr] (f) -- (p);
+\end{tikzpicture}
+\end{center}
+
+{\scriptsize Gate~1 multiplies flex demand by a Jacobi factor \emph{before} box~2.
+Gate~2 writes $\tau_{i,t}$ \emph{before} box~4. The market loop is not rewritten.}
+\syms{$i$ country, $t$ step \symsep $S_{i,t}$ stocks (MMT) \symsep $H_{i,t}$ harvest (MMT/step)
+\symsep avail grain on hand (MMT) \symsep $d_{i,t}$ desired use (MMT/step)
+\symsep $C^{\mathrm{flex}},C^{\mathrm{ind}}$ food/feed and industrial use (MMT/step)
+\symsep $\varepsilon$ own-price elasticity (dimensionless) \symsep $L_{i,t}$ lean gap (MMT)
+\symsep $s_i$ safety stock (MMT) \symsep $T_{i,t}=L+s$ \emph{target stock} (MMT; not the run
+length --- steps per year is $T_y=24$) \symsep $D_{i,t}$ import demand and $O_{i,t}$ export
+offers (MMT/step) \symsep $\tilde A_{ij}$ ask-reweighted destination shares and $\nu$
+residual-pool share (dimensionless) \symsep $W_{i,t}$ warehouse capacity (MMT)
+\symsep $r_t$ scarcity ratio (dimensionless) \symsep $p,p_0,p^{\mathrm{scar}},p^\star$
+prices (real 2010 \$/t) \symsep $\tau_{i,t}$ offer cut (fraction).}
+\bubbles{No extra sequencing parameter. This is \texttt{\_simulate\_window}.}
+{Boxes 1--7: MMT or MMT/step. Box 8: real 2010 \$/t.}
+{\texttt{sheaf/dynamic\_crop.py:577--686}.}
+\end{frame}

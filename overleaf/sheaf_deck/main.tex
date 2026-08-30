@@ -38,6 +38,14 @@
 % One-line topic: plain English first. Symbols belong in the body.
 \newcommand{\topic}[1]{%
 \noindent{\scriptsize\textcolor{blue!60!black}{\textbf{About.} #1}}\par\vspace{0.2em}}
+% Per-slide key: every letter on the slide, meaning, and unit.
+\newcommand{\symsep}{\,--\,}
+\newcommand{\syms}[1]{%
+\par\vspace{0.35em}
+{\tiny
+\noindent\textcolor{black!68}{\textbf{Symbols.}}\par\vspace{0.12em}
+\noindent\textcolor{black!68}{#1}\par
+}\vspace{0.15em}}
 
 % --- match / diverge banners ----------------------------------------------
 \newcommand{\matchbanner}[2]{%
@@ -81,8 +89,8 @@
 \begin{center}\vspace{-0.2em}\includegraphics[height=#1,width=0.90\textwidth,keepaspectratio]{#2}\end{center}}
 
 \title{SHEAF from first principles}
-\subtitle{Equation, assumption, unit, and source --- for a joint sitting with Agrimate}
-\author{Working deck (not a paper)}
+\subtitle{Equation, assumption, unit, and source --- discussion with Agrimate}
+\author{Discussion notes}
 \date{\today}
 
 \begin{document}
@@ -97,17 +105,22 @@ Annual leftover: \texttt{core.py}. Lineage: TWIST $\to$ Agrimate $\to$ SHEAF.\\
 \end{center}
 \end{frame}
 
+% Presentation order: why the model exists -> what it is -> the clock and
+% the data -> the equations in the order one step runs them -> how they are
+% solved -> what is locked and what it scored -> the two gates on top ->
+% the annual leftover -> questions.
 \input{sections/00_howto}
 \input{sections/01_lineage}
+\input{sections/01b_architecture}
 \input{sections/02_clock_units}
 \input{sections/03_data}
 \input{sections/04_harvest}
 \input{sections/05_demand_lean}
 \input{sections/06_trade_price}
+\input{sections/12_solution}
 \input{sections/07_params_scores}
 \input{sections/08_gate1}
 \input{sections/09_gate2}
-\input{sections/12_solution}
 \input{sections/10_annual}
 \input{sections/11_divergences}
 

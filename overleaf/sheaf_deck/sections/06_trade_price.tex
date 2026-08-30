@@ -1,16 +1,23 @@
-\section{Bilateral clear and world price}
+\section{Bilateral clear, stock update, world price}
 
 \begin{frame}{Ask-reweighted destinations}
 \topic{Exporters with a cheaper ask steal destination share from expensive ones.}
-\matchbanner{README \S8 $\tilde A_{ij}$}{dynamic\_crop.\_ask\_reweight\_dest}
+\matchbanner{README \S8 $\tilde A_{ij}$}{dynamic\_crop.\_ask\_reweight\_dest:488--494}
 
 \[
 \tilde A_{ij} \propto A_{ij}\Bigl(\frac{p_0}{q_{i,t}}\Bigr)^{\gamma},
-\quad \text{rows renormalised}.
+\quad \text{rows renormalised so } \textstyle\sum_j \tilde A_{ij}=1.
 \]
 
-$\gamma=\mathtt{ask\_comp\_elast}=1.25$ (reduced-form, shared). Cheap asks
-steal destination share. $q_{i,0}=p_0$.
+$\gamma=\mathtt{ask\_comp\_elast}=1.25$ (reduced-form, shared across crops).
+Cheap asks steal destination share. Every exporter starts at
+$q_{i,0}=p_0$.
+\syms{$i$ exporter, $j$ importer \symsep $A_{ij}$ baseline share of $i$'s exports
+going to $j$, from the FAOSTAT E0 matrix (dimensionless, rows sum to 1)
+\symsep $\tilde A_{ij}$ the same share after ask reweighting (dimensionless)
+\symsep $q_{i,t}$ exporter $i$'s ask price this step (real 2010 \$/t)
+\symsep $p_0$ reference world price (real 2010 \$/t) \symsep $\gamma$
+competitiveness exponent (dimensionless).}
 \bubbles{$\gamma=1.25$ reduced-form, locked, shared across crops.}
 {$A$, $\tilde A$: dimensionless shares. $q$: real 2010 \$/t.}
 {\texttt{dynamic\_crop.py:488--494}; \texttt{CropParams.ask\_comp\_elast}.}
@@ -18,16 +25,21 @@ steal destination share. $q_{i,0}=p_0$.
 
 \begin{frame}{Armington min-clear}
 \topic{Preferred trade: each link ships the minimum of that exporter's offer to that destination and that importer's demand from that source.}
-\matchbanner{README \S8 $\mathrm{ship}^0_{ij}$}{dynamic\_crop.\_bilateral\_clear}
+\matchbanner{README \S8 $\mathrm{ship}^0_{ij}$}{dynamic\_crop.\_bilateral\_clear:501--503}
 
 \[
 \mathrm{ship}^0_{ij}
-= \min\bigl(O_{i,t}\tilde A_{ij},\, D_{j,t} S_{ij}\bigr).
+= \min\bigl(O_{i,t}\,\tilde A_{ij},\; D_{j,t}\, S_{ij}\bigr).
 \]
 
-Tonnes come from $O$ and $D$ (USDA). $A$ and $S$ are FAOSTAT shares
-only. Whatever is left after this min goes to the residual pool (next
-slide).
+Tonnes come from $O$ and $D$, both USDA-derived. $\tilde A$ and $S$ are
+FAOSTAT \emph{shares} only. Whatever is left over on either side after
+this min goes to the residual pool (next slide).
+\syms{$\mathrm{ship}^0_{ij}$ preferred-link shipment, exporter $i\to$ importer $j$
+(MMT/step) \symsep $O_{i,t}$ export offers (MMT/step) \symsep $D_{j,t}$ import
+demand (MMT/step) \symsep $\tilde A_{ij}$ share of $i$'s exports aimed at $j$
+(rows sum to 1) \symsep $S_{ij}$ share of $j$'s imports normally sourced from
+$i$ (columns sum to 1); both dimensionless.}
 \bubbles{No extra parameter on the preferred links.}
 {Shipments: MMT/step.}
 {\texttt{dynamic\_crop.py:501--503}.}
@@ -47,55 +59,140 @@ slide).
 \[
 \mathrm{take}_j=\nu\,\mathrm{demand}^{\mathrm{left}}_j,
 \qquad
-\mathrm{fill}
+\mathrm{fill}^{\mathrm{pool}}
 =\min\Bigl(1,\;
 \tfrac{\sum_i\mathrm{offer}^{\mathrm{left}}_i}{\sum_j\mathrm{take}_j}\Bigr).
 \]
 
-Leftover offers are allocated by leftover-demand weights and columns are
-clipped not to exceed $\mathrm{take}\cdot\mathrm{fill}$.
-$\nu=0.15$ is residual substitution after Armington, \textbf{not}
-Gate~1 $\sigma$.
+Leftover offers are allocated by leftover-demand weights, and each
+importer column is clipped not to exceed
+$\mathrm{take}_j\cdot\mathrm{fill}^{\mathrm{pool}}$. $\nu$ is residual
+substitution \emph{between sources}, after Armington --- it is
+\textbf{not} the Gate~1 cross-grain scale $\sigma$.
+\syms{$\mathrm{offer}^{\mathrm{left}}_i$ offers $i$ could not place, and
+$\mathrm{demand}^{\mathrm{left}}_j$ demand $j$ could not fill on preferred links
+(both MMT/step) \symsep $\mathrm{take}_j$ how much of that unfilled demand may
+shop outside the usual sources (MMT/step) \symsep $\nu=\mathtt{residual\_subst}
+=0.15$ (dimensionless) \symsep $\mathrm{fill}^{\mathrm{pool}}$ pool fill rate
+(dimensionless, $\le 1$).}
 \bubbles{$\nu=\mathtt{residual\_subst}=0.15$ structural. Do not confuse with $\sigma$.}
 {MMT/step.}
 {\texttt{dynamic\_crop.py:505--520}; README \S8 Armington clear.}
 \end{frame}
 
-\begin{frame}{Fill rates update asks}
-\topic{How an exporter's ask price moves: sold-out raises it, leftover grain cuts it.}
+\begin{frame}{Carry capacity}
+\topic{Warehouse capacity: how much stock a country is allowed to carry.}
+\matchbanner{README \S8 $W$; GATE0\_PARAMETERIZATION \S2.3}{dynamic\_crop.py:614--618}
+
+\[
+W_{i,t}
+= \mathtt{max\_stu}\; C_i^{\mathrm{ann}}
++ \mathtt{pipeline\_max\_steps}\cdot C_i^{\mathrm{ann}}/24
++ \mathbf{1}_{\{\mathtt{pipeline}>0\}}\, H_{i,t}.
+\]
+
+Rice has $\mathtt{pipeline\_max\_steps}=0$, so the monsoon harvest
+$H_{i,t}$ is \textbf{not} padded into $W$ (it would otherwise be stored as
+if it were silo capacity). Wheat and maize use 12 steps $=6$ months of
+working stocks. Verified: wheat $W=34.810$~MMT, rice $W=19.073$~MMT.
+The $1.5 s_i$ term is an \emph{opening-stock} clip only, not part of $W$.
+\syms{$W_{i,t}$ warehouse capacity (MMT) \symsep $C_i^{\mathrm{ann}}$ mean annual
+use (MMT/year) \symsep $H_{i,t}$ this step's harvest (MMT/step)
+\symsep \texttt{max\_stu} carry ceiling as a fraction of $C^{\mathrm{ann}}$
+(dimensionless: wheat $0.28$, maize $0.18$, rice $0.22$)
+\symsep \texttt{pipeline\_max\_steps} working stocks in steps
+\symsep $\mathbf{1}_{\{\cdot\}}$ indicator, $1$ if true else $0$.}
+\bubbles{\texttt{max\_stu} literature; \texttt{pipeline\_max\_steps} structural
+(12 wheat/maize $=6$ months; 0 rice).}
+{$W$: MMT.}
+{README \S8; \texttt{GATE0\_PARAMETERIZATION.md} \S2.3;
+\texttt{dynamic\_crop.py:614--618}.}
+\end{frame}
+
+\begin{frame}{Consumption, stock update, soft warehouse clip}
+\topic{How consumption and stocks close the step, including a soft drain of anything above capacity.}
+\matchbanner{README \S8 warehouse\_lambda}{dynamic\_crop.py:607--623}
+
+\[
+C^{\mathrm{used}}_{i,t}
+= \min\bigl(d_{i,t},\; \max(0,\, \mathrm{avail}_{i,t}
+- X_{i,t} + R_{i,t})\bigr),
+\]
+\[
+\tilde S_{i,t+1}
+= \max(0,\, \mathrm{avail}_{i,t} - X_{i,t}
+- C^{\mathrm{used}}_{i,t} + R_{i,t}),
+\qquad
+S_{i,t+1}
+= \tilde S_{i,t+1} - \lambda_W \max(0,\, \tilde S_{i,t+1}-W_{i,t}).
+\]
+
+$\lambda_W=\mathtt{warehouse\_lambda}=0.08$ (defaults to the rebuild
+$\lambda$). A one-step \emph{hard} clip incinerated $\sim 10\%$ of
+wheat/maize harvest and starved lean-season offers; the soft clip leaves
+$W$ as an attractor instead of a wall.
+\syms{$C^{\mathrm{used}}_{i,t}$ realised consumption (MMT/step) \symsep $d_{i,t}$
+desired use (MMT/step) \symsep $\mathrm{avail}_{i,t}$ grain on hand (MMT)
+\symsep $X_{i,t}=\sum_j\mathrm{ship}_{ij}$ tonnes shipped out and
+$R_{i,t}=\sum_j\mathrm{ship}_{ji}$ tonnes received in (MMT/step)
+\symsep $\tilde S$ stocks before the clip and $S_{i,t+1}$ after it (MMT)
+\symsep $W_{i,t}$ capacity (MMT) \symsep $\lambda_W$ overflow drain
+(fraction of the excess per step).}
+\bubbles{$\lambda_W$ reduced-form, locked to $\lambda$.}
+{$S$: MMT of stocks at end of step.}
+{\texttt{dynamic\_crop.py:607--623}.}
+\end{frame}
+
+\begin{frame}{Fill rates and blockage update asks}
+\topic{How an exporter's ask price moves: sold-out raises it, leftover grain cuts it, and a blocked rival raises it.}
 \matchbanner{README \S8 $q_{i,t+1}$}{dynamic\_crop.py:625--636}
 
 \[
 \mathrm{fill}_{i,t}
-= \frac{\sum_j \mathrm{ship}_{ij}}{\max(O_{i,t},\epsilon)},
+= \frac{\sum_j \mathrm{ship}_{ij}}{O_{i,t}}
+\;\text{ if } O_{i,t}>\epsilon,\ \text{ else } \theta,
 \qquad
 b_t
 = \frac{\sum_{i,j} S_{ij}\,\tau_{i,t}\, D_{j,t}}{\max(\sum_j D_{j,t},\epsilon)}.
 \]
 
 \[
-q \leftarrow
-(1-\beta)\, q \exp\bigl(\alpha(\mathrm{fill}-\theta)+\alpha_r b\cdot\mathbf{1}_{O>0}\bigr)
-+ \beta\, p,
+q_{i,t+1} =
+(1-\beta)\, q_{i,t}\exp\bigl(\alpha(\mathrm{fill}_{i,t}-\theta)
++\alpha_r b_t\,\mathbf{1}_{\{O_{i,t}>\epsilon\}}\bigr)
++ \beta\, p_t,
 \]
 
-then clipped to $[0.45 p_0,\, 2.8 p_0]$. Sold-out $\Rightarrow$ raise ask;
-leftover $\Rightarrow$ cut. $\alpha_r=0$ recovers the own-fill law
-(rival term next slide).
+then clipped to $[0.45 p_0,\, 2.8 p_0]$. Sold out $\Rightarrow$ raise the
+ask; leftover grain $\Rightarrow$ cut it. An exporter with no offers keeps
+its ask ($\mathrm{fill}:=\theta$). $\alpha_r=0$ recovers the pure own-fill
+law.
+\syms{$q_{i,t}$ exporter ask (real 2010 \$/t) \symsep $\mathrm{fill}_{i,t}$ fraction
+of $i$'s offers actually sold (dimensionless) \symsep $b_t$ blockage: the share of
+world import demand whose \emph{usual} sources are cut (dimensionless)
+\symsep $\tau_{i,t}$ offer cut (fraction) \symsep $O,D$ offers and import demand
+(MMT/step) \symsep $S_{ij}$ importer $j$'s normal source shares
+\symsep $\alpha=0.15$ ask speed, $\theta=0.70$ target fill,
+$\beta=0.18$ pull toward $p$, $\alpha_r=0.80$ rival markup, all dimensionless
+\symsep $\epsilon=10^{-9}$ numerical guard.}
 \bubbles{$\alpha=0.15$, $\theta=0.70$, $\beta=0.18$: reduced-form, shared, locked.}
 {$q$: real 2010 \$/t. fill, $b$: dimensionless.}
 {\texttt{dynamic\_crop.py:625--636}.}
 \end{frame}
 
 \begin{frame}{Rival markup $\alpha_r$ is a floor, not a 2008 fit}
-\topic{When a preferred exporter is banned, the others mark their asks up a bit.}
-\matchbanner{GATE0\_PARAMETERIZATION $\alpha_r$ note}{dynamic\_crop.py:631--634}
+\topic{When a preferred exporter is banned, the surviving exporters mark their asks up a little.}
+\matchbanner{GATE0\_PARAMETERIZATION $\alpha_r$ note}{dynamic\_crop.py:631--635}
 
 $\alpha_r=0.80$ is the Agrimate oligopolist channel: survivors mark up
-when preferred sources are blocked. It is the smallest \emph{shared}
-value at which isolated maize $\tau$ does not \emph{cut} world price.
-
-$\alpha_r=0$ recovers the own-fill law. Not fit to 2008 peaks.
+when preferred sources are blocked. It was chosen as the smallest
+\emph{shared} value at which an isolated maize $\tau$ does not \emph{cut}
+world price (at $0.40$ it still cuts). $\alpha_r=0$ recovers the own-fill
+law. Not fit to the 2008 peaks.
+\syms{$\alpha_r$ rival-markup weight on the blockage term (dimensionless)
+\symsep $b_t$ blockage: share of world import demand whose usual sources are
+cut, $b_t=\sum_{i,j}S_{ij}\tau_{i,t}D_{j,t}/\sum_j D_{j,t}$ (dimensionless)
+\symsep $q$ exporter ask (real 2010 \$/t) \symsep $\tau$ offer cut (fraction).}
 \bubbles{$\alpha_r=0.80$ reduced-form, locked, shared.}
 {Dimensionless.}
 {\texttt{CropParams.ask\_rival}; isolated-maize $\tau$ assert floor $0$.}
@@ -107,94 +204,126 @@ $\alpha_r=0$ recovers the own-fill law. Not fit to 2008 peaks.
 
 \[
 \mathrm{locked}_t
-= \sum_i \tau_{i,t}\max(0, S_{i,t+1}-T_{i,t}),
+= \sum_i \tau_{i,t}\max(0,\, S_{i,t+1}-T_{i,t}),
 \qquad
 \mathrm{free}_t
 = \sum_i S_{i,t+1} - \sum_i L_{i,t} - \mathrm{locked}_t.
 \]
 
 If withheld grain counted as free, a ban would look like abundance once
-$\eta$ is symmetric. This is why $\eta$ can be symmetric in surplus and
-shortage without a ban looking cheap.
+the scarcity exponent is symmetric. This is why that exponent can be
+symmetric in surplus and shortage without a ban reading as cheap.
+\syms{$\mathrm{locked}_t$ surplus stock withheld behind export cuts (MMT)
+\symsep $\mathrm{free}_t$ world-accessible free cover (MMT) \symsep $S_{i,t+1}$
+end-of-step stocks (MMT) \symsep $T_{i,t}$ target stock (MMT) \symsep $L_{i,t}$
+lean gap (MMT) \symsep $\tau_{i,t}$ offer cut (fraction).}
 \bubbles{Accounting identity. No extra parameter.}
 {MMT of world-accessible free cover.}
 {\texttt{dynamic\_crop.py:641--643}.}
 \end{frame}
 
-\begin{frame}{Unmet anomaly and blockage}
-\topic{How tight the market is this step, relative to the no-shock twin.}
-\matchbanner{README \S8 $u_t$, $b_t$, $\Delta u_t$}{dynamic\_crop.py:646--648, 627--630}
+\begin{frame}{Unmet demand, and the excess over the twin}
+\topic{How tight the market is this step, relative to the no-shock twin run.}
+\matchbanner{README \S8 $u_t$, $\Delta u_t$}{dynamic\_crop.py:646--648}
 
 \[
-u_t = 1 - \frac{\sum_i \mathrm{received}_{i,t}}{\max(\sum_i D_{i,t},\epsilon)},
+u_t = \max\Bigl(0,\; 1 - \frac{\sum_i R_{i,t}}{\max(\sum_i D_{i,t},\epsilon)}\Bigr),
 \qquad
 \Delta u_t = \max(0,\, u_t - u^{\mathrm{twin}}_t).
 \]
 
-$b_t$ as on the ask slide. Twin unmet $u^{\mathrm{twin}}$ comes from the
-path-matched twin (seasonal $H$, mean flex, no industrial, $\tau\equiv 0$).
+$u^{\mathrm{twin}}$ is the same quantity on the path-matched twin
+(climatology $H$, mean flex, no industrial, $\tau\equiv 0$), computed once
+before the treatment run. Only the \emph{excess} over the twin feeds the
+price.
+\syms{$u_t$ fraction of world import demand left unfilled this step
+(dimensionless) \symsep $u^{\mathrm{twin}}_t$ the same on the no-shock twin run
+\symsep $\Delta u_t$ excess unmet over the twin (dimensionless)
+\symsep $R_{i,t}$ tonnes received and $D_{i,t}$ import demand (MMT/step)
+\symsep $\epsilon=10^{-9}$ numerical guard.}
 \bubbles{Measured tightness, not a parameter.}
 {Dimensionless fractions.}
-{\texttt{dynamic\_crop.py} unmet and block; twin from \texttt{prepare\_crop\_run:803--806}.}
+{\texttt{dynamic\_crop.py:646--648}; twin from \texttt{prepare\_crop\_run:803--806}.}
 \end{frame}
 
 \begin{frame}{Trade-weighted ask}
-\topic{The world price blends a trade-weighted average of exporter asks with a scarcity term. This slide is the ask average.}
+\topic{The first of the two price ingredients: a shipment-weighted average of exporter asks.}
 \matchbanner{README \S8 $p^{\mathrm{tr}}$}{dynamic\_crop.py:650--654}
 
 \[
 p^{\mathrm{tr}}_t
-=\frac{\sum_i q_{i,t}\,\mathrm{shipped}_{i,t}}{\sum_i\mathrm{shipped}_{i,t}}
+=\frac{\sum_i q_{i,t}\,X_{i,t}}{\sum_i X_{i,t}}
+\quad\text{if anyone ships, else } p^{\mathrm{tr}}_t=p_t .
 \]
 
-if anyone ships; otherwise the incoming $p_t$. This is not a separate
-market. It is the $\omega$ weight in $p^\star$ (next slides).
+This is not a separate market: $p^{\mathrm{tr}}$ is one of the two terms
+blended into the within-step price target $p^\star$, with weight $\omega$
+(two slides on).
+\syms{$p^{\mathrm{tr}}_t$ trade-weighted world ask (real 2010 \$/t)
+\symsep $q_{i,t}$ exporter $i$'s ask (real 2010 \$/t) \symsep $X_{i,t}=\sum_j
+\mathrm{ship}_{ij}$ tonnes $i$ actually shipped (MMT/step) \symsep $p_t$ price
+carried into the step (real 2010 \$/t) \symsep $\omega$ weight on
+$p^{\mathrm{tr}}$ in $p^\star$ (dimensionless).}
 \bubbles{$\omega=\mathtt{trade\_w}$ crop-specific, locked. This slide is the
-$p^{\mathrm{tr}}$ identity.}
+$p^{\mathrm{tr}}$ identity only.}
 {Real 2010 \$/t.}
 {\texttt{dynamic\_crop.py:650--654}.}
 \end{frame}
 
 \begin{frame}{Scarcity ratio}
-\topic{The scarcity ratio: free world cover versus the no-shock twin, with a floor so the ratio stays defined.}
-\matchbanner{README \S8 $\mathrm{shift}_t$, $r_t$}{dynamic\_crop.py:661--663}
+\topic{The second price ingredient: free world cover versus the no-shock twin, with a floor so the ratio stays defined.}
+\matchbanner{README \S8 $\mathrm{shift}_t$, $r_t$}{dynamic\_crop.py:660--663}
 
 \[
 \mathrm{shift}_t
-= 0.05\sum_i s_i + \max\bigl(0,\, -\min(\mathrm{free}_t, F^{\mathrm{twin}}_t)\bigr),
-\]
-\[
+= 0.05\sum_i s_i + \max\bigl(0,\, -\min(\mathrm{free}_t,\, F^{\mathrm{twin}}_t)\bigr),
+\qquad
 r_t = \frac{F^{\mathrm{twin}}_t+\mathrm{shift}_t}{\mathrm{free}_t+\mathrm{shift}_t}.
 \]
 
-For wheat, $0.05\sum s_i = 6.17$~MMT. The second term is zero unless
-free or twin goes negative. The $0.05$ is a numerical floor, not a
-literature elasticity.
+On the official 2006--11 wheat run $0.05\sum_i s_i = 6.44$~MMT (it is
+$6.17$~MMT on the shorter 2006--07 window used by
+\texttt{verify\_claims.py}, because $C^{\mathrm{ann}}$ is a window mean).
+The second term is zero unless free or twin cover goes negative. The
+$0.05$ is a numerical floor, not a literature elasticity.
+\syms{$r_t$ scarcity ratio: twin cover over actual cover (dimensionless; $>1$
+means tighter than normal) \symsep $\mathrm{free}_t$ world-accessible free cover
+(MMT) \symsep $F^{\mathrm{twin}}_t$ the same on the no-shock twin run (MMT)
+\symsep $s_i$ country safety stock (MMT) \symsep $\mathrm{shift}_t$ additive floor
+keeping the ratio finite and positive (MMT).}
 \bubbles{The $0.05$ is a numerical floor, locked.}
 {$r_t$ dimensionless. shift in MMT.}
-{\texttt{dynamic\_crop.py:661--663}; README \S8 world price.}
+{\texttt{dynamic\_crop.py:660--663}; README \S8 world price.}
 \end{frame}
 
 \begin{frame}{Scarcity price, blend, smoother}
-\topic{How the world price is built: scarcity term, blend with trade asks, then smooth.}
-\matchbanner{README \S8 $p^{\mathrm{scar}}$, $p^\star$, $p_t$}{dynamic\_crop.py:668--680}
+\topic{How the world price is finally built: a scarcity term, blended with the trade-weighted ask, then smoothed.}
+\matchbanner{README \S8 $p^{\mathrm{scar}}$, $p^\star$, $p_t$}{dynamic\_crop.py:668--681}
 
-If calm ($\mathrm{free}=F^{\mathrm{twin}}$, $\Delta u=0$, $b=0$): $p^\star=p_0$.
-Else
+If the step is calm ($\mathrm{free}_t=F^{\mathrm{twin}}_t$, $\Delta u_t=0$,
+$b_t=0$) then $p^\star_t=p_0$ exactly. Otherwise
 
 \[
 p^{\mathrm{scar}}_t
 = p_0\, r_t^{\eta}\,(1+\kappa_u\Delta u_t+\kappa_b b_t),
+\qquad
+p^\star_t = \omega\, p^{\mathrm{tr}}_t + (1-\omega)\, p^{\mathrm{scar}}_t,
 \]
 \[
-p^\star_t = \omega\, p^{\mathrm{tr}}_t + (1-\omega)\, p^{\mathrm{scar}}_t,
-\qquad
 p_t = \rho\, p_{t-1} + (1-\rho)\, p^\star_t,
+\quad\text{clipped to }[60,\,1200]~\$/\mathrm{t}.
 \]
 
-clipped to $[60, 1200]$ \$/t. $\eta$ is symmetric in surplus and shortage
-(muting abundance stored gluts). $p^{\mathrm{tr}}$ as on the previous
-identity slide.
+$\eta$ is symmetric in surplus and shortage: a glut must lower $p$ so that
+flex demand can eat it. Muting abundance was storing gluts.
+\syms{$p_t$ world price (real 2010 \$/t) \symsep $p_0$ reference price
+(real 2010 \$/t) \symsep $p^{\mathrm{scar}}$ scarcity price and
+$p^{\mathrm{tr}}=\sum_i q_iX_i/\sum_i X_i$ the shipment-weighted ask
+(real 2010 \$/t) \symsep $p^\star$ within-step price target (real 2010 \$/t)
+\symsep $r_t$ scarcity ratio, $\Delta u_t$ excess unmet demand, $b_t$ blockage
+(all dimensionless) \symsep $\eta$ scarcity inverse elasticity, $\omega$ ask
+weight, $\rho$ AR(1) smoother, $\kappa_u,\kappa_b$ unmet and blockage
+multipliers (all dimensionless).}
 \bubbles{$\omega,\eta,\kappa_u,\kappa_b,\rho$ reduced-form, crop-specific where tabled, locked. Not crisis-by-crisis.}
 {$p$: real 2010 \$/t.}
 {\texttt{CropParams}: \texttt{inv\_eta}, \texttt{trade\_w}, \texttt{unmet\_kappa},
@@ -202,7 +331,7 @@ identity slide.
 \end{frame}
 
 \begin{frame}{Calm identity holds to machine precision}
-\topic{Sanity check: no shock and no bans $\Rightarrow$ price stays at the reference and stocks match the twin.}
+\topic{Sanity check: no shock and no bans means the price stays at the reference and cover matches the twin.}
 \matchbanner{README \S8 \texttt{assert\_twin\_identity}}{dynamic\_crop.py:900--917}
 
 Wheat neither-path (no harvest shock, no AMIS, mean flex, no industrial):
@@ -213,11 +342,15 @@ Wheat neither-path (no harvest shock, no AMIS, mean flex, no industrial):
 \max_t \bigl|\mathrm{free}_t - F^{\mathrm{twin}}_t\bigr| = 0~\mathrm{MMT},
 \]
 
-with $p_0=213.5$ \$/t. The assert tolerance ($2\%$ price, $1$~MMT free) is
-loose relative to what the code actually delivers.
+with $p_0=213.5$ \$/t. The assert tolerance ($2\%$ on price, $1$~MMT on
+free cover) is loose relative to what the code actually delivers.
 
 \texttt{assert\_amis\_raises\_price}, \texttt{assert\_amis\_cuts\_exports},
-\texttt{assert\_no\_spring\_spike} also PASS on wheat, rice, and maize.
+and \texttt{assert\_no\_spring\_spike} also PASS on wheat, rice, and maize.
+\syms{$p_t$ model world price (real 2010 \$/t) \symsep $p_0$ reference price
+(real 2010 \$/t) \symsep $\mathrm{free}_t$ world-accessible cover and
+$F^{\mathrm{twin}}_t$ its twin-run counterpart (MMT) \symsep
+\emph{neither-path} means no harvest shock and no AMIS cuts.}
 \bubbles{These asserts are the Gate~0 hard machinery, not scores against Pink Sheet.}
 {Relative price drift; MMT for free stocks.}
 {\texttt{verify\_claims.py} section 9; \texttt{dynamic\_crop.py} asserts.}
@@ -225,15 +358,21 @@ loose relative to what the code actually delivers.
 
 \begin{frame}{One world price, by construction}
 \topic{There is one world price per grain. A ban does not create a cheaper domestic price.}
-There is no split domestic vs export ask. A ban withholds grain as stock
-and marks it locked; it does \textbf{not} create a cheaper domestic CPI.
-That is why Gate~2 welfare cannot put world $p$ in the food-security term
---- a world-price penalty would punish the government for the spike the
-ban itself causes (\texttt{dynamic\_policy.welfare} docstring).
+There is no split between a domestic and an export ask. A ban withholds
+grain as stock and marks it locked; it does \textbf{not} create a cheaper
+domestic CPI. That is why the Gate~2 welfare function cannot put world
+$p_t$ in its food-security term --- a world-price penalty would punish the
+government for the very spike its own ban causes
+(\texttt{dynamic\_policy.welfare} docstring).
 
-Agrimate has a richer agent set (commercial vs strategic stocks, importer
-behaviour). SHEAF's Gate~0 market is ask-dominated with a twin residual.
-That is \textbf{E} (philosophy), not a failed SPE.
+Agrimate has a richer agent set (commercial vs strategic stockholders,
+importer behaviour). SHEAF's Gate~0 market is ask-dominated with a twin
+scarcity residual. That is a \textbf{modelling-philosophy} difference
+(category \textbf{E}), not a failed spatial equilibrium.
+\syms{$p_t$ the single world price per crop (real 2010 \$/t) \symsep
+$\mathrm{locked}_t$ stock withheld behind a ban (MMT) \symsep no domestic price
+and no CPI exist in the model \symsep category \textbf{E} = modelling
+philosophy in the \texttt{CLAUDE.md} scheme.}
 \bubbles{No extra domestic-price parameter because there is no extra price.}
 {One $p_t$ per crop, real 2010 \$/t.}
 {\texttt{dynamic\_crop.\_simulate\_window} price update;

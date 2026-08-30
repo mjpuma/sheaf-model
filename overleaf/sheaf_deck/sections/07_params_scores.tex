@@ -27,6 +27,17 @@ $\alpha_r$ & $0.80$ & $0.80$ & $0.80$ & reduced-form & rival markup \\
 $\phi$ & $0.55$ & $0.50$ & $0.55$ & reduced-form & harvest foresight \\
 \bottomrule
 \end{tabular}}
+\syms{$\varepsilon$ own-price food/feed elasticity \symsep \texttt{stu\_target}
+safety stock-to-use, giving $s_i$ \symsep \texttt{max\_stu} carry ceiling,
+entering $W$ \symsep \texttt{pipeline} working stocks, in \emph{steps}
+\symsep $\lambda$ stock-rebuild speed and $\lambda_W$ overflow drain, per step
+\symsep $\eta$ scarcity inverse elasticity (exponent on $r_t$)
+\symsep $\rho$ AR(1) price smoother \symsep $\omega$ weight on the
+trade-weighted ask in $p^\star$ \symsep $\kappa_u,\kappa_b$ unmet and blockage
+multipliers \symsep $\alpha,\theta,\gamma,\beta$ ask speed, target fill,
+destination-competitiveness exponent, pull toward $p$ \symsep $\alpha_r$ rival
+markup \symsep $\phi$ harvest foresight. All dimensionless except
+\texttt{pipeline} (steps); $s_i$ and $W$ are in MMT.}
 \end{frame}
 
 \begin{frame}[label=gate0scores]{Gate 0 wheat --- locked score}
@@ -37,6 +48,7 @@ $\phi$ & $0.55$ & $0.50$ & $0.55$ & reduced-form & harvest foresight \\
 corr(full) $=+0.720$. 2007/08 $\times 2.27$ vs obs $\times 1.82$
 (restriction-led); 2010/11 $\times 1.45$ vs obs $\times 1.16$
 (production-led). MY-end stocks $\times 1.02$ vs PSD (May).}
+\syms{$p$ model and Pink Sheet (2010 \$/t). Stocks MMT. $\times$ is hike vs start-year $p_0$.}
 \end{frame}
 
 \begin{frame}{Gate 0 maize and rice --- locked scores}
@@ -56,9 +68,19 @@ rice  & $+0.68$ & $\times 1.72 / \times 1.84$ & $\times 0.82 / \times 0.79$ & $\
 
 \vspace{0.4em}
 {\scriptsize
-Maize 2007/08 is \textbf{demand-led} (industrial), not harvest-led.
-Rice 2007/08 is \textbf{restriction-led} ($\tau\times 1.75$). Isolated
-maize $\tau$ must not \emph{cut} world price (assert floor $0$).}
+Attribution comes from the single-channel runs. Maize is
+\textbf{demand-led} (industrial) in \emph{both} windows: 2007/08
+demand-only $\times 1.46$ vs harvest-only $\times 1.11$; 2010/11
+demand-only $\times 1.12$ vs harvest-only $\times 1.01$. Rice 2007/08 is
+\textbf{restriction-led} ($\tau$-only $\times 1.75$). An isolated maize
+$\tau$ must not \emph{cut} world price (assert floor $0$).}
+\syms{corr: Pearson correlation of the monthly model price with the Pink Sheet
+price over the full window (both real 2010 \$/t) \symsep hike
+$=p_{\mathrm{peak}}/p_0$, the crisis-window peak relative to the start-year
+reference (dimensionless) \symsep ``obs'' is the same ratio on the Pink Sheet
+series \symsep MY-end: model over PSD world ending stocks read at the
+marketing-year month (dimensionless ratio of MMT) \symsep $\tau$ export-offer
+cut (fraction).}
 \end{frame}
 
 \begin{frame}{Disclosed Gate 0 leftovers (not hidden knobs)}
@@ -78,6 +100,7 @@ retune list.
       while PSD use rises (wheat corr $-0.17$, maize $-0.64$, rice $-0.74$).
       $\tau$ cuts offers; shipments are demand-constrained.
 \end{itemize}
+\syms{$p$ 2010 \$/t \symsep stocks MMT \symsep $\varepsilon$ demand elasticity \symsep $\tau$ offer cut (fraction). Leftovers are not retune targets.}
 \end{frame}
 
 \begin{frame}{Who banned, who harvested --- 2008 wheat}
@@ -85,4 +108,5 @@ retune list.
 \fitfig[0.62\paperheight]{fig_gate0_map_wheat_roles_2008.png}
 {\scriptsize AMIS on the diary, not chosen. Gate~0 does not ask who
 \emph{would} restrict.}
+\syms{Harvest shock: LOWESS $a_{i,y}$ on $Q$. AMIS $\tau$: offer-cut fraction. Not a who-would-restrict map.}
 \end{frame}
