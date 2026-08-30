@@ -51,21 +51,19 @@ from \texttt{load\_psd\_country}, not the single world row of
 \textbf{Trade volume is MMT/step}, from USDA-derived offers $O$ and demand
 $D$. FAOSTAT E0 is never summed as tonnes: the vendored wheat 2006--07
 matrix sums to $4.786\times 10^{14}$, not the $\sim 120$~MMT of actual
-world wheat trade. So the code keeps only shares, in which the units
-cancel:
+world wheat trade. So the code keeps only shares, in which units cancel:
 
 {\small
 \[
 A_{ij} = \frac{E_{ij}}{\sum_k E_{ik}}, \quad
 S_{ij} = \frac{E_{ij}}{\sum_k E_{kj}}, \quad A_{ii}=S_{ii}=0,
-\]
-\[
+\qquad
 \mathrm{ship}_{ij}
 = \min\bigl(O_{i,t}\tilde A_{ij},\, D_{j,t} S_{ij}\bigr).
 \]}
 
 Egypt's wheat 2006--07 source mix is Russia $37\%$, USA $29\%$, EU $10\%$.
-That mix is what E0 contributes; the tonnes on the link come from $O$ and $D$.
+That mix is what E0 contributes; the tonnes come from $O$ and $D$.
 \syms{$E_{ij}$ raw FAOSTAT flow $i\to j$ (magnitude unit-agnostic, never used as
 tonnes) \symsep $A_{ij}$ share of $i$'s exports going to $j$ (rows sum to 1)
 \symsep $S_{ij}$ share of $j$'s imports sourced from $i$ (columns sum to 1)
@@ -158,31 +156,28 @@ quote \symsep category \textbf{E} = modelling philosophy, not an error.}
 \matchbanner{README \S8 $\tau_{i,t}\in[0,1]$}{dynamic\_crop.py:43--50}
 
 Gate~0 maps each AMIS policy label to an \textbf{offer cut} $\tau$, held
-on for the measure's start--end dates. Overlapping measures on the same
-country keep the \textbf{max}. Six of the 17 named nodes --- USA, EU,
-Canada, Brazil, Thailand, Nigeria --- appear in no AMIS row, so they never
-restrict in Gate~0.
+on for the measure's start--end dates; overlapping measures on one country
+keep the \textbf{max}. Six named nodes --- USA, EU, Canada, Brazil,
+Thailand, Nigeria --- appear in no AMIS row, so they never restrict.
 
 {\scriptsize
-\renewcommand{\arraystretch}{0.95}
+\renewcommand{\arraystretch}{0.9}
+\setlength{\tabcolsep}{4pt}
 \begin{center}
-\begin{tabular}{@{}lc@{}}
+\begin{tabular}{@{}lc@{\hspace{2.2em}}lc@{}}
 \toprule
-AMIS label & $\tau$ \\
+AMIS label & $\tau$ & AMIS label & $\tau$ \\
 \midrule
-Export prohibition & 0.95 \\
-Export quota & 0.70 \\
-Export tax & 0.50 \\
-Minimum export price & 0.35 \\
-Licensing requirement & 0.25 \\
-Customs-clearance restriction & 0.15 \\
+Export prohibition & 0.95 & Minimum export price & 0.35 \\
+Export quota & 0.70 & Licensing requirement & 0.25 \\
+Export tax & 0.50 & Customs-clearance restriction & 0.15 \\
 \bottomrule
 \end{tabular}
 \end{center}}
 \syms{$\tau_{i,t}\in[0,1]$ the fraction of country $i$'s export \emph{offers}
-withheld at step $t$ (dimensionless). $\tau=0.95$ means 95\% of offers are
-withheld. It is \textbf{not} a \$/t tax, and it does not clip shipments
-directly --- shipments stay demand-constrained.}
+withheld at step $t$ (dimensionless); $\tau=0.95$ withholds 95\% of offers.
+It is \textbf{not} a \$/t tax, and it does not clip shipments directly ---
+those stay demand-constrained.}
 \bubbles{Map is structural (Agrimate-style). Not fit per crisis.}
 {Dimensionless fraction of \emph{offers}. Not a \$/t tax.}
 {OECD / AMIS Policy Database, vendored 2026-08-21.}
@@ -206,7 +201,7 @@ export offers (MMT/step) \symsep $\mathrm{ship}_{ij}$ grain shipment (MMT/step)
 \bubbles{Class map is structural. No HS-line weight.}
 {$\tau$ dimensionless on grain offers.}
 {OECD/AMIS DetailedDatabase HS vs AggregatedDatabase class.
-\texttt{load\_amis\_restrictions(aggregated=True)}.}
+\texttt{load\_amis\_restrictions}, \texttt{aggregated=True}.}
 \end{frame}
 
 \begin{frame}{The leftover AMIS map is a different object}

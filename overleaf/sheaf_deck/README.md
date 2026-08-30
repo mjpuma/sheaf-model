@@ -55,6 +55,10 @@ Every slide carries a tiny **Symbols.** line (letter, meaning, unit) and
 avoids "as on the previous slide" cross-references, so each slide can be
 presented on its own.
 
+The deck compiles with no overfull `\vbox` or `\hbox`, so nothing is cut
+off at the bottom or the right of a slide. If you add prose to a frame,
+check the compile log for `Overfull \vbox` before presenting.
+
 Green banners are README/code matches. README §8 is the crisis-host
 specification (the former documentation gaps are written there). Grey
 is the leftover annual SPE. The companion script:

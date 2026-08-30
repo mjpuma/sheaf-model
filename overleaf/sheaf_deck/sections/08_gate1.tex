@@ -32,19 +32,13 @@ $0$ = no substitution) \symsep $\eta_{gh}$ isoelastic cross-price exponents
 \quad\text{(from \texttt{CropParams.elast})},
 \qquad
 \eta_{gh} = \sigma\,\rho_{gh}\,|\varepsilon_g|
-\quad (g\neq h).
+\quad (g\neq h),
 \]
 
-\texttt{RHO} (wheat, rice, maize):
-
-\[
-\rho =
-\begin{pmatrix}
-0 & 0.30 & 0.40 \\
-0.30 & 0 & 0.20 \\
-0.40 & 0.20 & 0
-\end{pmatrix}.
-\]
+with \texttt{calibration.RHO}, symmetric on (wheat, rice, maize),
+carrying $\rho_{\mathrm{wheat,rice}}=0.30$,
+$\rho_{\mathrm{wheat,maize}}=0.40$, $\rho_{\mathrm{rice,maize}}=0.20$ and
+a zero diagonal.
 
 Wheat$\leftrightarrow$maize is the strongest pair (feed). The own
 elasticities are Gate~0's, \emph{not} \texttt{calibration.OWN\_ELAST}

@@ -3,35 +3,24 @@
 \begin{frame}{One claim per slide}
 \topic{How to read the deck: one claim per slide, colour banners, three bubbles.}
 Purpose: walk through what SHEAF computes --- equation, assumption,
-unit, and source --- with the Agrimate authors.
+unit, and source --- with the Agrimate authors. Each slide states
+\textbf{one claim}, and the equation shown \emph{is} the specification.
 
 \begin{itemize}
 \item Blue \textbf{About.} line: plain English, then the equation below.
-\item Tiny \textbf{Symbols.} line: each letter on that slide, with meaning and unit.
-\item Each slide states \textbf{one claim}.
-\item The equation is the one in README \S8 (crisis host) or \S1--\S6
-      (leftover). That is the specification.
-\item Three bubbles: \textbf{parameter} (what is free / locked),
-      \textbf{unit}, \textbf{source} (which file, which vintage).
-\item Green banner = README \S8 (or the leftover \S1--\S6 claim) and the
-      code match. The equation is the specification.
-\item Grey banner = the annual SPE leftover in \texttt{sheaf/core.py}.
-      It is still in the repository. It is \textbf{not} the 2007/08 host.
-\item Red is reserved if a displayed claim and the code still disagree.
-      After the README catch-up, the crisis-host slides are green.
+\item Tiny \textbf{Symbols.} line: every letter on that slide, with
+      meaning and unit.
+\item Three bubbles: \textbf{parameter} (free or locked), \textbf{unit},
+      \textbf{source} (which file, which vintage).
+\item \textbf{Green} banner: the displayed claim and the code match.
+      \textbf{Grey}: the annual SPE leftover in \texttt{sheaf/core.py},
+      still in the repository but \textbf{not} the 2007/08 host.
+      \textbf{Red} is reserved for a live disagreement --- after the
+      README catch-up, the crisis-host slides are all green.
 \end{itemize}
-
-\vspace{0.2em}
-{\scriptsize \textbf{Running order.} Lineage $\to$ the two hosts and the
-one-step spine $\to$ clock and units $\to$ source data $\to$ harvest
-forcing $\to$ the step's equations in the order they run $\to$ method of
-solution $\to$ locked parameters and Gate~0 scores $\to$ Gate~1 $\to$
-Gate~2 $\to$ annual leftover $\to$ questions.}
-\syms{\S8 the crisis-host section of \texttt{README.md} \symsep \S1--\S6 the
-annual-leftover sections of the same README \symsep Gate~0 the locked
-single-crop 24-step market; Gate~1 adds cross-grain substitution; Gate~2 adds
-endogenous export cuts \symsep green banner = displayed claim matches the code;
-grey = annual leftover; red = a live disagreement.}
+\syms{\S8 the crisis-host section of \texttt{README.md} \symsep \S1--\S6 its
+annual-leftover sections \symsep Gate~0 the locked single-crop 24-step market;
+Gate~1 adds cross-grain substitution; Gate~2 adds endogenous export cuts.}
 \end{frame}
 
 \begin{frame}{The verification protocol (from \texttt{CLAUDE.md})}
@@ -61,8 +50,8 @@ code disagree numerically \symsep Deaton--Laroque the rational-expectations
 competitive-storage benchmark.}
 \end{frame}
 
-\begin{frame}[label=sitmap]{Sitting map}
-\topic{Where to jump if the sitting is short. Buttons go to the named slides.}
+\begin{frame}[label=sitmap]{Sitting map --- and the running order}
+\topic{The rows are in deck order, so this doubles as the running order. Buttons jump to the named slides if the sitting is short.}
 {\scriptsize
 \renewcommand{\arraystretch}{1.08}
 \begin{tabular}{@{}p{0.48\textwidth}p{0.46\textwidth}@{}}

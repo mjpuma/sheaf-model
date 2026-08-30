@@ -118,15 +118,13 @@ optional MPI. Each region, each step, solves three constrained problems
 \item purchaser: CES allocation of next-step demand across suppliers.
 \end{itemize}
 
-SHEAF Gate~0 replaces that commercial layer with the ask / Armington /
-scarcity map on the previous slides. Rewriting that map in Julia would not
-make it Agrimate. \textbf{SHEAF stays in Python.} That is a language lock,
-not a speed claim, and no runtime comparison is made here.
+SHEAF Gate~0 replaces that commercial layer with the closed-form ask /
+Armington / scarcity map, so \textbf{SHEAF stays in Python} --- a language
+lock, not a speed claim.
 \syms{Agrimate: per-step constrained optimizations (expected profit, CES
 utility, CES allocation) \symsep SHEAF Gate~0: the closed-form
-ask / Armington / scarcity map \symsep CES constant elasticity of substitution
-\symsep MPI message-passing parallelism. Same letters in the two papers,
-different objects.}
+ask / Armington / scarcity map \symsep CES constant elasticity of
+substitution \symsep MPI message-passing parallelism.}
 \bubbles{Language is locked to Python. The object being solved is not Julia's.}
 {No runtime comparison is claimed.}
 {Agrimate GitLab README (Julia model, Python inputs);
@@ -174,8 +172,6 @@ feeds the anomaly $a_{i,y}=(Q-\hat Q)/\hat Q$.}
       threshold comparing the second path to the first. No iterated best
       response on the fortnight clock.
 \end{itemize}
-
-Neither gate introduces a tolerance, an iteration count, or a solver.
 \syms{$\mathrm{fac}_t$ demand scale factor per grain (dimensionless)
 \symsep $\eta$ the $3\times3$ matrix of own- and cross-price elasticities
 (dimensionless) \symsep $p_t,p_0$ the three world prices and their references

@@ -47,25 +47,25 @@ $\Rightarrow$ the QP is well-posed. Code: \texttt{DemandSystem.surplus}.
 \topic{How the leftover demand-slope matrix is built from elasticities.}
 \leftoverbanner{README \S1}{core.py:111--130}
 
+{\small
 \[
 b_g = -\varepsilon_g \frac{D_{0,g}}{p_{0,g}}>0,
 \qquad
 S_{gh}=\sigma\rho_{gh}\sqrt{b_g b_h}\ (g\neq h),\quad S_{gg}=0,
 \]
 \[
-\text{row-cap: if }\sum_h S_{gh}\ge 0.95 b_g\text{ then rescale},
+\text{row-cap row }g\text{ if }\textstyle\sum_h S_{gh}\ge 0.95 b_g;
 \quad
-S\leftarrow\sqrt{S\circ S^\top},
+S\leftarrow\sqrt{S\circ S^\top};
 \quad
-M=\mathrm{diag}(b)-S,
+M=\mathrm{diag}(b)-S;
 \quad
 a=D_0+M p_0.
-\]
+\]}
 
 The audit-prep note asked whether the arithmetic symmetrisation
 $S\leftarrow 0.5(S+S^\top)$ preserves the construction; the code in fact
-uses the \textbf{geometric} mean $\sqrt{S\circ S^\top}$, which is what
-keeps the $0.95$ row bound. On SHEAF's calibration both are well-defined.
+uses the \textbf{geometric} mean, which is what keeps the $0.95$ row bound.
 \syms{$g,h$ grains \symsep $b_g$ own demand slope (MMT per \$/t, $>0$)
 \symsep $S_{gh}$ off-diagonal substitution block and $M$ the demand-slope
 matrix (both MMT per \$/t) \symsep $a$ choke demand and $D_{0}$ baseline

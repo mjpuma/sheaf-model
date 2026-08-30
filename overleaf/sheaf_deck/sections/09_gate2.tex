@@ -166,18 +166,16 @@ Not a 2008 who-restricted map.}
 
 $s^{\mathrm{gov}}=\mathtt{gov\_stu}\times C_i^{\mathrm{ann}}=18.13$~MMT for
 Russia, against Gate~0 competitive safety of $7.55$~MMT. The world price
-does \emph{not} enter the penalty. Grid $\{0,0.3,0.6,0.9\}$; the shock
-best response is interior at $0.6$.
-
-This nested best response is how $\tau^{\mathrm{on}}$ was locked. The live
-action rule is the Headey gate, not this annual loop.
+does \emph{not} enter the penalty. On the grid $\{0,0.3,0.6,0.9\}$ the
+shock best response is interior at $0.6$, and that is how
+$\tau^{\mathrm{on}}$ was locked. The live action rule is the Headey gate,
+not this annual loop.
 \syms{$\mathcal{W}$ one year's welfare for the exporter ((\$/t)$\times$MMT)
 \symsep $p_t$ world price (real 2010 \$/t) \symsep $X_{i,t}$ tonnes exported
 (MMT/step) \symsep $\bar S_{i,y}$ mean stock over the 24 steps of year $y$ (MMT)
 \symsep $s^{\mathrm{gov}}$ illustrative government buffer target (MMT)
 \symsep $\alpha=\mathtt{fs\_stock\_weight}=12$ penalty weight
-((\$/t)$\times$MMT per MMT$^2$) \symsep $(\cdot)_+$ positive part. This is a
-diagnostic, not the live $\tau_t$ rule.}
+\symsep $(\cdot)_+$ positive part.}
 \bubbles{$\alpha=12$, \texttt{gov\_stu}=0.48: illustrative.}
 {Revenue: (\$/t)$\times$MMT. Penalty: same units after $\alpha$.}
 {\texttt{grid\_best\_response}; \texttt{gate2\_beta\_score.csv}.}
