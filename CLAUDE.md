@@ -35,22 +35,20 @@ establish that any of them diverge.
 SHEAF (Substitution, Heterogeneous agents, Equilibrium, And Fragility) is a
 country-level, multi-commodity, game-theoretic network model of global grain
 trade. **Crisis validation does not use the annual SPE as its heartbeat.**
-The locked crisis market is the Gate 0 24-step spine
-(`sheaf/dynamic_crop.py`). Cross-commodity substitution (Gate 1) sits on
-that spine. The crisis game is **types slow, actions `τ_t` on that same
-clock** (Headey 2011; `diagnostics/GAME_CLOCK.md`) — not an annual Nash.
-`sheaf/core.py` remains the TWIST-era annual prototype (spatial QP +
-year-IBR + storage) and the object of the original README §§1–7
-correspondence claim. Gate 0 and Gate 1 scores are not re-run because
-the game clock was stated.
+The crisis market is the Gate 0 24-step spine
+(`sheaf/dynamic_crop.py`). The baseline is **open after colleague
+consultation**; do not silently fit 2008. Cross-commodity substitution
+(Gate 1) sits on that spine. The crisis game is **types slow, actions
+`τ_t` on that same clock** (Headey 2011; `diagnostics/GAME_CLOCK.md`) —
+not an annual Nash. The TWIST-era annual prototype (spatial QP +
+year-IBR + storage) is parked in [`sheaf/annual/`](sheaf/annual/README.md)
+(`sheaf/annual/core.py`). Do not treat it as the 2007/08 game.
 
-The annual formulation is written out in [README.md](README.md)
-("Mathematical formulation" section, §§1–7) and is claimed to match
-`sheaf/core.py` symbol-for-symbol. **Whether that correspondence
-(README annual equations ↔ `core.py`) holds is a primary verification
-target for that prototype** — to be established affirmatively or not,
-not assumed in either direction. Do not treat `core.py` as the 2007/08
-game.
+The annual formulation is written out in
+[sheaf/annual/README.md](sheaf/annual/README.md) and is claimed to match
+`sheaf/annual/core.py` symbol-for-symbol. **Whether that correspondence
+holds is a verification target for that prototype** — to be established
+affirmatively or not, not assumed in either direction.
 
 [VALIDATION.md](VALIDATION.md) documents an intended two-level empirical
 validation plan (Level 1: reproduce Agrimate's 2007/08 and 2010/11 hindcast
@@ -81,36 +79,32 @@ lineage is the correct reference frame for evaluation.
 
 ## Repository map
 
-Everything the model does lives in one package, `sheaf/`, with no
-subpackages. There is no separation into "market/", "game/", "storage/"
-directories — all four conceptual layers are classes/functions inside a
-single 487-line module.
+Crisis code lives in `sheaf/` as modules (no `market/` / `game/` split).
+The annual SPE is a **subpackage** `sheaf/annual/`, not on the default
+`sheaf` import path.
 
 | Path | Role | Notes |
 |---|---|---|
-| `sheaf/core.py` | **Annual SPE prototype** — demand system, spatial equilibrium (QP), storage rules, year-IBR export game, `SheafModel`. Crisis heartbeat is `dynamic_crop.py`; crisis game is `dynamic_policy.py`. This file remains the audit's original center of gravity for README §§1–7. |
-| `sheaf/calibration.py` | Prototype dataset: 17 named countries + a Rest-of-World residual node, hand-entered production/consumption/elasticities | Explicitly labeled "illustrative" in its own docstring, not presented as a production calibration. `build_countries()` is the entry point. |
-| `sheaf/data_usda.py` | USDA PSD adapter: loads world-aggregate crop series, LOWESS detrending (hand-rolled, not `statsmodels`), stock-to-use ratios, crisis-forcing multipliers | Feeds production-shock forcing for hindcasts. |
-| `sheaf/data_faostat.py` | FAOSTAT bilateral trade adapter: loads E0 matrices, resolves ISO3 via a country-conversion table + hardcoded aliases, aggregates to SHEAF's node set | Network *structure* only — its module docstring explains why production/reserves are deliberately sourced elsewhere (FAOSTAT stocks are a food-balance residual). |
-| `sheaf/__init__.py` | Public API re-exports | Thin; not a modeling target. |
-| `demo.py` | Black Sea wheat-shock scenario (Russia −40%, Ukraine −50%) run under substitution on/off, generates `sheaf_results.csv` and 4 figures | The one existing end-to-end run of the model; useful as a smoke test. Whether it constitutes validation is a question for the audit, not a premise. |
-| `scripts/validate_forcing.py` | Builds/plots USDA-derived production anomalies and stock-to-use ratios around the 2007/08 and 2010/11 crises | Diagnostic — verify independently whether it runs SHEAF or scores anything against history. |
-| `scripts/build_network.py` | Builds/plots the FAOSTAT baseline wheat network and Egypt's import-source shift across crisis windows | Diagnostic — same verification applies. |
-| `data/usda_world/`, `data/faostat_network/` | Vendored input CSVs + `PROVENANCE.txt` files | Check provenance files before treating any number pulled from these as ground truth. |
-| `README.md` | Full mathematical writeup, references, caveats section | A specification to check the code against — its self-description is a claim to verify, not evidence of the code's behavior. |
-| `VALIDATION.md` | Validation methodology (Level 1/2) and data-alignment rationale | Describes an intended validation process; whether it has been carried out is a separate, checkable question. |
-| `grist_results.csv`, `assets/`, `figures/` | Prior run outputs / presentation material | Not model code. |
+| `sheaf/dynamic_crop.py` | **Crisis host** — 24-step ask/Armington/scarcity map | Gate 0. Baseline is open after consult; scores in `diagnostics/gate0_*_report.md` are snapshots. |
+| `sheaf/dynamic_coupled.py` | Gate 1 isoelastic substitution on that spine | |
+| `sheaf/dynamic_policy.py` | Gate 2 Headey-clock actions | |
+| `sheaf/annual/` | Parked yearly SPE + year-Nash | `from sheaf.annual import SheafModel`. Equations in `sheaf/annual/README.md`. Demo: `scripts/annual/demo.py`. Tag `annual-spe-in-tree` is the pre-park tree. |
+| `sheaf/core.py` | ImportError shim → `sheaf.annual` | |
+| `sheaf/calibration.py` | Node names, GRAINS, RHO, illustrative DATA | `build_countries()` builds annual `Country` objects. |
+| `sheaf/data_usda.py` | USDA PSD, LOWESS, Pink Sheet, AMIS | Spine uses offer-cut τ; annual host uses `$/t` `amis_tau_schedule`. |
+| `sheaf/data_faostat.py` | FAOSTAT E0 share pattern | |
+| `sheaf/__init__.py` | Crisis public API | `run_crop_dynamics`, `GRAINS`, `STEPS_PER_YEAR`. Does **not** export `SheafModel`. |
+| `scripts/score_subannual_crop.py` | Crisis smoke test / official P1 | |
+| `scripts/annual/` | Annual demo + old Level-1 scripts | |
+| `README.md` | Crisis specification (§8) | Annual math is in `sheaf/annual/README.md`. |
 
-There is no `tests/` directory and no automated test suite in this
-repository. Whether that absence constitutes a deficiency, and of what
-severity, is for the audit to classify (see Classification System) rather
-than for this document to pre-judge.
+Audit reports that cite `sheaf/core.py` mean `sheaf/annual/core.py` after the park.
 
-## Core module internals (`sheaf/core.py`, line references as of this preparation pass)
+## Annual module internals (`sheaf/annual/core.py`)
 
 Each item below is phrased as a verification question with a pointer to
 where the relevant mathematical claim and implementation live. None presume
-an outcome.
+an outcome. Line numbers were taken when this file was still `sheaf/core.py`.
 
 1. **Demand system** (lines 49–119): `DemandSystem` dataclass +
    `build_demand_system()`. Verify whether the demand-matrix construction
@@ -241,9 +235,10 @@ justifies it against this full list, not against a single axis (e.g.,
 
 ## Ground rules for this preparation and the eventual audit phase
 
-- **Read-only.** Do not modify `sheaf/*.py`, `demo.py`, or `scripts/*.py` —
-  neither during this preparation pass nor during the audit phase that
-  follows it. Findings are reported, not silently patched.
+- **Read-only during a formal audit pass.** Do not silently patch
+  `sheaf/*.py` (including `sheaf/annual/`), `scripts/*.py`, or the
+  `demo.py` pointer. Findings are reported, not patched, unless the user
+  asked for the park / a baseline change.
 - **This document does not start the audit.** Preparation ends here; the
   audit begins only when separately instructed.
 - Units throughout the codebase: quantities in million tonnes (MMT), prices
@@ -304,15 +299,13 @@ After independent agent findings are collected, a lead reviewer role must:
   criticism that does not survive must be reclassified (commonly to H, D, or
   E) rather than dropped silently.
 
-## Reproducing the one existing run
+## Reproducing the crisis smoke test
 
 ```bash
 pip install -r requirements.txt
-python demo.py
+python scripts/score_subannual_crop.py --crop wheat
 ```
 
-This is the only current end-to-end execution path and a reasonable smoke
-test before/after any change, though it exercises only one scenario
-(Black Sea wheat shock). Whether it constitutes validation evidence, and at
-what confidence level, is itself a question for the audit (see Classification
-System, category F).
+Parked annual prototype: `python scripts/annual/demo.py`.
+Whether either run constitutes validation evidence is a question for the
+audit (see Classification System, category F).

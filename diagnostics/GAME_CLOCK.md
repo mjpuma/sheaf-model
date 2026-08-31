@@ -50,17 +50,18 @@ Conflating them into one annual `τ_i` is what the leftover host does.
 
 ## Where the leftover is
 
-`sheaf/core.py` `ExportRestrictionGame` + `demo.py` is the **TWIST-era
-annual SPE prototype**: one tax per year, node prices from a Takayama–
-Judge QP, consumer surplus at `p_i`. It was the right game when the
-market itself was annual. Gate 0 retired that market for crisis work
+`sheaf.annual` `ExportRestrictionGame` + `scripts/annual/demo.py` is the
+**TWIST-era annual SPE prototype**: one tax per year, node prices from a
+Takayama–Judge QP, consumer surplus at `p_i`. It was the right game when
+the market itself was annual. Gate 0 retired that market for crisis work
 (`ARCHITECTURE.md`, `diagnostics/LEVEL1_INTERROGATION.md`). Agrimate
 never had an endogenous game — AMIS is a diary — so there was no
 template for “governments choose on the 24-step clock,” and the Nash
-layer stayed on `core.py`. That is a leftover, not the 2007/08 object.
+layer stayed on the annual host. That is parked in `sheaf/annual/`, not
+the 2007/08 object.
 
-`demo.py` may still run the annual prototype. Crisis hindcasts and the
-crisis game do not.
+`python scripts/annual/demo.py` still runs that prototype. Crisis
+hindcasts and the crisis game do not.
 
 ## Where the live game sits
 

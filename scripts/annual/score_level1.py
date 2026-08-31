@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from sheaf import SheafModel, build_countries
+from sheaf.annual import SheafModel, build_countries
 from sheaf.data_usda import (
     amis_tau_schedule,
     country_production_shocks,
@@ -34,7 +34,7 @@ from sheaf.data_usda import (
     seed_stocks_from_psd,
 )
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 DIAG = ROOT / "diagnostics"
 FIGS = ROOT / "figures"
 COL = {"wheat": "#c0392b", "rice": "#2874a6", "maize": "#d68910"}

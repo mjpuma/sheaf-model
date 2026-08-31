@@ -231,9 +231,9 @@ def check_eta() -> None:
 
 
 def check_pd() -> None:
-    section("8. Annual demand system M (core.build_demand_system) PD claim")
+    section("8. Annual demand system M (sheaf.annual.build_demand_system) PD claim")
     from sheaf.calibration import DATA, GLOBAL_CONS, GRAINS, OWN_ELAST, P0, RHO
-    from sheaf.core import build_demand_system
+    from sheaf.annual import build_demand_system
 
     cons = [np.array(d["cons"], float) for d in DATA]
     cons.append(GLOBAL_CONS - np.sum(cons, axis=0))

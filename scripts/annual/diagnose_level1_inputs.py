@@ -33,7 +33,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from sheaf.calibration import GRAINS, build_countries
+from sheaf.annual import build_countries
+from sheaf.calibration import GRAINS
 from sheaf.data_usda import (
     amis_tau_schedule,
     country_production_shocks,
@@ -42,7 +43,7 @@ from sheaf.data_usda import (
     load_psd_country,
 )
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 DIAG = ROOT / "diagnostics"
 FIGS = ROOT / "figures"
 

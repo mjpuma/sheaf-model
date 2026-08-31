@@ -18,7 +18,7 @@ a time, 24 steps/year, exogenous AMIS cuts. Hindcasts 2007/08, 2010/11, and
 the 2021–23 Ukraine-war window. Do **not** re-run these scores to host the
 crisis game: Headey (2011) puts actions `τ_t` on this same spine with types
 slow (`../../diagnostics/GAME_CLOCK.md`). The annual program in
-`sheaf/core.py` is a leftover prototype, not the 2007/08 game.
+`sheaf.annual` is a parked yearly prototype, not the 2007/08 game.
 
 The older short note `../gate0_agrimate/` is a figure factory for the
 Agrimate scenario-split panels. **This folder is the writeup to upload.** Do not

@@ -96,7 +96,7 @@ targets; it is not the Gate 0 clock.
 - Multi-commodity demand / substitution as the differentiator vs Agrimate.
 - Node set + USDA/AMIS/Pink Sheet data plumbing (re-timed to steps).
 - Export-restriction *idea*; re-host on sub-annual information sets.
-  `sheaf/core.py` keeps the annual prototype (`demo.py`). It is not the
+  `sheaf.annual` keeps the yearly prototype (`scripts/annual/demo.py`). It is not the
   crisis game. Headey (2011) is the clock: India/Vietnam October,
   Thailand-in-March *discussing* a ban, Japan-in-May announcing stocks.
 
@@ -140,7 +140,7 @@ detailed diagnostics **before** substitution or Level 2. See
    the hindcast or the substitution band** to say this
    (`diagnostics/GAME_CLOCK.md`). `sheaf/dynamic_policy.py` is a
    two-player mechanism check (Russia harvest, Kazakhstan neighbor;
-   harvest diversion). `core.py` IBR stays a leftover.
+   harvest diversion). Annual IBR stays in `sheaf.annual`.
 
 Commands:
 ```bash

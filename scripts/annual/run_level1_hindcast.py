@@ -21,7 +21,7 @@ from pathlib import Path
 
 import numpy as np
 
-from sheaf import SheafModel, build_countries
+from sheaf.annual import SheafModel, build_countries
 from sheaf.data_usda import (
     amis_tau_schedule,
     country_production_shocks,

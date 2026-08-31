@@ -5,7 +5,7 @@
 E6 2022 hold-out scored; P3 claim frozen; consumption diagnostic scored.
 **No σ\***. **Game off in this note.** **Substitution: stop.** Do not
 re-run this band to host the game. Crisis game is types slow / `τ_t` on
-the Gate 0 spine (`diagnostics/GAME_CLOCK.md`), not annual `core.py` Nash.
+the Gate 0 spine (`diagnostics/GAME_CLOCK.md`), not annual `sheaf.annual` Nash.
 **Handoff for a new agent:** `diagnostics/GATE1_HANDOFF.md` (read first).
 **Living Overleaf note:** `overleaf/gate1_substitution/`.
 **P3 draft:** `overleaf/gate1_whitepaper/`.
@@ -178,7 +178,7 @@ spillovers.
 
 **Parallel (independent, no inherited conclusions):** (A) σ=0 identity vs
 `_simulate_window` — **MATCH**, max monthly `|Δp|` ~ 4×10⁻¹⁶; (B) isoelastic
-cross-price vs `core.py` Slutsky \(M_i\) — **keep isoelastic on spine**;
+cross-price vs `sheaf.annual` Slutsky \(M_i\) — **keep isoelastic on spine**;
 (C) identification / hold-out for \(\sigma\) — **band, not a 2008 fit**;
 (D) 2007/08 Pink Sheet spillover as data — **rice 2008 own-ban; maize least
 confounded; rice 2010 no co-spike**. Verification protocol per `CLAUDE.md`.
@@ -189,7 +189,7 @@ confounded; rice 2010 no co-spike**. Verification protocol per `CLAUDE.md`.
 ## Explicitly not Gate 1
 
 - Endogenous restriction **actions** (Headey clock on the Gate 0 spine;
-  not a reason to re-run this band; annual `core.py` Nash is leftover)
+  not a reason to re-run this band; annual `sheaf.annual` Nash is parked)
 - Endogenous network (FAOSTAT E0 is prescribed)
-- Linear Slutsky \(M_i\) in `sheaf/core.py` (annual SPE prototype; different demand)
+- Linear Slutsky \(M_i\) in `sheaf/annual/core.py` (annual SPE prototype; different demand)
 - Fitting Agrimate’s CPI series

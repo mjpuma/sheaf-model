@@ -18,7 +18,7 @@ Overleaf.)
 A one-claim-per-slide walkthrough of SHEAF for discussion with the
 Agrimate authors. Every equation is grounded in `README.md` and the
 live hosts (`sheaf/dynamic_crop.py`, `dynamic_coupled.py`,
-`dynamic_policy.py`). `sheaf/core.py` is labelled leftover.
+`dynamic_policy.py`). The annual SPE is parked in `sheaf/annual/`.
 
 ### Running order
 

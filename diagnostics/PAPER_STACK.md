@@ -20,7 +20,7 @@ them might end up as a section, an appendix, a later note, or never.
 
 | Question | What it is | What it is not |
 |---|---|---|
-| **Who restricts, and when?** | Positive game on the 24-step spine (Headey 2011): types slow, actions `τ_t`. Train on one window, score another — if we ever estimate. | Not an annual Nash in `core.py`. Not “write paper P4.” The beta is a two-player mechanism check (harvest diversion), not that score. |
+| **Who restricts, and when?** | Positive game on the 24-step spine (Headey 2011): types slow, actions `τ_t`. Train on one window, score another — if we ever estimate. | Not an annual Nash in `sheaf.annual`. Not “write paper P4.” The beta is a two-player mechanism check (harvest diversion), not that score. |
 | **Just enough / club of the willing?** | A *normative* variant of the same layer: restrict for domestic food security while limiting importer harm; what if only some join. | Not a separate model. Same host, different objective. Later, if ever. |
 | **Cooperation vs protectionism / tipping?** | Comparative statics on types (food-security vs cooperation weights). | Not a third paper by default. Still sub-annual actions. |
 | **Does the network emerge?** | Trade shares from costs and prices instead of FAOSTAT E0. | Optional. Gate 0 **prescribes** Armington on E0; say so. Not required for the hindcast or the game. |

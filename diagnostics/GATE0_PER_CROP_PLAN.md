@@ -128,7 +128,7 @@ corr wheat/rice ≳ +0.5, maize > 0; world MY-end STU on PSD (~×1.0–1.1).
 - Endogenous restriction **actions** (those belong on this 24-step spine
   later, Headey clock — not a reason to re-run Gate 0). Club / tipping
   are variants of that layer, not extra manuscripts.
-- Annual SPE Nash in `sheaf/core.py` as the 2007/08 game (leftover).
+- Annual SPE Nash in `sheaf.annual` as the 2007/08 game (parked).
 - Endogenous trade network without FAOSTAT E0.
 - Replacing Pink Sheet with Agrimate’s private series (use published Pink Sheet).
 - Crisis-specific knobs (e.g. boost κ only in 2008).

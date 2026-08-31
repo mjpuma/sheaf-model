@@ -4,11 +4,11 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from sheaf.calibration import build_countries, DATA
-from sheaf.core import (
+from sheaf.annual import (
     build_demand_system, SpatialEquilibrium, SpatialEquilibriumError,
-    strategic_storage, SheafModel,
+    strategic_storage, SheafModel, build_countries,
 )
+from sheaf.calibration import DATA
 from sheaf.data_faostat import SHEAF_NODE_MAP
 from sheaf.data_usda import crisis_forcing, shock_matrix_from_world_forcing
 
