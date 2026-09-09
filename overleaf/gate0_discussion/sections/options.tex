@@ -1,0 +1,215 @@
+\section{Questions raised at the sitting}
+\label{sec:options}
+
+Each subsection states a question raised by a coauthor, what Gate~0
+currently does, what the alternative would require, and the measurement
+that would distinguish them. No option is selected here.
+
+It is worth separating two classes of alternative. Some are
+reparameterisations or single-equation substitutions within the two-week
+recursion of \S\ref{sec:dynamics}. Others replace the host: per-agent
+constrained optimisation as in Agrimate \citep{kuhla2025}, or annual
+spatial price equilibrium \citep{samuelson1952,takayama1971}. The second
+class is not an edit. Figure~\ref{fig:pways} shows that division.
+
+\subsection{Which object is ``the baseline''?}
+
+The term was used for four distinct objects, and the ambiguity is worth
+resolving before anything else.
+
+The \emph{reference price} \(p_0\) is the start-year mean of the World
+Bank Pink Sheet in constant 2010 dollars, where \(p_0\) enters
+\eqref{eq:demand} as the price at which \(C^{\mathrm{flex}}_{i,t}\) is
+defined and \eqref{eq:pscar} as the level the scarcity price returns to.
+The \emph{climatological harvest} \(H^{\mathrm{seas}}_{i,t}\) is
+window-mean production distributed over the calendar, and enters
+expectations through \eqref{eq:hexp}. The \emph{spin-up} initialises
+stocks \(S_{i,t}\) from 2005 USDA levels and runs the unshocked recursion
+for two years, so that opening stocks are dynamically consistent rather
+than a raw data snapshot. The \emph{twin} is a full parallel run of the
+same recursion under \(H^{\mathrm{seas}}\), mean food and feed demand, no
+industrial excess, and \(\tau_{i,t}=0\), which supplies
+\(\mathcal{F}^{\mathrm{twin}}_t\) in \eqref{eq:ratio}. Scarcity is measured
+against the twin, not against \(p_0\) alone.
+
+Agrimate spins up for roughly four years. Lengthening ours is a
+sensitivity test on initial conditions, not a change of theory. Replacing
+the twin with an annual market-clearing reference is a change of host
+(Fig.~\ref{fig:pways}D).
+
+\flowfig{02_baselines_four_objects.pdf}{The four objects that have all been
+called ``baseline.'' The scarcity term in \eqref{eq:pscar} is measured
+against the twin. \label{fig:b0}}
+
+\subsection{Why is available surplus not fully offered each period?}
+
+Because \eqref{eq:offers} withholds the target stock \(T_{i,t}\) defined in
+\eqref{eq:target}. A country consumes \(d_{i,t}\), retains lean-season
+cover plus safety stock, and offers the residual. No interest rate and no
+expected-price comparison appear: there is no condition of the form
+\(\mathbb{E}_t[p_{t+1}]\ge (1+r)p_t + c\) that a competitive storer would
+impose, where \(r\) is the interest rate and \(c\) the physical cost of
+carry \citep{wright1982,williams1991,deaton1992}. Slide~48 of the deck is
+the offer-price update \eqref{eq:ask}, not a cost of carry; that reading
+should be confirmed with the authors.
+
+Agrimate's commercial supplier does solve a store-versus-sell problem from
+expected profit, conditional on announced restrictions
+\citep{kuhla2025}. Adopting that is Fig.~\ref{fig:pways}C, not a
+modification of \eqref{eq:target}. Note also that Agrimate separates
+commercial storage from a strategic-reserve agent following a
+partial-adjustment refill rule; SHEAF's Gate~2 food-security trigger is not
+that second agent, and the two should not be equated when comparing the
+storage layers. The intermediate option is an explicit
+arbitrage margin: hold above \(T_{i,t}\) only when
+\(\mathbb{E}_t[p_{t+1}]-p_t\) exceeds a per-step carry cost. This
+introduces both a price expectation and a carry parameter, neither of
+which the model currently has. A related experiment --- country-specific
+safety stock ratios \(\sigma^{\mathrm{stu}}_i\) --- improved US wheat
+stocks but inflated Chinese maize stocks by roughly a factor of three, and
+was not retained.
+
+\flowfig{10_storage_cover_rule.pdf}{Partition of available grain under
+\eqref{eq:offers}: consumption, cover, offer. No store-versus-sell
+programme is solved. \label{fig:s0}}
+
+\subsection{How is the world price determined?}
+
+By \eqref{eq:pscar}--\eqref{eq:pupdate}: a shipment-weighted offer price
+combined with a scarcity term and then smoothed. The system is a discrete
+map, not a differential equation; the only relaxation-like element is the
+offer-price adjustment \eqref{eq:ask}.
+
+Three distinct requests were compressed into ``there should be an
+optimisation.'' The first is \emph{agent optimisation}: per-region
+programmes at every step, i.e.\ Agrimate (Fig.~\ref{fig:pways}C). The
+second is \emph{market clearing}: price as the multiplier on a balance
+constraint in an annual spatial equilibrium (Fig.~\ref{fig:pways}D) ---
+the host that produced the wrong sign for 2007/08. The third is the
+observation that Gate~0 may already contain an optimisation principle,
+since \eqref{eq:pscar} has the form of inverse demand over accessible
+stocks with elasticity \(\eta\).
+
+Three gaps remain between that form and a genuine equilibrium, and they
+should be stated rather than papered over. Demand \eqref{eq:demand} uses
+\(p_{t-1}\), so quantities entering trade are not consistent with the
+price the same period produces. Blending and smoothing in
+\eqref{eq:pstar}--\eqref{eq:pupdate} means \(p_t\) does not lie on the
+inverse-demand schedule within the period. And \eqref{eq:target} is a
+target-stock rule, so storage is not a first-order condition. Writing
+these three sentences accurately is cheaper, and more defensible, than
+attaching an \(\arg\max\) to the existing recursion. TWIST likewise did
+not solve a storage Euler equation \citep{schewe2017}.
+
+Two alternatives remain inside the two-week host. The first is
+contemporaneous consistency: replace \(p_{t-1}\) with \(p_t\) in
+\eqref{eq:demand} and solve the resulting scalar fixed point
+\(p_t=\mathcal{G}(p_t)\) each period, where \(\mathcal{G}\) is the
+composition of \eqref{eq:demand}--\eqref{eq:pupdate}. That is one
+univariate root-find per crop per step, not a system of programmes. The
+second is a structural offer rule: replace the exponential adjustment in
+\eqref{eq:ask} with a markup over marginal cost, retaining the
+inverse-demand-plus-offers structure of \eqref{eq:pstar}.
+
+\flowfig{20_four_ways_p.pdf}{Four hosts capable of producing a world
+price. A is the current recursion. B remains the two-week host with
+demand and price made contemporaneously consistent. C and D are different
+models. \label{fig:pways}}
+
+\subsection{Who trades with whom, and at which price?}
+
+Traded quantities are determined by \eqref{eq:offers} and
+\eqref{eq:importdemand}; the FAOSTAT matrices \(A_{ij}\) and \(S_{ij}\)
+supply only the bilateral pattern, reweighted by \eqref{eq:reweight}. A
+restriction reduces \(O_{i,t}\) directly, whereas realised shipments
+\(X_{ij,t}\) are the short side of \eqref{eq:clear}; Russian wheat offers
+in late 2010 therefore collapse by far more than Russian shipments do.
+The phrase ``sold to each market'' in the notes most likely refers to
+Agrimate's purchaser agent rather than to its storer.
+
+A restriction does not currently generate a domestic price below \(p_t\).
+Introducing a domestic price \(p^{\mathrm{dom}}_{i,t}\) distinct from the
+world price would matter for a consumer-welfare analysis and would connect
+to the price-insulation literature \citep{martin2012}; it is not required
+to reproduce the single World Bank world price series that Gate~0 is
+scored against.
+
+\subsection{Is demand linear, and what counts as industrial use?}
+
+Demand is isoelastic, not linear: \eqref{eq:demand} is
+\(C^{\mathrm{flex}}(p_{t-1}/p_0)^{\varepsilon}\), so the elasticity
+\(\varepsilon\) is constant and the price response is multiplicative. The
+linear system \(D=a-Mp\) belongs to the parked annual host, where it is the
+quadratic-programme demand block; it is not the crisis specification. The
+two should not be conflated when comparing SHEAF against the annual
+formulation.
+
+The industrial component \(C^{\mathrm{ind}}_{i,t}\) is constructed as US
+maize food-seed-industrial use minus its 2000--04 mean, distributed evenly
+across periods, and is zero for every other country and crop. It is the
+post-Renewable-Fuel-Standard ethanol expansion treated as an exogenous,
+price-inelastic demand shifter \citep{rfs2005,abbott2011,roberts2013}, not
+an endogenous biofuel sector.
+
+For official scores, \(C^{\mathrm{flex}}_{i,t}\) is the window-mean food
+and feed level divided by 24 rather than the year-by-year USDA path. That
+choice matches Agrimate's treatment and is the reason simulated world
+consumption does not track the USDA series; using the observed annual path
+is available as a sensitivity but would change what the official split
+means.
+
+\subsection{Should a surplus lower the price, and on what frequency?}
+
+It does, within the same period. The exponent \(\eta\) in \eqref{eq:pscar}
+is symmetric: when accessible stocks exceed the twin, \(r_t<1\) and the
+scarcity price falls below \(p_0\), which raises food and feed demand
+through \eqref{eq:demand} in the following period. An earlier
+specification muted the abundance side, and the consequence was that
+surpluses accumulated in storage instead of clearing.
+
+The frequency question is separate and worth stating plainly. Abundance in
+grain markets is resolved over a marketing year, not a fortnight, and
+Gate~0 has no mechanism that operates at that frequency: there is no
+acreage response, and \(\phi\) in \eqref{eq:hexp} looks forward only to the
+next harvest pulse. What the two-week recursion can represent is the
+within-season absorption of a surplus through consumption and stock
+accumulation. Multi-year adjustment is outside its scope, and neither TWIST
+\citep{schewe2017} nor Agrimate \citep{kuhla2025} makes production
+endogenous either.
+
+\subsection{What is the expectational horizon?}
+
+Short, and confined to one place. Equation \eqref{eq:hexp} places weight
+\(\phi\approx 0.5\) on the current harvest realisation and the remainder on
+climatology, and this expectation enters only the cover target
+\eqref{eq:target}. Demand \eqref{eq:demand} uses the realised lagged price
+\(p_{t-1}\), which is backward-looking rather than expectational. The
+lean-season horizon in \(L_{i,t}\) is defined by arrival of 12\% of the
+annual \emph{world} harvest and is therefore common across countries, not
+indexed to national harvest calendars.
+
+The statement ``prices stay near the reference unless new information
+arrives'' is the identity established in \S\ref{sec:dynamics}: with
+\(\mathcal{F}_t=\mathcal{F}^{\mathrm{twin}}_t\), \(\Delta u_t=0\) and
+\(b_t=0\), \eqref{eq:pscar} returns \(p_0\) exactly. One live option is to
+index \(L_{i,t}\) to national harvest calendars. Rational-expectations
+storage over a long horizon \citep{deaton1992} is the opposite of what was
+requested and would change the host.
+
+\subsection{Is the parameter count defensible?}
+
+The concern is legitimate and should be answered by classification and by
+ablation rather than by assertion. Table~\ref{tab:params} labels each
+parameter as literature-sourced (L), definitional (S), or reduced-form
+(R). Reduced-form parameters have economically signed effects but are not
+structural elasticities, and they are not retuned crisis by crisis.
+
+Separately, the model contains several inequality constraints --- storage
+capacity \(W_{i,t}\) in \eqref{eq:capacity}, the offer-price bounds on
+\eqref{eq:ask}, the world-price bounds on \eqref{eq:pupdate}, and the AMIS
+mapping to \(\tau_{i,t}\). Coauthors observed that a sufficiently
+constrained rule-based system can mimic the outcome of an optimisation.
+The cheapest empirical response is channel ablation: set \(\omega=1\) or
+\(\omega=0\) in \eqref{eq:pstar}, set \(\alpha_r=0\) or \(\kappa_b=0\) in
+\eqref{eq:ask} and \eqref{eq:pscar}, and record which channel carries
+2007/08 versus 2010/11. That is a decomposition, not a refit.

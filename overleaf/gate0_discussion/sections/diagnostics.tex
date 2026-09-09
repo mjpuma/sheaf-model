@@ -1,0 +1,73 @@
+\section{Diagnostics that would distinguish the alternatives}
+\label{sec:diagnostics}
+
+Each item below is a measurement on the current recursion, or on a
+labelled experiment that does not retune the 2007/08 window. They are
+stated so that an alternative can be rejected or accepted on evidence
+rather than on preference.
+
+\paragraph{Properties that must already hold.}
+Four are exact and should be asserted in tests. When the crisis run
+matches the twin in accessible stocks, unmet import demand, and blockage,
+\eqref{eq:pscar}--\eqref{eq:pstar} return \(p^\star_t=p_0\). Maize export
+restrictions applied in isolation must not lower the world price; this is
+the condition that set \(\alpha_r\) in \eqref{eq:ask}. Availability is
+exhausted by consumption, net trade, the change in stocks, and the
+capacity drawdown in \eqref{eq:stocks}. The twin holds price at \(p_0\),
+so it exerts no feedback through \eqref{eq:demand}.
+
+\paragraph{Contemporaneous demand (option B).}
+Along a scored trajectory, recompute \eqref{eq:demand} at the price
+\(p_t\) that the period actually produced, and compare it to the \(d_{i,t}\)
+that entered \eqref{eq:offers}. The distribution of
+\(d_{i,t}(p_t)-d_{i,t}(p_{t-1})\) bounds what contemporaneous consistency
+can do. If it is small, the fixed point changes labels rather than
+results; if it is large in 2007/08, the informational structure genuinely
+differs and the change is substantive.
+
+\paragraph{Offer prices as a markup rule.}
+Regress \(\log(q_{i,t}/q_{i,t-1})\) on the fill rate \(f_{i,t}\) from
+\eqref{eq:ask}. The current specification is exponential in
+\(f_{i,t}-\theta\); a markup over marginal cost implies a different
+relationship, in particular a dependence on cost rather than on excess
+demand. Establish whether the existing rule is already observationally
+close to a markup before replacing it.
+
+\paragraph{Storage as intertemporal arbitrage.}
+Under an arbitrage condition, offers should rise with the expected price
+increase. Under \eqref{eq:offers} they rise with surplus above
+\(T_{i,t}\). Scatter \(O_{i,t}\) against \(p_{t+1}-p_t\) as a descriptive
+baseline, recognising that this is not decisive because cover already
+covaries with the harvest calendar. The failed experiment with
+country-specific \(\sigma^{\mathrm{stu}}_i\) (Chinese maize stocks
+inflating threefold) is the relevant prior.
+
+\paragraph{Domestic price insulation.}
+Inspect the state directly: no variable distinct from \(p_t\) enters
+\eqref{eq:demand} for a restricting country. Any claim about consumer
+welfare inside a banning country is therefore outside what Gate~0
+currently represents \citep{martin2012}.
+
+\paragraph{National versus world lean-season clocks.}
+Compare the world harvest-pulse horizon in \(L_{i,t}\) against each
+country's own harvest calendar. Cover held in the month preceding a
+country's own harvest is a direct signature of the common world clock.
+
+\paragraph{Channel ablation.}
+Re-run the official harvest-plus-restrictions score with, in turn,
+\(\omega=1\) (offer prices only), \(\omega=0\) (scarcity only),
+\(\alpha_r=0\) (no rival markup), and \(\kappa_b=0\) (no blockage term).
+This attributes 2007/08 and 2010/11 to specific channels without
+introducing a new specification.
+
+\paragraph{Known residuals under the present rule.}
+These stand regardless of which option is chosen, and should not be used
+to motivate a change unless the change targets their mechanism. Wheat
+2007/08 remains high and restriction-led. World consumption does not track
+the USDA path, which is expected given that official scores use mean food
+and feed demand and \eqref{eq:demand} reduces consumption as price rises.
+Many exporters sit at the safety-stock floor \(s_i\). Restrictions cut
+offers substantially more than shipments. Introducing an optimisation
+under the world price does not automatically resolve any of these, and
+fitting \(\kappa_b\) to 2007/08 would not constitute standing behind the
+market.
