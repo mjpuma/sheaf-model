@@ -1,6 +1,11 @@
 # Gate 0 parameterization — equations, sources, and defensibility
 
-**Status:** locked with `sheaf/dynamic_crop.py` (`CropParams` / `default_crop_params`)  
+**Status:** current map in `sheaf/dynamic_crop.py` (`CropParams` /
+`default_crop_params`). Snapshot scores in `diagnostics/gate0_*_report.md`.
+Baseline is **open** after coauthor consultation
+([`DEVELOPMENT.md`](DEVELOPMENT.md)). Sitting questions as options:
+[`GATE0_DISCUSSION.md`](GATE0_DISCUSSION.md). Identification still forbids
+crisis-by-crisis fit.
 **Score entry point:** `python scripts/score_subannual_crop.py --crop {wheat,maize,rice}`  
 **White paper (Overleaf):** `overleaf/gate0_whitepaper/` — substitution off, strategy off; 2006–11 plus Ukraine-war 2021–23.
 
@@ -317,5 +322,6 @@ Agrimate-matched Overleaf table: `overleaf/gate0_agrimate/tables/price_metrics.t
   Rice assert window is a 2008 tax; Oct–Dec 2007 ban+harvest signs are
   right. Isolated-τ price bar for maize stands. No warehouse retune.
 
-Substitution and Level 2 stay blocked.
+Substitution and the Headey-clock game stay **paused** until the Gate 0
+baseline is one we will stand behind (`DEVELOPMENT.md`).
 

@@ -46,11 +46,12 @@ slow outer loop. It is not the default API and **not** the 2007/08 object.
 alone miss the 2008 rice spike and understate 2007/08 wheat; adding observed export
 restrictions (AMIS) produces both. That is why SHEAF has a strategic layer —
 restrictions are first-order, not a residual. Agrimate takes those restrictions as
-given; SHEAF's next step is to let exporters choose them **on that same
-two-week clock**. Characteristic government types (how much they care
-about domestic food) can be sticky; the decision is not. Substitution is
-the other missing piece, and is still off in this figure. Gate 0 does
-not need to be re-run to say that.
+given. SHEAF’s destination is to let exporters choose them on that same
+two-week clock; **right now we are back on Gate 0** after coauthor
+consultation ([`diagnostics/DEVELOPMENT.md`](diagnostics/DEVELOPMENT.md)).
+Characteristic government types (how much they care about domestic food)
+can be sticky; the decision is not. Substitution is the other missing
+piece, and is still off in this figure.
 
 ## Mathematical formulation
 
@@ -463,6 +464,11 @@ scripts/score_subannual_crop.py  # crisis smoke test / official P1
 scripts/score_gate1.py
 scripts/score_gate2_beta.py
 scripts/annual/demo.py           # Black Sea shock on the parked annual host
+diagnostics/DEVELOPMENT.md       # living queue: back on Gate 0
+diagnostics/GATE0_DISCUSSION.md  # sitting questions → options (before prompts)
+diagnostics/GATE0_FLOWS.md       # captions for the flow diagrams
+figures/gate0_flows/             # Gate 0 current-map vs option SVGs
+overleaf/gate0_discussion/       # Overleaf: plain + economic + each figure
 diagnostics/GAME_CLOCK.md
 ```
 
