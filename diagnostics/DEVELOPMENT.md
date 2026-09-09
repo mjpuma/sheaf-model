@@ -36,11 +36,20 @@ questions about *how \(p\) is formed* do.
    Walk the sitting questions as options (keep / characterize / change),
    with a complexity budget, **before** prompts and **before** equation
    changes. The point is a Gate 0 we will stand behind.
-2. **Then write Cursor prompts** in this repository against
-   `sheaf/dynamic_crop.py`, one surviving cluster at a time. Not the earlier
-   pack aimed at Agrimate’s repo. Prompts force characterization of the
-   current map first.
-3. **Interrogate, then decide.** Named keep, or named change + re-score
+2. **Cursor prompts against `sheaf/dynamic_crop.py`** — drafted, awaiting
+   coauthor review: [`audit_prompts/GATE0_MODEL_PROMPTS.md`](../audit_prompts/GATE0_MODEL_PROMPTS.md).
+   Part A (A1–A5) is read-only characterization of the current map. Part B
+   (X1–X4) changes an equation and each is **gated** on a Part A result.
+   Not the earlier pack aimed at Agrimate’s repo.
+3. **Run A1 first.** Four candidate divergences between the equations in
+   `overleaf/gate0_discussion/main.pdf` and `_simulate_window` were noticed
+   while drafting the pack and seeded into A1 as hypotheses: the size and
+   state-dependence of the scarcity regulariser, whether the calm identity
+   is algebraic or an explicit branch, the one-sided truncation of the unmet
+   anomaly, and whether \(p^{\mathrm{tr}}\) uses this step's asks. The note
+   goes to Potsdam as a statement of what SHEAF does, so it should not be
+   sent until A1 returns.
+4. **Interrogate, then decide.** Named keep, or named change + re-score
    (official vs sensitivity). Do not skip characterize-the-current-law.
 
 ## Paused
