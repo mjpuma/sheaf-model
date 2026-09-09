@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="414" height="718" viewBox="0 0 414 718" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">
+<rect width="414" height="718" fill="#ffffff"/>
+<text x="28" y="28" font-size="16" font-weight="600" fill="#18181b">Price — Agrimate three NLPs</text>
+<text x="28" y="48" font-size="12" fill="#52525b">P4 / O4 different object — Prices are outputs of programs. No world p as a primitive. Do not clone as Gate 0.</text>
+<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#71717a"/></marker></defs>
+<path d="M 112.0 140.0 C 112.0 171.0, 112.0 171.0, 112.0 202.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 112.0 250.0 C 112.0 281.0, 112.0 281.0, 112.0 312.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 112.0 360.0 C 112.0 391.0, 112.0 391.0, 112.0 422.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 112.0 470.0 C 112.0 501.0, 112.0 501.0, 112.0 532.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 112.0 580.0 C 112.0 611.0, 112.0 611.0, 112.0 642.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 112.0 360.0 C 112.0 391.0, 302.0 391.0, 302.0 422.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 112.0 470.0 C 112.0 501.0, 302.0 501.0, 302.0 532.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 302.0 470.0 C 302.0 556.0, 302.0 556.0, 302.0 642.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 302.0 580.0 C 302.0 611.0, 302.0 611.0, 302.0 642.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<rect x="28.0" y="92.0" width="168" height="48" rx="6" fill="#f4f4f5" stroke="#71717a" stroke-width="1.0"/>
+<text x="112.0" y="120.0" text-anchor="middle" font-size="11" fill="#3f3f46">harvest in</text>
+<rect x="28.0" y="202.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="112.0" y="230.0" text-anchor="middle" font-size="11" fill="#18181b">policy τ known</text>
+<rect x="28.0" y="312.0" width="168" height="48" rx="6" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.75"/>
+<text x="112.0" y="340.0" text-anchor="middle" font-size="11" fill="#1e3a8a">supplier NLP</text>
+<rect x="28.0" y="422.0" width="168" height="48" rx="6" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.75"/>
+<text x="112.0" y="450.0" text-anchor="middle" font-size="11" fill="#1e3a8a">consumer NLP</text>
+<rect x="28.0" y="532.0" width="168" height="48" rx="6" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.75"/>
+<text x="112.0" y="560.0" text-anchor="middle" font-size="11" fill="#1e3a8a">purchaser CES</text>
+<rect x="28.0" y="642.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="112.0" y="670.0" text-anchor="middle" font-size="11" fill="#18181b">S′</text>
+<rect x="218.0" y="422.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="302.0" y="450.0" text-anchor="middle" font-size="11" fill="#18181b">export price</text>
+<rect x="218.0" y="532.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="302.0" y="560.0" text-anchor="middle" font-size="11" fill="#18181b">domestic price</text>
+<rect x="218.0" y="642.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="302.0" y="670.0" text-anchor="middle" font-size="11" fill="#18181b">paper world p (acct.)</text>
+</svg>
