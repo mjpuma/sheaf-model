@@ -133,7 +133,9 @@ loop, no QP, no per-region NLP.
    uses **incoming** \(p\) (last step).
 2. Target \(T=L+s\), offers \(O=\max(0,\mathrm{avail}-d-T)(1-\tau)\),
    import demand \(D\) = food gap + \(\lambda\) rebuild.
-3. Armington \(\mathrm{ship}=\min(O\tilde A,\,D S)\) plus residual pool.
+3. Armington \(\mathrm{ship}=\min(O A,\,D\tilde S)\) plus residual pool.
+   (\(\tilde S\) is the CES origin mix; destination-row \(\tilde A\) is a
+   no-op.)
 4. Consume, update stocks, soft-clip toward warehouse \(W\).
 5. Asks: sold-out raises \(q\), leftover cuts \(q\), blockage marks up,
    pull toward \(p\):
@@ -353,8 +355,8 @@ Euler).
 |---|---|---|
 | \(O\) | Export offers: surplus above food and \(T\), times \((1-\tau)\) | MMT/step |
 | \(D\) | Purchase / import demand: food gap + \(\lambda\) rebuild toward \(T\) | MMT/step |
-| \(A,\tilde A\) | Destination shares (FAOSTAT, then ask-reweighted \(\tilde A\propto A(p_0/q)^{\gamma}\)) | dimensionless |
-| \(S\) | Source shares (FAOSTAT) | dimensionless |
+| \(A\) | Destination shares (FAOSTAT). Dest-row reweight \(\tilde A\) is the identity (`_ask_reweight_dest`) | dimensionless |
+| \(S,\tilde S\) | Source shares (FAOSTAT, then CES origin mix \(\tilde S\propto S(p_0/q)^{\gamma}\); `_ask_reweight_src`) | dimensionless |
 | \(d\) | Desired use: isoelastic flex + inelastic industrial | MMT/step |
 | \(C^{\mathrm{ind}}\) | USA maize FSI minus 2000–04 mean; else 0 | MMT/step |
 | \(p\) | One world price per crop, real 2010 $/t | $/t |
@@ -381,7 +383,7 @@ means, were mixed into the same breath.
 |---|---|---|---|---|
 | T0 | **Keep** one world \(p\), asks \(q_i\), Armington min-clear, isoelastic flex, USA maize FSI residual | Writeup only | Honest; matches current snapshots | Ban cannot cheapen a local CPI (Gate 2 welfare on world \(p\) is the later pain) |
 | T1 | **Domestic vs export price** when \(\tau>0\) (two \(p\)’s per exporter) | New state | Food-security welfare; economist “ban creates a wedge” | New identification. Gate 2 benefit, not a Gate 0 hindcast requirement |
-| T2 | **CES purchaser** for destination mix instead of \(\tilde A\) | Allocation rule | Lineage with Agrimate purchaser | New CES elasticity; FAOSTAT \(A\) becomes preference weights |
+| T2 | **Nested CES purchaser** (budget + origins) instead of origin-mix \(\tilde S\) | Allocation rule | Full Agrimate purchaser. Origin-share CES already ships; dest-row \(\tilde A\) is a no-op | Nested elasticity; FAOSTAT \(S\) already preference weights |
 | T3 | **\(\tau\) cuts shipments not offers** (or both) | Quantity accounting | Shipment signs vs AMIS | Changes the disclosed leftover; must not be a 2008 knob |
 | T4 | **Year-by-year flex as official demand** | Score protocol | Match PSD consumption path | Official split today is mean flex (Agrimate-matched). Would relabel Gate 0 |
 | T5 | **Linear demand on the 24-step host** | Demand system | Match parked README §1 | Wrong object; isoelastic is the crisis claim |

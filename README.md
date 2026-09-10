@@ -246,10 +246,14 @@ scored Vietnam window is a 2008 tax. Not FAOSTAT bilateral crisis volumes.
 
 #### Adaptive ask prices and Armington clear
 
-Destination shares are ask-reweighted,
-$$\tilde A_{ij}\propto A_{ij}\,(p_0/q_{i,t})^{\gamma}\quad(\text{rows renormed}),$$
+Importer source shares are the CES mix (cheaper origins gain share),
+$$\tilde S_{ij}\propto S_{ij}\,(p_0/q_{i,t})^{\gamma}\quad(\text{columns renormed}),$$
 then preferred links clear as
-$$\mathrm{ship}^0_{ij}=\min\bigl(O_{i,t}\tilde A_{ij},\,D_{j,t}S_{ij}\bigr).$$
+$$\mathrm{ship}^0_{ij}=\min\bigl(O_{i,t}A_{ij},\,D_{j,t}\tilde S_{ij}\bigr).$$
+Destination-row reweighting \(\tilde A_{ij}\propto A_{ij}(p_0/q_{i,t})^{\gamma}\)
+(`_ask_reweight_dest`) is the identity and does not allocate trade; the
+live channel is `_ask_reweight_src`.
+
 Leftover offers and leftover demand form a residual pool that can fill at
 most fraction $\nu$ of leftover demand (`_bilateral_clear`):
 $$
@@ -342,7 +346,7 @@ before the loop. Inside the step:
 1. $\mathrm{avail}_{i,t}=S_{i,t}+H_{i,t}$
 2. $d,L,T,D,O$ from closed-form algebra (isoelastic $d$ uses the
    **incoming** $p_{t-1}$; $q_{i,t}$ is the ask inherited from $t-1$)
-3. $\tilde A$, Armington $\min$, residual pool (dense $n\times n$)
+3. $\tilde S$, Armington $\min$, residual pool (dense $n\times n$)
 4. consumption, stock update, soft warehouse clip
 5. ask update $\to q_{i,t+1}$
 6. $p^{\mathrm{tr}}$, $\mathrm{shift}$, $r$, $p^{\mathrm{scar}}$,

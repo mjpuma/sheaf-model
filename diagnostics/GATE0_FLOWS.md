@@ -30,7 +30,7 @@ flowchart TB
   target["T = L + s<br/>world lean clock"]
   offers["O = surplus above d+T, times 1-τ"]
   importd["D = food gap + λ rebuild"]
-  trade["Armington min(O Ã, D S)<br/>+ residual pool"]
+  trade["Armington min(O A, D S̃)<br/>+ residual pool"]
   stocks["S' then soft-clip toward W"]
   asks["q ← fill, blockage, pull to p"]
   pscar["p^scar ∝ r^η × tightness"]
@@ -316,8 +316,10 @@ Deaton–Laroque RE (S5) is off the table as a Gate 0 test.
 ### Current — rules, not agents
 
 The §1 and §5-S0 diagrams *are* the commercial layer: a partition plus
-Armington. Destination mix is \(\tilde A \propto A(p_0/q)^\gamma\), not a
-purchaser CES.
+Armington. Importer source mix is the CES law
+\(\tilde S \propto S(p_0/q)^\gamma\) (`_ask_reweight_src`). Destination-row
+\(\tilde A\) (`_ask_reweight_dest`) is a no-op and does not allocate trade.
+This is Agrimate Eq. 8c's origin mix, not a nested purchaser CES.
 
 ### Agrimate — three programs
 

@@ -136,8 +136,15 @@ is an **opening-stock** clip only (`prepare_crop_run`); it is not in \(W\).
 ### 2.4 Bilateral clear and asks (Agrimate-aligned)
 
 - FAOSTAT E0 → destination shares \(A\) and source shares \(S\) (structural network).
-- Ask-reweight \(\tilde A_{ij}\propto A_{ij}(p_0/q_i)^{\gamma}\); Armington min clear
-  plus residual pool share \(\nu\).
+- Origin-share CES mix \(\tilde S_{ij}\propto S_{ij}(p_0/q_i)^{\gamma}\),
+  renormalised by importer (`_ask_reweight_src`). Cheaper origins gain
+  share. Destination-row \(\tilde A_{ij}\propto A_{ij}(p_0/q_i)^{\gamma}\)
+  (`_ask_reweight_dest`) is a no-op: a row-constant cancels, so it does
+  not allocate trade. `ask_comp_elast` is \(\gamma\) on the origin mix
+  (live). Census `cen03` recorded it as inert, which remains true of the
+  dest-row map and is false of the origin-share law.
+- Armington min clear \(\mathrm{ship}=\min(O A,\,D\tilde S)\) plus residual
+  pool share \(\nu\).
 - FAOSTAT rice E0 in the 2006–07 / 2010–11 crisis files has a **zero Vietnam
   row** (data hole). `load_trade_shares` fills destination mix from 2019–21
   and scales the row to 12% of crisis-window export total (Vietnam's observed
@@ -199,7 +206,8 @@ From `default_crop_params()`:
 | \(\omega\) `trade_w` | 0.70 | 0.80 | 0.72 | reduced-form | Asks dominate; scarcity residual |
 | \(\kappa_u\) | 2.5 | 2.5 | 2.5 | reduced-form | Unmet-anomaly weight |
 | \(\kappa_b\) | 4.0 | 4.0 | 4.5 | reduced-form | Preferred-source blockage |
-| \(\alpha,\theta,\gamma,\beta\) | 0.15 / 0.70 / 1.25 / 0.18 | same | same | reduced-form | Ask adaptation (shared) |
+| \(\alpha,\theta,\beta\) | 0.15 / 0.70 / 0.18 | same | same | reduced-form | Ask adaptation (shared) |
+| \(\gamma\) `ask_comp_elast` | 1.25 | 1.25 | 1.25 | reduced-form | CES substitution over origins (`_ask_reweight_src`; dest-row is a no-op) |
 | \(\alpha_r\) `ask_rival` | 0.80 | 0.80 | 0.80 | reduced-form | Survivor markup when preferred sources blocked; ≥ 0. Set by isolated-τ non-cut (maize), not 2008 peaks |
 | \(\phi\) `foresight_phi` | 0.55 | 0.50 | 0.55 | reduced-form | Blend realized vs seasonal harvest |
 | `shock_mode` | full | full | full | structural | Signed LOWESS anomalies on climatology; not raw PSD levels |

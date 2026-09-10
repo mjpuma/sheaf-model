@@ -237,9 +237,12 @@ automatically an error. Full tables in
   markup over the marginal value of own accessible stock, which is exactly
   \(U'(F_i)\) for the CRRA felicity the scarcity term already implies.
   That law has a rest point at the reference without the pin, passes all
-  four robustness tests, and does not need the rival markup. It also
-  takes wheat correlation from +0.73 to +0.58, maize from +0.78 to +0.34,
-  and rice from +0.68 to +0.19. We did not ship it.
+  four robustness tests, and does not need the rival markup. The prototype
+  was scored on the pre-CES ask law, not against the current official
+  maize +0.778 path. Like-for-like on that path: wheat +0.720 → +0.576,
+  maize +0.712 → +0.339, rice +0.678 → +0.194. With CES kept, foc+ces
+  maize is +0.468 (wheat +0.543, rice +0.187). Either comparison costs
+  the crisis; we did not ship it.
 - **Rice trade is half residual.** 47% of rice shipments bypass the
   FAOSTAT pattern (wheat 12%, maize 4%). The network is doing less work
   for rice than the note suggests.
