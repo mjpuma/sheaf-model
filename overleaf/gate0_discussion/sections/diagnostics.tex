@@ -6,15 +6,35 @@ labelled experiment that does not retune the 2007/08 window. They are
 stated so that an alternative can be rejected or accepted on evidence
 rather than on preference.
 
-\paragraph{Properties that must already hold.}
-Four are exact and should be asserted in tests. When the crisis run
-matches the twin in accessible stocks, unmet import demand, and blockage,
-\eqref{eq:pscar}--\eqref{eq:pstar} return \(p^\star_t=p_0\). Maize export
-restrictions applied in isolation must not lower the world price; this is
-the condition that set \(\alpha_r\) in \eqref{eq:ask}. Availability is
-exhausted by consumption, net trade, the change in stocks, and the
-capacity drawdown in \eqref{eq:stocks}. The twin holds price at \(p_0\),
-so it exerts no feedback through \eqref{eq:demand}.
+\paragraph{Properties that already hold, and how.}
+Four are asserted in tests, but they do not all hold for the same reason,
+and the distinction turned out to matter. When the crisis run matches the
+twin in accessible stocks, unmet import demand, and blockage, the
+implementation returns \(p^\star_t=p_0\) --- by the explicit conditional
+described in \S\ref{sec:dynamics}, not by the algebra of
+\eqref{eq:pscar}--\eqref{eq:pstar}. Any test of this property is therefore
+a test that the conditional is present and that the matched configuration
+is genuinely matched; it is not evidence that the price law returns to the
+reference on its own. A test that would be evidence of the latter is given
+below. The remaining three are structural: maize export restrictions
+applied in isolation must not lower the world price, which is the condition
+that set \(\alpha_r\) in \eqref{eq:ask}; availability is exhausted by
+consumption, net trade, the change in stocks, and the capacity drawdown in
+\eqref{eq:stocks}; and the twin holds price at \(p_0\), so it exerts no
+feedback through \eqref{eq:demand}.
+
+\paragraph{Does a quiet market return to the reference?}
+The test worth adding. Disable the conditional, run the matched
+configuration, and measure the drift of \(p_t\) from \(p_0\). Currently
+that drift is 25\% for wheat, 34\% for maize and 19\% for rice, so the
+answer is no: the offer-price law has no rest point at the reference. If
+\eqref{eq:ask} is ever rebuilt, this is the measurement that would show it
+had worked, and it is worth asserting at a stated tolerance so the property
+cannot silently regress. Note that the existing restriction-raises-price
+test uses the restriction-only run as its baseline, and the conditional
+fires at 24--32 of its 144 steps; if the conditional is removed, that
+baseline drifts and the test's lift measurement loses its meaning unless it
+is re-specified.
 
 \paragraph{Contemporaneous demand (option B).}
 Along a scored trajectory, recompute \eqref{eq:demand} at the price

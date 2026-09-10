@@ -30,27 +30,60 @@ Still not allowed:
 Headey (2011) still does **not**, by itself, force a Gate 0 re-run. Colleague
 questions about *how \(p\) is formed* do.
 
-## Now
+## Now — Gate 0 characterization sweep
 
-1. **Discussion document** — [`GATE0_DISCUSSION.md`](GATE0_DISCUSSION.md).
-   Walk the sitting questions as options (keep / characterize / change),
-   with a complexity budget, **before** prompts and **before** equation
-   changes. The point is a Gate 0 we will stand behind.
-2. **Cursor prompts against `sheaf/dynamic_crop.py`** — drafted, awaiting
-   coauthor review: [`audit_prompts/GATE0_MODEL_PROMPTS.md`](../audit_prompts/GATE0_MODEL_PROMPTS.md).
-   Part A (A1–A5) is read-only characterization of the current map. Part B
-   (X1–X4) changes an equation and each is **gated** on a Part A result.
-   Not the earlier pack aimed at Agrimate’s repo.
-3. **Run A1 first.** Four candidate divergences between the equations in
-   `overleaf/gate0_discussion/main.pdf` and `_simulate_window` were noticed
-   while drafting the pack and seeded into A1 as hypotheses: the size and
-   state-dependence of the scarcity regulariser, whether the calm identity
-   is algebraic or an explicit branch, the one-sided truncation of the unmet
-   anomaly, and whether \(p^{\mathrm{tr}}\) uses this step's asks. The note
-   goes to Potsdam as a statement of what SHEAF does, so it should not be
-   sent until A1 returns.
-4. **Interrogate, then decide.** Named keep, or named change + re-score
-   (official vs sensitivity). Do not skip characterize-the-current-law.
+**Deliverable to Potsdam is no longer a prompt pack.** It is (a) the
+corrected note, (b) measured results, (c) proposed next steps. Prompts stay
+in the repo as the record of method:
+[`audit_prompts/GATE0_MODEL_PROMPTS.md`](../audit_prompts/GATE0_MODEL_PROMPTS.md)
+(Part A = read-only characterization, Part B = gated changes).
+
+| ID | Activity | Status | Artifacts |
+|---|---|---|---|
+| A1 | Note equations vs `_simulate_window`, symbol by symbol | **done** — all four seeded hypotheses confirmed | [`gate0_prep/a1/`](gate0_prep/a1/) |
+| A1b | Why the calm branch has work to do; is `θ` mis-set? | **done** — re-targeting `θ` rejected | `gate0_prep/a1/A1B_CALM_FIXED_POINT.md` |
+| A1c | Does the calm branch touch a scored result? | **done** — no (0/144 in both scored legs) | `gate0_prep/a1/A1C_CALM_REACH.md` |
+| A2 | Is `p^scar` already an optimisation principle? | not started | — |
+| A3 | Size of the contemporaneous-demand gap; is `p=G(p)` well posed? | running | `gate0_prep/a3/` |
+| A4 | Cover rule's implied shadow value; cause of the exporter floor | running | `gate0_prep/a4/` |
+| A5 | Channel ablation: which channel carries which crisis | running | `gate0_prep/a5/` |
+
+### A1 findings (all four confirmed; details in `gate0_prep/a1/`)
+
+1. **Scarcity regulariser is not small or constant.** \(f_t=0.05\sum_i s_i
+   +\max(0,-\min(F,F^{\mathrm{twin}}))\) = 6.4 / 6.5 / 3.9 MMT
+   (wheat/maize/rice), i.e. 4.8% / 3.1% / **10.3%** of mean accessible
+   stock. Bias vs the unregularised ratio: 2.2% / 3.4% / **35.4%** mean.
+   Accessible stock goes **negative** at 58/144 steps for rice — the world
+   holds less than its own lean cover — so for rice \(r_t\) is materially a
+   regularised quantity. Category **G** on the note; the second term is
+   defensible as implemented. Confidence 95–100% (reproduced).
+2. **The reference identity is enforced, not derived.** An explicit
+   conditional sets \(p^\star=p_0\) when the run matches the twin. Disable
+   it and the matched run drifts **25% / 34% / 19%** against a 2% test
+   tolerance. Root cause: realised matched-run fill is **0.54 / 0.32 /
+   0.62** against \(\theta=0.70\), so the ask law pushes offers down every
+   step with nothing happening — it has **no rest point at \(p_0\)**.
+   Category **G** on the claim; the underlying property is a real design
+   question (see A1b/A1c). Confidence 95–100%.
+3. **Unmet-demand channel is one-sided.** \(\Delta u=\max(0,u-u^{twin})\),
+   and the truncation binds at 92/59/100 of 144 steps. Category **G**.
+4. **\(p^{\mathrm{tr}}\) uses this step's asks**, not the lagged asks that
+   allocated the trade. Offer prices are updated twice in one causal chain.
+   Category **G**. Median per-step ask move $7.58 (wheat) — not negligible.
+
+**No code change recommended from A1.** Removing the conditional breaks two
+of four robustness assertions and changes nothing scored; re-targeting
+\(\theta\) leaves 19–20% drift and degrades maize corr +0.71 → +0.65. Fixes
+applied were to the note (`overleaf/gate0_discussion/`, now 19 pp.).
+
+### Then
+
+- **A2** — the one Part A prompt not yet run.
+- **Decide** each cluster: named keep, or named change + re-score (official
+  vs sensitivity). Do not skip characterize-the-current-law.
+- **Deck** — `overleaf/sheaf_deck/` needs the A1 corrections (slide 48
+  wording, the twin-identity claim). **Deferred until the sweep closes.**
 
 ## Paused
 

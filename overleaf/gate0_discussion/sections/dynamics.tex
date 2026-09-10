@@ -223,12 +223,25 @@ matters: without it, a restriction would register as abundance. Let
 \(\mathcal{F}^{\mathrm{twin}}_t\) be the same quantity in the twin, and
 define the scarcity ratio
 \begin{equation}
-r_t=\frac{\mathcal{F}^{\mathrm{twin}}_t+f}{\mathcal{F}_t+f},
+r_t=\frac{\mathcal{F}^{\mathrm{twin}}_t+f_t}{\mathcal{F}_t+f_t},
+\qquad
+f_t=0.05\sum_i s_i+\max\bigl(0,\,-\min(\mathcal{F}_t,\mathcal{F}^{\mathrm{twin}}_t)\bigr),
 \label{eq:ratio}
 \end{equation}
-where \(f>0\) is a small regularising constant (MMT) that keeps
-\eqref{eq:ratio} finite when accessible stocks approach zero. The price
-target and its updating are
+where \(f_t\) is a regulariser (MMT) keeping \eqref{eq:ratio} finite and
+positive. It is worth being explicit that \(f_t\) is neither small nor
+constant, because it changes how \eqref{eq:ratio} should be read. Its first
+term is 5\% of world safety stock: 6.4~MMT for wheat, 6.5 for maize, 3.9
+for rice, which is 4.8\%, 3.1\% and 10.3\% of mean accessible stock in the
+scored window. Against the unregularised ratio
+\(\mathcal{F}^{\mathrm{twin}}_t/\mathcal{F}_t\) it biases \(r_t\) by 2.2\%
+on average for wheat, 3.4\% for maize and 35.4\% for rice. The second term
+exists because \(\mathcal{F}_t\) as defined in \eqref{eq:free} can be
+negative --- the world can hold less than its own lean-season requirement
+--- which happens at 1 of 144 steps for maize and 58 of 144 for rice. Where
+that occurs the unregularised ratio is meaningless, so for rice in
+particular \(r_t\) is materially a regularised quantity rather than a ratio
+of stocks. The price target and its updating are
 \begin{align}
 p^{\mathrm{scar}}_t&=p_0\,r_t^{\eta}\bigl(1+\kappa_u\Delta u_t+\kappa_b b_t\bigr),
 \label{eq:pscar}\\[2pt]
@@ -239,13 +252,30 @@ p_t&=\rho\,p_{t-1}+(1-\rho)\,p^{\star}_t,
 \end{align}
 where \(p^{\mathrm{scar}}_t\) is the scarcity price (2010 \$/t),
 \(\eta>0\) is the elasticity of price with respect to the inverse of
-accessible stocks, \(\Delta u_t\) is the excess of unmet import demand over
-its twin value (dimensionless), \(\kappa_u,\kappa_b\ge 0\) weight unmet
-demand and restriction blockage, \(p^{\mathrm{tr}}_t\) is the
-shipment-weighted mean offer price (2010 \$/t), \(\omega\in[0,1]\) is the
-weight on realised trade prices, \(p^{\star}_t\) is the within-period price
-target (2010 \$/t), and \(\rho\in[0,1]\) is the smoothing parameter. The
-world price is bounded to \([60,1200]\) \$/t.
+accessible stocks, \(\kappa_u,\kappa_b\ge 0\) weight unmet demand and
+restriction blockage, \(p^{\mathrm{tr}}_t\) is the shipment-weighted mean
+offer price (2010 \$/t), \(\omega\in[0,1]\) is the weight on realised trade
+prices, \(p^{\star}_t\) is the within-period price target (2010 \$/t), and
+\(\rho\in[0,1]\) is the smoothing parameter. The world price is bounded to
+\([60,1200]\) \$/t.
+
+Two details of \eqref{eq:pscar}--\eqref{eq:pstar} are easy to state
+imprecisely and are worth pinning down. First, the unmet-demand term is
+one-sided,
+\begin{equation}
+\Delta u_t=\max\bigl(0,\,u_t-u^{\mathrm{twin}}_t\bigr),
+\label{eq:unmet}
+\end{equation}
+where \(u_t\) is the share of world import demand left unmet and
+\(u^{\mathrm{twin}}_t\) its value in the twin. Unmet demand below the twin
+therefore cannot lower the price, whereas unmet demand above it raises the
+price. The truncation binds: \(u_t<u^{\mathrm{twin}}_t\) at 92 of 144 steps
+for wheat, 59 for maize and 100 for rice, so this is the usual case rather
+than an edge case. Second, \(p^{\mathrm{tr}}_t\) is weighted by this
+period's shipments and uses this period's offer prices \(q_{i,t}\) from
+\eqref{eq:ask}, not the lagged \(q_{i,t-1}\) that entered the allocation in
+\eqref{eq:reweight}. Offer prices are therefore updated twice within one
+period's causal chain: once to allocate trade, once to price it.
 
 Equation \eqref{eq:pscar} is inverse-demand in form: price rises as
 accessible stocks fall relative to normal, with elasticity \(\eta\). The
@@ -256,17 +286,50 @@ realised trade prices and smooth the result, so the world price is not
 required to lie on the inverse-demand schedule within the period. That is
 the honest gap, and it is the subject of \S\ref{sec:options}.
 
-\subsection{Exact properties}
+\subsection{Properties, and one that is enforced rather than derived}
 
 \paragraph{Reference identity.}
-If the crisis run matches the twin in accessible stocks, unmet import
-demand, and blockage --- \(\mathcal{F}_t=\mathcal{F}^{\mathrm{twin}}_t\),
-\(\Delta u_t=0\), \(b_t=0\) --- then \(r_t=1\) and \eqref{eq:pscar}
-gives \(p^{\mathrm{scar}}_t=p_0\). With offer prices at \(p_0\),
-\eqref{eq:pstar} gives \(p^{\star}_t=p_0\) exactly, and
-\eqref{eq:pupdate} is a geometric approach to \(p_0\). This is an algebraic
-identity, not a calibrated residual. Note that \(\mathcal{F}^{\mathrm{twin}}_t\)
-itself oscillates seasonally: the reference is a trajectory, not a constant.
+Suppose the crisis run matches the twin in accessible stocks, unmet import
+demand, and blockage: \(\mathcal{F}_t=\mathcal{F}^{\mathrm{twin}}_t\),
+\(\Delta u_t=0\), \(b_t=0\). Then \(r_t=1\) and \eqref{eq:pscar} gives
+\(p^{\mathrm{scar}}_t=p_0\). The implementation additionally sets
+\(p^{\star}_t=p_0\) outright in this case, by an explicit conditional on
+those three quantities. That conditional is doing real work, and an earlier
+draft of this note was wrong to describe the identity as following from the
+algebra.
+
+The algebra alone gives
+\(p^{\star}_t=\omega p^{\mathrm{tr}}_t+(1-\omega)p_0\), which equals
+\(p_0\) only if \(p^{\mathrm{tr}}_t=p_0\), i.e.\ only if offer prices rest
+at the reference. They do not. In a matched run --- climatological harvest,
+mean food and feed demand, no industrial excess, \(\tau\equiv 0\) ---
+realised fill sits well below the target \(\theta=0.70\), averaging 0.54
+for wheat, 0.32 for maize and 0.62 for rice, so \eqref{eq:ask} pushes offer
+prices down every period even with nothing happening. The trade-weighted
+offer price settles near \(0.66p_0\) for wheat and \(0.71p_0\) for maize.
+With the conditional removed, the world price in a matched run drifts 25\%
+for wheat, 34\% for maize and 19\% for rice, against the 2\% tolerance at
+which the twin-identity test is written. Re-targeting \(\theta\) to the
+realised matched-run fill does not repair this: the drift falls only to
+about 19\% for wheat and 20\% for maize, because the stationarity condition
+is per-exporter and the realised fill is highly dispersed across countries
+and periods.
+
+So the honest statement is that \eqref{eq:ask} has no rest point at \(p_0\)
+in a market with nothing happening, and the conditional is what makes the
+reference exact. Two things bound how much this matters. It changes no
+scored result: the conditional fires at 0 of 144 steps in the official
+harvest-plus-restrictions run and 0 of 144 in the harvest-only run, because
+any harvest anomaly breaks the equality immediately. But it is load-bearing
+for the model's own robustness tests, firing at all 144 steps of the matched
+run that the twin-identity test uses and at 24--32 steps of the
+restriction-only run that the restriction-raises-price test uses as its
+baseline. Whether to keep it and document it, or to rebuild \eqref{eq:ask}
+so that a quiet market is a genuine fixed point, is a live design question
+and is taken up in \S\ref{sec:options}.
+
+Note finally that \(\mathcal{F}^{\mathrm{twin}}_t\) oscillates seasonally,
+so the reference is a trajectory rather than a constant.
 
 \paragraph{Twin closure.}
 During the twin run the price is held at \(p_0\), so

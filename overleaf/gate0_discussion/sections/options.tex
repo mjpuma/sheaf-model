@@ -116,6 +116,48 @@ price. A is the current recursion. B remains the two-week host with
 demand and price made contemporaneously consistent. C and D are different
 models. \label{fig:pways}}
 
+\subsection{Should a quiet market be a fixed point?}
+
+This question was not asked at the sitting. It emerged from checking the
+equations in \S\ref{sec:dynamics} line by line against the implementation,
+and it is the most substantive thing that check produced, so it is recorded
+here rather than buried.
+
+The design intent is that a market with no harvest anomaly, no restriction
+and no demand shifter should sit at the reference price. The implementation
+delivers that intent with an explicit conditional. The underlying law does
+not: realised fill in a matched run averages 0.54, 0.32 and 0.62 for wheat,
+maize and rice against a target \(\theta=0.70\), so \eqref{eq:ask} pushes
+offer prices down every period in a market where nothing is happening, and
+the world price drifts 19--34\% once the conditional is removed. Three
+responses are available.
+
+\emph{Keep it and document it.} Defensible, and cheapest. The conditional
+fires at 0 of 144 steps in both scored legs, so no published number depends
+on it. What must change is the claim: the reference is a modelling axiom
+enforced at one point in the map, not a property derived from the price law.
+The cost is that a referee who reads \eqref{eq:ask} and asks what it does in
+a quiet market gets an answer we would rather not give.
+
+\emph{Re-target \(\theta\).} Tested and rejected. Setting \(\theta\) to the
+realised matched-run fill leaves 19--20\% drift, because stationarity in
+\eqref{eq:ask} is per-exporter while the realised fill is widely dispersed,
+and it degrades the maize price correlation from \(+0.71\) to \(+0.65\). The
+mean fill is the wrong object to match.
+
+\emph{Rebuild \eqref{eq:ask} so the quiet market is a genuine rest point.}
+The principled option, and the one that connects to the optimisation
+question in \S\ref{sec:options}: an offer rule derived from an exporter
+problem would have its rest point determined by that problem rather than by
+a free target-fill parameter. This is a real change with score consequences
+across all three crops, and it should not be undertaken on the strength of
+this diagnostic alone.
+
+The recommendation is the first for now and the third as the candidate if
+the offer-price law is revisited for other reasons. What should not happen
+is quietly keeping the conditional while continuing to describe the identity
+as algebraic.
+
 \subsection{Who trades with whom, and at which price?}
 
 Traded quantities are determined by \eqref{eq:offers} and
