@@ -141,3 +141,84 @@ unaffected to the last digit. Any figure, table or slide carrying the old
 maize numbers needs regenerating, and the coauthors should be told that the
 old maize number was drawn from a range spanning +0.28 to +0.83 rather than
 being a stable property of the model.
+
+---
+
+# R0h/R0i — price flexibility, and a discontinuity at zero
+
+Two further own-thread results, both executed. Scripts:
+`scripts/scratch/r0h_price_flexibility.py`, `r0i_shortfall_response.py`.
+
+## The hypothesis I was testing, and its falsification
+
+Agrimate's world price is isoelastic inverse demand on a **flow**:
+`p*_wld = P(Σ_r X*_r / X*, α)` with `α = 3` the inverse price elasticity of
+the single world market (Suppl. §D.7.4.1), and `α_I = 3.5` for the
+international market (Tbl. D.8). SHEAF's is isoelastic in a ratio of
+**stock**, `p_scar = p0 · r^inv_eta`, with `inv_eta` of 0.90/0.85/0.95.
+
+Because 0.9 is so much smaller than 3.5, my working hypothesis was that
+SHEAF's price map is structurally too insensitive to scarcity, and that
+`ask_rival` — which A2 showed has no surviving independent justification —
+is supplying amplitude the price map should generate itself.
+
+**That hypothesis is false, and I am recording it as such.** The exponents
+are not comparable: one applies to a flow, the other to a stock roughly
+thirty times a fortnight's consumption. The comparable quantity is the
+reduced-form price flexibility, measured by applying uniform proportional
+harvest shortfalls to the matched configuration:
+
+| crop | measured flexibility | SHEAF's own flow reference 1/\|ε\| | Agrimate α |
+|---|---|---|---|
+| wheat | **5.49** | 6.7 | 3.0–3.5 |
+| maize | **2.96** | 4.0 | 3.0–3.5 |
+| rice | **4.88** | 5.0 | 3.0–3.5 |
+
+SHEAF sits just below the flow reference implied by its own demand
+elasticities and at or above Agrimate's α on two crops of three.
+**Classification H (not an issue), confidence 80–95%** — measured across a
+0.5%–15% shortfall grid, though on one configuration only. The scarcity
+map's steepness is not where SHEAF is weak.
+
+## What the same experiment did find
+
+The response is **discontinuous at zero**. Mean price over the matched run:
+
+| crop | at 0% shortfall | at 0.5% shortfall | jump |
+|---|---|---|---|
+| wheat | 213.5 | 193.2 | **−9.5%** |
+| maize | 135.4 | 104.8 | **−22.6%** |
+| rice | 339.0 | 344.8 | +1.7% |
+
+Beyond that first step the response is smooth and correctly monotone for
+all three crops. So the model's price does the right thing everywhere
+except in an infinitesimal neighbourhood of its own reference, where an
+arbitrarily small shortfall makes the market **cheaper** by a tenth for
+wheat and by nearly a quarter for maize.
+
+This is the calm conditional at `dynamic_crop.py` L681–684, seen from a
+different angle. A1 already established that the conditional enforces
+`p* = p0` rather than deriving it, and that the offer-price law's actual
+rest point is below `p0` because realised fill (0.54/0.32/0.62) sits well
+under the target fill of 0.70. What R0i adds is the consequence for the
+model as a map: **the transfer function has a step discontinuity at the
+origin**, of exactly the size of the gap between the pinned reference and
+the ask law's true rest point.
+
+The numbers are **identical before and after the R0f scarcity fix**
+(wheat 193.2 both, maize 104.8 both), so this predates that change and is
+not caused by it.
+
+**Classification A (mathematical error) at the level of the price map's
+specification — a discontinuous response to a continuous perturbation is
+not a defensible market model — with the caveat that the discontinuity is
+deliberate and disclosed as a conditional. Confidence 95–100%, directly
+reproduced.** It is the same defect A1 reported, so it is not a new finding
+so much as a much sharper statement of an existing one: not "the identity
+is enforced rather than derived," but "the model's price jumps by up to 23%
+in response to an arbitrarily small shock."
+
+This materially strengthens the case for the exporter-FOC repair, since a
+price set as inverse demand at an optimally chosen supply is continuous in
+the state by construction and would return `p0` in a calm market without a
+conditional.

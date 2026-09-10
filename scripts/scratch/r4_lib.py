@@ -144,6 +144,8 @@ def simulate_r4(
         mp_alpha: float = 0.0,
         mp_form: str = "exp",
         s_ref: np.ndarray | None = None,
+        flow_alpha: float = 0.0,
+        x_ref: np.ndarray | None = None,
         alloc_mode: str = "shipped",
         record: bool = True,
 ) -> dict:
@@ -214,6 +216,16 @@ def simulate_r4(
             else:
                 markup = np.exp(mp_alpha * (share - sr))
             markup = np.clip(markup, 0.25, 4.0)
+
+        # ---- Agrimate Eq. (D.9): common isoelastic inverse demand on the
+        # total supply to the international market, relative to baseline ----
+        flow = 1.0
+        if flow_alpha > 0.0 and x_ref is not None:
+            xr = float(x_ref[t])
+            f = 0.02 * float(np.mean(x_ref)) + 1e-9
+            flow = float(np.clip(((xr + f) / (tot_o + f)) ** flow_alpha,
+                                 0.25, 4.0))
+        markup = markup * flow
         ask_eff = ask * markup
 
         if alloc_mode == "shipped":
@@ -318,28 +330,37 @@ def simulate_r4(
 # --------------------------------------------------------------------------
 # prep-level drivers
 # --------------------------------------------------------------------------
-def twin_offer_shares(prep: CropPrep) -> np.ndarray:
-    """Per-step offer shares on the calm twin path — the reference s*_r.
+def retwin(prep: CropPrep, alloc_mode: str = "shipped") -> dict:
+    """Recompute the calm twin under a given allocation rule.
 
-    Reproduces the twin leg that ``prepare_crop_run`` runs internally.
+    Returns free / unmet reference paths and the per-step offer shares s*_r.
+    With ``alloc_mode="shipped"`` these reproduce ``prep.free_twin`` /
+    ``prep.unmet_twin`` exactly, which is the self-consistency check.
     """
     H_for_twin = prep.H if prep.params.twin_harvest == "realized" else prep.H_seas
     out = simulate_r4(
         H_for_twin, prep.C_flex_twin, prep.C_ind_twin,
         np.zeros_like(H_for_twin), prep.stock0.copy(), prep.safety, prep.p0,
         prep.C_ann, prep.A, prep.S, prep.params,
-        free_twin=None, H_seasonal=prep.H_seas, record=False)
-    return out["share"]
+        free_twin=None, H_seasonal=prep.H_seas,
+        alloc_mode=alloc_mode, record=False)
+    return dict(free_twin=out["free"], unmet_twin=out["unmet"],
+                s_ref=out["share"], x_ref=out["offers"].sum(axis=0))
 
 
-def run_prep(prep: CropPrep, cuts=None, harvest=None, **kw) -> dict:
+def run_prep(prep: CropPrep, cuts=None, harvest=None, twin: dict | None = None,
+             **kw) -> dict:
     H = prep.H if harvest is None else harvest
     cuts_use = prep.cuts if cuts is None else cuts
+    ft = prep.free_twin if twin is None else twin["free_twin"]
+    ut = prep.unmet_twin if twin is None else twin["unmet_twin"]
+    if twin is not None:
+        kw.setdefault("s_ref", twin["s_ref"])
+        kw.setdefault("x_ref", twin["x_ref"])
     return simulate_r4(
         H, prep.C_flex, prep.C_ind, cuts_use, prep.stock0.copy(),
         prep.safety, prep.p0, prep.C_ann, prep.A, prep.S, prep.params,
-        free_twin=prep.free_twin, unmet_twin=prep.unmet_twin,
-        H_seasonal=prep.H_seas, **kw)
+        free_twin=ft, unmet_twin=ut, H_seasonal=prep.H_seas, **kw)
 
 
 def verify_replica(crop: str = "wheat", **kw) -> dict:
@@ -395,6 +416,73 @@ def official_price(crop: str, **kw) -> np.ndarray:
 _PREP_KEYS = {"ask_rival", "inv_eta", "trade_w", "residual_subst",
               "ask_comp_elast", "block_kappa", "unmet_kappa", "ask_alpha",
               "ask_beta", "elast", "smooth"}
+
+
+# --------------------------------------------------------------------------
+# the four robustness assertions, re-expressed against the variant model
+# --------------------------------------------------------------------------
+_LIFT_WINDOW = {"wheat": (2010, 8, 2010, 12, 0.05),
+                "rice": (2008, 1, 2008, 6, 0.05),
+                "maize": (2007, 5, 2008, 6, 0.00)}
+_EXPORTER_WIN = {"wheat": ("Russia", 2010, 8, 2010, 12, 0.20, 0.85),
+                 "rice": ("Vietnam", 2008, 9, 2008, 11, 0.70, None),
+                 "maize": ("Argentina", 2007, 5, 2007, 5, 0.70, None)}
+
+
+def _steps(y0, m0, y1, m1, sy=2006):
+    return ((y0 - sy) * STEPS_PER_YEAR + (m0 - 1) * 2,
+            (y1 - sy) * STEPS_PER_YEAR + (m1 - 1) * 2 + 2)
+
+
+def asserts(crop: str, alloc_mode="shipped", overrides: dict | None = None,
+            **sim_kw) -> dict:
+    ov = dict(overrides or {})
+    calm = dict(use_shocks=False, use_demand=False, use_industrial=False)
+
+    # 1. twin identity + 4. no spring spike (same calm run)
+    prep = prepare_crop_run(crop, use_amis=False, **calm, **ov)
+    tw = retwin(prep, alloc_mode=alloc_mode)
+    res = run_prep(prep, twin=tw, alloc_mode=alloc_mode, **sim_kw)
+    p0 = float(res["price"][0])
+    tail = res["price"][STEPS_PER_YEAR:]
+    twin_drift = float(np.max(np.abs(tail - p0)) / max(p0, 1.0))
+    twin_free = float(np.max(np.abs(res["free"] - tw["free_twin"])))
+    m = to_monthly(res["price"], prep.start_year, prep.end_year)
+    spring = float(m[m.month.isin([3, 4])].model_price.mean())
+    autumn = float(m[m.month.isin([9, 10])].model_price.mean())
+    spring_ratio = spring / max(autumn, 1e-9)
+
+    # 2. AMIS raises price (perturbed baseline, A2f protocol)
+    y0, m0, y1, m1, floor = _LIFT_WINDOW[crop]
+    prep_t = prepare_crop_run(crop, use_amis=True, **calm, **ov)
+    tw_t = retwin(prep_t, alloc_mode=alloc_mode)
+    tau = run_prep(prep_t, twin=tw_t, alloc_mode=alloc_mode, **sim_kw)
+    base = run_prep(prep, twin=tw, harvest=prep.H * (1.0 - 1e-6),
+                    alloc_mode=alloc_mode, **sim_kw)
+    t0, t1 = _steps(y0, m0, y1, m1, prep.start_year)
+    lift = (float(np.mean(tau["price"][t0:t1]))
+            / max(float(np.mean(base["price"][t0:t1])), 1e-9) - 1.0)
+
+    # 3. AMIS cuts exporter offers (and wheat shipments)
+    country, a0, b0, a1, b1, max_off, max_shp = _EXPORTER_WIN[crop]
+    base2 = run_prep(prep, twin=tw, alloc_mode=alloc_mode, **sim_kw)
+    i = prep.countries.index(country)
+    u0, u1 = _steps(a0, b0, a1, b1, prep.start_year)
+    off_ratio = (float(np.mean(tau["offers"][i, u0:u1]))
+                 / max(float(np.mean(base2["offers"][i, u0:u1])), 1e-12))
+    shp_ratio = (float(np.mean(tau["exports"][i, u0:u1]))
+                 / max(float(np.mean(base2["exports"][i, u0:u1])), 1e-12))
+
+    return dict(
+        twin_drift=twin_drift, twin_free_err=twin_free,
+        twin_pass=bool(twin_drift <= 0.02 and twin_free <= 1.0),
+        lift=lift, lift_floor=floor, lift_pass=bool(lift >= floor),
+        offer_ratio=off_ratio, offer_max=max_off,
+        offer_pass=bool(off_ratio <= max_off),
+        ship_ratio=shp_ratio, ship_max=max_shp,
+        ship_pass=bool(max_shp is None or shp_ratio <= max_shp),
+        spring_ratio=spring_ratio, spring_pass=bool(spring_ratio <= 1.25),
+    )
 
 
 def reweight_is_noop(prep: CropPrep, gamma: float = 1.25) -> float:
