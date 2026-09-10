@@ -1,0 +1,7 @@
+model,target,corr,n
+SHEAF Gate 0 wheat (full leg),"Pink Sheet US HRW, MUV-deflated",0.7198612368258545,72
+Agrimate full model (digitised),"US HRW, US-CPI-deflated (digitised)",0.43886154585318965,72
+Agrimate prod-anomalies only (digitised),"US HRW, US-CPI-deflated (digitised)",0.3085331541018081,72
+Agrimate unperturbed baseline (digitised),"US HRW, US-CPI-deflated (digitised)",-0.09362271376737674,72
+Agrimate full model (digitised),"Pink Sheet US HRW, MUV-deflated",0.40636755663252416,72
+SHEAF Gate 0 wheat (full leg),"US HRW, US-CPI-deflated (digitised)",0.8201589633130565,72

@@ -674,8 +674,17 @@ def _simulate_window(
         else:
             twin = float(free_twin[t])
             floor0 = 0.05 * safety_w
-            shift = floor0 + max(0.0, -min(free, twin))
-            ratio = (twin + shift) / (free + shift)
+            if free < 0.0 <= twin:
+                # Lean requirement exceeds physical stock while the reference
+                # does not. The shift below would then reduce the denominator
+                # to floor0, making the ratio ≈ twin/floor0 — a number set by
+                # the regulariser rather than by scarcity (maize 2006-12a:
+                # ratio 35.1, price ×4.13 in one step). Floor the denominator
+                # on physical stock instead, which cannot go negative.
+                ratio = (twin + floor0) / (0.10 * float(stock.sum()) + floor0)
+            else:
+                shift = floor0 + max(0.0, -min(free, twin))
+                ratio = (twin + shift) / (free + shift)
             u0 = float(unmet_twin[t]) if unmet_twin is not None else 0.0
             u_anom = max(0.0, unmet_frac - u0)
             calm = (abs(free - twin) < 1e-6 and u_anom < 1e-9

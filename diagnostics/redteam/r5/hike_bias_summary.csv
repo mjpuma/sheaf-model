@@ -1,0 +1,2 @@
+n_cells,n_overshoot,mean_log_ratio,geometric_mean_amplification,median_pct_error,sd_log_ratio,t_stat,sign_test_p_one_sided,wheat_mean_pct_error,maize_mean_pct_error,rice_mean_pct_error
+6,5,0.11907179598126244,1.126450790024999,16.358779606051797,0.11578384260775132,2.519048740668999,0.109375,24.842988496130204,16.358779606051797,-1.416245568697827

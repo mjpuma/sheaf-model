@@ -18,16 +18,16 @@ CropParams(crop='rice', elast=-0.2, stu_target=0.18, max_stu=0.22, seasonal_buff
 ## Monthly price vs Pink Sheet
 - `full` corr = +0.678
 - `shocks` corr = -0.115
-- `demand` corr = +0.309
+- `demand` corr = +0.298
 - `tau` corr = +0.662
 
 ## Crisis hike ratios (3-mo mean peak/base)
 - **2007/08** obs×1.84  `full`×1.72  `shocks`×0.93  `demand`×1.21  `tau`×1.75
-- **2010/11** obs×0.79  `full`×0.82  `shocks`×1.06  `demand`×1.60  `tau`×0.81
+- **2010/11** obs×0.79  `full`×0.82  `shocks`×1.06  `demand`×1.61  `tau`×0.81
 
 ## Attribution (which isolated leg carries the hike)
 - 2007/08: shocks×0.93  demand×1.21  tau×1.75 (full×1.72) — restriction-led
-- 2010/11: shocks×1.06  demand×1.60  tau×0.81 (full×0.82) — demand-led
+- 2010/11: shocks×1.06  demand×1.61  tau×0.81 (full×0.82) — demand-led
 - **tau column, unpinned baseline**: 2007/08 ×1.70 (vs ×1.75 above), 2010/11 ×0.81 (vs ×0.81) — restriction-led / demand-led
   The tau leg's base window is pinned at p0 by the calm branch, so the ratio above understates the restriction channel. The unpinned line is the like-for-like measurement; both are printed until the coauthors settle which is the headline.
 

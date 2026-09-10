@@ -1,0 +1,4 @@
+object,n_nodes,n_grains,build_s,per_period_s,implied_144_steps_s,implied_3crops_x_5legs_s,note
+"annual QP, 1 period, game OFF",18,3,6.345799192786217e-05,0.05199716700008139,7.48759204801172,112.3138807201758,one cvxpy solve per period
+"annual QP + year-IBR game, 1 period",18,3,,0.0337539580068551,4.8605699529871345,72.90854929480702,Gate 2 analogue cost
+"Gate 0 shipped map, 144 steps",18,1,,9.634936383614937e-05,0.01387430839240551,0.20811462588608265,no inner solve
