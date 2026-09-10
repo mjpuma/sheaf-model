@@ -28,6 +28,8 @@ CropParams(crop='maize', elast=-0.25, stu_target=0.16, max_stu=0.18, seasonal_bu
 ## Attribution (which isolated leg carries the hike)
 - 2007/08: shocks×1.11  demand×1.46  tau×1.10 (full×1.97) — demand-led
 - 2010/11: shocks×1.01  demand×1.12  tau×0.92 (full×1.70) — demand-led
+- **tau column, unpinned baseline**: 2007/08 ×1.69 (vs ×1.10 above), 2010/11 ×0.86 (vs ×0.92) — restriction-led / demand-led
+  The tau leg's base window is pinned at p0 by the calm branch, so the ratio above understates the restriction channel. The unpinned line is the like-for-like measurement; both are printed until the coauthors settle which is the headline.
 
 ## US maize industrial (inelastic FSI excess)
 - Cumulative US industrial use over window: 453.5 MMT-steps (RFS residual vs 2000–04 FSI).

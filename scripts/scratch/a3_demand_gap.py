@@ -526,12 +526,13 @@ def all_step_scan(crop: str, prep: CropPrep, res, n: int = 801,
                            - _G(st, t, sk, ak, pk, root - h)) / (2 * h))
         # --- discontinuity hunt: bisect the steepest cells on the regime ---
         jumps = []
-        order = np.argsort(-np.abs(np.diff(g)))
-        for j in order[:n_jump_probes]:
+        dg = np.abs(np.diff(g))
+        cand = [j for j in range(len(grid) - 1)
+                if _regime(outs[j]) != _regime(outs[j + 1])]
+        cand.sort(key=lambda j: -dg[j])
+        for j in cand[:n_jump_probes]:
             a, b = grid[j], grid[j + 1]
             key = _regime(outs[j])
-            if key == _regime(outs[j + 1]):
-                continue
             for _ in range(60):
                 mid = 0.5 * (a + b)
                 if _regime(step_G(st, t, sk, ak, pk, mid)) == key:
@@ -692,7 +693,8 @@ def calm_reachability(crop: str, prep: CropPrep, res) -> pd.DataFrame:
 
 
 def calm_jump_detail(crop: str, prep: CropPrep, res,
-                     reach: pd.DataFrame) -> pd.DataFrame:
+                     reach: pd.DataFrame,
+                     all_root: np.ndarray | None = None) -> pd.DataFrame:
     """For the steps where `calm` IS reachable, bisect onto free(x)=twin and
     measure whether the branch actually fires and what it does to G."""
     st = build_static(prep)
@@ -716,26 +718,45 @@ def calm_jump_detail(crop: str, prep: CropPrep, res,
                 b = mid
             if b - a < 1e-13 * max(1.0, b):
                 break
-        oa, ob = f(a), f(b)
-        # scan a tight neighbourhood for any step where calm actually fires
-        nb = np.linspace(a - 1e-3, b + 1e-3, 4001)
-        fired = [(float(x), f(x)) for x in nb]
-        n_fired = sum(1 for _, o in fired if o["calm"])
+        pc = 0.5 * (a + b)
+        # locate the two EDGES of the calm plateau, then evaluate G outside
+        lo_edge, hi_edge = pc, pc
+        d = 1e-9
+        while d < 10.0 and f(pc - d)["calm"]:
+            lo_edge, d = pc - d, d * 2
+        d = 1e-9
+        while d < 10.0 and f(pc + d)["calm"]:
+            hi_edge, d = pc + d, d * 2
+        lo_out, hi_out = lo_edge, hi_edge
+        for _ in range(80):                     # tighten each edge
+            m = 0.5 * (lo_edge + lo_out)
+            if f(m)["calm"]:
+                lo_edge = m
+            else:
+                lo_out = m
+        for _ in range(80):
+            m = 0.5 * (hi_edge + hi_out)
+            if f(m)["calm"]:
+                hi_edge = m
+            else:
+                hi_out = m
+        g_in = f(pc)["p_out"]
+        g_lo, g_hi = f(lo_out)["p_out"], f(hi_out)["p_out"]
+        root = float(all_root[t]) if all_root is not None else np.nan
         rows.append(dict(
             crop=crop, step=t, tag=step_tag(t), episode=epi[t], twin=twin,
-            p_cross=0.5 * (a + b), bracket_width=b - a,
-            free_below=oa["free"], free_above=ob["free"],
-            abs_free_minus_twin_below=abs(oa["free"] - twin),
-            abs_free_minus_twin_above=abs(ob["free"] - twin),
-            calm_fired_below=oa["calm"], calm_fired_above=ob["calm"],
-            n_calm_in_1mUSD_neighbourhood=n_fired,
-            G_below=oa["p_out"], G_above=ob["p_out"],
-            observed_jump=abs(ob["p_out"] - oa["p_out"]),
-            hypothetical_jump=(1.0 - st.prep.params.smooth)
-            * st.prep.params.trade_w * abs(oa["p_trade"] - prep.p0),
-            calm_window_width_in_p=(
-                2e-6 / max(abs((ob["free"] - oa["free"]) / max(b - a, 1e-300)),
-                           1e-300)),
+            p_cross=pc, calm_fires=bool(f(pc)["calm"]),
+            calm_lo=lo_edge, calm_hi=hi_edge,
+            calm_window_width=hi_edge - lo_edge,
+            G_in_calm=g_in, G_just_below=g_lo, G_just_above=g_hi,
+            jump_low_edge=abs(g_in - g_lo), jump_high_edge=abs(g_hi - g_in),
+            max_calm_jump=max(abs(g_in - g_lo), abs(g_hi - g_in)),
+            p_trade_outside=f(lo_out)["p_trade"],
+            root=root,
+            root_in_calm_window=bool(np.isfinite(root)
+                                     and lo_edge <= root <= hi_edge),
+            root_to_calm_window=(min(abs(root - lo_edge), abs(root - hi_edge))
+                                 if np.isfinite(root) else np.nan),
         ))
     return pd.DataFrame(rows)
 
@@ -969,7 +990,9 @@ def main() -> None:
                                 sorted(set(worst + probe))))
         cre = calm_reachability(crop, prep, res)
         creach.append(cre)
-        cjd.append(calm_jump_detail(crop, prep, res, cre))
+        cjd.append(calm_jump_detail(crop, prep, res, cre,
+                                    a.set_index("step").fp.reindex(
+                                        range(prep.H.shape[1])).to_numpy()))
         figs.append(plot_g(crop, prep, res, probe[:4]))
         figs.append(plot_g_wide(crop, prep, res, probe[:4]))
 
@@ -1267,15 +1290,24 @@ def main() -> None:
           f"over all steps is {cr.hypothetical_jump.max():.4g} $/t, so the "
           f"hazard is real in magnitude and only unreachability is "
           f"protecting the solve.", "",
-          "The reachable steps in detail — bisect onto `free(x) = twin` and "
-          "check whether the branch actually fires. "
-          "`calm_window_width_in_p` is `2e-6 / |d free/d p|`, the width in "
-          "$/t of the price interval satisfying `|free-twin| < 1e-6`:", "",
-          _fmt(cj[["crop", "step", "tag", "episode", "p_cross",
-                   "abs_free_minus_twin_below", "calm_fired_below",
-                   "calm_fired_above", "n_calm_in_1mUSD_neighbourhood",
-                   "observed_jump", "hypothetical_jump",
-                   "calm_window_width_in_p"]]), ""]
+          "The reachable steps in detail. Bisect onto `free(x) = twin`, then "
+          "expand outward to find the two EDGES of the calm plateau and "
+          "evaluate `G` just outside each. On the plateau `p_star = p0` "
+          "exactly, so `G` is flat there and steps down/up at both edges:",
+          "",
+          _fmt(cj[["crop", "step", "tag", "episode", "p_cross", "calm_fires",
+                   "calm_window_width", "G_in_calm", "G_just_below",
+                   "G_just_above", "max_calm_jump", "root",
+                   "root_in_calm_window", "root_to_calm_window"]]), "",
+          f"So the calm branch does make `G` genuinely discontinuous where "
+          f"it is reachable: the plateau is "
+          f"{cj.calm_window_width.min():.2g}–{cj.calm_window_width.max():.2g} "
+          f"$/t wide and `G` steps by up to "
+          f"{cj.max_calm_jump.max():.4g} $/t at its edges. It is reachable "
+          f"at 7 of 432 steps and at none of them does the root fall inside "
+          f"the plateau (closest approach "
+          f"{cj.root_to_calm_window.min():.4g} $/t). The hazard is real but "
+          f"it did not fire on this path.", ""]
 
     L += ["## Artifacts", "",
           "- `diagnostics/gate0_prep/a3/demand_gap.csv` "

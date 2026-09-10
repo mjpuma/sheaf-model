@@ -246,15 +246,15 @@ Bisection on `free(x) - twin` over the whole interval, to land on the calm bound
 
 | crop | episode | n | n_roots_min | n_roots_max | L_max_worst | L_max_median | slope_at_root_worst | n_not_monotone | max_abs_fp_residual | picard_iters_max | picard_iters_median | max_abs_picard_vs_bisect | n_free_negative | min_resid_at_60 | max_resid_at_1200 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| maize | 2007/08 | 44 | 1 | 1 | 2.362 | 0.02121 | 0.04888 | 1 | 2.842e-14 | 8 | 5 | 2.286e-10 | 1 | 31.65 | -829.5 |
-| maize | 2010/11 | 42 | 1 | 1 | 0.7884 | 0.03058 | 0.05788 | 18 | 0 | 9 | 5 | 2.24e-10 | 0 | 110.9 | -884.6 |
-| maize | calm | 58 | 1 | 1 | 0.6056 | 0.01574 | 0.02379 | 21 | 5.684e-14 | 6 | 5 | 1.764e-10 | 0 | 45.96 | -872.4 |
-| rice | 2007/08 | 44 | 1 | 1 | 19.86 | 0.2321 | 0.1174 | 6 | 0 | 12 | 6 | 5.162e-10 | 18 | 266.8 | -503 |
-| rice | 2010/11 | 42 | 1 | 1 | 0.1009 | 0.04481 | 0.004658 | 3 | 1.137e-13 | 6 | 5 | 1.171e-11 | 7 | 473.5 | -303.6 |
-| rice | calm | 58 | 1 | 1 | 0.6571 | 0.05984 | 0.07695 | 3 | 5.684e-14 | 9 | 5 | 3.532e-10 | 8 | 322.1 | -298.2 |
-| wheat | 2007/08 | 44 | 1 | 1 | 0.2081 | 0.05705 | 0.04795 | 5 | 5.684e-14 | 8 | 5 | 4.549e-10 | 0 | 126.6 | -771.6 |
-| wheat | 2010/11 | 42 | 1 | 1 | 0.06656 | 0.01301 | 0.00636 | 12 | 2.842e-14 | 6 | 5 | 2.191e-11 | 0 | 152.7 | -752.8 |
-| wheat | calm | 58 | 1 | 1 | 0.1211 | 0.0152 | 0.01968 | 9 | 0 | 6 | 5 | 1.896e-10 | 0 | 135.6 | -664.3 |
+| maize | 2007/08 | 44 | 1 | 1 | 4.727 | 0.02149 | 0.04888 | 1 | 2.842e-14 | 8 | 5 | 2.286e-10 | 1 | 31.65 | -829.5 |
+| maize | 2010/11 | 42 | 1 | 1 | 0.791 | 0.0344 | 0.05788 | 18 | 0 | 9 | 5 | 2.24e-10 | 0 | 110.9 | -884.6 |
+| maize | calm | 58 | 1 | 1 | 1.212 | 0.01599 | 0.02379 | 21 | 5.684e-14 | 6 | 5 | 1.764e-10 | 0 | 45.96 | -872.4 |
+| rice | 2007/08 | 44 | 1 | 1 | 39.71 | 0.234 | 0.1174 | 6 | 0 | 12 | 6 | 5.162e-10 | 18 | 266.8 | -503 |
+| rice | 2010/11 | 42 | 1 | 1 | 0.1061 | 0.04543 | 0.004658 | 3 | 1.137e-13 | 6 | 5 | 1.171e-11 | 7 | 473.5 | -303.6 |
+| rice | calm | 58 | 1 | 1 | 0.6667 | 0.06104 | 0.07695 | 3 | 5.684e-14 | 9 | 5 | 3.532e-10 | 8 | 322.1 | -298.2 |
+| wheat | 2007/08 | 44 | 1 | 1 | 0.2114 | 0.05791 | 0.04795 | 5 | 5.684e-14 | 8 | 5 | 4.549e-10 | 0 | 126.6 | -771.6 |
+| wheat | 2010/11 | 42 | 1 | 1 | 0.09967 | 0.0133 | 0.00636 | 12 | 2.842e-14 | 6 | 5 | 2.191e-11 | 0 | 152.7 | -752.8 |
+| wheat | calm | 58 | 1 | 1 | 0.1229 | 0.01542 | 0.01968 | 9 | 0 | 6 | 5 | 1.896e-10 | 0 | 135.6 | -664.3 |
 
 Root count is exactly 1 at all 432 crop-steps: min=1, max=1. `resid_at_60 > 0 > resid_at_1200` at every step (min resid at 60 = 31.6, max resid at 1200 = -298), so `G` maps [60,1200] strictly into itself and the clip cannot remove the root.
 
@@ -276,14 +276,70 @@ Including the first model year, the worst single step is:
 
 | crop | step | tag | episode | in_first_model_year | p_prev | p_official | fp | fp_minus_official | fp_pct_of_official | L_max_global | picard_iters | free_official |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| maize | 22 | 2006-12a | 2007/08 | True | 95.5 | 393.9 | 379.3 | -14.61 | -3.707 | 0.2269 | 8 | -15.18 |
-| rice | 24 | 2007-01a | 2007/08 | False | 312.6 | 346 | 342.4 | -3.683 | -1.064 | 0.8567 | 12 | -32.72 |
-| rice | 25 | 2007-01b | 2007/08 | False | 346 | 375.2 | 372.3 | -2.898 | -0.7724 | 0.8757 | 11 | -33.79 |
-| rice | 26 | 2007-02a | 2007/08 | False | 375.2 | 398.4 | 396.1 | -2.271 | -0.57 | 0.9111 | 11 | -33.34 |
-| rice | 27 | 2007-02b | 2007/08 | False | 398.4 | 412.4 | 411.2 | -1.179 | -0.286 | 0.9326 | 10 | -32.24 |
-| wheat | 21 | 2006-11b | 2007/08 | True | 238.2 | 256.5 | 255.8 | -0.7816 | -0.3047 | 0.1693 | 8 | 32.37 |
-| rice | 44 | 2007-11a | 2007/08 | False | 539.9 | 598.8 | 598.1 | -0.6502 | -0.1086 | 0.2388 | 6 | 31.25 |
+| maize | 22 | 2006-12a | 2007/08 | True | 95.5 | 393.9 | 379.3 | -14.61 | -3.707 | 0.2302 | 8 | -15.18 |
+| rice | 24 | 2007-01a | 2007/08 | False | 312.6 | 346 | 342.4 | -3.683 | -1.064 | 0.8683 | 12 | -32.72 |
+| rice | 25 | 2007-01b | 2007/08 | False | 346 | 375.2 | 372.3 | -2.898 | -0.7724 | 0.8876 | 11 | -33.79 |
+| rice | 26 | 2007-02a | 2007/08 | False | 375.2 | 398.4 | 396.1 | -2.271 | -0.57 | 0.9234 | 11 | -33.34 |
+| rice | 27 | 2007-02b | 2007/08 | False | 398.4 | 412.4 | 411.2 | -1.179 | -0.286 | 0.9452 | 10 | -32.24 |
+| wheat | 21 | 2006-11b | 2007/08 | True | 238.2 | 256.5 | 255.8 | -0.7816 | -0.3047 | 0.1722 | 8 | 32.37 |
+| rice | 44 | 2007-11a | 2007/08 | False | 539.9 | 598.8 | 598.1 | -0.6502 | -0.1086 | 0.2428 | 6 | 31.25 |
 | maize | 100 | 2010-03a | 2010/11 | False | 206.6 | 216.7 | 216.1 | -0.5663 | -0.2613 | 0.1129 | 9 | 141.4 |
+
+### 3d-bis. Where G is steep, and where it JUMPS
+
+`L_max_global` above is the sup over the whole clip interval, including trial prices far from the root. It exceeds 1 at 5 of 432 steps. The reason is not curvature: it is a genuine jump. Ranking grid cells by |ΔG| and bisecting each on the *regime tuple* (number of countries with `offers > 1e-9`; whether `shipped_sum > 1e-12`; whether `calm` fired; whether the price clip bound) localises the jumps to machine width:
+
+| crop | episode | n | n_steps_with_a_jump | max_jump_dollars | mean_jump_dollars | min_root_to_jump | n_root_inside_jump |
+|---|---|---|---|---|---|---|---|
+| maize | 2007/08 | 44 | 4 | 6.754 | 0.1535 | 19.35 | 0 |
+| maize | 2010/11 | 42 | 4 | 1.092e-08 | 7.111e-10 | 95.49 | 0 |
+| maize | calm | 58 | 5 | 1.742 | 0.03003 | 143 | 0 |
+| rice | 2007/08 | 44 | 2 | 11.7 | 0.2659 | 170.6 | 0 |
+| rice | 2010/11 | 42 | 0 | 0 | 0 | — | 0 |
+| rice | calm | 58 | 1 | 1.371e-07 | 2.364e-09 | 644.5 | 0 |
+| wheat | 2007/08 | 44 | 0 | 0 | 0 | — | 0 |
+| wheat | 2010/11 | 42 | 0 | 0 | 0 | — | 0 |
+| wheat | calm | 58 | 1 | 1.135e-08 | 1.957e-10 | 452.3 | 0 |
+
+Jump causes, counted over all steps with a jump above 0.01 $/t:
+
+| crop | jump_cause | n | max_jump | min_root_to_jump |
+|---|---|---|---|---|
+| maize | ptrade_fallback | 2 | 6.754 | 108.3 |
+| rice | ptrade_fallback | 1 | 11.7 | 170.6 |
+
+Ten largest jumps:
+
+| crop | step | tag | episode | p_official | fp | max_jump_G | p_at_max_jump | jump_cause | root_to_nearest_jump | L_max_global | picard_iters |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| rice | 51 | 2008-02b | 2007/08 | 573.6 | 573.6 | 11.7 | 402.9 | ptrade_fallback | 170.6 | 39.71 | 4 |
+| maize | 42 | 2007-10a | 2007/08 | 178.2 | 178.3 | 6.754 | 69.98 | ptrade_fallback | 108.3 | 4.727 | 4 |
+| maize | 137 | 2011-09b | calm | 266.7 | 266.8 | 1.742 | 123.7 | ptrade_fallback | 143 | 1.212 | 4 |
+| rice | 64 | 2008-09a | calm | 879.3 | 879.3 | 1.371e-07 | 234.7 | offers_trunc | 644.5 | 0.06709 | 5 |
+| wheat | 129 | 2011-05b | calm | 514.5 | 514.5 | 1.135e-08 | 62.15 | offers_trunc | 452.3 | 0.03168 | 5 |
+| maize | 108 | 2010-07a | 2010/11 | 297 | 296.8 | 1.092e-08 | 125.7 | offers_trunc | 171.2 | 0.6804 | 7 |
+| maize | 109 | 2010-07b | 2010/11 | 299 | 299 | 8.393e-09 | 108.6 | offers_trunc | 190.4 | 0.791 | 6 |
+| maize | 104 | 2010-05a | 2010/11 | 262.8 | 262.6 | 7.941e-09 | 134.5 | offers_trunc | 128.1 | 0.2387 | 7 |
+| maize | 133 | 2011-07b | calm | 314 | 314 | 6.381e-09 | 62.7 | offers_trunc | 251.3 | 0.1536 | 5 |
+| maize | 131 | 2011-06b | calm | 324.1 | 324.1 | 5.322e-09 | 72.43 | offers_trunc | 251.6 | 0.7544 | 5 |
+
+The mechanism, read off the code: `offers = max(0, avail - desired - target)*(1-cuts)` (L596) is continuous in the trial price, but it reaches exactly zero for the last remaining exporter at some trial price. When it does, `shipped_sum` falls through the `1e-12` guard at L651 and `p_trade` switches discontinuously from `dot(ask, shipped)/shipped_sum` — a mean over one infinitesimal shipment, so it equals that single country's ask — to the fallback `p_trade = p` (L653). `p_trade` enters `p_star` with weight `trade_w` and then the smoother with weight `(1-smooth)`, so the jump in `G` is `(1-smooth)*trade_w*|ask_last - p_{t-1}|`. **This is a fourth discontinuity, not among the three named in the brief, and on this evidence it is the largest one.**
+
+### 3d-ter. Picard robustness from deliberately bad starts
+
+`x <- G(x)` started at 60, 1200, `0.5 p_{t-1}` and `2 p_{t-1}` as well as at `p_{t-1}`, tolerance 1e-8 $/t, cap 200 iterations:
+
+| crop | episode | n | n_bad_starts_all_converged | picard_bad_max_iters | max_spread_vs_bisected_root |
+|---|---|---|---|---|---|
+| maize | 2007/08 | 44 | 44 | 9 | 1.067e-10 |
+| maize | 2010/11 | 42 | 42 | 10 | 5.385e-10 |
+| maize | calm | 58 | 58 | 8 | 1.846e-10 |
+| rice | 2007/08 | 44 | 44 | 13 | 7.742e-10 |
+| rice | 2010/11 | 42 | 42 | 6 | 1.99e-11 |
+| rice | calm | 58 | 58 | 11 | 5.642e-10 |
+| wheat | 2007/08 | 44 | 44 | 9 | 4.13e-10 |
+| wheat | 2010/11 | 42 | 42 | 6 | 2.726e-11 |
+| wheat | calm | 58 | 58 | 8 | 1.791e-10 |
 
 ### 3e. Grid-refinement continuity test
 
@@ -339,6 +395,18 @@ The branch needs three conditions simultaneously (`|free-twin| < 1e-6`, `u_anom 
 
 Steps where the calm branch is reachable by any trial price: **7 of 432**. Where it is not reachable, the L666-669 conditional is dead code for the fixed point and cannot create a jump. `hypothetical_jump` = `(1-smooth)*trade_w*|p_trade - p0|` is what the jump in `G` WOULD be if the branch did fire; its max over all steps is 153.8 $/t, so the hazard is real in magnitude and only unreachability is protecting the solve.
 
+The reachable steps in detail — bisect onto `free(x) = twin` and check whether the branch actually fires. `calm_window_width_in_p` is `2e-6 / |d free/d p|`, the width in $/t of the price interval satisfying `|free-twin| < 1e-6`:
+
+| crop | step | tag | episode | p_cross | abs_free_minus_twin_below | calm_fired_below | calm_fired_above | n_calm_in_1mUSD_neighbourhood | observed_jump | hypothetical_jump | calm_window_width_in_p |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| wheat | 7 | 2006-04b | calm | 693.8 | 2.132e-14 | True | True | 1131 | 0 | 3.867 | 0.0005365 |
+| wheat | 8 | 2006-05a | calm | 594.5 | 1.279e-13 | True | True | 937 | 0 | 10.6 | 0.0005067 |
+| maize | 138 | 2011-10a | calm | 149.4 | 5.684e-14 | True | True | 85 | 0 | 36.77 | 4.75e-05 |
+| maize | 139 | 2011-10b | calm | 344.2 | 1.137e-13 | True | True | 241 | 0 | 34.17 | 0.000114 |
+| rice | 1 | 2006-01b | calm | 341.1 | 2.842e-14 | True | True | 433 | 0 | 0.8681 | 0.0002171 |
+| rice | 2 | 2006-02a | calm | 345.1 | 2.416e-13 | True | True | 429 | 0 | 0.7574 | 0.0002171 |
+| rice | 3 | 2006-02b | calm | 349.3 | 8.527e-14 | True | True | 429 | 0 | 0.7412 | 0.0002171 |
+
 ## Artifacts
 
 - `diagnostics/gate0_prep/a3/demand_gap.csv` (7776 rows: crop × step × country)
@@ -349,6 +417,7 @@ Steps where the calm branch is reachable by any trial price: **7 of 432**. Where
 - `diagnostics/gate0_prep/a3/g_all_steps.csv` (432 rows)
 - `diagnostics/gate0_prep/a3/g_grid_refinement.csv`
 - `diagnostics/gate0_prep/a3/g_calm_reachability.csv` (432 rows)
+- `diagnostics/gate0_prep/a3/g_calm_jump_detail.csv` (7 rows)
 - `diagnostics/gate0_prep/a3/replica_verification.csv`
 - `figures/scratch/a3/g_curve_wheat.png`
 - `figures/scratch/a3/g_curve_wide_wheat.png`

@@ -28,6 +28,8 @@ CropParams(crop='wheat', elast=-0.15, stu_target=0.2, max_stu=0.28, seasonal_buf
 ## Attribution (which isolated leg carries the hike)
 - 2007/08: shocks×1.20  demand×0.98  tau×1.70 (full×2.27) — restriction-led
 - 2010/11: shocks×1.85  demand×1.35  tau×1.36 (full×1.45) — production-led
+- **tau column, unpinned baseline**: 2007/08 ×1.99 (vs ×1.70 above), 2010/11 ×1.36 (vs ×1.36) — restriction-led / production-led
+  The tau leg's base window is pinned at p0 by the calm branch, so the ratio above understates the restriction channel. The unpinned line is the like-for-like measurement; both are printed until the coauthors settle which is the headline.
 
 ## Annual world ending stocks (calendar Dec vs PSD; MY-end month=5)
 - 2006: Dec 241.3 MMT (STU 0.49); MY-end 126.5 MMT (STU 0.26) vs PSD 134.8 MMT (STU 0.27)

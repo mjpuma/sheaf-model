@@ -116,8 +116,23 @@ class CropParams:
     ask_beta: float = 0.18
     # reduced_form — survivors mark up when preferred sources are blocked
     # (Agrimate oligopolist channel). Sign: >= 0. Zero ⇒ own-fill law only.
-    # 0.80 is the smallest shared value at which isolated maize τ does not
-    # cut world price (0.40 still cuts; not fit to 2008 peaks).
+    #
+    # This value was previously justified as "the smallest shared value at
+    # which isolated maize τ does not cut world price". That justification
+    # does not survive a like-for-like test. The old sign test compared an
+    # unpinned τ leg against a baseline leg that the calm branch in
+    # `_simulate_window` pins at exactly p0, while the ask law's own quiet
+    # level is ≈0.71·p0 for maize — so the test was measuring the release of
+    # that pin. With the baseline perturbed out of the calm regime
+    # (`assert_amis_raises_price`), maize clears the floor at ask_rival = 0.0
+    # (+4.7%), as do wheat (+48.8%) and rice (+16.0%).
+    #
+    # So the sign condition does NOT pin this parameter. It remains
+    # load-bearing for crisis amplitude (setting it to 0 moves maize corr
+    # +0.712 → +0.414 and rice 2007/08 ×1.72 → ×1.01 vs observed ×1.84), so
+    # it is not spurious either. Treat it as a reduced-form amplitude
+    # parameter awaiting an external basis, shared across crops and years,
+    # and not fit to 2008. See diagnostics/gate0_prep/a2/.
     ask_rival: float = 0.80
     # structural — harvest foresight blend; pulse definition
     foresight_phi: float = 0.55
@@ -719,9 +734,14 @@ def prepare_crop_run(
     if overrides:
         from dataclasses import fields, replace
         allowed = {f.name for f in fields(CropParams)} - {"crop"}
-        patch = {k: v for k, v in overrides.items() if k in allowed}
-        if patch:
-            params = replace(params, **patch)
+        unknown = sorted(set(overrides) - allowed)
+        if unknown:
+            # Silently dropping these returned the baseline path, so a typo'd
+            # sensitivity study reported "no effect" instead of failing.
+            raise TypeError(
+                f"unknown CropParams override(s): {unknown}. "
+                f"Valid fields: {sorted(allowed)}")
+        params = replace(params, **overrides)
 
     if countries is None:
         from .calibration import DATA
@@ -898,10 +918,18 @@ def result_to_monthly(res: CropSimResult) -> pd.DataFrame:
 
 
 def assert_twin_identity(crop: str = "wheat", tol_price: float = 0.02,
-                         tol_free: float = 1.0) -> None:
-    """No harvest / demand / AMIS shocks ⇒ free ≡ twin and price flat at p0."""
+                         tol_free: float = 1.0, **overrides) -> None:
+    """No harvest / demand / AMIS shocks ⇒ free ≡ twin and price flat at p0.
+
+    Note what this does and does not establish. The flat price is delivered
+    by the calm branch in ``_simulate_window``, which sets ``p_star = p0``
+    outright once free ≡ twin. It is not evidence that the ask law returns to
+    p0 on its own — with that branch disabled the same run drifts 25 / 34 /
+    19 % (wheat / maize / rice). See ``diagnostics/gate0_prep/a1/``.
+    """
     res = run_crop_dynamics(crop, use_amis=False, use_shocks=False,
-                            use_demand=False, use_industrial=False)
+                            use_demand=False, use_industrial=False,
+                            **overrides)
     p0 = float(res.price[0])
     tail = res.price[STEPS_PER_YEAR:]
     rel = float(np.max(np.abs(tail - p0)) / max(p0, 1.0))
@@ -918,11 +946,21 @@ def assert_twin_identity(crop: str = "wheat", tol_price: float = 0.02,
 
 
 def assert_amis_raises_price(crop: str = "wheat",
-                             min_lift: float | None = None) -> None:
+                             min_lift: float | None = None,
+                             **overrides) -> None:
     """Tau-only vs no-AMIS in the crop's primary ban window.
 
     Maize floor is 0 (must not *cut* world price). Offer-cut assert remains
     the quantity check.
+
+    The baseline leg is perturbed by one part per million of harvest so that
+    it leaves the matched regime. Without that, the calm branch in
+    ``_simulate_window`` pins the baseline at exactly p0 while the τ leg is
+    priced by the ask/scarcity law, whose quiet level is ≈0.66·p0 (wheat) and
+    ≈0.71·p0 (maize) — so the measured "lift" included the release of that
+    pin and was biased down by 27 pp for maize. The perturbation changes
+    physical quantities by 1e-6 and makes both legs share a price law.
+    See ``diagnostics/gate0_prep/a2/``.
     """
     if crop == "wheat":
         y0, m0, y1, m1 = 2010, 8, 2010, 12
@@ -938,9 +976,12 @@ def assert_amis_raises_price(crop: str = "wheat",
     if min_lift is None:
         min_lift = floor
     tau = run_crop_dynamics(crop, use_amis=True, use_shocks=False,
-                            use_demand=False, use_industrial=False)
-    base = run_crop_dynamics(crop, use_amis=False, use_shocks=False,
-                             use_demand=False, use_industrial=False)
+                            use_demand=False, use_industrial=False,
+                            **overrides)
+    prep_base = prepare_crop_run(crop, use_amis=False, use_shocks=False,
+                                 use_demand=False, use_industrial=False,
+                                 **overrides)
+    base = simulate_prep(prep_base, harvest=prep_base.H * (1.0 - 1e-6))
     t0 = (y0 - tau.start_year) * STEPS_PER_YEAR + (m0 - 1) * 2
     t1 = (y1 - tau.start_year) * STEPS_PER_YEAR + (m1 - 1) * 2 + 2
     p_tau = float(np.mean(tau.price[t0:t1]))
@@ -953,7 +994,7 @@ def assert_amis_raises_price(crop: str = "wheat",
 
 
 def assert_no_spring_spike(crop: str = "wheat",
-                           max_ratio: float = 1.25) -> None:
+                           max_ratio: float = 1.25, **overrides) -> None:
     """Lean-cover accounting must not create a fake spring spike on climatology.
 
     Full-path maize can still have a real NH lean (harvest in autumn); that is
@@ -961,7 +1002,7 @@ def assert_no_spring_spike(crop: str = "wheat",
     """
     res = run_crop_dynamics(
         crop, use_amis=False, use_shocks=False, use_demand=False,
-        use_industrial=False)
+        use_industrial=False, **overrides)
     m = result_to_monthly(res)
     spring = float(m[m.month.isin([3, 4])]["model_price"].mean())
     autumn = float(m[m.month.isin([9, 10])]["model_price"].mean())
@@ -973,7 +1014,8 @@ def assert_no_spring_spike(crop: str = "wheat",
 
 def assert_amis_cuts_exports(crop: str = "wheat",
                              max_offer_ratio: float | None = None,
-                             max_ship_ratio: float | None = None) -> None:
+                             max_ship_ratio: float | None = None,
+                             **overrides) -> None:
     # Wheat Russia ban ≈0.95 → very low offers; maize/rice quotas/taxes milder.
     if max_offer_ratio is None:
         max_offer_ratio = 0.20 if crop == "wheat" else 0.70
@@ -981,9 +1023,11 @@ def assert_amis_cuts_exports(crop: str = "wheat",
         max_ship_ratio = 0.85 if crop == "wheat" else 0.95
     country, y0, m0, y1, m1 = _EXPORTER_WINDOWS[crop]
     tau = run_crop_dynamics(crop, use_amis=True, use_shocks=False,
-                            use_demand=False, use_industrial=False)
+                            use_demand=False, use_industrial=False,
+                            **overrides)
     base = run_crop_dynamics(crop, use_amis=False, use_shocks=False,
-                             use_demand=False, use_industrial=False)
+                             use_demand=False, use_industrial=False,
+                             **overrides)
     if country not in tau.countries:
         raise AssertionError(f"{crop}: {country} not in node set")
     i = tau.countries.index(country)
