@@ -17,6 +17,7 @@ from .dynamic_crop import (
     CropPrep,
     CropSimResult,
     _ask_reweight_dest,
+    _ask_reweight_src,
     _bilateral_clear,
     default_crop_params,
     prepare_crop_run,
@@ -139,8 +140,10 @@ def _simulate_coupled(preps: list[CropPrep], eta: np.ndarray,
 
             A_eff = _ask_reweight_dest(
                 pr.A, ask[g], pr.p0, gamma=params.ask_comp_elast)
+            S_eff = _ask_reweight_src(
+                pr.S, ask[g], pr.p0, gamma=params.ask_comp_elast)
             shipped, received, ship = _bilateral_clear(
-                offers, demand, A_eff, pr.S, subst=params.residual_subst)
+                offers, demand, A_eff, S_eff, subst=params.residual_subst)
             recv_path[g][:, t] = received
             trade_path[g][:, :, t] = ship
 

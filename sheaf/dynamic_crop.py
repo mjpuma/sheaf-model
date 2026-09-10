@@ -112,6 +112,9 @@ class CropParams:
     # reduced_form — ask adaptation (Agrimate-like offer prices)
     ask_alpha: float = 0.15
     ask_target_fill: float = 0.70
+    # CES substitution elasticity over origins (importer source shares).
+    # Destination-share reweighting is algebraically the identity and is
+    # not used; see `_ask_reweight_src`.
     ask_comp_elast: float = 1.25
     ask_beta: float = 0.18
     # reduced_form — survivors mark up when preferred sources are blocked
@@ -502,11 +505,35 @@ def load_trade_shares(crop: str, countries: list[str],
 
 def _ask_reweight_dest(A: np.ndarray, ask: np.ndarray, p0: float,
                        gamma: float = 1.25) -> np.ndarray:
+    """Destination-share reweight. Algebraically the identity.
+
+    Each row of ``A`` is multiplied by a scalar ``(p0/q_i)^gamma`` and
+    then renormalised to sum 1, so the scalar cancels. Kept so existing
+    callers do not break; the live Armington channel is
+    ``_ask_reweight_src``.
+    """
     rel = (float(p0) / np.maximum(ask, 1e-6)) ** gamma
     A_eff = A * rel[:, None]
     row = A_eff.sum(axis=1, keepdims=True)
     np.divide(A_eff, row, out=A_eff, where=row > 0)
     return A_eff
+
+
+def _ask_reweight_src(S: np.ndarray, ask: np.ndarray, p0: float,
+                      gamma: float = 1.25) -> np.ndarray:
+    """CES source-share reweight: cheaper origins win importer share.
+
+    Column ``j`` of the result is importer ``j``'s expenditure-minimising
+    origin mix for a CES aggregator with elasticity of substitution
+    ``gamma`` and preference weights ``S[:, j]``. This is the channel
+    ``ask_comp_elast`` was documented as providing and that destination
+    reweighting cannot, because a row-scalar cancels.
+    """
+    rel = (float(p0) / np.maximum(ask, 1e-6)) ** gamma
+    S_eff = S * rel[:, None]
+    col = S_eff.sum(axis=0, keepdims=True)
+    np.divide(S_eff, col, out=S_eff, where=col > 0)
+    return S_eff
 
 
 def _bilateral_clear(offers: np.ndarray, demand: np.ndarray,
@@ -614,8 +641,9 @@ def _simulate_window(
         ask_path[:, t] = ask
 
         A_eff = _ask_reweight_dest(A, ask, p0, gamma=params.ask_comp_elast)
+        S_eff = _ask_reweight_src(S, ask, p0, gamma=params.ask_comp_elast)
         shipped, received, ship = _bilateral_clear(
-            offers, demand, A_eff, S, subst=params.residual_subst)
+            offers, demand, A_eff, S_eff, subst=params.residual_subst)
         recv_path[:, t] = received
         trade_path[:, :, t] = ship
 

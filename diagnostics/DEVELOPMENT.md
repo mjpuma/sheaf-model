@@ -129,16 +129,34 @@ for the τ column, whose base window *is* the pinned stretch.
   ask-dynamics-carried for wheat and maize. No globally inert parameter, but
   three exact conditional-inertness identities.
 
+### Red team vs Agrimate — shipped one fix
+
+Synthesis: [`gate0_prep/redteam/REDTEAM_SYNTHESIS.md`](gate0_prep/redteam/REDTEAM_SYNTHESIS.md).
+Potsdam letter updated.
+
+**Shipped:** CES source-share reweight (`_ask_reweight_src`). Destination
+reweight was the identity (`ask_comp_elast` inert). All twelve asserts
+pass. New official full-leg scores: wheat **+0.728 / ×2.28 / ×1.45**,
+maize **+0.778 / ×2.20 / ×1.59**, rice **+0.678 / ×1.72 / ×0.82**.
+
+**Prototyped, not shipped:** exporter FOC in place of the ask law.
+Restores the quiet-market rest point without the pin and passes asserts;
+destroys crisis amplitude (maize corr +0.78 → +0.34).
+
+**Their hard-bounds claim is false.** All-three-hard-bounds maize corr
++0.71 → +0.22.
+
+**Remaining gap vs Agrimate:** store-versus-sell. Rice residual pool 47%.
+
 ### Then
 
-- **A4** — the last measurement still running. Storage is the cluster where
-  Agrimate's commercial-supplier agent is the sharpest contrast.
+- **A4** — measurements are in `gate0_prep/a4/`; write-up still open.
+  Storage is the remaining Agrimate contrast.
 - **Three open decisions**, all in `POTSDAM_RESPONSE.md`: the basis for
   `ask_rival`; keep-and-document vs rebuild the offer-price law; which τ
   ratio is the headline. None should be settled unilaterally.
-- **Deck** — `overleaf/sheaf_deck/` needs the A1/A2 corrections (slide 48
-  wording, the twin-identity claim, the maize attribution). **Deferred until
-  the sweep closes**, per the user's instruction.
+- **Deck** — `overleaf/sheaf_deck/` needs the A1/A2 corrections and the
+  CES / maize-score update. **Still deferred** until the user asks.
 
 ## Paused
 

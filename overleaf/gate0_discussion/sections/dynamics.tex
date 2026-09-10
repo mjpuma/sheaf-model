@@ -125,27 +125,32 @@ partial-adjustment rate toward the stock target (per step). Equation
 solution to a dynamic programme.
 
 Bilateral allocation is Armington on a prescribed network
-\citep{armington1969}. Preferred destination shares are reweighted toward
-low offer prices,
+\citep{armington1969}. Importer source shares are the CES
+expenditure-minimising mix over origins,
 \begin{equation}
-\tilde A_{ij,t}\;\propto\;A_{ij}\left(\frac{p_0}{q_{i,t-1}}\right)^{\gamma},
-\qquad \sum_j \tilde A_{ij,t}=1,
+\tilde S_{ij,t}\;\propto\;S_{ij}\left(\frac{p_0}{q_{i,t-1}}\right)^{\gamma},
+\qquad \sum_i \tilde S_{ij,t}=1,
 \label{eq:reweight}
 \end{equation}
-where \(A_{ij}\) is the observed FAOSTAT destination share of exporter
-\(i\) to importer \(j\) (dimensionless), \(q_{i,t-1}\) is exporter \(i\)'s
-lagged offer price (2010 \$/t), and \(\gamma>0\) governs how strongly
-buyers shift toward cheaper origins. Shipments on each link are the short
-side,
+where \(S_{ij}\) is the observed FAOSTAT source share of importer \(j\)
+from exporter \(i\) (dimensionless; note \(S_{ij}\) is a share, whereas
+\(S_{i,t}\) is a stock), \(q_{i,t-1}\) is exporter \(i\)'s lagged offer
+price (2010 \$/t), and \(\gamma>0\) is the elasticity of substitution
+across origins. An earlier draft reweighted destination shares
+\(A_{ij}\) by the same factor and renormalised each exporter's row.
+That map is the identity: a row-constant cancels, so cheaper origins
+never gained share. Equation \eqref{eq:reweight} is the importer-side
+object that actually responds to relative offer prices, and is the
+first-order condition of a CES expenditure-minimisation problem. Shipments
+on each link are the short side,
 \begin{equation}
-X_{ij,t}=\min\bigl(O_{i,t}\tilde A_{ij,t},\;S_{ij}D_{j,t}\bigr),
+X_{ij,t}=\min\bigl(O_{i,t}A_{ij},\;\tilde S_{ij,t}D_{j,t}\bigr),
 \label{eq:clear}
 \end{equation}
 where \(X_{ij,t}\) is the shipment from \(i\) to \(j\) (MMT per step) and
-\(S_{ij}\) is the observed source share of importer \(j\) from exporter
-\(i\) (dimensionless; note \(S_{ij}\) is a share, whereas \(S_{i,t}\) is a
-stock). Unmatched supply then meets a fraction \(\nu\) of unmatched demand
-through a residual pool. Quantities therefore come from
+\(A_{ij}\) is the observed destination share of exporter \(i\) to importer
+\(j\) (dimensionless). Unmatched supply then meets a fraction \(\nu\) of
+unmatched demand through a residual pool. Quantities therefore come from
 \eqref{eq:offers}--\eqref{eq:importdemand}; the trade matrix supplies only
 the pattern of partners.
 

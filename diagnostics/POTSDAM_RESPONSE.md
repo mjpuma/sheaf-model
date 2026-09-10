@@ -2,44 +2,62 @@
 
 To: Kuhla, Kubiczek, Otto
 From: the SHEAF team
-Accompanies: `overleaf/gate0_discussion/main.pdf` (19 pp., revised)
+Accompanies: `overleaf/gate0_discussion/main.pdf` (20 pp., revised)
 
 Thank you for the sitting. This is not a list of things we intend to do. It
 is what your questions turned up when we went and checked, what we changed
 as a result, and where we would value your judgement.
 
-The short version: your questions about the price map sent us to compare the
-written equations against the executed code line by line. Four of the note's
-statements were wrong, one of them materially. Correcting the measurement
-that the material one had contaminated changes a headline result in your
-favour — the restriction channel is now the leading 2007/08 channel in all
-three crops, where maize had previously read as demand-led. No model
-equation was changed and no score moved.
+The short version. Your questions sent us to compare the written equations
+against the executed code, and then to red-team Gate 0 against Agrimate on
+optimisation, clearing, and the rest of the formulation. Four of the note's
+statements were wrong. One coding bug was also an optimisation gap: the
+Armington competition you would recognise as Eq. 8c was algebraically the
+identity, so cheaper origins never gained share. That is now a CES
+source-share reweight — the first-order condition of expenditure
+minimisation — and it is the one model change we shipped. An exporter
+first-order condition that would give the offer-price law a rest point, and
+remove four reduced-form knobs, restores the quiet market but costs the
+crisis; we prototyped it and did not adopt it. The restriction channel is
+the leading 2007/08 channel in all three crops once a contaminated
+comparison is repaired. Storage is the place Gate 0 is still weaker than
+Agrimate.
 
 ---
 
 ## 1. What we changed
 
-Four corrections to the note, three fixes to code. Every official score is
-unchanged to three digits: wheat +0.720 / ×2.27 / ×1.45, maize +0.712 /
-×1.97 / ×1.70, rice +0.678 / ×1.72 / ×0.82 (monthly price correlation
-against the deflated Pink Sheet, then the 2007/08 and 2010/11 hike ratios).
+**The one equation change.** Destination-share reweighting
+\(\tilde A_{ij}\propto A_{ij}(p_0/q_i)^\gamma\), renormalised by exporter,
+is the identity: a row-constant cancels. `ask_comp_elast` therefore did
+nothing, against the note, the parameter comment, and Agrimate Eq. 8c.
+Importer source shares are now the CES mix,
+\(\tilde S_{ij}\propto S_{ij}(p_0/q_i)^\gamma\), renormalised by importer.
+All twelve robustness assertions still pass. Official scores, full leg,
+before → after:
 
-**Note corrections.** The scarcity regulariser was described as a small
-constant; it is 5% of world safety stock plus a state-dependent term, which
-biases the scarcity ratio by 35% on average for rice. The unmet-demand
-channel was written without its truncation at zero, which binds at 92, 59
-and 100 of 144 steps. The trade-weighted price was ambiguous about which
-period's offer prices it uses; it uses the current ones, so offer prices are
-updated twice in one causal chain. And the reference identity was described
-as algebraic when it is enforced — see §2.
+| crop | corr | 2007/08 | 2010/11 | observed 07/08, 10/11 |
+|---|---|---|---|---|
+| wheat | +0.720 → **+0.728** | ×2.27 → ×2.28 | ×1.45 → ×1.45 | ×1.82, ×1.16 |
+| maize | +0.712 → **+0.778** | ×1.97 → ×2.20 | ×1.70 → ×1.59 | ×1.84, ×1.44 |
+| rice | +0.678 → **+0.678** | ×1.72 → ×1.72 | ×0.82 → ×0.82 | ×1.84, ×0.79 |
 
-**Code fixes.** Unknown keyword overrides were silently dropped, so a
-mistyped sensitivity study returned the baseline and reported no effect;
-they now raise. The four robustness assertions could not be run under
-parameter overrides, so no sensitivity study could exercise them; they now
-can. And the restriction sign test was not comparing like with like, which
-is §2.
+Maize moved because the twin is rebuilt under the same law. That is a
+consequence of making the documented mechanism real, not a retune.
+
+**Note corrections (no score effect).** The scarcity regulariser is 5% of
+world safety stock plus a state-dependent term, not a small constant, and
+biases the rice scarcity ratio by 35% on average. The unmet-demand channel
+is truncated at zero and the truncation binds at 92 / 59 / 100 of 144 steps.
+The trade-weighted price uses this period's asks, and falls back to the
+previous world price when nothing ships — a jump of up to 12 $/t that was
+missing from the printed equation. The reference identity is enforced, not
+derived — see §2.
+
+**Measurement fixes (no equation change).** Unknown keyword overrides now
+raise. The four assertions accept overrides. The restriction sign test
+perturbs its baseline harvest by one part per million so both legs share a
+price law — see §2.
 
 ---
 
@@ -83,8 +101,8 @@ under both versions of the test: as written, maize crosses at 0.755, which
 is why 0.80 was chosen; corrected, maize clears at zero but by only +4.7%,
 so the condition is nearly binding rather than comfortably slack. And the
 parameter is not spurious — setting it to zero moves the maize correlation
-from +0.712 to +0.414 and the rice 2007/08 ratio from ×1.72 to ×1.01 against
-an observed ×1.84.
+from +0.778 to +0.520 after the CES repair (it was +0.712 → +0.414 before)
+and the rice 2007/08 ratio from ×1.72 to ×1.01 against an observed ×1.84.
 
 So the finding is narrower and more awkward than "a knob we can drop": a
 parameter that materially sets crisis amplitude has no independent basis for
@@ -100,8 +118,8 @@ the restriction-only leg's hike ratio.
 
 | crop | 2007/08 τ ratio, as published | like-for-like | observed |
 |---|---|---|---|
-| wheat | ×1.70 | ×1.99 | ×1.82 |
-| maize | ×1.10 | ×1.69 | ×1.84 |
+| wheat | ×1.71 | ×2.00 | ×1.82 |
+| maize | ×1.09 | ×1.69 | ×1.84 |
 | rice | ×1.75 | ×1.70 | ×1.84 |
 
 Maize 2007/08 moves from demand-led to restriction-led. Both numbers are
@@ -119,15 +137,15 @@ measured something, the measurement is in the third column.
 |---|---|---|
 | How is price formed? Is it a differential equation? | §3.5 eqs (12)–(17); §4.3 | Discrete sequential map. Price flexibility table in `gate0_prep/a2/` |
 | Export prices each step? World vs export price? | §3.4 eq (11); §4.4 | Two prices, both now defined; §2 above on their interaction |
-| Do we need an optimisation principle? | §4.3 | The scarcity term *is* isoelastic inverse demand over accessible stock, elasticity −1/η. The blend with the mean offer price is not the stationarity condition of any single objective |
+| Do we need an optimisation principle? | §4.3 | Scarcity term = \(U'(F)\) for CRRA over accessible stock. CES sourcing is now a real FOC. The ask law is not; an exporter FOC was prototyped (see §4) |
 | What is the baseline? | §4.1, Fig. 2 | Four objects, all named |
-| Commercial hold / competitive storage / one agent | §4.2, Fig. 3 | A4 in progress; reported separately |
-| How much is sold to each market? | §3.2 eqs (6)–(8); §4.4 | FAOSTAT supplies the pattern only |
+| Commercial hold / competitive storage / one agent | §4.2, Fig. 3 | Cover rule, not store-versus-sell. Implied newsvendor penalties are \(10^{5}\)–\(10^{6}\). This is the remaining gap |
+| How much is sold to each market? | §3.2 eqs (6)–(8); §4.4 | FAOSTAT pattern plus residual pool. Residual share: wheat 12%, maize 4%, **rice 47%** |
 | Linear demand? Industrial use? | §3.1 eq (1); §4.5 | Isoelastic, not linear |
 | Expectations: not ten-year foresight | §3.1 eq (2); §4.7 | Foresight is near-inert for wheat (0.02 on all metrics), active for maize (0.30) |
 | Slide 48 / storage cost; why not dump everything? | §4.2 | Slide 48 is the ask update, not a cost of carry. **Please confirm which you meant** |
-| Glut should lower p; annually? | §4.6 | The channel is one-sided by construction; now stated |
-| Too many parameters | §4.8, Table 2; §5 | Ablation below |
+| Glut should lower p; annually? | §4.6 | Surplus already lowers the price through the scarcity ratio, roughly symmetrically at 1–2% shocks. The unmet channel is a different, one-sided object |
+| Too many parameters | §4.8, Table 2; §5 | Hard bounds do **not** reproduce the official scores (maize corr +0.71 → +0.22). Three collinear pairs; `ask_comp_elast` was the one dead knob and is now live |
 | "FRO and economics" | — | We read "FAO and economists". **Please confirm** |
 
 ---
@@ -195,29 +213,69 @@ assertions re-run in each of the thirty cells.
 
 ---
 
+### Gate 0 against Agrimate
+
+We red-teamed the formulation on three axes — optimisation, clearing, and
+the rest of the census — with the instruction that Gate 0 should be as
+strong as Agrimate or stronger, and that a cheaper design is not
+automatically an error. Full tables in
+`diagnostics/gate0_prep/redteam/REDTEAM_SYNTHESIS.md`. The short version:
+
+- **Now at parity:** importer sourcing. That was the dead Armington
+  channel; it is now the CES first-order condition you already use.
+- **Already answered, without a change:** a surplus lowers the price.
+  Controlled ±1% and ±2% harvest shocks move the price roughly
+  symmetrically through the scarcity ratio. The one-sided unmet term is a
+  different object.
+- **Your "hard bounds would give similar behaviour" is false.** Replacing
+  the partial-adjustment and smoothing knobs with 0/1 bounds moves maize
+  correlation from +0.71 to +0.22. The knobs are doing work.
+- **Still weaker:** the store-versus-sell decision. The cover rule is a
+  target-stock heuristic. Backing out the newsvendor penalty that would
+  rationalise the safety stock produces ratios of \(10^{5}\) to \(10^{6}\).
+  We prototyped the obvious close — set each exporter's offer price to a
+  markup over the marginal value of own accessible stock, which is exactly
+  \(U'(F_i)\) for the CRRA felicity the scarcity term already implies.
+  That law has a rest point at the reference without the pin, passes all
+  four robustness tests, and does not need the rival markup. It also
+  takes wheat correlation from +0.73 to +0.58, maize from +0.78 to +0.34,
+  and rice from +0.68 to +0.19. We did not ship it.
+- **Rice trade is half residual.** 47% of rice shipments bypass the
+  FAOSTAT pattern (wheat 12%, maize 4%). The network is doing less work
+  for rice than the note suggests.
+- **The paper's thesis is intact.** Restrictions are a first-class object
+  on the market's own clock. That is the thing SHEAF does that Agrimate
+  does not. Gate 0 is a strong enough host on the quantity side and a
+  usable host on the incentive side: exporter revenue at own offer price
+  differs from revenue at the world price by 5–15%, so a government's
+  objective is representable. It is not yet as strong as Agrimate on the
+  decision that produces the surplus those restrictions act on.
+
 ## 5. What we propose next
 
 1. **Settle the rival markup.** External basis, explicit reduced-form
-   relabel, or derive it. We would take your view on which.
+   relabel, or derive it from the exporter problem in the bullet above.
+   We would take your view on which.
 2. **Decide the offer-price law.** Keep the conditional and document it, or
-   rebuild the law so a quiet market is a genuine rest point. The second is
-   the principled option and connects to your optimisation question; it is
-   also a real change with consequences across all three crops, so we would
-   not do it on the strength of one diagnostic.
+   rebuild so a quiet market is a genuine rest point. The FOC prototype is
+   the candidate; the cost is now measured.
 3. **Settle the attribution headline** — pinned or like-for-like.
-4. **Storage.** A4 is running: the cover rule's implied intertemporal
-   behaviour, and which of three candidate causes produces the exporter
-   stock floor. We will send it separately. This is the cluster where your
-   commercial-supplier agent is the sharpest contrast, and we would rather
-   bring you a measurement than a proposal.
-5. **Contemporaneous demand.** Well posed and cheap, but small. Our
-   inclination is to record the measurement and not change the map.
+4. **Storage.** The remaining gap versus Agrimate. We will not clone the
+   commercial-supplier agent and call it SHEAF. If there is a one-line
+   store-versus-sell condition you would accept as in the lineage, we
+   would rather hear it than invent one.
+5. **Rice residual pool.** Diagnose before redesigning. 47% is large
+   enough that the FAOSTAT pattern may be the wrong object for rice, not
+   merely a thin one.
+6. **Contemporaneous demand.** Well posed and cheap, but small. Record,
+   do not change.
 
 ## 6. What we would like from you
 
 - Confirmation on the two transcription questions in §3.
-- Your view on the rival markup, which is the one place where we have a
-  parameter doing real work without a defensible reason for its value.
-- Whether the commercial-storage contrast in §4.2 of the note describes
-  Agrimate accurately. We have tried to state your treatment from the
-  published description rather than assume it.
+- Your view on the rival markup, and on whether the exporter FOC we
+  prototyped is the object you meant by an optimisation principle, or
+  whether you meant something closer to the commercial-supplier programme.
+- Whether §4.2 of the note describes Agrimate's storage treatment
+  accurately. We have tried to state it from the published description
+  rather than assume it.
