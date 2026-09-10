@@ -145,12 +145,29 @@ step, which is 0.3% to 0.9% of world desired use, largest in 2007/08 for
 maize.
 
 We also checked whether the implied fixed point is well posed, since that
-determines whether this is a one-line change or a numerical project. Over
-all 432 crop-steps, the map has exactly one root at every step, its
-Lipschitz constant has a median of 0.02 to 0.03, and plain Picard iteration
-converges in five to nine iterations. So it is a one-line root-find. Whether
-it is worth doing for a 0.3% to 0.9% correction is a separate question and
-we lean against, but the obstacle we expected is not there.
+determines whether this is a one-line change or a numerical project. The
+answer is in between. Over all 432 crop-steps the map has exactly one root
+at every step, the slope at the root never exceeds 0.117 in absolute value,
+and plain Picard iteration converges in at most thirteen iterations even
+from deliberately bad starting points. So the inner solve is genuinely
+cheap.
+
+What stops it being one line is that the map is not globally contractive —
+its Lipschitz constant over the admissible price interval reaches 39.7,
+always far from the root — and it has two real jump discontinuities. One is
+the conditional discussed in §2, which steps the map by up to 37 $/t. The
+other we had not catalogued at all: when world shipments fall below a
+threshold, the shipment-weighted offer price falls back to the previous
+world price, and the mean it replaces does not approach that value, so the
+map jumps by up to 12 $/t. A jump straddling a root means no root exists
+there, so an implementation needs a bracketed solve with an explicit
+residual check rather than a bare iteration. Neither jump came near a root
+on the scored path, but both live where accessible stock is small or
+negative — which is the regime the model exists to study.
+
+Our inclination is still to record the measurement and not change the map,
+for a 0.3% to 0.9% correction. But the second discontinuity is a genuine
+gap in how we had written the price down, and it is now in the note.
 
 ### Which channel carries which crisis?
 

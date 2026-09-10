@@ -192,6 +192,52 @@ Resulting one-step move in the price the step writes (`p_out` under contemporane
 
 `G(x)` = the price the step writes when demand is evaluated at trial price `x`, incoming state held at the official path. Option B is `p_t = G(p_t)`.
 
+### 3a-analytic. The sign chain, derived from the code
+
+Reading L580 -> L596 -> L643 -> L661-663 -> L674 -> L678 -> L680, with `elast < 0`:
+
+```
+d desired_i/dp = elast * desired_flex_i / p            <  0   (L580, exact)
+d offers_i/dp  = -(d desired_i/dp)(1 - cuts_i)         >= 0   (L596, where offers_i > 0)
+d demand_i/dp  <= 0                                            (L592-595: both food_need and rebuild fall as desired falls)
+d free/dp      = -d(sum consumption)/dp - d locked/dp   >= 0   (L643: sum_i shipped_i == sum_j received_j, so the
+                 bilateral flows cancel in the WORLD sum and only consumption, the warehouse drain and `locked` survive)
+d ratio/dp     = -(ratio/(free+shift)) d free/dp        <= 0   (L663, when free>0 and twin>0 so `shift` is constant)
+d p_scar/dp    = p_scar inv_eta (d ratio/dp)/ratio      <= 0   (L674, plus a <=0 unmet term through u_anom)
+G'(p)          = (1-smooth)[trade_w dp_trade/dp
+                            + (1-trade_w) dp_scar/dp]          (L678, L680)
+```
+
+Every link except `dp_trade/dp` has a sign that follows from the code alone, and they compose to `G' <= 0`. The trade channel is *not* sign-definite: `p_trade = dot(ask, shipped)/sum(shipped)` (L652), and `shipped` comes from `min(offers_i A_ij, S_ij demand_j)` in `_bilateral_clear` (L500-503) — the minimum of an increasing and a decreasing function of `p`, hence unimodal rather than monotone, with moving weights. That is the reason `G` is not exactly monotone everywhere. Link-by-link numerical check, every second step after the first model year:
+
+| crop | episode | n | d_desired_le0 | d_offers_ge0 | d_demand_le0 | d_free_ge0 | d_ratio_le0 | d_pscar_le0 | d_ptrade_le0 | G_slope_le0 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| maize | 2007/08 | 15 | 15 | 15 | 15 | 15 | 15 | 15 | 13 | 15 |
+| maize | 2010/11 | 21 | 21 | 21 | 21 | 21 | 21 | 21 | 14 | 20 |
+| maize | calm | 24 | 24 | 24 | 24 | 24 | 24 | 23 | 18 | 22 |
+| rice | 2007/08 | 15 | 15 | 15 | 15 | 15 | 15 | 15 | 13 | 15 |
+| rice | 2010/11 | 21 | 21 | 21 | 21 | 21 | 21 | 19 | 14 | 19 |
+| rice | calm | 24 | 24 | 24 | 24 | 24 | 24 | 22 | 17 | 22 |
+| wheat | 2007/08 | 15 | 15 | 15 | 15 | 15 | 15 | 15 | 6 | 14 |
+| wheat | 2010/11 | 21 | 21 | 21 | 21 | 21 | 21 | 21 | 10 | 20 |
+| wheat | calm | 24 | 24 | 24 | 24 | 24 | 24 | 24 | 12 | 21 |
+
+Counts are out of `n`. The only links that ever come out with the 'wrong' sign are the trade channel and, through it, `G` itself.
+
+Closed form for the scarcity channel vs the measured total slope (rows with `free > 0`, where the constant-`shift` branch applies); `unexplained` is `num_slope - analytic_scar - trade_channel`, i.e. the `u_anom` term plus kinks:
+
+| crop | episode | n | mean_num_slope | mean_analytic_scar | mean_trade_channel | mean_abs_unexplained | max_abs_unexplained |
+|---|---|---|---|---|---|---|---|
+| maize | 2007/08 | 15 | -0.004364 | -0.003477 | -0.0005271 | 0.0005601 | 0.001678 |
+| maize | 2010/11 | 21 | -0.009059 | -0.002565 | 0.008349 | 0.01488 | 0.07485 |
+| maize | calm | 24 | -0.003601 | -0.001788 | 0.001617 | 0.003786 | 0.04446 |
+| rice | 2007/08 | 7 | -0.007481 | -0.006569 | -0.001133 | 0.0007884 | 0.00183 |
+| rice | 2010/11 | 18 | -0.001671 | -0.001598 | -0.000205 | 0.0002883 | 0.001338 |
+| rice | calm | 24 | -0.002199 | -0.001805 | -0.0004987 | 0.0003662 | 0.001997 |
+| wheat | 2007/08 | 15 | -0.008726 | -0.006452 | 0.00179 | 0.004143 | 0.01305 |
+| wheat | 2010/11 | 21 | -0.002003 | -0.002011 | 6.264e-05 | 0.0003318 | 0.002063 |
+| wheat | calm | 24 | -0.0009598 | -0.001391 | 0.0005471 | 0.000258 | 0.002615 |
+
 ### 3a. Local behaviour on ±35% around the official price
 
 | crop | episode | n | L_max_worst | L_max_mean | all_monotone_decreasing | n_not_monotone | worst_root_sign_changes | max_abs_fp_residual | max_abs_fp_minus_official | n_any_calm | n_twin_in_range |
@@ -409,6 +455,58 @@ The reachable steps in detail. Bisect onto `free(x) = twin`, then expand outward
 
 So the calm branch does make `G` genuinely discontinuous where it is reachable: the plateau is 4.2e-05–0.00057 $/t wide and `G` steps by up to 36.77 $/t at its edges. It is reachable at 7 of 432 steps and at none of them does the root fall inside the plateau (closest approach 0.9715 $/t). The hazard is real but it did not fire on this path.
 
+## 4. Verdict
+
+### Size of the gap (computed)
+
+Dropping the first model year, the world flex-demand gap `d(p_t) - d(p_{t-1})` has mean absolute value 0.129 MMT per step (0.57% of world desired use) and never exceeds 1.091 MMT (4.01%) at any of 360 crop-steps. Including the first model year, the single worst step is maize 2006-12a at -10.03 MMT (-28.7% of use), driven by a 4.1x one-step price jump inside the spin-up transient that `assert_twin_identity` already discards.
+
+### One-step propagated bound (computed)
+
+Holding the incoming state fixed, world offers move by 0.147% on average (max 8.87%), the scarcity ratio `r_t` by 0.207% on average (max 6.83%), and the price the step writes by 0.0811 $/t on average (max 4.113 $/t). Solving the step's fixed point outright rather than taking one Picard step moves the price by 0.0774 $/t on average and at most 3.683 $/t (1.064% of the official price). **One-step bound; the incoming state is pinned to the official path and is not allowed to drift.**
+
+### Well-posedness of G (computed + reasoned)
+
+| property | finding | evidence |
+|---|---|---|
+| `G` maps [60,1200] into itself | yes, strictly | `resid_at_60 >= 31.6 > 0` and `resid_at_1200 <= -298 < 0` at all 432 crop-steps (computed) |
+| monotone decreasing | yes analytically except the trade channel; not exactly, in practice | sign chain above is `<= 0` link by link; `min(offers, demand)` in `_bilateral_clear` makes `p_trade` unimodal, and `G'` is positive somewhere at 78 of 432 steps (computed) |
+| contraction near the root | yes, strongly | `|G'(p*)| <= 0.1174` over all 432 steps; median `L_max` on the whole clip interval 0.0327 (computed) |
+| contraction globally on [60,1200] | no | `L_max > 1` at 5 steps, up to 39.7, always at trial prices far from the root (computed) |
+| number of roots | exactly one, everywhere | `root_sign_changes == 1` at all 432 crop-steps; `|residual| <= 1.14e-13` $/t (computed) |
+| price clip (L681) breaks it | no | the clip is continuous and monotone; it is what makes `G` self-mapping, and it never binds at the root (0 roots at a discontinuity) (reasoned + computed) |
+| `calm` branch (L666-669) breaks it | it is a genuine jump, but reachable at only 7 of 432 steps and never at the root | plateau 4.2e-05-5.7e-04 $/t wide, `G` steps by 0.74-36.77 $/t at its edges, exactly `(1-smooth)*trade_w*|p_trade - p0|`; closest root approach 0.97 $/t (computed) |
+| `max(0,.)` truncations break it | no, they are kinks not jumps | the `offers > 1e-9` crossing changes `fill` and the `rival` exponent discontinuously, but the affected country's shipment weight in `p_trade` goes to zero at the same time, so the measured jump is <= 1.4e-07 $/t (computed) |
+| **`shipped_sum > 1e-12` fallback (L651-653)** | **a fourth discontinuity, not in the brief, and the largest one** | jumps of 1.74-11.70 $/t at 3 of 432 steps; closest root approach 108 $/t (computed) |
+| plain Picard from `p_{t-1}` converges | yes, always | <= 12 iterations to 1e-8 $/t at all 432 steps; median 5 (computed) |
+| Picard converges from bad starts | yes, always | 60, 1200, 0.5 p_prev, 2 p_prev all converge at all 432 steps, <= 13 iterations, agreeing with the bisected root to 7.7e-10 $/t (computed) |
+
+### One-line root-find, or a numerical project?
+
+**On this path, the inner solve is genuinely cheap: five to thirteen Picard iterations of the existing step body, converging from any start we tried, to a root that is unique at every one of 432 crop-steps.** That is the computed part, and it is strong.
+
+**But `G` is not a globally well-behaved map, and the reasons are structural rather than incidental.** Three of them are worth writing down before anyone commits to X1:
+
+1. `G` has real jump discontinuities. The `p_trade` fallback at L651-653 produced jumps up to 11.7 $/t, and the `calm` branch at L666-669 produced jumps up to 36.8 $/t. Neither landed on a root here, but a jump straddling a root means *no root exists*, and then any solver returns a point whose residual is bounded below by the jump height. A solver must therefore check the residual it achieved and log failures — it cannot assume convergence, which is exactly what the X1 prompt already asks for.
+2. Global contraction fails. `L_max` on [60,1200] reaches 40. Convergence here is a local property of the neighbourhood of the official price, not a Banach guarantee. It held for every start we tested, but it is not a theorem.
+3. Both hazards live where `free` is small or negative (34 of 432 steps have `free < 0`), which is precisely the crisis regime the model exists to study. When `free < twin < 0`, `shift = floor0 - free` makes the denominator of `ratio` collapse to the constant `0.05*safety_w`, and the map stiffens. The steps with the largest `L_max` and the largest jumps are the 2007/08 rice steps and the maize 2006-12 transient.
+
+So: not a one-line root-find, but not a numerical project either. It is a small, bounded piece of numerical work — a bracketed solve with an explicit residual check, a logged non-convergence path, and a decision about what to do when no root exists — which is a day of careful implementation, not a research programme. **And the measured prize is small: under half a $/t of price movement on the sharpest one-step bound, at every step outside the spin-up year.**
+
+### Classification and confidence (per `CLAUDE.md`)
+
+| finding | class | confidence |
+|---|---|---|
+| The demand-information gap is numerically small everywhere outside the first model year (mean |gap| 0.57% of use, max 4.01%) | H (investigated, no defect) | 95-100% — direct reproduction; the replica of the step body matches the official path to 0.0 |
+| Per-step fixed point moves the price by at most 3.68 $/t (1.06%), one-step, incoming state fixed | H | 95-100% for the one-step statement; **not** evidence about a full option-B path, which was not run |
+| `G` has exactly one root at all 432 crop-steps, with `|G'(p*)| <= 0.117` | H | 95-100% on this path (exhaustive over steps, 801-point grid + bisection); 80-95% as a general claim, since a grid can miss a feature narrower than its cells |
+| The `p_trade` fallback at L651-653 makes `G` discontinuous, with jumps up to 11.7 $/t | C (numerical issue) | 95-100% that the discontinuity exists and has that magnitude (localised by bisection to machine width); 40-60% that it would ever strand an option-B solve, since it never came within 108 $/t of a root here |
+| The `calm` branch at L666-669 makes `G` discontinuous by exactly `(1-smooth)*trade_w*|p_trade - p0|` (up to 36.8 $/t) on a plateau ~1e-4 $/t wide | C | 95-100% — measured jump matches the closed form to 4 significant figures at all 7 reachable steps. This is also independent corroboration of hypothesis H2 in prompt A1: in a calm run the identity `p_star = p0` is enforced by the conditional, since just outside it `p_star = trade_w*p_trade + (1-trade_w)*p0` and `p_trade != p0` |
+| `G` is analytically monotone decreasing except through the trade channel, which `min(offers, demand)` makes unimodal | A/E — neither, it is a property, not a defect | 80-95%: the chain is derived from the code and each link verified numerically, but the composition is not a proof over all parameter values |
+| Global contraction fails on [60,1200] (`L_max` up to 40) | C | 95-100% that the sup exceeds 1; the steep region is always far from the root |
+
+No change is recommended here. Per the brief, option B / X1 also needs A2, and its own gate additionally asks for a materially large gap — which, on this evidence, is not what was found.
+
 ## Artifacts
 
 - `diagnostics/gate0_prep/a3/demand_gap.csv` (7776 rows: crop × step × country)
@@ -420,6 +518,7 @@ So the calm branch does make `G` genuinely discontinuous where it is reachable: 
 - `diagnostics/gate0_prep/a3/g_grid_refinement.csv`
 - `diagnostics/gate0_prep/a3/g_calm_reachability.csv` (432 rows)
 - `diagnostics/gate0_prep/a3/g_calm_jump_detail.csv` (7 rows)
+- `diagnostics/gate0_prep/a3/g_chain_signs.csv` (180 rows)
 - `diagnostics/gate0_prep/a3/replica_verification.csv`
 - `figures/scratch/a3/g_curve_wheat.png`
 - `figures/scratch/a3/g_curve_wide_wheat.png`
@@ -428,4 +527,6 @@ So the calm branch does make `G` genuinely discontinuous where it is reachable: 
 - `figures/scratch/a3/g_curve_rice.png`
 - `figures/scratch/a3/g_curve_wide_rice.png`
 - `figures/scratch/a3/demand_gap_paths.png`
+- `figures/scratch/a3/g_discontinuities.png`
+- `figures/scratch/a3/g_calm_discontinuity.png`
 

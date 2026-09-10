@@ -909,23 +909,23 @@ def plot_g(crop: str, prep: CropPrep, res, steps: list[int]) -> Path:
         ax.plot(grid, cur.G, color="#1f4e79", lw=1.6, label="G(p)")
         ax.plot(grid, grid, color="0.5", ls="--", lw=1.0, label="45°")
         ax.axvline(pt, color="#c0392b", lw=1.0, ls=":",
-                   label=f"official $p_t$={pt:.0f}")
+                   label=f"official p_t={pt:.0f}")
         ax.axvline(float(p_in[t]), color="#e67e22", lw=1.0, ls=":",
-                   label=f"$p_{{t-1}}$={float(p_in[t]):.0f}")
+                   label=f"p_(t-1)={float(p_in[t]):.0f}")
         resid = cur.G.to_numpy() - grid
         idx = np.where(np.sign(resid[:-1]) * np.sign(resid[1:]) < 0)[0]
         if len(idx):
             ax.plot([grid[idx[0]]], [cur.G.iloc[idx[0]]], "o",
                     color="#1e8449", ms=5, label="fixed point")
         ax.set_title(f"{crop} step {t} ({step_tag(t)}, {epi[t]})", fontsize=9)
-        ax.set_xlabel("trial price $p$  ($/t)")
-        ax.set_ylabel("$G(p)$  ($/t)")
+        ax.set_xlabel("trial price p  (USD/t)")
+        ax.set_ylabel("G(p)  (USD/t)")
         ax.legend(fontsize=6.5, frameon=False)
         ax2 = axes[1][k]
         ax2.plot(grid, resid, color="#6c3483", lw=1.4)
         ax2.axhline(0.0, color="0.5", lw=0.8)
-        ax2.set_xlabel("trial price $p$  ($/t)")
-        ax2.set_ylabel("$G(p) - p$  ($/t)")
+        ax2.set_xlabel("trial price p  (USD/t)")
+        ax2.set_ylabel("G(p) - p  (USD/t)")
         slope = np.diff(cur.G.to_numpy()) / np.diff(grid)
         ax2.set_title(
             f"max|G'| = {np.max(np.abs(slope)):.3g}; "
@@ -955,20 +955,75 @@ def plot_g_wide(crop: str, prep: CropPrep, res, steps: list[int]) -> Path:
         ax.plot(grid, cur.G, color="#1f4e79", lw=1.6, label="G(p)")
         ax.plot(grid, grid, color="0.5", ls="--", lw=1.0, label="45°")
         ax.axvline(float(res.price[t]), color="#c0392b", lw=1.0, ls=":",
-                   label="official $p_t$")
+                   label="official p_t")
         resid = cur.G.to_numpy() - grid
         idx = np.where(np.sign(resid[:-1]) * np.sign(resid[1:]) < 0)[0]
         for j in idx:
             ax.plot([grid[j]], [cur.G.iloc[j]], "o", color="#1e8449", ms=5)
         ax.set_title(f"{crop} step {t} ({step_tag(t)}, {epi[t]})", fontsize=9)
-        ax.set_xlabel("trial price $p$  ($/t)")
-        ax.set_ylabel("$G(p)$  ($/t)")
+        ax.set_xlabel("trial price p  (USD/t)")
+        ax.set_ylabel("G(p)  (USD/t)")
         ax.legend(fontsize=7, frameon=False, loc="upper left")
     fig.suptitle(f"A3 Task 3 — G on the full clip interval [60, 1200] "
                  f"({crop}): G is nearly flat, so exactly one crossing",
                  fontsize=10)
     fig.tight_layout(rect=(0, 0, 1, 0.9))
     path = FIGS / f"g_curve_wide_{crop}.png"
+    fig.savefig(path, dpi=140)
+    plt.close(fig)
+    return path
+
+
+def plot_jumps(cases: list[tuple], preps: dict) -> Path:
+    """Zoom on the located discontinuities: G across a jump, at machine width."""
+    fig, axes = plt.subplots(1, len(cases), figsize=(4.0 * len(cases), 3.5),
+                             squeeze=False)
+    for k, (crop, t, pj, cause, jump) in enumerate(cases):
+        prep, res, st, (si, ai, pi) = preps[crop]
+        span = 4.0
+        grid = np.linspace(pj - span, pj + span, 601)
+        g = np.array([_G(st, t, si[:, t], ai[:, t], float(pi[t]), float(x))
+                      for x in grid])
+        ax = axes[0][k]
+        ax.plot(grid, g, color="#c0392b", lw=1.4)
+        ax.axvline(pj, color="0.4", ls=":", lw=1.0)
+        ax.set_title(f"{crop} step {t} ({step_tag(t)})\n{cause}: "
+                     f"G jumps {jump:.2f} USD/t at p={pj:.2f}", fontsize=8.5)
+        ax.set_xlabel("trial price p  (USD/t)")
+        ax.set_ylabel("G(p)  (USD/t)")
+    fig.suptitle("A3 Task 3 — the located jump discontinuities in G "
+                 "(these are NOT at a root on this path)", fontsize=10)
+    fig.tight_layout(rect=(0, 0, 1, 0.88))
+    path = FIGS / "g_discontinuities.png"
+    fig.savefig(path, dpi=140)
+    plt.close(fig)
+    return path
+
+
+def plot_calm_zoom(cases: list[tuple], preps: dict) -> Path:
+    """Zoom on the `calm` plateau: G is flat on it and steps at both edges."""
+    fig, axes = plt.subplots(1, len(cases), figsize=(4.0 * len(cases), 3.5),
+                             squeeze=False)
+    for k, (crop, t, pc, lo, hi, jump) in enumerate(cases):
+        prep, res, st, (si, ai, pi) = preps[crop]
+        wdt = max(hi - lo, 1e-6)
+        grid = np.linspace(pc - 3 * wdt, pc + 3 * wdt, 601)
+        g = np.array([_G(st, t, si[:, t], ai[:, t], float(pi[t]), float(x))
+                      for x in grid])
+        ax = axes[0][k]
+        ax.plot((grid - pc) * 1e3, g, color="#6c3483", lw=1.4)
+        ax.axvspan((lo - pc) * 1e3, (hi - pc) * 1e3, color="#1e8449",
+                   alpha=0.15, label="calm plateau")
+        ax.set_title(f"{crop} step {t} ({step_tag(t)})\ncalm branch: "
+                     f"G steps {jump:.2f} USD/t, plateau "
+                     f"{(hi - lo) * 1e3:.2f} milli-USD/t wide", fontsize=8.5)
+        ax.set_xlabel(f"trial price - {pc:.4f}  (milli-USD/t)")
+        ax.set_ylabel("G(p)  (USD/t)")
+        ax.legend(fontsize=7, frameon=False)
+    fig.suptitle("A3 Task 3 — the L666-669 `calm` branch is a genuine "
+                 "discontinuity in G", fontsize=10)
+    fig.tight_layout(rect=(0, 0, 1, 0.88))
+    path = FIGS / "g_calm_discontinuity.png"
     fig.savefig(path, dpi=140)
     plt.close(fig)
     return path
@@ -984,7 +1039,7 @@ def plot_gap(world: pd.DataFrame) -> Path:
         for name, y0, m0, y1, m1 in EPISODES:
             t0, t1 = _step_slice(y0, m0, y1, m1)
             ax.axvspan(t0, t1, color="#c0392b", alpha=0.12)
-        ax.set_title(f"{crop}: world flex-demand gap  $d(p_t)-d(p_{{t-1}})$",
+        ax.set_title(f"{crop}: world flex-demand gap  d(p_t) - d(p_t-1)",
                      fontsize=9)
         ax.set_xlabel("step")
         ax.set_ylabel("MMT / step")
@@ -1013,11 +1068,13 @@ def main() -> None:
     per_country, world, lip, wide, calm, verif = [], [], [], [], [], []
     allsc, refn, creach, cjd, chs = [], [], [], [], []
     figs = []
+    preps: dict = {}
     for crop in CROPS:
         print(f"[{crop}] official run + prep …", flush=True)
         res_off = run_crop_dynamics(crop, **RUN_KW)
         prep = prepare_crop_run(crop, **RUN_KW)
         res = simulate_prep(prep)
+        st_c = build_static(prep)
         dp = float(np.max(np.abs(res.price - res_off.price)))
         print(f"[{crop}] simulate_prep vs run_crop_dynamics "
               f"max|Δp| = {dp:.3e}", flush=True)
@@ -1063,6 +1120,7 @@ def main() -> None:
                                           prep.H.shape[1], 2))))
         figs.append(plot_g(crop, prep, res, probe[:4]))
         figs.append(plot_g_wide(crop, prep, res, probe[:4]))
+        preps[crop] = (prep, res, st_c, incoming_states(prep, res))
 
     pc = pd.concat(per_country, ignore_index=True)
     w = pd.concat(world, ignore_index=True)
@@ -1088,6 +1146,17 @@ def main() -> None:
     ch.to_csv(OUT / "g_chain_signs.csv", index=False)
     vf.to_csv(OUT / "replica_verification.csv", index=False)
     figs.append(plot_gap(w))
+    jc = az[az.max_jump_G > 0.01].sort_values("max_jump_G", ascending=False)
+    if len(jc):
+        figs.append(plot_jumps(
+            [(r.crop, int(r.step), float(r.p_at_max_jump), r.jump_cause,
+              float(r.max_jump_G)) for r in jc.head(3).itertuples()], preps))
+    cjb = cj.sort_values("max_calm_jump", ascending=False)
+    if len(cjb):
+        figs.append(plot_calm_zoom(
+            [(r.crop, int(r.step), float(r.p_cross), float(r.calm_lo),
+              float(r.calm_hi), float(r.max_calm_jump))
+             for r in cjb.head(3).itertuples()], preps))
 
     # ---------------- report ----------------
     L = ["# A3 — size of the contemporaneous-demand gap, and is G well posed?",
@@ -1194,6 +1263,68 @@ def main() -> None:
           "`G(x)` = the price the step writes when demand is evaluated at "
           "trial price `x`, incoming state held at the official path. "
           "Option B is `p_t = G(p_t)`.", "",
+          "### 3a-analytic. The sign chain, derived from the code", "",
+          "Reading L580 -> L596 -> L643 -> L661-663 -> L674 -> L678 -> L680, "
+          "with `elast < 0`:", "",
+          "```",
+          "d desired_i/dp = elast * desired_flex_i / p            <  0   "
+          "(L580, exact)",
+          "d offers_i/dp  = -(d desired_i/dp)(1 - cuts_i)         >= 0   "
+          "(L596, where offers_i > 0)",
+          "d demand_i/dp  <= 0                                            "
+          "(L592-595: both food_need and rebuild fall as desired falls)",
+          "d free/dp      = -d(sum consumption)/dp - d locked/dp   >= 0   "
+          "(L643: sum_i shipped_i == sum_j received_j, so the",
+          "                 bilateral flows cancel in the WORLD sum and only "
+          "consumption, the warehouse drain and `locked` survive)",
+          "d ratio/dp     = -(ratio/(free+shift)) d free/dp        <= 0   "
+          "(L663, when free>0 and twin>0 so `shift` is constant)",
+          "d p_scar/dp    = p_scar inv_eta (d ratio/dp)/ratio      <= 0   "
+          "(L674, plus a <=0 unmet term through u_anom)",
+          "G'(p)          = (1-smooth)[trade_w dp_trade/dp",
+          "                            + (1-trade_w) dp_scar/dp]          "
+          "(L678, L680)",
+          "```", "",
+          "Every link except `dp_trade/dp` has a sign that follows from the "
+          "code alone, and they compose to `G' <= 0`. The trade channel is "
+          "*not* sign-definite: `p_trade = dot(ask, shipped)/sum(shipped)` "
+          "(L652), and `shipped` comes from `min(offers_i A_ij, "
+          "S_ij demand_j)` in `_bilateral_clear` (L500-503) — the minimum of "
+          "an increasing and a decreasing function of `p`, hence unimodal "
+          "rather than monotone, with moving weights. That is the reason `G` "
+          "is not exactly monotone everywhere. Link-by-link numerical check, "
+          "every second step after the first model year:", "",
+          _fmt(ch.groupby(["crop", "episode"]).agg(
+              n=("step", "size"),
+              d_desired_le0=("d_desired_dp", lambda s: int((s <= 0).sum())),
+              d_offers_ge0=("d_offers_dp", lambda s: int((s >= 0).sum())),
+              d_demand_le0=("d_demand_dp", lambda s: int((s <= 0).sum())),
+              d_free_ge0=("d_free_dp", lambda s: int((s >= 0).sum())),
+              d_ratio_le0=("d_ratio_dp", lambda s: int((s <= 0).sum())),
+              d_pscar_le0=("d_pscar_dp", lambda s: int((s <= 0).sum())),
+              d_ptrade_le0=("d_ptrade_dp", lambda s: int((s <= 0).sum())),
+              G_slope_le0=("num_slope", lambda s: int((s <= 0).sum())),
+          ).reset_index()), "",
+          "Counts are out of `n`. The only links that ever come out with the "
+          "'wrong' sign are the trade channel and, through it, `G` itself.",
+          "",
+          "Closed form for the scarcity channel vs the measured total slope "
+          "(rows with `free > 0`, where the constant-`shift` branch "
+          "applies); `unexplained` is "
+          "`num_slope - analytic_scar - trade_channel`, i.e. the `u_anom` "
+          "term plus kinks:", "",
+          _fmt(ch[ch.free > 0].assign(
+              unexplained=lambda d: d.num_slope - d.analytic_scar_slope
+              - d.trade_channel).groupby(["crop", "episode"]).agg(
+                  n=("step", "size"),
+                  mean_num_slope=("num_slope", "mean"),
+                  mean_analytic_scar=("analytic_scar_slope", "mean"),
+                  mean_trade_channel=("trade_channel", "mean"),
+                  mean_abs_unexplained=("unexplained",
+                                        lambda s: s.abs().mean()),
+                  max_abs_unexplained=("unexplained",
+                                       lambda s: s.abs().max()),
+          ).reset_index()), "",
           "### 3a. Local behaviour on ±35% around the official price", "",
           _fmt(lp.groupby(["crop", "episode"]).agg(
               n=("L_max", "size"),
@@ -1379,7 +1510,182 @@ def main() -> None:
           f"{cj.root_to_calm_window.min():.4g} $/t). The hazard is real but "
           f"it did not fire on this path.", ""]
 
-    L += ["## Artifacts", "",
+    az2 = az[az.step >= STEPS_PER_YEAR]
+    L += ["## 4. Verdict", "",
+          "### Size of the gap (computed)", "",
+          "Dropping the first model year, the world flex-demand gap "
+          "`d(p_t) - d(p_{t-1})` has mean absolute value "
+          f"{w2.world_gap_mmt.abs().mean():.3f} MMT per step "
+          f"({w2.world_gap_pct.abs().mean():.2f}% of world desired use) and "
+          f"never exceeds {w2.world_gap_mmt.abs().max():.3f} MMT "
+          f"({w2.world_gap_pct.abs().max():.2f}%) at any of "
+          f"{len(w2)} crop-steps. Including the first model year, the single "
+          "worst step is maize 2006-12a at "
+          f"{w[(w.crop == 'maize') & (w.step == 22)].world_gap_mmt.iloc[0]:.2f}"
+          " MMT (-28.7% of use), driven by a 4.1x one-step price jump inside "
+          "the spin-up transient that `assert_twin_identity` already "
+          "discards.", "",
+          "### One-step propagated bound (computed)", "",
+          "Holding the incoming state fixed, world offers move by "
+          f"{w2.offers_gap_pct.abs().mean():.3f}% on average "
+          f"(max {w2.offers_gap_pct.abs().max():.2f}%), the scarcity ratio "
+          f"`r_t` by {w2.ratio_gap_pct.abs().mean():.3f}% on average "
+          f"(max {w2.ratio_gap_pct.abs().max():.2f}%), and the price the "
+          "step writes by "
+          f"{w2.p_gap_one_step.abs().mean():.4f} $/t on average "
+          f"(max {w2.p_gap_one_step.abs().max():.3f} $/t). Solving the step's "
+          "fixed point outright rather than taking one Picard step moves the "
+          f"price by {az2.fp_minus_official.abs().mean():.4f} $/t on average "
+          f"and at most {az2.fp_minus_official.abs().max():.3f} $/t "
+          f"({az2.fp_pct_of_official.abs().max():.3f}% of the official "
+          "price). **One-step bound; the incoming state is pinned to the "
+          "official path and is not allowed to drift.**", "",
+          "### Well-posedness of G (computed + reasoned)", "",
+          "| property | finding | evidence |",
+          "|---|---|---|",
+          "| `G` maps [60,1200] into itself | yes, strictly | "
+          f"`resid_at_60 >= {az.resid_at_60.min():.1f} > 0` and "
+          f"`resid_at_1200 <= {az.resid_at_1200.max():.0f} < 0` at all "
+          f"{len(az)} crop-steps (computed) |",
+          "| monotone decreasing | yes analytically except the trade "
+          "channel; not exactly, in practice | sign chain above is `<= 0` "
+          "link by link; `min(offers, demand)` in `_bilateral_clear` makes "
+          "`p_trade` unimodal, and `G'` is positive somewhere at "
+          f"{int((az.max_positive_slope > 1e-9).sum())} of {len(az)} steps "
+          "(computed) |",
+          "| contraction near the root | yes, strongly | "
+          f"`|G'(p*)| <= {az.fp_slope.abs().max():.4f}` over all "
+          f"{len(az)} steps; median `L_max` on the whole clip interval "
+          f"{az.L_max_global.median():.4f} (computed) |",
+          "| contraction globally on [60,1200] | no | `L_max > 1` at "
+          f"{int((az.L_max_global > 1).sum())} steps, up to "
+          f"{az.L_max_global.max():.1f}, always at trial prices far from the "
+          "root (computed) |",
+          "| number of roots | exactly one, everywhere | "
+          f"`root_sign_changes == 1` at all {len(az)} crop-steps; "
+          f"`|residual| <= {az.fp_residual.abs().max():.2e}` $/t (computed) |",
+          "| price clip (L681) breaks it | no | the clip is continuous and "
+          "monotone; it is what makes `G` self-mapping, and it never binds "
+          f"at the root ({int(az.root_inside_jump.sum())} roots at a "
+          "discontinuity) (reasoned + computed) |",
+          "| `calm` branch (L666-669) breaks it | it is a genuine jump, but "
+          "reachable at only 7 of 432 steps and never at the root | "
+          f"plateau {cj.calm_window_width.min():.1e}-"
+          f"{cj.calm_window_width.max():.1e} $/t wide, `G` steps by "
+          f"{cj.max_calm_jump.min():.2f}-{cj.max_calm_jump.max():.2f} $/t at "
+          "its edges, exactly "
+          "`(1-smooth)*trade_w*|p_trade - p0|`; closest root approach "
+          f"{cj.root_to_calm_window.min():.2f} $/t (computed) |",
+          "| `max(0,.)` truncations break it | no, they are kinks not jumps "
+          "| the `offers > 1e-9` crossing changes `fill` and the `rival` "
+          "exponent discontinuously, but the affected country's shipment "
+          "weight in `p_trade` goes to zero at the same time, so the "
+          f"measured jump is <= {az[az.jump_cause == 'offers_trunc'].max_jump_G.max():.1e} $/t "
+          "(computed) |",
+          "| **`shipped_sum > 1e-12` fallback (L651-653)** | **a fourth "
+          "discontinuity, not in the brief, and the largest one** | jumps of "
+          f"{az[az.jump_cause == 'ptrade_fallback'].max_jump_G.min():.2f}-"
+          f"{az[az.jump_cause == 'ptrade_fallback'].max_jump_G.max():.2f} $/t "
+          "at 3 of 432 steps; closest root approach "
+          f"{az[az.jump_cause == 'ptrade_fallback'].root_to_nearest_jump.min():.0f} "
+          "$/t (computed) |",
+          "| plain Picard from `p_{t-1}` converges | yes, always | "
+          f"<= {az.picard_iters.max()} iterations to 1e-8 $/t at all "
+          f"{len(az)} steps; median {az.picard_iters.median():.0f} "
+          "(computed) |",
+          "| Picard converges from bad starts | yes, always | 60, 1200, "
+          f"0.5 p_prev, 2 p_prev all converge at all {len(az)} steps, "
+          f"<= {az.picard_bad_max_iters.max()} iterations, agreeing with the "
+          f"bisected root to {az.picard_bad_max_spread.abs().max():.1e} $/t "
+          "(computed) |", "",
+          "### One-line root-find, or a numerical project?", "",
+          "**On this path, the inner solve is genuinely cheap: five to "
+          "thirteen Picard iterations of the existing step body, converging "
+          "from any start we tried, to a root that is unique at every one of "
+          "432 crop-steps.** That is the computed part, and it is strong.",
+          "",
+          "**But `G` is not a globally well-behaved map, and the reasons are "
+          "structural rather than incidental.** Three of them are worth "
+          "writing down before anyone commits to X1:", "",
+          "1. `G` has real jump discontinuities. The `p_trade` fallback at "
+          "L651-653 produced jumps up to "
+          f"{az.max_jump_G.max():.1f} $/t, and the `calm` branch at "
+          f"L666-669 produced jumps up to {cj.max_calm_jump.max():.1f} $/t. "
+          "Neither landed on a root here, but a jump straddling a root means "
+          "*no root exists*, and then any solver returns a point whose "
+          "residual is bounded below by the jump height. A solver must "
+          "therefore check the residual it achieved and log failures — it "
+          "cannot assume convergence, which is exactly what the X1 prompt "
+          "already asks for.",
+          "2. Global contraction fails. `L_max` on [60,1200] reaches "
+          f"{az.L_max_global.max():.0f}. Convergence here is a local "
+          "property of the neighbourhood of the official price, not a "
+          "Banach guarantee. It held for every start we tested, but it is "
+          "not a theorem.",
+          "3. Both hazards live where `free` is small or negative "
+          f"({int(az.free_negative.sum())} of {len(az)} steps have "
+          "`free < 0`), which is precisely the crisis regime the model "
+          "exists to study. When `free < twin < 0`, `shift = floor0 - free` "
+          "makes the denominator of `ratio` collapse to the constant "
+          "`0.05*safety_w`, and the map stiffens. The steps with the "
+          "largest `L_max` and the largest jumps are the 2007/08 rice steps "
+          "and the maize 2006-12 transient.", "",
+          "So: not a one-line root-find, but not a numerical project either. "
+          "It is a small, bounded piece of numerical work — a bracketed "
+          "solve with an explicit residual check, a logged non-convergence "
+          "path, and a decision about what to do when no root exists — "
+          "which is a day of careful implementation, not a research "
+          "programme. **And the measured prize is small: under half a $/t of "
+          "price movement on the sharpest one-step bound, at every step "
+          "outside the spin-up year.**", "",
+          "### Classification and confidence (per `CLAUDE.md`)", "",
+          "| finding | class | confidence |",
+          "|---|---|---|",
+          "| The demand-information gap is numerically small everywhere "
+          "outside the first model year (mean |gap| "
+          f"{w2.world_gap_pct.abs().mean():.2f}% of use, max "
+          f"{w2.world_gap_pct.abs().max():.2f}%) | H (investigated, no "
+          "defect) | 95-100% — direct reproduction; the replica of the step "
+          "body matches the official path to 0.0 |",
+          "| Per-step fixed point moves the price by at most "
+          f"{az2.fp_minus_official.abs().max():.2f} $/t "
+          f"({az2.fp_pct_of_official.abs().max():.2f}%), one-step, incoming "
+          "state fixed | H | 95-100% for the one-step statement; **not** "
+          "evidence about a full option-B path, which was not run |",
+          "| `G` has exactly one root at all 432 crop-steps, with "
+          f"`|G'(p*)| <= {az.fp_slope.abs().max():.3f}` | H | 95-100% on "
+          "this path (exhaustive over steps, 801-point grid + bisection); "
+          "80-95% as a general claim, since a grid can miss a feature "
+          "narrower than its cells |",
+          "| The `p_trade` fallback at L651-653 makes `G` discontinuous, "
+          f"with jumps up to {az.max_jump_G.max():.1f} $/t | C (numerical "
+          "issue) | 95-100% that the discontinuity exists and has that "
+          "magnitude (localised by bisection to machine width); 40-60% that "
+          "it would ever strand an option-B solve, since it never came "
+          "within "
+          f"{az[az.jump_cause == 'ptrade_fallback'].root_to_nearest_jump.min():.0f}"
+          " $/t of a root here |",
+          "| The `calm` branch at L666-669 makes `G` discontinuous by "
+          f"exactly `(1-smooth)*trade_w*|p_trade - p0|` (up to "
+          f"{cj.max_calm_jump.max():.1f} $/t) on a plateau ~1e-4 $/t wide | "
+          "C | 95-100% — measured jump matches the closed form to 4 "
+          "significant figures at all 7 reachable steps. This is also "
+          "independent corroboration of hypothesis H2 in prompt A1: in a "
+          "calm run the identity `p_star = p0` is enforced by the "
+          "conditional, since just outside it `p_star = trade_w*p_trade + "
+          "(1-trade_w)*p0` and `p_trade != p0` |",
+          "| `G` is analytically monotone decreasing except through the "
+          "trade channel, which `min(offers, demand)` makes unimodal | A/E "
+          "— neither, it is a property, not a defect | 80-95%: the chain is "
+          "derived from the code and each link verified numerically, but "
+          "the composition is not a proof over all parameter values |",
+          "| Global contraction fails on [60,1200] (`L_max` up to "
+          f"{az.L_max_global.max():.0f}) | C | 95-100% that the sup exceeds "
+          "1; the steep region is always far from the root |", "",
+          "No change is recommended here. Per the brief, option B / X1 also "
+          "needs A2, and its own gate additionally asks for a materially "
+          "large gap — which, on this evidence, is not what was found.", "",
+          "## Artifacts", "",
           "- `diagnostics/gate0_prep/a3/demand_gap.csv` "
           f"({len(pc)} rows: crop × step × country)",
           "- `diagnostics/gate0_prep/a3/demand_gap_world.csv` "
@@ -1393,6 +1699,8 @@ def main() -> None:
           f"({len(cr)} rows)",
           f"- `diagnostics/gate0_prep/a3/g_calm_jump_detail.csv` "
           f"({len(cj)} rows)",
+          f"- `diagnostics/gate0_prep/a3/g_chain_signs.csv` "
+          f"({len(ch)} rows)",
           "- `diagnostics/gate0_prep/a3/replica_verification.csv`"]
     for f in figs:
         L.append(f"- `{f.relative_to(ROOT)}`")

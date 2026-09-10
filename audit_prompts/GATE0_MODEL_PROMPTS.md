@@ -203,7 +203,11 @@ map, never a replacement.
 ### X1 — Contemporaneous demand (gated on A2 and A3)
 
 ```
-GATE. Do not start unless: A3 found the demand gap materially large in at least one scored episode, AND A3 found G well posed (monotone, single root, no discontinuity from the clip or the calm branch), AND coauthors have decided this cluster. If any gate fails, stop and say which.
+GATE — **both halves now fail on A3's evidence; do not start.** The gate as written required (a) a materially large demand gap in at least one scored episode, (b) G well posed with no discontinuity from the clip or the calm branch, and (c) a coauthor decision.
+
+(a) fails: the gap is 0.3–0.9% of world desired use, max 4.0% outside the spin-up year, and the crisis windows are not systematically worse than calm periods. (b) fails as written, though less badly than the phrasing suggests: G has exactly one root at all 432 steps with |G'(p*)| ≤ 0.117 and Picard converges in ≤13 iterations, but G is not globally contractive (L_max 39.7) and the calm branch *is* a genuine discontinuity (≤36.8 $/t), as is a `p_trade` fallback at L665–669 (≤11.7 $/t) that this gate did not know about. Neither jump came near a root on the scored path.
+
+So the revised condition, if this is ever reopened: X1 is a bracketed solve with an explicit residual check and a logged non-convergence path, roughly a day, not a one-line root-find. It should not be reopened for a sub-1% correction without a reason beyond correctness. See `diagnostics/gate0_prep/a3/`.
 
 Implement demand at p_t as a labelled sensitivity, not a replacement. Add a parameter selecting the information set; default stays the current lagged-price behaviour. Solve the scalar fixed point per crop per step with an explicit tolerance and a documented fallback if it fails to converge; log every non-convergence rather than silently falling back. Re-score all three crops, official and sensitivity side by side. Hold every reduced-form knob at its current value: eta, omega, kappa, alpha, beta, phi. If the sensitivity scores worse, that is a result and it gets reported, not fixed by retuning.
 

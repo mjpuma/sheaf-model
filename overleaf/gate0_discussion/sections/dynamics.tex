@@ -260,7 +260,28 @@ prices, \(p^{\star}_t\) is the within-period price target (2010 \$/t), and
 \([60,1200]\) \$/t.
 
 Two details of \eqref{eq:pscar}--\eqref{eq:pstar} are easy to state
-imprecisely and are worth pinning down. First, the unmet-demand term is
+imprecisely and are worth pinning down. Before them, one omission. The
+trade-weighted offer price is undefined when nothing ships, and the
+implementation resolves that by falling back to the previous world price,
+\begin{equation}
+p^{\mathrm{tr}}_t=
+\begin{cases}
+\dfrac{\sum_i q_{i,t}\,x_{i,t}}{\sum_i x_{i,t}}, & \sum_i x_{i,t}>\epsilon,\\[2ex]
+p_{t-1}, & \text{otherwise,}
+\end{cases}
+\label{eq:ptrade}
+\end{equation}
+where \(x_{i,t}\) is the quantity country \(i\) actually ships in period
+\(t\) (MMT) and \(\epsilon=10^{-12}\) MMT. This is not a removable
+convention. As world shipments vanish the weighted mean tends to the offer
+price of whichever exporter still ships, which need not be \(p_{t-1}\), so
+\eqref{eq:ptrade} is genuinely discontinuous at the threshold: perturbing
+the price across it moves \(p^{\mathrm{tr}}_t\) by up to 12 \$/t. The
+threshold is not crossed on the scored paths, but it is reachable under
+price perturbation at a handful of steps, all of them where accessible
+stock is small or negative.
+
+Now the two details. First, the unmet-demand term is
 one-sided,
 \begin{equation}
 \Delta u_t=\max\bigl(0,\,u_t-u^{\mathrm{twin}}_t\bigr),
@@ -271,10 +292,9 @@ where \(u_t\) is the share of world import demand left unmet and
 therefore cannot lower the price, whereas unmet demand above it raises the
 price. The truncation binds: \(u_t<u^{\mathrm{twin}}_t\) at 92 of 144 steps
 for wheat, 59 for maize and 100 for rice, so this is the usual case rather
-than an edge case. Second, \(p^{\mathrm{tr}}_t\) is weighted by this
-period's shipments and uses this period's offer prices \(q_{i,t}\) from
-\eqref{eq:ask}, not the lagged \(q_{i,t-1}\) that entered the allocation in
-\eqref{eq:reweight}. Offer prices are therefore updated twice within one
+than an edge case. Second, the offer prices in \eqref{eq:ptrade} are this
+period's \(q_{i,t}\) from \eqref{eq:ask}, not the lagged \(q_{i,t-1}\) that
+entered the allocation in \eqref{eq:reweight}. Offer prices are therefore updated twice within one
 period's causal chain: once to allocate trade, once to price it.
 
 Equation \eqref{eq:pscar} is inverse-demand in form: price rises as

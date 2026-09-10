@@ -115,10 +115,16 @@ for the τ column, whose base window *is* the pinned stretch.
 
 ### A3 / A5 in one line each
 
-- **A3** — the contemporaneous-demand gap is 0.3–0.9% of world desired use;
-  the implied fixed point has exactly one root at all 432 steps, Lipschitz
-  median 0.02–0.03, Picard converges in 5–9 iterations. Well posed and
-  cheap, but small. Inclination: record, do not adopt.
+- **A3** — the contemporaneous-demand gap is 0.3–0.9% of world desired use
+  (max 4.0% outside the spin-up year); one-step propagated price move
+  ≤ 4.11 $/t. The fixed point has exactly one root at all 432 steps,
+  \(|G'(p^\*)|\le 0.117\), Picard converges in ≤13 iterations from bad
+  starts — but \(G\) is **not** globally contractive (L_max 39.7) and has
+  two real jumps: the calm branch (≤36.8 $/t) and an uncatalogued
+  \(p^{\mathrm{tr}}\) fallback at L665–669 (≤11.7 $/t). So X1 needs a
+  bracketed solve with a residual check, not a bare iteration. Inclination:
+  record, do not adopt. The \(p^{\mathrm{tr}}\) fallback is now written
+  into the note as eq (13) — it was missing from our own equations.
 - **A5** — 2007/08 is restriction-carried in all three crops; 2010/11 is
   ask-dynamics-carried for wheat and maize. No globally inert parameter, but
   three exact conditional-inertness identities.
