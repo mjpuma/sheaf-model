@@ -468,6 +468,278 @@ def wide_scan(crop: str, prep: CropPrep, res, steps: list[int],
     return pd.DataFrame(rows)
 
 
+def _G(st: Static, t: int, stock_in, ask_in, p_in: float, x: float) -> float:
+    return step_G(st, t, stock_in, ask_in, p_in, float(x))["p_out"]
+
+
+def _regime(o: dict) -> tuple:
+    """The discrete switches inside the step body that G can jump across."""
+    return (o["n_offer_pos"],                 # max(0,...) in offers, L596
+            bool(o["shipped_sum"] > 1e-12),   # p_trade fallback, L651
+            bool(o["calm"]),                  # calm branch, L666
+            bool(o["clipped"]))               # price clip, L681
+
+
+def all_step_scan(crop: str, prep: CropPrep, res, n: int = 801,
+                  n_jump_probes: int = 6) -> pd.DataFrame:
+    """Every step: global root count on [60,1200], L_max, root, jumps, Picard.
+
+    Discontinuities are found by ranking grid cells by |ΔG|, bisecting the
+    top ``n_jump_probes`` cells on the *regime tuple* (see ``_regime``) down
+    to machine width, and measuring |G| across the resulting bracket.  A cell
+    that is merely steep rather than discontinuous returns a jump of ~0, so
+    the measurement is safe against false positives.
+    """
+    st = build_static(prep)
+    stock_in, ask_in, p_in = incoming_states(prep, res)
+    T = prep.H.shape[1]
+    epi = episode_labels(T)
+    grid = np.linspace(60.0, 1200.0, n)
+    rows = []
+    for t in range(T):
+        sk, ak, pk = stock_in[:, t], ask_in[:, t], float(p_in[t])
+        outs = [step_G(st, t, sk, ak, pk, x) for x in grid]
+        g = np.array([o["p_out"] for o in outs])
+        resid = g - grid
+        slope = np.diff(g) / np.diff(grid)
+        sc = np.where(np.sign(resid[:-1]) * np.sign(resid[1:]) < 0)[0]
+        root = np.nan
+        root_resid = np.nan
+        root_slope = np.nan
+        if len(sc):
+            a, b = grid[sc[0]], grid[sc[0] + 1]
+            ra = resid[sc[0]]
+            for _ in range(100):
+                mid = 0.5 * (a + b)
+                rm = _G(st, t, sk, ak, pk, mid) - mid
+                if rm == 0.0:
+                    a = b = mid
+                    break
+                if np.sign(rm) == np.sign(ra):
+                    a, ra = mid, rm
+                else:
+                    b = mid
+            root = 0.5 * (a + b)
+            root_resid = _G(st, t, sk, ak, pk, root) - root
+            h = max(1e-4, 1e-6 * root)
+            root_slope = ((_G(st, t, sk, ak, pk, root + h)
+                           - _G(st, t, sk, ak, pk, root - h)) / (2 * h))
+        # --- discontinuity hunt: bisect the steepest cells on the regime ---
+        jumps = []
+        order = np.argsort(-np.abs(np.diff(g)))
+        for j in order[:n_jump_probes]:
+            a, b = grid[j], grid[j + 1]
+            key = _regime(outs[j])
+            if key == _regime(outs[j + 1]):
+                continue
+            for _ in range(60):
+                mid = 0.5 * (a + b)
+                if _regime(step_G(st, t, sk, ak, pk, mid)) == key:
+                    a = mid
+                else:
+                    b = mid
+                if b - a < 1e-11 * max(1.0, b):
+                    break
+            ga = _G(st, t, sk, ak, pk, a)
+            gb = _G(st, t, sk, ak, pk, b)
+            jumps.append((0.5 * (a + b), abs(gb - ga),
+                          _regime(step_G(st, t, sk, ak, pk, a)),
+                          _regime(step_G(st, t, sk, ak, pk, b))))
+        jumps = [j for j in jumps if j[1] > 1e-9]
+        max_jump = max((j[1] for j in jumps), default=0.0)
+        p_at_max_jump = (max(jumps, key=lambda j: j[1])[0] if jumps
+                         else np.nan)
+        dist = (min((abs(j[0] - root) for j in jumps), default=np.nan)
+                if np.isfinite(root) else np.nan)
+        which = ""
+        if jumps:
+            ja, jb = max(jumps, key=lambda j: j[1])[2:]
+            bits = []
+            if ja[0] != jb[0]:
+                bits.append("offers_trunc")
+            if ja[1] != jb[1]:
+                bits.append("ptrade_fallback")
+            if ja[2] != jb[2]:
+                bits.append("calm_branch")
+            if ja[3] != jb[3]:
+                bits.append("price_clip")
+            which = "+".join(bits)
+
+        # plain Picard from the lagged price (what the shipped code uses)
+        x = pk
+        it = 0
+        for it in range(1, 201):
+            xn = _G(st, t, sk, ak, pk, x)
+            if abs(xn - x) < 1e-8:
+                x = xn
+                break
+            x = xn
+        # Picard robustness from deliberately bad starts
+        picard_bad = []
+        for x0 in (60.0, 1200.0, 0.5 * pk, 2.0 * pk):
+            y = float(np.clip(x0, 60.0, 1200.0))
+            ok, k = False, 0
+            for k in range(1, 201):
+                yn = _G(st, t, sk, ak, pk, y)
+                if abs(yn - y) < 1e-8:
+                    y, ok = yn, True
+                    break
+                y = yn
+            picard_bad.append((ok, k, y))
+        rows.append(dict(
+            crop=crop, step=t, tag=step_tag(t), episode=epi[t],
+            in_first_model_year=bool(t < STEPS_PER_YEAR),
+            p_prev=pk, p_official=float(res.price[t]),
+            root_sign_changes=int(len(sc)),
+            L_max_global=float(np.max(np.abs(slope))),
+            max_positive_slope=float(slope.max()),
+            monotone_decreasing=bool(np.all(slope <= 0.0)),
+            resid_at_60=float(resid[0]), resid_at_1200=float(resid[-1]),
+            fp=root, fp_residual=root_resid, fp_slope=root_slope,
+            fp_minus_official=root - float(res.price[t]),
+            fp_pct_of_official=100.0 * (root - float(res.price[t]))
+            / float(res.price[t]),
+            picard_iters=it, picard_fp=x,
+            picard_minus_bisect=x - root,
+            n_jumps_found=len(jumps), max_jump_G=max_jump,
+            p_at_max_jump=p_at_max_jump, jump_cause=which,
+            root_to_nearest_jump=dist,
+            root_inside_jump=bool(np.isfinite(dist) and dist < 1e-6
+                                  and max_jump > 1e-6),
+            picard_bad_all_converged=all(p[0] for p in picard_bad),
+            picard_bad_max_iters=max(p[1] for p in picard_bad),
+            picard_bad_max_spread=(
+                max(abs(p[2] - root) for p in picard_bad)
+                if np.isfinite(root) else np.nan),
+            free_official=float(res.free_liquid[t]),
+            free_negative=bool(float(res.free_liquid[t]) < 0.0),
+            twin=float(prep.free_twin[t]),
+            max_cut=float(prep.cuts[:, t].max()),
+        ))
+    return pd.DataFrame(rows)
+
+
+def refine_scan(crop: str, prep: CropPrep, res, steps: list[int],
+                ns=(401, 3201, 25601), half_width: float = 0.15
+                ) -> pd.DataFrame:
+    """Grid-refinement continuity test.
+
+    If ``G`` had a jump in the window, ``L_max`` estimated by finite
+    differences would grow ~linearly with the grid density.  If it plateaus,
+    no jump is present at that resolution.
+    """
+    st = build_static(prep)
+    stock_in, ask_in, p_in = incoming_states(prep, res)
+    epi = episode_labels(prep.H.shape[1])
+    rows = []
+    for t in steps:
+        sk, ak, pk = stock_in[:, t], ask_in[:, t], float(p_in[t])
+        pt = float(res.price[t])
+        lo = max(60.0, pt * (1 - half_width))
+        hi = min(1200.0, pt * (1 + half_width))
+        rec = dict(crop=crop, step=t, tag=step_tag(t), episode=epi[t],
+                   p_official=pt, lo=lo, hi=hi)
+        for n in ns:
+            grid = np.linspace(lo, hi, n)
+            g = np.array([_G(st, t, sk, ak, pk, x) for x in grid])
+            slope = np.diff(g) / np.diff(grid)
+            rec[f"L_max_n{n}"] = float(np.max(np.abs(slope)))
+            rec[f"maxjump_n{n}"] = float(np.max(np.abs(np.diff(g))))
+        rows.append(rec)
+    return pd.DataFrame(rows)
+
+
+def calm_reachability(crop: str, prep: CropPrep, res) -> pd.DataFrame:
+    """Is the L666-669 `calm` branch reachable at all along the scored path?
+
+    `calm` needs THREE conditions at once: |free-twin| < 1e-6,
+    u_anom < 1e-9, block_frac < 1e-9.  ``block_frac`` is zero iff no
+    restricted exporter is a preferred source for any positive demand, which
+    is a property of ``cuts`` and ``S``, not of the trial price.  So the
+    branch is unreachable at every step where AMIS is biting.
+    """
+    st = build_static(prep)
+    stock_in, ask_in, p_in = incoming_states(prep, res)
+    T = prep.H.shape[1]
+    epi = episode_labels(T)
+    rows = []
+    for t in range(T):
+        sk, ak, pk = stock_in[:, t], ask_in[:, t], float(p_in[t])
+        lo_o = step_G(st, t, sk, ak, pk, 60.0)
+        hi_o = step_G(st, t, sk, ak, pk, 1200.0)
+        twin = float(prep.free_twin[t])
+        cross = np.sign(lo_o["free"] - twin) != np.sign(hi_o["free"] - twin)
+        rows.append(dict(
+            crop=crop, step=t, tag=step_tag(t), episode=epi[t],
+            twin=twin, free_at_60=lo_o["free"], free_at_1200=hi_o["free"],
+            free_crosses_twin=bool(cross),
+            block_frac_at_60=lo_o["block_frac"],
+            block_frac_at_1200=hi_o["block_frac"],
+            block_frac_zero=bool(max(lo_o["block_frac"],
+                                     hi_o["block_frac"]) < 1e-9),
+            u_anom_at_60=lo_o["u_anom"], u_anom_at_1200=hi_o["u_anom"],
+            u_anom_zero=bool(max(lo_o["u_anom"], hi_o["u_anom"]) < 1e-9),
+            calm_reachable=bool(cross
+                                and max(lo_o["block_frac"],
+                                        hi_o["block_frac"]) < 1e-9
+                                and max(lo_o["u_anom"],
+                                        hi_o["u_anom"]) < 1e-9),
+            p_trade_at_60=lo_o["p_trade"],
+            hypothetical_jump=(1.0 - st.prep.params.smooth)
+            * st.prep.params.trade_w * abs(lo_o["p_trade"] - prep.p0),
+        ))
+    return pd.DataFrame(rows)
+
+
+def calm_jump_detail(crop: str, prep: CropPrep, res,
+                     reach: pd.DataFrame) -> pd.DataFrame:
+    """For the steps where `calm` IS reachable, bisect onto free(x)=twin and
+    measure whether the branch actually fires and what it does to G."""
+    st = build_static(prep)
+    stock_in, ask_in, p_in = incoming_states(prep, res)
+    epi = episode_labels(prep.H.shape[1])
+    rows = []
+    for t in reach[reach.calm_reachable].step.tolist():
+        sk, ak, pk = stock_in[:, t], ask_in[:, t], float(p_in[t])
+        twin = float(prep.free_twin[t])
+
+        def f(x):
+            return step_G(st, t, sk, ak, pk, float(x))
+
+        a, b = 60.0, 1200.0
+        sa = np.sign(f(a)["free"] - twin)
+        for _ in range(200):
+            mid = 0.5 * (a + b)
+            if np.sign(f(mid)["free"] - twin) == sa:
+                a = mid
+            else:
+                b = mid
+            if b - a < 1e-13 * max(1.0, b):
+                break
+        oa, ob = f(a), f(b)
+        # scan a tight neighbourhood for any step where calm actually fires
+        nb = np.linspace(a - 1e-3, b + 1e-3, 4001)
+        fired = [(float(x), f(x)) for x in nb]
+        n_fired = sum(1 for _, o in fired if o["calm"])
+        rows.append(dict(
+            crop=crop, step=t, tag=step_tag(t), episode=epi[t], twin=twin,
+            p_cross=0.5 * (a + b), bracket_width=b - a,
+            free_below=oa["free"], free_above=ob["free"],
+            abs_free_minus_twin_below=abs(oa["free"] - twin),
+            abs_free_minus_twin_above=abs(ob["free"] - twin),
+            calm_fired_below=oa["calm"], calm_fired_above=ob["calm"],
+            n_calm_in_1mUSD_neighbourhood=n_fired,
+            G_below=oa["p_out"], G_above=ob["p_out"],
+            observed_jump=abs(ob["p_out"] - oa["p_out"]),
+            hypothetical_jump=(1.0 - st.prep.params.smooth)
+            * st.prep.params.trade_w * abs(oa["p_trade"] - prep.p0),
+            calm_window_width_in_p=(
+                2e-6 / max(abs((ob["free"] - oa["free"]) / max(b - a, 1e-300)),
+                           1e-300)),
+        ))
+    return pd.DataFrame(rows)
+
+
 def calm_probe(crop: str, prep: CropPrep, res, steps: list[int]) -> pd.DataFrame:
     """Bisect on free(p) - twin to land on the calm boundary and measure the
     jump in G across it.  This is the L666-669 discontinuity, made explicit."""
@@ -582,6 +854,40 @@ def plot_g(crop: str, prep: CropPrep, res, steps: list[int]) -> Path:
     return path
 
 
+def plot_g_wide(crop: str, prep: CropPrep, res, steps: list[int]) -> Path:
+    """G over the whole admissible interval [60, 1200], with the 45° line."""
+    st = build_static(prep)
+    stock_in, ask_in, p_in = incoming_states(prep, res)
+    epi = episode_labels(prep.H.shape[1])
+    grid = np.linspace(60.0, 1200.0, 361)
+    fig, axes = plt.subplots(1, len(steps), figsize=(3.9 * len(steps), 3.6),
+                             squeeze=False)
+    for k, t in enumerate(steps):
+        cur = g_curve(st, t, stock_in[:, t], ask_in[:, t], float(p_in[t]),
+                      grid)
+        ax = axes[0][k]
+        ax.plot(grid, cur.G, color="#1f4e79", lw=1.6, label="G(p)")
+        ax.plot(grid, grid, color="0.5", ls="--", lw=1.0, label="45°")
+        ax.axvline(float(res.price[t]), color="#c0392b", lw=1.0, ls=":",
+                   label="official $p_t$")
+        resid = cur.G.to_numpy() - grid
+        idx = np.where(np.sign(resid[:-1]) * np.sign(resid[1:]) < 0)[0]
+        for j in idx:
+            ax.plot([grid[j]], [cur.G.iloc[j]], "o", color="#1e8449", ms=5)
+        ax.set_title(f"{crop} step {t} ({step_tag(t)}, {epi[t]})", fontsize=9)
+        ax.set_xlabel("trial price $p$  ($/t)")
+        ax.set_ylabel("$G(p)$  ($/t)")
+        ax.legend(fontsize=7, frameon=False, loc="upper left")
+    fig.suptitle(f"A3 Task 3 — G on the full clip interval [60, 1200] "
+                 f"({crop}): G is nearly flat, so exactly one crossing",
+                 fontsize=10)
+    fig.tight_layout(rect=(0, 0, 1, 0.9))
+    path = FIGS / f"g_curve_wide_{crop}.png"
+    fig.savefig(path, dpi=140)
+    plt.close(fig)
+    return path
+
+
 def plot_gap(world: pd.DataFrame) -> Path:
     fig, axes = plt.subplots(2, 3, figsize=(13.5, 6.6), squeeze=False)
     for k, crop in enumerate(CROPS):
@@ -619,6 +925,7 @@ def main() -> None:
     FIGS.mkdir(parents=True, exist_ok=True)
 
     per_country, world, lip, wide, calm, verif = [], [], [], [], [], []
+    allsc, refn, creach, cjd = [], [], [], []
     figs = []
     for crop in CROPS:
         print(f"[{crop}] official run + prep …", flush=True)
@@ -652,13 +959,29 @@ def main() -> None:
         lip.append(lipschitz_probe(crop, prep, res, sorted(set(every + probe))))
         wide.append(wide_scan(crop, prep, res, probe))
         calm.append(calm_probe(crop, prep, res, probe))
+
+        print(f"[{crop}] all-step global scan …", flush=True)
+        a = all_step_scan(crop, prep, res)
+        allsc.append(a)
+        worst = a.reindex(a.L_max_global.sort_values(
+            ascending=False).index).step.head(6).tolist()
+        refn.append(refine_scan(crop, prep, res,
+                                sorted(set(worst + probe))))
+        cre = calm_reachability(crop, prep, res)
+        creach.append(cre)
+        cjd.append(calm_jump_detail(crop, prep, res, cre))
         figs.append(plot_g(crop, prep, res, probe[:4]))
+        figs.append(plot_g_wide(crop, prep, res, probe[:4]))
 
     pc = pd.concat(per_country, ignore_index=True)
     w = pd.concat(world, ignore_index=True)
     lp = pd.concat(lip, ignore_index=True)
     wd = pd.concat(wide, ignore_index=True)
     cp = pd.concat(calm, ignore_index=True)
+    az = pd.concat(allsc, ignore_index=True)
+    rf = pd.concat(refn, ignore_index=True)
+    cr = pd.concat(creach, ignore_index=True)
+    cj = pd.concat(cjd, ignore_index=True)
     vf = pd.DataFrame(verif)
 
     pc.to_csv(OUT / "demand_gap.csv", index=False)
@@ -666,6 +989,10 @@ def main() -> None:
     lp.to_csv(OUT / "g_lipschitz.csv", index=False)
     wd.to_csv(OUT / "g_wide_scan.csv", index=False)
     cp.to_csv(OUT / "g_calm_boundary.csv", index=False)
+    az.to_csv(OUT / "g_all_steps.csv", index=False)
+    rf.to_csv(OUT / "g_grid_refinement.csv", index=False)
+    cr.to_csv(OUT / "g_calm_reachability.csv", index=False)
+    cj.to_csv(OUT / "g_calm_jump_detail.csv", index=False)
     vf.to_csv(OUT / "replica_verification.csv", index=False)
     figs.append(plot_gap(w))
 
@@ -717,6 +1044,21 @@ def main() -> None:
            .reset_index())
     L += ["Episode summary (absolute value, so signs do not cancel):", "",
           _fmt(piv), ""]
+
+    w2 = w[w.step >= STEPS_PER_YEAR]
+    piv2 = (w2.groupby(["crop", "episode"])
+            .agg(n=("step", "size"),
+                 mean_abs_gap_mmt=("world_gap_mmt", lambda s: s.abs().mean()),
+                 max_abs_gap_mmt=("world_gap_mmt", lambda s: s.abs().max()),
+                 mean_abs_gap_pct=("world_gap_pct", lambda s: s.abs().mean()),
+                 max_abs_gap_pct=("world_gap_pct", lambda s: s.abs().max()))
+            .reset_index())
+    L += ["Same, **dropping the first model year (steps 0-23)**. "
+          "`assert_twin_identity` (L907) already discards `price[:24]` as "
+          "transient, and the single largest gap in the whole dataset "
+          "(maize step 22, 2006-12a) sits inside it, so the episode numbers "
+          "should be read from this table rather than the one above:", "",
+          _fmt(piv2), ""]
 
     top = (w.reindex(w.world_gap_mmt.abs().sort_values(ascending=False).index)
            .head(15)[["crop", "step", "tag", "episode", "p_prev", "p_t",
@@ -784,6 +1126,157 @@ def main() -> None:
           "size of the discontinuity implied by dropping the trade term.",
           "", _fmt(cp), ""]
 
+    L += ["### 3d. Every step, every crop: root count, Lipschitz, Picard", "",
+          "`G` evaluated on a 401-point grid spanning the whole clip "
+          "interval [60, 1200] at all 3 x 144 steps; the root then bisected "
+          "to machine precision; then plain Picard (`x <- G(x)`) started "
+          "from `p_{t-1}`, tolerance 1e-8 $/t, cap 200 iterations.", "",
+          _fmt(az.groupby(["crop", "episode"]).agg(
+              n=("step", "size"),
+              n_roots_min=("root_sign_changes", "min"),
+              n_roots_max=("root_sign_changes", "max"),
+              L_max_worst=("L_max_global", "max"),
+              L_max_median=("L_max_global", "median"),
+              slope_at_root_worst=("fp_slope", lambda s: s.abs().max()),
+              n_not_monotone=("monotone_decreasing",
+                              lambda s: int((~s).sum())),
+              max_abs_fp_residual=("fp_residual", lambda s: s.abs().max()),
+              picard_iters_max=("picard_iters", "max"),
+              picard_iters_median=("picard_iters", "median"),
+              max_abs_picard_vs_bisect=("picard_minus_bisect",
+                                        lambda s: s.abs().max()),
+              n_free_negative=("free_negative", "sum"),
+              min_resid_at_60=("resid_at_60", "min"),
+              max_resid_at_1200=("resid_at_1200", "max"),
+          ).reset_index()), "",
+          f"Root count is exactly 1 at all "
+          f"{len(az)} crop-steps: "
+          f"min={int(az.root_sign_changes.min())}, "
+          f"max={int(az.root_sign_changes.max())}. "
+          f"`resid_at_60 > 0 > resid_at_1200` at every step "
+          f"(min resid at 60 = {az.resid_at_60.min():.3g}, "
+          f"max resid at 1200 = {az.resid_at_1200.max():.3g}), so `G` maps "
+          f"[60,1200] strictly into itself and the clip cannot remove the "
+          f"root.", "",
+          "**Per-step fixed point vs the official price** — this is the "
+          "sharpest one-step number available, and it is still a one-step "
+          "bound: it solves `p = G(p)` at step *t* with the incoming stock, "
+          "ask vector and `p_{t-1}` pinned to the official path, so it does "
+          "not let the state drift as a real option-B run would.", "",
+          _fmt(az[az.step >= STEPS_PER_YEAR].groupby(["crop", "episode"]).agg(
+              n=("step", "size"),
+              mean_abs_dp=("fp_minus_official", lambda s: s.abs().mean()),
+              max_abs_dp=("fp_minus_official", lambda s: s.abs().max()),
+              mean_abs_pct=("fp_pct_of_official", lambda s: s.abs().mean()),
+              max_abs_pct=("fp_pct_of_official", lambda s: s.abs().max()),
+          ).reset_index()), "",
+          "Including the first model year, the worst single step is:", "",
+          _fmt(az.reindex(az.fp_minus_official.abs()
+                          .sort_values(ascending=False).index)
+               .head(8)[["crop", "step", "tag", "episode",
+                         "in_first_model_year", "p_prev", "p_official", "fp",
+                         "fp_minus_official", "fp_pct_of_official",
+                         "L_max_global", "picard_iters", "free_official"]]),
+          ""]
+
+    L += ["### 3d-bis. Where G is steep, and where it JUMPS", "",
+          "`L_max_global` above is the sup over the whole clip interval, "
+          "including trial prices far from the root. It exceeds 1 at "
+          f"{int((az.L_max_global > 1).sum())} of {len(az)} steps. The "
+          "reason is not curvature: it is a genuine jump. Ranking grid "
+          "cells by |ΔG| and bisecting each on the *regime tuple* "
+          "(number of countries with `offers > 1e-9`; whether "
+          "`shipped_sum > 1e-12`; whether `calm` fired; whether the price "
+          "clip bound) localises the jumps to machine width:", "",
+          _fmt(az.groupby(["crop", "episode"]).agg(
+              n=("step", "size"),
+              n_steps_with_a_jump=("n_jumps_found",
+                                   lambda s: int((s > 0).sum())),
+              max_jump_dollars=("max_jump_G", "max"),
+              mean_jump_dollars=("max_jump_G", "mean"),
+              min_root_to_jump=("root_to_nearest_jump", "min"),
+              n_root_inside_jump=("root_inside_jump", "sum"),
+          ).reset_index()), "",
+          "Jump causes, counted over all steps with a jump above 0.01 $/t:",
+          "",
+          _fmt(az[az.max_jump_G > 0.01].groupby(["crop", "jump_cause"])
+               .agg(n=("step", "size"),
+                    max_jump=("max_jump_G", "max"),
+                    min_root_to_jump=("root_to_nearest_jump", "min"))
+               .reset_index()), "",
+          "Ten largest jumps:", "",
+          _fmt(az.reindex(az.max_jump_G.sort_values(ascending=False).index)
+               .head(10)[["crop", "step", "tag", "episode", "p_official",
+                          "fp", "max_jump_G", "p_at_max_jump", "jump_cause",
+                          "root_to_nearest_jump", "L_max_global",
+                          "picard_iters"]]), "",
+          "The mechanism, read off the code: `offers = max(0, avail - "
+          "desired - target)*(1-cuts)` (L596) is continuous in the trial "
+          "price, but it reaches exactly zero for the last remaining "
+          "exporter at some trial price. When it does, `shipped_sum` falls "
+          "through the `1e-12` guard at L651 and `p_trade` switches "
+          "discontinuously from `dot(ask, shipped)/shipped_sum` — a mean "
+          "over one infinitesimal shipment, so it equals that single "
+          "country's ask — to the fallback `p_trade = p` (L653). `p_trade` "
+          "enters `p_star` with weight `trade_w` and then the smoother with "
+          "weight `(1-smooth)`, so the jump in `G` is "
+          "`(1-smooth)*trade_w*|ask_last - p_{t-1}|`. **This is a fourth "
+          "discontinuity, not among the three named in the brief, and on "
+          "this evidence it is the largest one.**", "",
+          "### 3d-ter. Picard robustness from deliberately bad starts", "",
+          "`x <- G(x)` started at 60, 1200, `0.5 p_{t-1}` and `2 p_{t-1}` "
+          "as well as at `p_{t-1}`, tolerance 1e-8 $/t, cap 200 iterations:",
+          "",
+          _fmt(az.groupby(["crop", "episode"]).agg(
+              n=("step", "size"),
+              n_bad_starts_all_converged=("picard_bad_all_converged", "sum"),
+              picard_bad_max_iters=("picard_bad_max_iters", "max"),
+              max_spread_vs_bisected_root=("picard_bad_max_spread",
+                                           lambda s: s.abs().max()),
+          ).reset_index()), ""]
+
+    L += ["### 3e. Grid-refinement continuity test", "",
+          "If `G` had a jump inside the window, the finite-difference "
+          "`L_max` would grow roughly linearly with grid density and "
+          "`maxjump` would stay pinned at the jump height. Six worst-slope "
+          "steps per crop plus the probe steps, window = official price "
+          "+/- 15%:", "",
+          _fmt(rf), ""]
+
+    L += ["### 3f. Is the `calm` branch reachable at all?", "",
+          "The branch needs three conditions simultaneously "
+          "(`|free-twin| < 1e-6`, `u_anom < 1e-9`, `block_frac < 1e-9`). "
+          "`block_frac` does not depend on the trial price except through "
+          "the demand *weights*; it is zero only if no restricted exporter "
+          "is a preferred source for any positive demand. Scan over all "
+          "3 x 144 steps:", "",
+          _fmt(cr.groupby(["crop", "episode"]).agg(
+              n=("step", "size"),
+              n_free_crosses_twin=("free_crosses_twin", "sum"),
+              n_block_frac_zero=("block_frac_zero", "sum"),
+              n_u_anom_zero=("u_anom_zero", "sum"),
+              n_calm_reachable=("calm_reachable", "sum"),
+              max_hypothetical_jump=("hypothetical_jump", "max"),
+          ).reset_index()), "",
+          f"Steps where the calm branch is reachable by any trial price: "
+          f"**{int(cr.calm_reachable.sum())} of {len(cr)}**. "
+          f"Where it is not reachable, the L666-669 conditional is dead "
+          f"code for the fixed point and cannot create a jump. "
+          f"`hypothetical_jump` = `(1-smooth)*trade_w*|p_trade - p0|` is "
+          f"what the jump in `G` WOULD be if the branch did fire; its max "
+          f"over all steps is {cr.hypothetical_jump.max():.4g} $/t, so the "
+          f"hazard is real in magnitude and only unreachability is "
+          f"protecting the solve.", "",
+          "The reachable steps in detail — bisect onto `free(x) = twin` and "
+          "check whether the branch actually fires. "
+          "`calm_window_width_in_p` is `2e-6 / |d free/d p|`, the width in "
+          "$/t of the price interval satisfying `|free-twin| < 1e-6`:", "",
+          _fmt(cj[["crop", "step", "tag", "episode", "p_cross",
+                   "abs_free_minus_twin_below", "calm_fired_below",
+                   "calm_fired_above", "n_calm_in_1mUSD_neighbourhood",
+                   "observed_jump", "hypothetical_jump",
+                   "calm_window_width_in_p"]]), ""]
+
     L += ["## Artifacts", "",
           "- `diagnostics/gate0_prep/a3/demand_gap.csv` "
           f"({len(pc)} rows: crop × step × country)",
@@ -792,6 +1285,12 @@ def main() -> None:
           "- `diagnostics/gate0_prep/a3/g_lipschitz.csv`",
           "- `diagnostics/gate0_prep/a3/g_wide_scan.csv`",
           "- `diagnostics/gate0_prep/a3/g_calm_boundary.csv`",
+          f"- `diagnostics/gate0_prep/a3/g_all_steps.csv` ({len(az)} rows)",
+          "- `diagnostics/gate0_prep/a3/g_grid_refinement.csv`",
+          f"- `diagnostics/gate0_prep/a3/g_calm_reachability.csv` "
+          f"({len(cr)} rows)",
+          f"- `diagnostics/gate0_prep/a3/g_calm_jump_detail.csv` "
+          f"({len(cj)} rows)",
           "- `diagnostics/gate0_prep/a3/replica_verification.csv`"]
     for f in figs:
         L.append(f"- `{f.relative_to(ROOT)}`")

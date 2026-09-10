@@ -50,8 +50,11 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from sheaf.calendar24 import STEPS_PER_YEAR  # noqa: E402
+from sheaf.calibration import DATA  # noqa: E402
+from sheaf.data_usda import load_psd_country  # noqa: E402
 from sheaf.dynamic_crop import (  # noqa: E402
     MAX_LEAN_STEPS,
+    _simulate_window,
     prepare_crop_run,
     simulate_prep,
 )
@@ -162,6 +165,12 @@ def implied_carry(crop: str, prep, res, st) -> pd.DataFrame:
                 continue
             q_t, q_n = float(ask[i, t]), float(ask[i, t + 1])
             p_t, p_n = float(price[t]), float(price[t + 1])
+            # dynamic_crop L636 clips the ask to [0.45 p0, 2.8 p0]. Where
+            # either end of the pair sits on a clip the return is an
+            # artefact of the bound, not of the storage rule.
+            lo, hi = 0.45 * prep.p0, 2.8 * prep.p0
+            clipped = bool(min(abs(q_t - lo), abs(q_t - hi)) < 1e-6
+                           or min(abs(q_n - lo), abs(q_n - hi)) < 1e-6)
             r_ask = q_n / q_t - 1.0
             r_world = p_n / p_t - 1.0
             r_ask_c = (q_n - C_PHYS_STEP) / q_t - 1.0
@@ -178,6 +187,7 @@ def implied_carry(crop: str, prep, res, st) -> pd.DataFrame:
                 offers_mmt=float(res.offers[i, t]),
                 unmet_other_mmt=unmet_other,
                 ask_t=q_t, ask_next=q_n, p_t=p_t, p_next=p_n,
+                ask_at_clip=clipped,
                 implied_r_step_ask=r_ask,
                 implied_r_step_ask_carry=r_ask_c,
                 implied_r_step_world=r_world,
@@ -195,6 +205,7 @@ def carry_summary(df: pd.DataFrame) -> pd.DataFrame:
         out.append(dict(
             crop=crop, country=country, n_withhold_steps=int(len(g)),
             n_no_cut=int((g.cut <= 0).sum()),
+            n_ask_at_clip=int(g.ask_at_clip.sum()),
             median_r_step=float(np.median(r)),
             p10_r_step=float(np.percentile(r, 10)),
             p90_r_step=float(np.percentile(r, 90)),
@@ -336,22 +347,99 @@ def floor_table(crop: str, prep, res, st) -> pd.DataFrame:
                       pd.DataFrame(extra)], axis=1)
 
 
+def psd_means(crop: str, countries: list[str],
+              years: list[int]) -> pd.DataFrame:
+    """Mean 2006-11 PSD production / domestic use / exports / stocks per node.
+
+    RestOfWorld is world minus named nodes, exactly as ``_psd_annual``
+    (dynamic_crop L232-255) builds the residual node.
+    """
+    psd = load_psd_country(crop)
+    named = [c for c in countries if c != "RestOfWorld"]
+    rows = []
+    for y in years:
+        sub = psd[psd.year == y]
+        tot = {k: float(sub[k].sum()) for k in
+               ("production", "consumption", "exports", "ending_stocks")}
+        acc = dict.fromkeys(tot, 0.0)
+        for c in named:
+            hit = sub[sub.country == c]
+            rec = {k: (float(hit[k].iloc[0]) if len(hit) else 0.0)
+                   for k in tot}
+            for k in tot:
+                acc[k] += rec[k]
+            rows.append(dict(country=c, year=y, **rec))
+        if "RestOfWorld" in countries:
+            rows.append(dict(country="RestOfWorld", year=y,
+                             **{k: max(tot[k] - acc[k], 0.0) for k in tot}))
+    df = pd.DataFrame(rows).groupby("country", as_index=False).mean(
+        numeric_only=True).drop(columns=["year"])
+    df["total_use"] = df.consumption + df.exports
+    df["export_share"] = np.where(df.total_use > 1e-9,
+                                  df.exports / df.total_use, 0.0)
+    df["psd_stu_dom"] = np.where(df.consumption > 1e-9,
+                                 df.ending_stocks / df.consumption, np.nan)
+    df["psd_stu_totuse"] = np.where(df.total_use > 1e-9,
+                                    df.ending_stocks / df.total_use, np.nan)
+    return df
+
+
+def rebased_prep(crop: str, base_prep, new_safety: np.ndarray):
+    """Copy of the prep with a different safety vector, twin rebuilt.
+
+    The calm twin is re-derived with the same safety (mirroring
+    dynamic_crop L802-806) so the scarcity reference stays path-matched.
+    ``stock0`` is *not* re-seeded, which makes every lift below a lower
+    bound on the effect. Diagnostic probe only.
+    """
+    from dataclasses import replace as dc_replace
+    p = base_prep.params
+    H_for_twin = (base_prep.H if p.twin_harvest == "realized"
+                  else base_prep.H_seas)
+    _, _, _, _, free_twin, unmet_twin, _, _, _, _, _ = _simulate_window(
+        H_for_twin, base_prep.C_flex_twin, base_prep.C_ind_twin,
+        np.zeros_like(H_for_twin), base_prep.stock0.copy(), new_safety,
+        base_prep.p0, base_prep.C_ann, base_prep.A, base_prep.S, p,
+        free_twin=None, H_seasonal=base_prep.H_seas)
+    return dc_replace(base_prep, safety=new_safety, free_twin=free_twin,
+                      unmet_twin=unmet_twin)
+
+
 def probe_grid(crop: str, base_prep, base_res) -> pd.DataFrame:
     """Diagnostic probes only. None of these is a proposed default."""
     p = base_prep.params
+    years = list(range(START, END + 1))
+    pm = psd_means(crop, base_prep.countries, years).set_index("country")
+    order = [pm.loc[c] if c in pm.index else None for c in base_prep.countries]
+    total_use = np.array([r.total_use if r is not None else 0.0
+                          for r in order], float)
+    stu_dom = np.array([r.psd_stu_dom if r is not None else np.nan
+                        for r in order], float)
+    # (b1) same single world stu_target, but multiplying total use
+    # (domestic + exports) instead of domestic use alone.
+    safety_totuse = p.stu_target * np.maximum(total_use, base_prep.C_ann)
+    # (b2) the S3 shape: country-specific ratios taken straight from PSD.
+    stu_country = np.where(np.isfinite(stu_dom), stu_dom, p.stu_target)
+    safety_country = stu_country * base_prep.C_ann
+
     probes = [
-        ("baseline", {}, None),
+        ("baseline", {}, None, None),
         ("stu_target+0.10 (max_stu held)",
-         dict(stu_target=p.stu_target + 0.10), None),
+         dict(stu_target=p.stu_target + 0.10), None, None),
         ("stu_target+0.10 & max_stu+0.10",
          dict(stu_target=p.stu_target + 0.10,
-              max_stu=p.max_stu + 0.10), None),
+              max_stu=p.max_stu + 0.10), None, None),
         ("stu_target x2 & max_stu x2",
-         dict(stu_target=2 * p.stu_target, max_stu=2 * p.max_stu), None),
-        ("offer damp 30% (uniform synthetic cut)", {}, 0.30),
+         dict(stu_target=2 * p.stu_target, max_stu=2 * p.max_stu),
+         None, None),
+        ("offer damp 30% (uniform synthetic cut)", {}, 0.30, None),
+        ("REBASE: s_i = stu_target x (dom use + exports)", {}, None,
+         safety_totuse),
+        ("S3 shape: s_i = PSD country STU x dom use", {}, None,
+         safety_country),
     ]
     rows = []
-    for label, over, damp in probes:
+    for label, over, damp, safety in probes:
         if over:
             prep = prepare_crop_run(
                 crop, start_year=START, end_year=END, use_amis=True,
@@ -361,6 +449,9 @@ def probe_grid(crop: str, base_prep, base_res) -> pd.DataFrame:
             prep = base_prep
             cuts = np.maximum(base_prep.cuts, damp)
             res = simulate_prep(prep, cuts=cuts)
+        elif safety is not None:
+            prep = rebased_prep(crop, base_prep, safety)
+            res = simulate_prep(prep)
         else:
             prep, res = base_prep, base_res
         bal = country_balance(res, crop)
@@ -381,6 +472,80 @@ def probe_grid(crop: str, base_prep, base_res) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def binding_table(crop: str, prep, res, st) -> pd.DataFrame:
+    """Does the cover target actually bind, over all 144 steps?
+
+    Three mutually exclusive regimes per country-step:
+      offering  : avail - desired > T, so the rule sells the residual
+      at_target : stock lands within 1% of T
+      short     : stock below T, the rebuild lambda is the only way back
+    """
+    stock, target = res.stock, st["target"]
+    n, T = stock.shape
+    rel = np.where(target > 1e-9, stock / np.maximum(target, 1e-9), np.nan)
+    offering = res.offers > 1e-6
+    rows = []
+    for i, c in enumerate(prep.countries):
+        r = rel[i]
+        rows.append(dict(
+            crop=crop, country=c,
+            share_offering=float(offering[i].mean()),
+            share_at_or_above_target=float(np.nanmean(r >= 0.99)),
+            share_short_of_target=float(np.nanmean(r < 0.99)),
+            median_stock_over_target=float(np.nanmedian(r)),
+            p90_stock_over_target=float(np.nanpercentile(r, 90)),
+            median_target_mmt=float(np.median(target[i])),
+            safety_mmt=float(prep.safety[i]),
+            median_lean_over_safety=float(
+                np.median(st["lean_gap"][i]) / max(prep.safety[i], 1e-9)),
+        ))
+    return pd.DataFrame(rows)
+
+
+def floor_decomposition(crop: str, prep, floor_df: pd.DataFrame
+                        ) -> pd.DataFrame:
+    r"""Split log(model / PSD) at the scored month into additive pieces.
+
+    log(S/S^{PSD}) = log(S/T)                      "never reaches the target"
+                   + log(T/s)                      "lean term at that month"
+                   + [log(sigma) - log(stu^{PSD,totuse})]  "target level"
+                   + log(1 - export share)         "base is domestic use only"
+
+    The last two sum to log(s / S^{PSD}) exactly, because
+    s = sigma C^{ann} and stu^{PSD,dom} = stu^{PSD,totuse}/(1-export share).
+    """
+    p = prep.params
+    pm = psd_means(crop, prep.countries,
+                   list(range(START, END + 1))).set_index("country")
+    g = floor_df[(floor_df.crop == crop) & (floor_df.psd_stock > 1.0)].copy()
+    g = g[(g.model_stock > 0) & (g.target_mmt > 0) & (g.safety_mmt > 0)]
+    rows = []
+    for c, sub in g.groupby("country"):
+        if c not in pm.index or not np.isfinite(pm.loc[c, "psd_stu_totuse"]):
+            continue
+        es = float(pm.loc[c, "export_share"])
+        stu_tu = float(pm.loc[c, "psd_stu_totuse"])
+        rows.append(dict(
+            crop=crop, country=c,
+            log_total=float(np.log(sub.model_stock / sub.psd_stock).mean()),
+            log_below_target=float(
+                np.log(sub.model_stock / sub.target_mmt).mean()),
+            log_lean_term=float(
+                np.log(sub.target_mmt / sub.safety_mmt).mean()),
+            log_target_level=float(np.log(p.stu_target) - np.log(stu_tu)),
+            log_domestic_base=float(np.log(max(1.0 - es, 1e-6))),
+            export_share=es, psd_stu_totuse=stu_tu,
+            psd_stu_dom=float(pm.loc[c, "psd_stu_dom"]),
+            model_over_psd=float((sub.model_stock / sub.psd_stock).mean()),
+        ))
+    out = pd.DataFrame(rows)
+    if len(out):
+        out["log_recon"] = (out.log_below_target + out.log_lean_term
+                            + out.log_target_level + out.log_domestic_base)
+        out["recon_resid"] = out.log_total - out.log_recon
+    return out.sort_values("log_total") if len(out) else out
+
+
 FLOOR_WATCH = {
     "wheat": ("USA", "Canada", "Australia", "Russia", "EU", "China", "India"),
     "maize": ("USA", "Argentina", "Brazil", "China", "EU"),
@@ -394,12 +559,15 @@ def main() -> None:
     FIGS.mkdir(parents=True, exist_ok=True)
 
     carry, summ, scat, floors, probes, checks = [], [], [], [], [], []
+    binds: list[pd.DataFrame] = []
+    preps = {}
     for crop in CROPS:
         print(f"[a4] {crop}: official leg (amis+shocks, mean flex)…")
         prep = prepare_crop_run(crop, start_year=START, end_year=END,
                                 use_amis=True, use_shocks=True,
                                 use_demand=False)
         res = simulate_prep(prep)
+        preps[crop] = prep
         st = reconstruct(prep, res)
         err = float(np.max(np.abs(st["offers_check"] - res.offers)))
         checks.append(dict(crop=crop, max_abs_offer_recon_err_mmt=err,
@@ -422,6 +590,7 @@ def main() -> None:
         fig_scatter(crop, panel, FIGS / f"fig_a4_{crop}_offers_vs_dp.png")
 
         floors.append(floor_table(crop, prep, res, st))
+        binds.append(binding_table(crop, prep, res, st))
         probes.append(probe_grid(crop, prep, res))
 
     carry_df = pd.concat(carry, ignore_index=True)
@@ -432,6 +601,11 @@ def main() -> None:
         OUT / "offer_price_scatter_stats.csv", index=False)
     floor_df = pd.concat(floors, ignore_index=True)
     floor_df.to_csv(OUT / "floor_country_table.csv", index=False)
+    pd.concat([floor_decomposition(c, p, floor_df)
+               for c, p in preps.items()], ignore_index=True).to_csv(
+        OUT / "floor_decomposition.csv", index=False)
+    pd.concat(binds, ignore_index=True).to_csv(
+        OUT / "target_binding.csv", index=False)
     pd.concat(probes, ignore_index=True).to_csv(
         OUT / "floor_probes.csv", index=False)
     pd.DataFrame(checks).to_csv(OUT / "reconstruction_check.csv", index=False)
