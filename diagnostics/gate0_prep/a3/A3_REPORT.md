@@ -291,15 +291,15 @@ Including the first model year, the worst single step is:
 
 | crop | episode | n | n_steps_with_a_jump | max_jump_dollars | mean_jump_dollars | min_root_to_jump | n_root_inside_jump |
 |---|---|---|---|---|---|---|---|
-| maize | 2007/08 | 44 | 4 | 6.754 | 0.1535 | 19.35 | 0 |
-| maize | 2010/11 | 42 | 4 | 1.092e-08 | 7.111e-10 | 95.49 | 0 |
-| maize | calm | 58 | 5 | 1.742 | 0.03003 | 143 | 0 |
-| rice | 2007/08 | 44 | 2 | 11.7 | 0.2659 | 170.6 | 0 |
-| rice | 2010/11 | 42 | 0 | 0 | 0 | — | 0 |
-| rice | calm | 58 | 1 | 1.371e-07 | 2.364e-09 | 644.5 | 0 |
-| wheat | 2007/08 | 44 | 0 | 0 | 0 | — | 0 |
-| wheat | 2010/11 | 42 | 0 | 0 | 0 | — | 0 |
-| wheat | calm | 58 | 1 | 1.135e-08 | 1.957e-10 | 452.3 | 0 |
+| maize | 2007/08 | 44 | 10 | 6.754 | 0.1535 | 3.711 | 0 |
+| maize | 2010/11 | 42 | 20 | 1.396e-08 | 3.39e-09 | 40.69 | 0 |
+| maize | calm | 58 | 28 | 1.742 | 0.03003 | 12.64 | 0 |
+| rice | 2007/08 | 44 | 12 | 11.7 | 0.2659 | 34.02 | 0 |
+| rice | 2010/11 | 42 | 12 | 1.046e-07 | 1.116e-08 | 140.7 | 0 |
+| rice | calm | 58 | 9 | 1.371e-07 | 1.078e-08 | 110.5 | 0 |
+| wheat | 2007/08 | 44 | 11 | 5.566e-09 | 7.727e-10 | 53.51 | 0 |
+| wheat | 2010/11 | 42 | 13 | 6.903e-09 | 7.69e-10 | 31.94 | 0 |
+| wheat | calm | 58 | 12 | 1.135e-08 | 9.582e-10 | 13.95 | 0 |
 
 Jump causes, counted over all steps with a jump above 0.01 $/t:
 
@@ -316,12 +316,12 @@ Ten largest jumps:
 | maize | 42 | 2007-10a | 2007/08 | 178.2 | 178.3 | 6.754 | 69.98 | ptrade_fallback | 108.3 | 4.727 | 4 |
 | maize | 137 | 2011-09b | calm | 266.7 | 266.8 | 1.742 | 123.7 | ptrade_fallback | 143 | 1.212 | 4 |
 | rice | 64 | 2008-09a | calm | 879.3 | 879.3 | 1.371e-07 | 234.7 | offers_trunc | 644.5 | 0.06709 | 5 |
-| wheat | 129 | 2011-05b | calm | 514.5 | 514.5 | 1.135e-08 | 62.15 | offers_trunc | 452.3 | 0.03168 | 5 |
-| maize | 108 | 2010-07a | 2010/11 | 297 | 296.8 | 1.092e-08 | 125.7 | offers_trunc | 171.2 | 0.6804 | 7 |
-| maize | 109 | 2010-07b | 2010/11 | 299 | 299 | 8.393e-09 | 108.6 | offers_trunc | 190.4 | 0.791 | 6 |
-| maize | 104 | 2010-05a | 2010/11 | 262.8 | 262.6 | 7.941e-09 | 134.5 | offers_trunc | 128.1 | 0.2387 | 7 |
-| maize | 133 | 2011-07b | calm | 314 | 314 | 6.381e-09 | 62.7 | offers_trunc | 251.3 | 0.1536 | 5 |
-| maize | 131 | 2011-06b | calm | 324.1 | 324.1 | 5.322e-09 | 72.43 | offers_trunc | 251.6 | 0.7544 | 5 |
+| rice | 111 | 2010-08b | 2010/11 | 845.5 | 845.4 | 1.046e-07 | 498.5 | offers_trunc | 346.9 | 0.04351 | 5 |
+| rice | 59 | 2008-06b | calm | 795.9 | 795.9 | 9.23e-08 | 685.4 | offers_trunc | 110.5 | 0.1269 | 5 |
+| rice | 107 | 2010-06b | 2010/11 | 759.3 | 759.2 | 9.048e-08 | 428.3 | offers_trunc | 330.9 | 0.08027 | 5 |
+| rice | 131 | 2011-06b | calm | 757.3 | 757.3 | 8.732e-08 | 1095 | offers_trunc | 337.7 | 0.08471 | 5 |
+| rice | 130 | 2011-06a | calm | 735.1 | 735 | 8.611e-08 | 490 | offers_trunc | 245 | 0.09576 | 5 |
+| rice | 83 | 2009-06b | 2010/11 | 750.8 | 750.7 | 8.27e-08 | 561.4 | offers_trunc | 189.3 | 0.07563 | 6 |
 
 The mechanism, read off the code: `offers = max(0, avail - desired - target)*(1-cuts)` (L596) is continuous in the trial price, but it reaches exactly zero for the last remaining exporter at some trial price. When it does, `shipped_sum` falls through the `1e-12` guard at L651 and `p_trade` switches discontinuously from `dot(ask, shipped)/shipped_sum` — a mean over one infinitesimal shipment, so it equals that single country's ask — to the fallback `p_trade = p` (L653). `p_trade` enters `p_star` with weight `trade_w` and then the smoother with weight `(1-smooth)`, so the jump in `G` is `(1-smooth)*trade_w*|ask_last - p_{t-1}|`. **This is a fourth discontinuity, not among the three named in the brief, and on this evidence it is the largest one.**
 
@@ -395,17 +395,19 @@ The branch needs three conditions simultaneously (`|free-twin| < 1e-6`, `u_anom 
 
 Steps where the calm branch is reachable by any trial price: **7 of 432**. Where it is not reachable, the L666-669 conditional is dead code for the fixed point and cannot create a jump. `hypothetical_jump` = `(1-smooth)*trade_w*|p_trade - p0|` is what the jump in `G` WOULD be if the branch did fire; its max over all steps is 153.8 $/t, so the hazard is real in magnitude and only unreachability is protecting the solve.
 
-The reachable steps in detail — bisect onto `free(x) = twin` and check whether the branch actually fires. `calm_window_width_in_p` is `2e-6 / |d free/d p|`, the width in $/t of the price interval satisfying `|free-twin| < 1e-6`:
+The reachable steps in detail. Bisect onto `free(x) = twin`, then expand outward to find the two EDGES of the calm plateau and evaluate `G` just outside each. On the plateau `p_star = p0` exactly, so `G` is flat there and steps down/up at both edges:
 
-| crop | step | tag | episode | p_cross | abs_free_minus_twin_below | calm_fired_below | calm_fired_above | n_calm_in_1mUSD_neighbourhood | observed_jump | hypothetical_jump | calm_window_width_in_p |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| wheat | 7 | 2006-04b | calm | 693.8 | 2.132e-14 | True | True | 1131 | 0 | 3.867 | 0.0005365 |
-| wheat | 8 | 2006-05a | calm | 594.5 | 1.279e-13 | True | True | 937 | 0 | 10.6 | 0.0005067 |
-| maize | 138 | 2011-10a | calm | 149.4 | 5.684e-14 | True | True | 85 | 0 | 36.77 | 4.75e-05 |
-| maize | 139 | 2011-10b | calm | 344.2 | 1.137e-13 | True | True | 241 | 0 | 34.17 | 0.000114 |
-| rice | 1 | 2006-01b | calm | 341.1 | 2.842e-14 | True | True | 433 | 0 | 0.8681 | 0.0002171 |
-| rice | 2 | 2006-02a | calm | 345.1 | 2.416e-13 | True | True | 429 | 0 | 0.7574 | 0.0002171 |
-| rice | 3 | 2006-02b | calm | 349.3 | 8.527e-14 | True | True | 429 | 0 | 0.7412 | 0.0002171 |
+| crop | step | tag | episode | p_cross | calm_fires | calm_window_width | G_in_calm | G_just_below | G_just_above | max_calm_jump | root | root_in_calm_window | root_to_calm_window |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| wheat | 7 | 2006-04b | calm | 693.8 | True | 0.0005243 | 209 | 209 | 209 | 0 | 206.2 | False | 487.6 |
+| wheat | 8 | 2006-05a | calm | 594.5 | True | 0.0002621 | 208.8 | 208.8 | 208.8 | 0 | 199.2 | False | 395.4 |
+| maize | 138 | 2011-10a | calm | 149.4 | True | 3.277e-05 | 220.8 | 220.8 | 220.8 | 0 | 257.5 | False | 108 |
+| maize | 139 | 2011-10b | calm | 344.2 | True | 6.554e-05 | 214.8 | 214.8 | 214.8 | 0 | 249 | False | 95.23 |
+| rice | 1 | 2006-01b | calm | 341.1 | True | 0.0001311 | 341.2 | 341.2 | 341.2 | 0 | 342 | False | 0.9715 |
+| rice | 2 | 2006-02a | calm | 345.1 | True | 0.0001311 | 340.9 | 340.9 | 340.9 | 0 | 341.9 | False | 3.121 |
+| rice | 3 | 2006-02b | calm | 349.3 | True | 0.0001311 | 340.9 | 340.9 | 340.9 | 0 | 342.2 | False | 7.123 |
+
+So the calm branch does make `G` genuinely discontinuous where it is reachable: the plateau is 3.3e-05–0.00052 $/t wide and `G` steps by up to 0 $/t at its edges. It is reachable at 7 of 432 steps and at none of them does the root fall inside the plateau (closest approach 0.9715 $/t). The hazard is real but it did not fire on this path.
 
 ## Artifacts
 

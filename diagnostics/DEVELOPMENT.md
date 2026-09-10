@@ -43,7 +43,8 @@ in the repo as the record of method:
 | A1 | Note equations vs `_simulate_window`, symbol by symbol | **done** — all four seeded hypotheses confirmed | [`gate0_prep/a1/`](gate0_prep/a1/) |
 | A1b | Why the calm branch has work to do; is `θ` mis-set? | **done** — re-targeting `θ` rejected | `gate0_prep/a1/A1B_CALM_FIXED_POINT.md` |
 | A1c | Does the calm branch touch a scored result? | **done** — no (0/144 in both scored legs) | `gate0_prep/a1/A1C_CALM_REACH.md` |
-| A2 | Is `p^scar` already an optimisation principle? | not started | — |
+| A2 | Is `p^scar` already an optimisation principle? | **done** — yes for the scarcity term; the blend is not | [`gate0_prep/a2/`](gate0_prep/a2/) |
+| A2b–f | Price flexibility; monotonicity; the pin's reach into the τ column and the sign test | **done** — the sweep's headline | `gate0_prep/a2/A2{B,C,D,E,F}_*.md` |
 | A3 | Size of the contemporaneous-demand gap; is `p=G(p)` well posed? | running | `gate0_prep/a3/` |
 | A4 | Cover rule's implied shadow value; cause of the exporter floor | running | `gate0_prep/a4/` |
 | A5 | Channel ablation: which channel carries which crisis | running | `gate0_prep/a5/` |
@@ -72,18 +73,62 @@ in the repo as the record of method:
    allocated the trade. Offer prices are updated twice in one causal chain.
    Category **G**. Median per-step ask move $7.58 (wheat) — not negligible.
 
-**No code change recommended from A1.** Removing the conditional breaks two
-of four robustness assertions and changes nothing scored; re-targeting
-\(\theta\) leaves 19–20% drift and degrades maize corr +0.71 → +0.65. Fixes
-applied were to the note (`overleaf/gate0_discussion/`, now 19 pp.).
+**No code change recommended from A1 alone.** Removing the conditional
+breaks two of four robustness assertions; re-targeting \(\theta\) leaves
+19–20% drift and degrades maize corr +0.71 → +0.65. A1's fixes were to the
+note (`overleaf/gate0_discussion/`, now 19 pp.).
+
+### A2 findings — the sweep's headline
+
+A1c's "no scored number depends on the conditional" was **too strong**. It
+holds for the price correlation and the full/harvest-only hike ratios, not
+for the τ column, whose base window *is* the pinned stretch.
+
+1. **The restriction sign test was not like-for-like.** Its baseline leg is
+   pinned at \(p_0\) at every step while the τ leg is priced by the ask law,
+   whose quiet level is 0.66/0.71/0.96 × \(p_0\). Maize lift was biased down
+   27 pp. Category **B**, confidence 95–100%.
+2. **`ask_rival = 0.80` has lost its justification.** The comment claimed it
+   was the smallest value clearing the maize sign condition; on the
+   corrected test the condition holds at **0.0** for all three crops
+   (+4.7% / +48.8% / +16.0%). It is *not* spurious — at 0.0, maize corr
+   +0.712 → +0.414 and rice 07/08 ×1.72 → ×1.01. So it is a reduced-form
+   amplitude parameter with no external basis. Category **F**, 95–100%.
+   **Open decision** (see `POTSDAM_RESPONSE.md` §2).
+3. **Maize 2007/08 flips demand-led → restriction-led** (τ ×1.10 → ×1.69,
+   observed ×1.84); wheat ×1.70 → ×1.99. A5 reached the same conclusion by
+   ablation, independently. **Open decision: which is the headline.**
+
+### Fixes applied (commit `cafb8ba`) — no equation changed, no score moved
+
+- `prepare_crop_run` raises on unknown overrides (was silently dropping
+  them, so typo'd sensitivities reported "no effect"). Category **B**.
+- All four assertions take `**overrides`. Category **G**.
+- `assert_amis_raises_price` perturbs the baseline harvest by 1e-6 to leave
+  the matched regime. Maize lift +1.9% → +31.2%; all twelve still pass.
+- `score_subannual_crop.py` prints both τ ratios until the headline is
+  settled.
+
+### A3 / A5 in one line each
+
+- **A3** — the contemporaneous-demand gap is 0.3–0.9% of world desired use;
+  the implied fixed point has exactly one root at all 432 steps, Lipschitz
+  median 0.02–0.03, Picard converges in 5–9 iterations. Well posed and
+  cheap, but small. Inclination: record, do not adopt.
+- **A5** — 2007/08 is restriction-carried in all three crops; 2010/11 is
+  ask-dynamics-carried for wheat and maize. No globally inert parameter, but
+  three exact conditional-inertness identities.
 
 ### Then
 
-- **A2** — the one Part A prompt not yet run.
-- **Decide** each cluster: named keep, or named change + re-score (official
-  vs sensitivity). Do not skip characterize-the-current-law.
-- **Deck** — `overleaf/sheaf_deck/` needs the A1 corrections (slide 48
-  wording, the twin-identity claim). **Deferred until the sweep closes.**
+- **A4** — the last measurement still running. Storage is the cluster where
+  Agrimate's commercial-supplier agent is the sharpest contrast.
+- **Three open decisions**, all in `POTSDAM_RESPONSE.md`: the basis for
+  `ask_rival`; keep-and-document vs rebuild the offer-price law; which τ
+  ratio is the headline. None should be settled unilaterally.
+- **Deck** — `overleaf/sheaf_deck/` needs the A1/A2 corrections (slide 48
+  wording, the twin-identity claim, the maize attribution). **Deferred until
+  the sweep closes**, per the user's instruction.
 
 ## Paused
 

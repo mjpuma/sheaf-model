@@ -720,14 +720,26 @@ def calm_jump_detail(crop: str, prep: CropPrep, res,
                 break
         pc = 0.5 * (a + b)
         # locate the two EDGES of the calm plateau, then evaluate G outside
-        lo_edge, hi_edge = pc, pc
+        lo_edge = hi_edge = pc
+        lo_out = hi_out = None
         d = 1e-9
-        while d < 10.0 and f(pc - d)["calm"]:
-            lo_edge, d = pc - d, d * 2
+        while d < 100.0:
+            if f(pc - d)["calm"]:
+                lo_edge, d = pc - d, d * 2
+            else:
+                lo_out = pc - d
+                break
         d = 1e-9
-        while d < 10.0 and f(pc + d)["calm"]:
-            hi_edge, d = pc + d, d * 2
-        lo_out, hi_out = lo_edge, hi_edge
+        while d < 100.0:
+            if f(pc + d)["calm"]:
+                hi_edge, d = pc + d, d * 2
+            else:
+                hi_out = pc + d
+                break
+        if lo_out is None:
+            lo_out = pc - 100.0
+        if hi_out is None:
+            hi_out = pc + 100.0
         for _ in range(80):                     # tighten each edge
             m = 0.5 * (lo_edge + lo_out)
             if f(m)["calm"]:
