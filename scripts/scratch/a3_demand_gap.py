@@ -773,6 +773,59 @@ def calm_jump_detail(crop: str, prep: CropPrep, res,
     return pd.DataFrame(rows)
 
 
+def chain_signs(crop: str, prep: CropPrep, res, steps: list[int],
+                h_rel: float = 1e-5) -> pd.DataFrame:
+    """Numerical check of the analytic sign chain, link by link.
+
+    Analytic (exact, from the code):
+      d desired/dp  = elast * desired_flex / p            < 0   (elast < 0)
+      d offers/dp   = -d desired/dp * (1-cuts) >= 0       (where offers > 0)
+      d demand/dp   <= 0
+    Then, in the interior regime (free > 0 and twin > 0, so `shift` is the
+    constant `0.05*safety_w`):
+      d ratio/dp    = -(ratio/(free+shift)) * d free/dp   <= 0
+      d p_scar/dp   = p_scar * inv_eta * (d ratio/dp)/ratio <= 0
+      G'(p) = (1-smooth) * [trade_w * dp_trade/dp
+                            + (1-trade_w) * dp_scar/dp]
+    ``analytic_scar_slope`` below is the closed form of the second term with
+    ``d free/dp`` measured; ``num_slope`` is a central difference on G.
+    """
+    st = build_static(prep)
+    stock_in, ask_in, p_in = incoming_states(prep, res)
+    pr = prep.params
+    epi = episode_labels(prep.H.shape[1])
+    rows = []
+    for t in steps:
+        sk, ak, pk = stock_in[:, t], ask_in[:, t], float(p_in[t])
+        p = float(res.price[t])
+        h = h_rel * p
+        a, b = step_G(st, t, sk, ak, pk, p - h), step_G(st, t, sk, ak, pk,
+                                                        p + h)
+        m = step_G(st, t, sk, ak, pk, p)
+        d = lambda k: (b[k] - a[k]) / (2 * h)
+        dfree = d("free")
+        an = ((1.0 - pr.smooth) * (1.0 - pr.trade_w)
+              * (-m["p_scar"] * pr.inv_eta / (m["free"] + m["shift"]))
+              * dfree) if np.isfinite(m["p_scar"]) else np.nan
+        rows.append(dict(
+            crop=crop, step=t, tag=step_tag(t), episode=epi[t], p=p,
+            d_desired_dp=float((b["desired"] - a["desired"]).sum() / (2 * h)),
+            d_offers_dp=float((b["offers"] - a["offers"]).sum() / (2 * h)),
+            d_demand_dp=float((b["demand"] - a["demand"]).sum() / (2 * h)),
+            d_free_dp=dfree,
+            d_ratio_dp=d("ratio"),
+            d_pscar_dp=d("p_scar"),
+            d_ptrade_dp=d("p_trade"),
+            d_pstar_dp=d("p_star"),
+            num_slope=d("p_out"),
+            analytic_scar_slope=an,
+            trade_channel=(1.0 - pr.smooth) * pr.trade_w * d("p_trade"),
+            free=m["free"], shift=m["shift"], ratio=m["ratio"],
+            p_scar=m["p_scar"],
+        ))
+    return pd.DataFrame(rows)
+
+
 def calm_probe(crop: str, prep: CropPrep, res, steps: list[int]) -> pd.DataFrame:
     """Bisect on free(p) - twin to land on the calm boundary and measure the
     jump in G across it.  This is the L666-669 discontinuity, made explicit."""
@@ -958,7 +1011,7 @@ def main() -> None:
     FIGS.mkdir(parents=True, exist_ok=True)
 
     per_country, world, lip, wide, calm, verif = [], [], [], [], [], []
-    allsc, refn, creach, cjd = [], [], [], []
+    allsc, refn, creach, cjd, chs = [], [], [], [], []
     figs = []
     for crop in CROPS:
         print(f"[{crop}] official run + prep …", flush=True)
@@ -1005,6 +1058,9 @@ def main() -> None:
         cjd.append(calm_jump_detail(crop, prep, res, cre,
                                     a.set_index("step").fp.reindex(
                                         range(prep.H.shape[1])).to_numpy()))
+        chs.append(chain_signs(crop, prep, res,
+                               list(range(STEPS_PER_YEAR,
+                                          prep.H.shape[1], 2))))
         figs.append(plot_g(crop, prep, res, probe[:4]))
         figs.append(plot_g_wide(crop, prep, res, probe[:4]))
 
@@ -1017,6 +1073,7 @@ def main() -> None:
     rf = pd.concat(refn, ignore_index=True)
     cr = pd.concat(creach, ignore_index=True)
     cj = pd.concat(cjd, ignore_index=True)
+    ch = pd.concat(chs, ignore_index=True)
     vf = pd.DataFrame(verif)
 
     pc.to_csv(OUT / "demand_gap.csv", index=False)
@@ -1028,6 +1085,7 @@ def main() -> None:
     rf.to_csv(OUT / "g_grid_refinement.csv", index=False)
     cr.to_csv(OUT / "g_calm_reachability.csv", index=False)
     cj.to_csv(OUT / "g_calm_jump_detail.csv", index=False)
+    ch.to_csv(OUT / "g_chain_signs.csv", index=False)
     vf.to_csv(OUT / "replica_verification.csv", index=False)
     figs.append(plot_gap(w))
 

@@ -399,15 +399,15 @@ The reachable steps in detail. Bisect onto `free(x) = twin`, then expand outward
 
 | crop | step | tag | episode | p_cross | calm_fires | calm_window_width | G_in_calm | G_just_below | G_just_above | max_calm_jump | root | root_in_calm_window | root_to_calm_window |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| wheat | 7 | 2006-04b | calm | 693.8 | True | 0.0005243 | 209 | 209 | 209 | 0 | 206.2 | False | 487.6 |
-| wheat | 8 | 2006-05a | calm | 594.5 | True | 0.0002621 | 208.8 | 208.8 | 208.8 | 0 | 199.2 | False | 395.4 |
-| maize | 138 | 2011-10a | calm | 149.4 | True | 3.277e-05 | 220.8 | 220.8 | 220.8 | 0 | 257.5 | False | 108 |
-| maize | 139 | 2011-10b | calm | 344.2 | True | 6.554e-05 | 214.8 | 214.8 | 214.8 | 0 | 249 | False | 95.23 |
-| rice | 1 | 2006-01b | calm | 341.1 | True | 0.0001311 | 341.2 | 341.2 | 341.2 | 0 | 342 | False | 0.9715 |
-| rice | 2 | 2006-02a | calm | 345.1 | True | 0.0001311 | 340.9 | 340.9 | 340.9 | 0 | 341.9 | False | 3.121 |
-| rice | 3 | 2006-02b | calm | 349.3 | True | 0.0001311 | 340.9 | 340.9 | 340.9 | 0 | 342.2 | False | 7.123 |
+| wheat | 7 | 2006-04b | calm | 693.8 | True | 0.0005654 | 209 | 205.2 | 205.2 | 3.867 | 206.2 | False | 487.6 |
+| wheat | 8 | 2006-05a | calm | 594.5 | True | 0.0004681 | 208.8 | 198.2 | 198.2 | 10.6 | 199.2 | False | 395.4 |
+| maize | 138 | 2011-10a | calm | 149.4 | True | 4.248e-05 | 220.8 | 257.6 | 257.6 | 36.77 | 257.5 | False | 108 |
+| maize | 139 | 2011-10b | calm | 344.2 | True | 0.0001206 | 214.8 | 249 | 249 | 34.17 | 249 | False | 95.23 |
+| rice | 1 | 2006-01b | calm | 341.1 | True | 0.0002168 | 341.2 | 342.1 | 342.1 | 0.8681 | 342 | False | 0.9715 |
+| rice | 2 | 2006-02a | calm | 345.1 | True | 0.0002149 | 340.9 | 341.7 | 341.7 | 0.7574 | 341.9 | False | 3.121 |
+| rice | 3 | 2006-02b | calm | 349.3 | True | 0.0002142 | 340.9 | 341.6 | 341.6 | 0.7412 | 342.2 | False | 7.123 |
 
-So the calm branch does make `G` genuinely discontinuous where it is reachable: the plateau is 3.3e-05–0.00052 $/t wide and `G` steps by up to 0 $/t at its edges. It is reachable at 7 of 432 steps and at none of them does the root fall inside the plateau (closest approach 0.9715 $/t). The hazard is real but it did not fire on this path.
+So the calm branch does make `G` genuinely discontinuous where it is reachable: the plateau is 4.2e-05–0.00057 $/t wide and `G` steps by up to 36.77 $/t at its edges. It is reachable at 7 of 432 steps and at none of them does the root fall inside the plateau (closest approach 0.9715 $/t). The hazard is real but it did not fire on this path.
 
 ## Artifacts
 

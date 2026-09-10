@@ -1,0 +1,7 @@
+crop,floor,crossing_old,clears_at_zero_old,crossing_new,clears_at_zero_new,lift0_corrected,lift08_corrected
+maize,0.0,0.7546875,False,0.0,True,,
+wheat,0.05,0.0,True,0.0,True,,
+rice,0.05,0.0,True,0.0,True,,
+maize,,,,,,0.0467102134010593,0.31235213603771617
+wheat,,,,,,0.48756905487589,0.9636426997448007
+rice,,,,,,0.15994584085988683,0.8318370292869746

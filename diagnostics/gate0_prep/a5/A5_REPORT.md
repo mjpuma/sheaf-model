@@ -295,6 +295,51 @@ while the one *sign* assert is the binding constraint. Confidence 95–100%
 
 Findings 6 and 7 are reported, not patched, per the read-only ground rule.
 
+## Adjudication of finding 1 (added by the lead reviewer, after A2)
+
+**Finding 1 is reclassified H → F.** Not because the measurement was wrong
+— it reproduces exactly — but because the test it measured was not
+comparing like with like, which A5 had no way to know.
+
+A2e/A2f found that `assert_amis_raises_price` compared an unpinned τ leg
+against a baseline leg pinned at exactly `p0` by the calm branch in
+`_simulate_window`, while the ask law's own quiet level is 0.66 / 0.71 /
+0.96 × `p0`. The maize lift was therefore biased down by about 27 pp. The
+test was repaired in commit `cafb8ba` by perturbing the baseline harvest by
+1e-6, which takes it out of the matched regime so both legs share a price
+law. `scripts/scratch/adjudicate_ask_rival.py` then located the crossing
+under both versions:
+
+| crop | floor | crossing, test as A5 found it | crossing, corrected test |
+|---|---|---|---|
+| maize | +0.00 | **0.755** | clears at 0.0 (+0.0467) |
+| wheat | +0.05 | clears at 0.0 | clears at 0.0 (+0.4876) |
+| rice | +0.05 | clears at 0.0 | clears at 0.0 (+0.1599) |
+
+A5's 0.751 estimate is confirmed at 0.755 on a finer bisection, so the two
+passes agree on every number they share. What changes is the reading. On the
+corrected test **no crop's sign condition binds at any positive
+`ask_rival`**, so the condition does not select 0.80 and the code comment
+claiming it does was wrong (fixed in `cafb8ba`).
+
+Two caveats against over-reading this in the other direction. Maize's
+corrected margin at `ask_rival = 0` is only +0.047, so the condition is
+nearly binding rather than comfortably slack. And `ask_rival` is not thereby
+shown to be spurious — A2f measured the cost of dropping it as maize corr
++0.712 → +0.414 and rice 2007/08 ×1.72 → ×1.01 against an observed ×1.84.
+
+The finding that survives is narrower and more awkward than either pass
+alone: a parameter that materially sets crisis amplitude has no independent
+justification for its value. Category **F** (empirical limitation),
+confidence 95–100%. It is an open decision, not a defect to patch — see
+`diagnostics/POTSDAM_RESPONSE.md` §2.
+
+**Findings 6 and 7 are now fixed** in `cafb8ba`, after the user asked for
+fixes rather than a report: `prepare_crop_run` raises `TypeError` on unknown
+overrides, and all four assertions take `**overrides`. Finding 7's silent
+drop is worth noting as the reason this adjudication was possible at all —
+A5 caught it precisely because it verified its overrides had landed.
+
 ## What I did not do
 
 - Did not run the `demand` or `tau` legs under ablation (out of A5 scope;

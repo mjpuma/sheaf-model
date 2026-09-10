@@ -91,10 +91,14 @@ for the τ column, whose base window *is* the pinned stretch.
 2. **`ask_rival = 0.80` has lost its justification.** The comment claimed it
    was the smallest value clearing the maize sign condition; on the
    corrected test the condition holds at **0.0** for all three crops
-   (+4.7% / +48.8% / +16.0%). It is *not* spurious — at 0.0, maize corr
-   +0.712 → +0.414 and rice 07/08 ×1.72 → ×1.01. So it is a reduced-form
-   amplitude parameter with no external basis. Category **F**, 95–100%.
-   **Open decision** (see `POTSDAM_RESPONSE.md` §2).
+   (+4.7% / +48.8% / +16.0%). Crossing bisected under both tests: **0.755**
+   as written (A5 independently got 0.751), **clears at 0.0** corrected —
+   though maize's corrected margin is only +4.7%, so nearly binding, not
+   slack. It is *not* spurious — at 0.0, maize corr +0.712 → +0.414 and rice
+   07/08 ×1.72 → ×1.01. So it is a reduced-form amplitude parameter with no
+   external basis. Category **F**, 95–100%. **Open decision** (see
+   `POTSDAM_RESPONSE.md` §2). This reclassifies A5's finding 1 from H;
+   adjudication recorded in `gate0_prep/a5/ADJUDICATION_ASK_RIVAL.md`.
 3. **Maize 2007/08 flips demand-led → restriction-led** (τ ×1.10 → ×1.69,
    observed ×1.84); wheat ×1.70 → ×1.99. A5 reached the same conclusion by
    ablation, independently. **Open decision: which is the headline.**

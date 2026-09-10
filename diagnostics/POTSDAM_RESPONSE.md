@@ -78,11 +78,17 @@ isolated maize restrictions do not cut the world price. On the corrected
 test the condition holds at zero for all three crops (maize +4.7%, wheat
 +48.8%, rice +16.0%). The sign condition does not pin the parameter.
 
-It is also not a spurious knob: setting it to zero moves the maize
-correlation from +0.712 to +0.414 and the rice 2007/08 ratio from ×1.72 to
-×1.01 against an observed ×1.84. So we have a parameter that materially sets
-crisis amplitude and now has no independent basis, which is the
-identification problem we are least comfortable with. We would rather hear
+We should not overstate this in the other direction. Bisecting the crossing
+under both versions of the test: as written, maize crosses at 0.755, which
+is why 0.80 was chosen; corrected, maize clears at zero but by only +4.7%,
+so the condition is nearly binding rather than comfortably slack. And the
+parameter is not spurious — setting it to zero moves the maize correlation
+from +0.712 to +0.414 and the rice 2007/08 ratio from ×1.72 to ×1.01 against
+an observed ×1.84.
+
+So the finding is narrower and more awkward than "a knob we can drop": a
+parameter that materially sets crisis amplitude has no independent basis for
+its value. That is the identification problem we are least comfortable with. We would rather hear
 your view than pick a story. Options as we see them: find an external basis
 (the export-restriction price-transmission literature is the obvious place),
 relabel it explicitly as a shared reduced-form amplitude parameter and
