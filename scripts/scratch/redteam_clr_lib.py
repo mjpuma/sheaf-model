@@ -106,6 +106,8 @@ def simulate_instrumented(
         tat_mode: str = "consumption",
         alloc_mode: str = "shipped",
         alloc_gamma: float | None = None,
+        ask_floor_frac: float = 0.45,
+        ask_ceil_frac: float = 2.8,
         clearing_mode: str = "blend",
         drawdown_lambda: float | None = None,
         record_trade: bool = True,
@@ -201,7 +203,7 @@ def simulate_instrumented(
         ask = ask * np.exp(params.ask_alpha * (fill - params.ask_target_fill)
                            + np.where(offers > 1e-9, rival, 0.0))
         ask = (1.0 - params.ask_beta) * ask + params.ask_beta * p
-        ask = np.clip(ask, 0.45 * p0, 2.8 * p0)
+        ask = np.clip(ask, ask_floor_frac * p0, ask_ceil_frac * p0)
 
         lean_need = float(lean_gap.sum())
         locked = float((cuts_use[:, t] * np.maximum(0.0, stock_new - target)).sum())

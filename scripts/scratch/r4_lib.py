@@ -163,6 +163,7 @@ def simulate_r4(
     ask_path = np.zeros((n, T))
     askeff_path = np.zeros((n, T))
     markup_path = np.ones((n, T))
+    flow_path = np.ones(T)
     share_path = np.zeros((n, T))
     recv_path = np.zeros((n, T))
     block_path = np.zeros(T)
@@ -311,6 +312,7 @@ def simulate_r4(
         ask_path[:, t] = ask
         askeff_path[:, t] = ask_eff
         markup_path[:, t] = markup
+        flow_path[t] = flow
         share_path[:, t] = share
         recv_path[:, t] = received
         block_path[t] = block_frac
@@ -322,7 +324,8 @@ def simulate_r4(
     return dict(price=price, stock=stock_path, cons=cons_path,
                 exports=exp_path, free=free_path, unmet=unmet_path,
                 offers=offer_path, demand=demand_path, ask=ask_path,
-                ask_eff=askeff_path, markup=markup_path, share=share_path,
+                ask_eff=askeff_path, markup=markup_path, flow=flow_path,
+                share=share_path,
                 received=recv_path, block_frac=block_path,
                 p_trade=ptrade_path, p_scar=pscar_path, trade=trade_path)
 

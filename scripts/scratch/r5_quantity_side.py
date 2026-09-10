@@ -63,20 +63,16 @@ def _group(idx, gap=4):
     return groups
 
 
-def panel_frame(arr, box):
-    x0, y0, x1, y1 = box
-    dark = arr[y0:y1, x0:x1].sum(axis=2) < 260
-    rows = np.where(dark.sum(axis=1) > 0.6 * dark.shape[1])[0]
-    cols = np.where(dark.sum(axis=0) > 0.6 * dark.shape[0])[0]
-    return (cols.min() + x0, cols.max() + x0, rows.min() + y0, rows.max() + y0)
-
-
-def y_ticks(arr, left, top, bot):
+def y_ticks(arr, left, top, bot, n_expected):
+    """Inward tick marks on the left spine; drop the spines themselves."""
     g = arr.mean(axis=2)
     strip = g[top:bot + 1, left + 8:left + 20] < 120
     rows = np.where(strip.all(axis=1))[0]
-    out = [int(round(np.mean(r))) + top for r in _group(rows)]
-    return [r for r in out if top + 20 < r < bot - 20]
+    out = [int(round(np.mean(range(a, b + 1)))) + top for a, b in _group(rows)]
+    out = [r for r in out if r > top + 20]
+    if len(out) > n_expected:                  # bottom spine doubles as a tick
+        out = out[:n_expected]
+    return out
 
 
 def bars(arr, rgb, left, right, top, bot, zero_row, scale):
@@ -101,9 +97,9 @@ def bars(arr, rgb, left, right, top, bot, zero_row, scale):
     return out
 
 
-def digitise_panel(arr, box, gridvals):
-    left, right, top, bot = panel_frame(arr, box)
-    ticks = y_ticks(arr, left, top, bot)
+def digitise_panel(arr, frame, gridvals):
+    left, right, top, bot = frame
+    ticks = y_ticks(arr, left, top, bot, len(gridvals))
     assert len(ticks) == len(gridvals), (ticks, gridvals)
     fit = np.polyfit(ticks, gridvals, 1)          # value = a*row + b
     scale = -fit[0]                                # value units per pixel up
@@ -117,12 +113,10 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     arr = render()
 
-    # panel (b): y ticks are -4,-3,-2,-1,0,1  (top tick is +1)
-    supply = digitise_panel(arr, PANELS["supply_change"]["box"],
-                            [1.0, 0.0, -1.0, -2.0, -3.0, -4.0])
-    # panel (e): y ticks are 6,3,0,-3
-    stock = digitise_panel(arr, PANELS["stock_change"]["box"],
-                           [6.0, 3.0, 0.0, -3.0])
+    supply = digitise_panel(arr, PANELS["supply_change"]["frame"],
+                            PANELS["supply_change"]["tick_values"])
+    stock = digitise_panel(arr, PANELS["stock_change"]["frame"],
+                           PANELS["stock_change"]["tick_values"])
 
     rows = []
     for name, (left, right, top, bot, fao, mod) in [
