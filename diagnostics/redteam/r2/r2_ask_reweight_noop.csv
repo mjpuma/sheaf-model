@@ -1,0 +1,4 @@
+crop,n_nodes,n_rows_sum_to_1,n_rows_zero,max_abs_A_eff_minus_A
+wheat,18,16,2,3.3306690738754696e-16
+maize,18,16,2,3.3306690738754696e-16
+rice,18,17,1,2.7755575615628914e-16

@@ -1,0 +1,5 @@
+model,target,nrmse_meanscaled
+SHEAF Gate 0 wheat,Pink Sheet HRW MUV-real,0.21254893984632744
+Agrimate full model,HRW US-CPI-real (digitised),0.234732794780109
+Agrimate prod-anomalies only,HRW US-CPI-real (digitised),0.24602513979689797
+Agrimate unperturbed baseline,HRW US-CPI-real (digitised),0.2761357045086266

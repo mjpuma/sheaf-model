@@ -1,0 +1,100 @@
+\section{Clock and units}
+
+\begin{frame}{The crisis clock is 24 steps per year}
+\topic{Time in the crisis model: 24 steps per year, about two weeks each.}
+\matchbanner{README \S8: $T_y=24$, $\Delta t \approx 15.2$ days}{calendar24.py:12--13}
+
+\[
+T_y = 24, \qquad \Delta t = \frac{365.25}{24} = 15.21875~\text{days}.
+\]
+
+Exactly two steps per calendar month: \texttt{year\_step} $= 2(\mathrm{month}-1)+\mathrm{half}$,
+\texttt{half}\ $\in\{0,1\}$. Midpoints sit near day 8 and day 23.
+
+A 2006--2011 run is $6\times 24 = 144$ steps. Verified:
+\texttt{n\_steps(2006,2011)=144}.
+\syms{$T_y$ steps per calendar year (dimensionless count, $=24$)
+\symsep $\Delta t$ days per step \symsep $t$ global step index, counting from
+the first step of the run (dimensionless) \symsep \texttt{year\_step}
+$\in\{0,\ldots,23\}$ position within the calendar year \symsep month
+$\in\{1,\ldots,12\}$ \symsep half $\in\{0,1\}$, first or second half of that
+month.}
+\bubbles{$T_y$ is structural (Agrimate \S4.1). Not a fitted frequency.}
+{Time: dimensionless step index $t$. Calendar: (year, month, half).}
+{\texttt{sheaf/calendar24.py}. Agrimate \citep{kuhla2025} \S4.1.
+\texttt{ARCHITECTURE.md} locks 24, not 26 fortnights.}
+\end{frame}
+
+\begin{frame}{Why 24, not 26 fortnights}
+\topic{Why 24 steps, not a true 26-fortnight calendar.}
+A true fortnight calendar (26.09 steps/year) does not tile months. Pink
+Sheet targets and AMIS start/end dates are monthly. Scoring a 26-step path
+against a monthly series requires an extra month$\leftrightarrow$step map
+that Agrimate does not use.
+
+SHEAF therefore uses Agrimate's 24. A 26-step sensitivity is allowed only
+with that map written down (\texttt{ARCHITECTURE.md}). It is not the
+default and is not scored here.
+\syms{$T_y=24$ steps per year, Agrimate's clock and SHEAF's default
+\symsep a true 14-day fortnight year would be $365.25/14\approx 26.09$ steps,
+which does not tile calendar months \symsep the scoring targets (World Bank
+Pink Sheet prices, AMIS measure start/end dates) are monthly.}
+\bubbles{No free parameter. Clock is a lineage choice.}
+{24 steps / calendar year.}
+{Agrimate \S4.1; \texttt{ARCHITECTURE.md} ``SHEAF policy: default
+STEPS\_PER\_YEAR = 24''.}
+\end{frame}
+
+\begin{frame}{Canonical units}
+\topic{Units: million tonnes, dollars per tonne, and export cuts as fractions.}
+\matchbanner{core.py docstring; README \S8}{core.py:40, data\_usda.py:36}
+
+{\scriptsize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.38\textwidth}
+  >{\raggedright\arraybackslash}p{0.28\textwidth}
+  >{\raggedright\arraybackslash}X@{}}
+\toprule
+Object & Unit in the model & Conversion \\
+\midrule
+Production, consumption, stocks, trade & million tonnes (MMT) & PSD $\times 10^{-3}$ \\
+Prices, asks & real USD / tonne & Pink Sheet MUV, 2010 base \\
+Export cut $\tau$ on the spine & dimensionless fraction of offers & AMIS label $\to$ $\{0.95,0.70,\ldots\}$ \\
+Export tax in \texttt{core.py} & USD / tonne wedge & leftover; not Gate~0 \\
+\bottomrule
+\end{tabularx}}
+\syms{$Q$ production, $C$ consumption, $R$ ending stocks, $S$ carried stocks,
+$H$ harvest, $O$ export offers, $D$ import demand, $\mathrm{ship}$ bilateral
+shipment --- all MMT, or MMT/step where they are per-step flows
+\symsep $p$ world price and $q$ exporter ask, both real 2010 \$/t
+\symsep $\tau$ on the crisis spine is a dimensionless fraction of \emph{offers},
+never \$/t \symsep MUV the World Bank manufactures-unit-value deflator.}
+\bubbles{\texttt{\_KT\_TO\_MMT = 1e-3} is structural accounting.}
+{1000~MT (PSD raw) $\to$ MMT. Prices already \$/mt.}
+{\texttt{data\_usda.py:36, 74--77}. \texttt{data/usda\_psd/PROVENANCE.txt}.}
+\end{frame}
+
+\begin{frame}{A worked unit check}
+\topic{One worked example: USDA reports thousand tonnes; the model uses million tonnes.}
+\matchbanner{USA wheat 2008 production}{data\_usda.load\_psd\_country}
+
+Raw PSD bulk, United States, Wheat, Market Year 2008,
+\texttt{Production} $= 68363$ (thousand metric tonnes).
+
+\[
+68.363~\mathrm{MMT} = 68363 \times 10^{-3}.
+\]
+
+\texttt{load\_psd\_country("wheat", country="USA")} returns $68.363$.
+Verified in \texttt{verify\_claims.py}.
+\syms{$Q_{\mathrm{USA},2008}$ USA wheat production in marketing year 2008
+$=68.363$ MMT/year \symsep the PSD bulk file reports thousand metric tonnes,
+so every quantity column is multiplied by $10^{-3}$
+(\texttt{\_KT\_TO\_MMT}) \symsep marketing year, not calendar year (US wheat
+runs June--May).}
+\bubbles{No scale knob. If this factor were $1$, every stock and harvest
+would be a thousand times too large.}
+{MMT / year on the annual table; MMT / step after $/24$ or calendar weights.}
+{USDA FAS PSD Online bulk ZIP, \texttt{psd\_grains\_country\_year.csv},
+downloaded 2026-08-21.}
+\end{frame}

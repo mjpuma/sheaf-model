@@ -1,0 +1,196 @@
+\section{Gate 2 --- Headey-clock actions}
+
+\begin{frame}[label=gate2]{Types are slow; actions are fortnightly}
+\topic{Governments can keep a sticky type; the export cut itself is chosen every two weeks.}
+\matchbanner{GAME\_CLOCK.md; Headey 2011}{dynamic\_policy.py:1--7}
+
+\citet{headey2011} objects that sit on dates, not marketing years: export
+restrictions, import surges, stock-release \emph{announcements}. Gate~2
+beta implements only the first, as a climatology-relative stock gate.
+
+Characteristic government types (how much a government cares about
+domestic food) can be sticky. The decision $\tau_t$ is not. Conflating
+them into one annual tax is what \texttt{core.py} still does. That annual
+Nash is a TWIST-era prototype. It is not run here.
+\syms{$\tau_t$ export offer cut this step (fraction in $[0,1]$). Types (who plays, buffer, intensity) are slow; $\tau_t$ is fortnightly.}
+\bubbles{Knobs below are illustrative types. They do not flip every step.}
+{Time: 24-step wheat spine. $\tau_t\in[0,1]$.}
+{\citet{headey2011}; \texttt{diagnostics/GAME\_CLOCK.md}.}
+\end{frame}
+
+\begin{frame}{Illustrative knobs --- not AMIS estimates}
+\topic{The Gate~2 knobs are illustrative types, not estimates from AMIS or 2008 prices.}
+\matchbanner{PolicyKnobs docstring}{dynamic\_policy.py:19--49}
+
+{\scriptsize
+\renewcommand{\arraystretch}{0.95}
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Knob & Default & Role \\
+\midrule
+\texttt{players} & (Russia, Kazakhstan) & who can choose $\tau_t$ \\
+\texttt{harvest\_mult} & $0.50$ on Russia, 2007 & synthetic harvest \\
+\texttt{gov\_stu} & $0.48$ & gov buffer / annual use \\
+\texttt{fs\_stock\_weight} & $12$ & nested-year BR only \\
+\texttt{tau\_on} & $0.6$ & intensity when the gate is on \\
+\texttt{stock\_ratio\_trigger} & $0.85$ & $S_t/S^{\mathrm{calm}}_t$ threshold \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+{\scriptsize Locked after the calm/shock flip was visible. Not estimated
+from AMIS or crisis prices. AMIS off. Substitution off. Gate~0/1 not re-run.}
+\syms{$\tau^{\mathrm{on}}$ cut when the gate is on (fraction) \symsep $r$ trigger on $S/S^{\mathrm{calm}}$ (dimensionless) \symsep \texttt{gov\_stu} buffer / annual use \symsep harvest\_mult on $H$ (dimensionless).}
+\bubbles{All four type knobs are illustrative. Class: not literature, not structural.}
+{\texttt{gov\_stu} dimensionless; buffer in MMT; $\tau$ dimensionless.}
+{\texttt{PolicyKnobs}; \texttt{GATE2\_PLAN.md}.}
+\end{frame}
+
+\begin{frame}{The crisis object is a ratio, not an absolute floor}
+\topic{A country restricts when its stocks are thin relative to a normal year, not versus a fixed floor.}
+\matchbanner{GAME\_CLOCK.md $S_{i,t}/S^{\mathrm{calm}}_{i,t}$}{dynamic\_policy.climatology\_relative\_cuts}
+
+\[
+\tau_{i,t}
+=
+\begin{cases}
+\tau^{\mathrm{on}} & \text{if } t\text{ in the shock year and }
+S^{\mathrm{open}}_{i,t}/S^{\mathrm{calm}}_{i,t} < r,\\
+0 & \text{otherwise.}
+\end{cases}
+\]
+
+An absolute stock floor would fire every hungry season even in
+climatology, because the harvest calendar already drives the trough below
+\texttt{stu\_target}$\times C^{\mathrm{ann}}$. Comparing against the
+\emph{same calendar step in a normal year} is what separates a crisis from
+a seasonal sawtooth.
+\syms{$i$ player country, $t$ step \symsep $\tau_{i,t}$ export-offer cut
+(fraction in $[0,1]$) \symsep $\tau^{\mathrm{on}}=0.6$ the cut applied when the
+gate fires \symsep $S^{\mathrm{open}}_{i,t}$ stocks on the shocked,
+trade-\emph{open} pass (MMT) \symsep $S^{\mathrm{calm}}_{i,t}$ stocks on the
+climatology pass at the same step (MMT) \symsep $r=0.85$ trigger on the ratio
+(dimensionless) \symsep $C^{\mathrm{ann}}$ mean annual use (MMT/year).}
+\bubbles{$r=0.85$, $\tau^{\mathrm{on}}=0.6$: illustrative.}
+{$S$ MMT; ratio dimensionless.}
+{\texttt{dynamic\_policy.py:128--185}. Two-pass: open path, then cuts.}
+\end{frame}
+
+\begin{frame}{Method: three forward passes of the Gate~0 map}
+\topic{Endogenous cuts are not found by iterating a game. The same market map is run three times and the cut is read off a threshold.}
+\matchbanner{README \S8 Gate 2 method}{dynamic\_policy.simulate\_headey:188--202}
+
+\[
+S^{\mathrm{calm}}=\mathcal{M}(H^{\mathrm{seas}},\,\tau\equiv0),
+\qquad
+S^{\mathrm{open}}=\mathcal{M}(H^{\mathrm{shock}},\,\tau\equiv0),
+\]
+\[
+\tau_{i,t}=\tau^{\mathrm{on}}\cdot
+\mathbf{1}\bigl\{S^{\mathrm{open}}_{i,t}/S^{\mathrm{calm}}_{i,t}<r\bigr\}
+\ \text{ in the shock year},
+\qquad
+S^{\mathrm{closed}}=\mathcal{M}(H^{\mathrm{shock}},\,\tau).
+\]
+
+The Gate~0 market loop is not rewritten --- $\mathcal{M}$ is literally
+\texttt{simulate\_prep}. Only \texttt{exporter} (Russia) receives the
+synthetic harvest multiplier $0.50$; Kazakhstan's harvest is unchanged;
+Ukraine is on the market but does not play.
+\syms{$\mathcal{M}$ the Gate~0 forward map, one call per pass \symsep
+$H^{\mathrm{seas}}$ climatology harvest and $H^{\mathrm{shock}}$ the shocked
+harvest (MMT/step) \symsep $S^{\mathrm{calm}},S^{\mathrm{open}},
+S^{\mathrm{closed}}$ end-of-step stocks on the three passes (MMT)
+\symsep $\tau_{i,t}$ offer cut (fraction) and $\tau^{\mathrm{on}}=0.6$ its
+value when the gate fires \symsep $r=0.85$ trigger on the stock ratio
+(dimensionless) \symsep $\mathbf{1}\{\cdot\}$ indicator, $1$ if true else $0$.}
+\bubbles{Three passes is a protocol, not a parameter. No iterated best response.}
+{Harvest multiplier dimensionless; $S$ in MMT.}
+{\texttt{simulate\_headey}; \texttt{climatology\_relative\_cuts};
+\texttt{shock\_year\_harvest}.}
+\end{frame}
+
+\begin{frame}{Hard bars --- all PASS}
+\topic{The hard tests: nobody restricts in a normal year; Russia and Kazakhstan do after the shock.}
+\fitfig[0.24\paperheight]{fig_gate2_headey_tau.png}
+
+{\scriptsize
+\renewcommand{\arraystretch}{0.95}
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Player & calm on & shock on & first step / min $S/S^{\mathrm{calm}}$ \\
+\midrule
+Russia & $0/24$ & $12/24$ & step 12 / $0.45$ \\
+Kazakhstan & $0/24$ & $6/24$ & step 13 / $0.76$ \\
+\bottomrule
+\end{tabular}
+\end{center}}
+
+{\scriptsize Russia shipments $3.27\to 3.25$~MMT.
+Nested year BR: calm $\tau^\star=0$, shock $\tau^\star=0.6$.}
+\syms{$\tau$ offer cut (fraction). $S/S^{\mathrm{calm}}$ stock ratio (dimensionless). Shipments MMT in the shock year.}
+\end{frame}
+
+\begin{frame}{The cascade is harvest diversion, not ban-on-ban}
+\topic{Kazakhstan is already thin from the missing Russian harvest, before Russia bans.}
+\matchbanner{README: cascade is harvest diversion}{GATE2\_PLAN.md; verify\_claims.py}
+\fitfig[0.30\paperheight]{fig_gate2_ratios.png}
+{\scriptsize Open-path KZ trough $0.757<0.85$ \emph{before} any Russian
+$\tau$. Closed raises that trough to $0.807$. Ukraine open min $0.86$
+(does not fire). Neighbour fires from harvest diversion, not ban-on-ban.}
+\syms{$S/S^{\mathrm{calm}}$ (dimensionless). Trigger $r=0.85$. Open path is shocked harvest with $\tau=0$.}
+\bubbles{No extra contagion parameter. The ratio is sufficient.}
+{Ratio dimensionless.}
+{\texttt{verify\_claims.py} section 11; \texttt{gate2\_beta\_report.md}.}
+\end{frame}
+
+\begin{frame}{Roles on the map}
+\topic{Who can choose a cut, who gets the harvest shock, who is on the market and silent.}
+\fitfig[0.62\paperheight]{fig_gate2_map_roles.png}
+{\scriptsize Who plays, who is shocked, who is on the market and silent.
+Not a 2008 who-restricted map.}
+\syms{Players choose $\tau_t$ (fraction). Shock is on $H$ (MMT/step). Silent nodes still trade.}
+\end{frame}
+
+\begin{frame}{Nested-year BR is a diagnostic, not the crisis object}
+\topic{A year-level welfare check used to lock the cut intensity --- not the live fortnight rule.}
+\leftoverbanner{welfare() year-mean stock vs s\_gov}{dynamic\_policy.py:87--117}
+
+\[
+\mathcal{W}
+= \underbrace{\sum_{t\in y} p_t X_{i,t}}_{\text{export revenue}}
+- \alpha \bigl(\max(0, s^{\mathrm{gov}}-\bar S_{i,y})\bigr)^2.
+\]
+
+$s^{\mathrm{gov}}=\mathtt{gov\_stu}\times C_i^{\mathrm{ann}}=18.13$~MMT for
+Russia, against Gate~0 competitive safety of $7.55$~MMT. The world price
+does \emph{not} enter the penalty. On the grid $\{0,0.3,0.6,0.9\}$ the
+shock best response is interior at $0.6$, and that is how
+$\tau^{\mathrm{on}}$ was locked. The live action rule is the Headey gate,
+not this annual loop.
+\syms{$\mathcal{W}$ one year's welfare for the exporter ((\$/t)$\times$MMT)
+\symsep $p_t$ world price (real 2010 \$/t) \symsep $X_{i,t}$ tonnes exported
+(MMT/step) \symsep $\bar S_{i,y}$ mean stock over the 24 steps of year $y$ (MMT)
+\symsep $s^{\mathrm{gov}}$ illustrative government buffer target (MMT)
+\symsep $\alpha=\mathtt{fs\_stock\_weight}=12$ penalty weight
+\symsep $(\cdot)_+$ positive part.}
+\bubbles{$\alpha=12$, \texttt{gov\_stu}=0.48: illustrative.}
+{Revenue: (\$/t)$\times$MMT. Penalty: same units after $\alpha$.}
+{\texttt{grid\_best\_response}; \texttt{gate2\_beta\_score.csv}.}
+\end{frame}
+
+\begin{frame}{What Gate 2 beta does not claim}
+\topic{What this beta does not claim: not 2008 who-banned, not a fortnight Nash, not importer scramble.}
+\begin{itemize}
+\item Not who banned in 2008 or 2010.
+\item Not sequential fortnight Nash.
+\item Not importer scramble or Japan-style reserve announcements.
+\item Not a split domestic vs export price.
+\item Not a retune of CropParams or $\sigma$.
+\item Ukraine harvest does not cascade onto Russia (Russia is too fat);
+      Kazakhstan was locked as the neighbour for that reason. Disclosed.
+\end{itemize}
+\syms{$\tau_t$ fortnight offer cut (fraction). Not a \$/t Nash tax. $\sigma$ unused (substitution off).}
+\end{frame}

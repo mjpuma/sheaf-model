@@ -1,0 +1,107 @@
+\section{Lineage and destination}
+
+\begin{frame}[label=lineage]{TWIST $\to$ Agrimate $\to$ SHEAF}
+\topic{Where SHEAF sits: after TWIST and Agrimate, and what it adds.}
+\matchbanner{README lineage paragraph}{README.md:490--495}
+
+TWIST \citep{schewe2017} --- applied in \citet{falkendal2021} ---
+reproduces annual world wheat prices from a stylised price--supply curve.
+It does not resolve a trade network. It does not take export restrictions
+as a first-order object.
+
+Agrimate \citep{kuhla2025} adds a dynamic agent-based network with
+commercial and strategic stockholding, 24 steps per year, and hindcasts
+2007/08 and 2010/11. Export restrictions enter as an \textbf{exogenous
+AMIS schedule}. Both predecessors are \textbf{single-commodity}.
+
+SHEAF exists to put two missing pieces on that network:
+\begin{enumerate}
+\item \textbf{Endogenous strategy} --- governments choose restrictions.
+\item \textbf{Cross-grain substitution} --- wheat, rice, maize linked on demand.
+\end{enumerate}
+\syms{AMIS the FAO-hosted Agricultural Market Information System policy diary
+\symsep ``exogenous'' means the restriction is read from that diary
+\symsep ``endogenous'' means the model chooses it \symsep single-commodity:
+one grain, no cross-price link \symsep 24 steps per year $=$ half-month
+fortnights.}
+\end{frame}
+
+\begin{frame}{What SHEAF is \emph{not} claiming}
+\topic{What we are not claiming --- design choices, not bugs.}
+SHEAF is Agrimate-\emph{aligned}, not an Agrimate clone and not a
+Deaton--Laroque storage equilibrium \citep{deaton1992,wright1982,williams1991}.
+
+\begin{itemize}
+\item No rational-expectations competitive storage; no endogenous acreage.
+\item No WASDE ethanol gallon series (USA maize uses a PSD FSI residual).
+\item No flour / bread / kcal wheat-equivalent. Unprocessed grain, as
+      Agrimate \citep{kuhla2025}. Rice is milled; wheat is not.
+\item No oligopolistic traders as strategic players (the market layer
+      \emph{is} traders arbitraging; the state sets the ban).
+\item Spatial price equilibrium of Enke--Samuelson--Takayama--Judge
+      \citep{enke1951,samuelson1952,takayama1971} lives in the
+      \textbf{annual leftover}, not in the 24-step ask market.
+\end{itemize}
+
+Those are design choices (\textbf{E}), disclosed. They are not bugs.
+\syms{Category \textbf{E} in the \texttt{CLAUDE.md} scheme: a difference of
+modelling philosophy, not a mathematical error (\textbf{A}) or a coding bug
+(\textbf{B}) \symsep rational-expectations competitive storage: the
+Deaton--Laroque class, where storers forecast the equilibrium price
+distribution \symsep endogenous acreage: planted area responding to price.}
+\end{frame}
+
+\begin{frame}{Gate 0 prices --- substitution off}
+\topic{World prices for wheat, rice, and maize with substitution off.}
+\fitfig[0.50\paperheight]{fig1_gate0_prices.png}
+{\scriptsize Wheat/rice/maize, 2006--11, Pink Sheet in real 2010 USD.
+Harvest anomalies alone miss the 2008 rice spike; AMIS produces it.
+This is Gate~0 only. Gate~1 and Gate~2 are not in the figure.}
+\syms{$p$ world price (real 2010 \$/t). Vertical axis: Pink Sheet vs model. Time: months 2006--11.}
+\end{frame}
+
+\begin{frame}{What each gate is allowed to claim}
+\topic{What each gate is allowed to claim, and what it is not.}
+{\scriptsize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}lp{0.74\textwidth}@{}}
+\toprule
+Gate~0 & Can a 24-step single-crop market, substitution off, AMIS prescribed,
+         hindcast crisis prices? \textbf{Accepted.} \\
+Gate~1 & Does turning isoelastic substitution on spill in the right
+         direction without breaking Gate~0? Band $\{0,0.3,0.6\}$.
+         \textbf{No $\sigma^\star$.} Claim frozen. \\
+Gate~2 $\beta$ & Can two exporters, same slow type, stay open in climatology
+         and can a harvest failure at one turn the neighbour on?
+         \textbf{Not a 2008 score.} \\
+\bottomrule
+\end{tabular}}
+
+\vspace{0.4em}
+{\scriptsize Do not re-run Gate~0 or Gate~1 to host the game
+(\texttt{diagnostics/GAME\_CLOCK.md}).}
+\syms{$\sigma$ substitution scale (dimensionless). $\tau$ export cut: Gate~0 AMIS fraction of offers; Gate~2 Headey fraction. Not a \$/t tax.}
+\end{frame}
+
+\begin{frame}{The node set}
+\topic{Which countries are in the model (17 named plus Rest-of-World).}
+\matchbanner{README \S8 notation table, $i,j$}{calibration.DATA + RestOfWorld}
+
+17 named countries plus a residual Rest-of-World that closes the PSD world
+sum:
+
+USA, Russia, EU, Ukraine, Kazakhstan, Canada, Australia, Argentina,
+Brazil, India, Thailand, Vietnam, China, Egypt, Indonesia, Mexico, Nigeria,
+RestOfWorld.
+
+EU is 27 ISO3 members in \texttt{data\_faostat.EU\_ISO3}. Quantities on the
+crisis host come from USDA PSD, not from the illustrative
+\texttt{calibration.DATA} table (that table still seeds the annual leftover
+and the \emph{names} of the nodes).
+\syms{$i,j$ country nodes (17 named + Rest-of-World). Quantities: MMT after PSD $\times 10^{-3}$.}
+\bubbles{Node names are structural.
+Illustrative prod/cons in \texttt{DATA} are \emph{not} the Gate~0 levels.}
+{Named-node production, consumption, stocks: MMT after $\times 10^{-3}$.}
+{USDA FAS PSD bulk, downloaded 2026-08-21. Country map in
+\texttt{data\_usda.\_PSD\_COUNTRY\_TO\_SHEAF}.}
+\end{frame}

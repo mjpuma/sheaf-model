@@ -1,0 +1,48 @@
+\section{Proposed order of discussion}
+\label{sec:order}
+
+This is an order for the conversation, not an implementation schedule.
+
+\begin{enumerate}
+\item \textbf{Terminology.} Agree that ``baseline,'' ``offer,'' ``share,''
+      ``ask,'' and ``world price'' each denote one object
+      (Fig.~\ref{fig:b0}, \S\ref{sec:notation}). Several apparent
+      disagreements at the sitting were about naming.
+\item \textbf{Accurate description.} Establish whether \eqref{eq:pscar}
+      already behaves as inverse demand and whether \eqref{eq:ask} already
+      behaves as a markup. Any text stating that SHEAF contains
+      Agrimate-style optimising agents should be corrected; it does not.
+\item \textbf{Storage.} Decide between the cover rule \eqref{eq:target}
+      (Fig.~\ref{fig:s0}) and an explicit arbitrage condition. Confirm
+      with the Agrimate authors that slide~48 refers to offer prices
+      rather than a cost of carry.
+\item \textbf{Price formation.} Choose among retaining
+      \eqref{eq:pupdate} as it stands, imposing contemporaneous
+      consistency between \eqref{eq:demand} and \(p_t\), or giving
+      exporters a structural markup. This follows items 2 and 3 so that a
+      markup rule is not combined with a cover rule by accident.
+\item \textbf{Ablation before respecification.} Run the channel
+      decomposition in \S\ref{sec:diagnostics} before adopting any new
+      official specification.
+\end{enumerate}
+
+Three outcomes are possible for each item. If the alternative turns out to
+be the current mechanism under an accurate label, we retain the equation
+and correct the description. If it is contemporaneous consistency or a
+one-equation storage rule, it is a labelled experiment and the
+corresponding diagnostic in \S\ref{sec:diagnostics} should be run first.
+If it is per-agent optimisation or annual market clearing, it is a change
+of host and should be evaluated as such.
+
+Four things are explicitly out of scope: fitting the 2007/08 window,
+selecting a preferred substitution elasticity, folding the annual
+formulation back into the two-week recursion, and treating
+Deaton--Laroque \citep{deaton1992} as the standard against which the
+storage rule is judged, given that neither TWIST \citep{schewe2017} nor
+Agrimate \citep{kuhla2025} implements it. Headey's chronology
+\citep{headey2011} determines when a later restriction game should act; it
+does not by itself motivate retuning this market. Questions about how the
+world price is formed do.
+
+Cross-commodity substitution and the restriction game remain deferred
+until Gate~0 is a market we would publish as stated.

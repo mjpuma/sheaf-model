@@ -10,7 +10,6 @@ consumption and BACI/COMTRADE flows for a production run.
 
 from __future__ import annotations
 import numpy as np
-from .core import build_demand_system, Country
 
 GRAINS = ("wheat", "rice", "maize")
 P0 = np.array([250.0, 400.0, 200.0])            # reference prices $/t
@@ -139,6 +138,8 @@ def build_countries(substitution: bool = True, policy_pool: str | None = None,
         set private/gov opening stocks from ending_stocks where available, and
         set GLOBAL_* from world PSD so RoW closes on the same vintage.
     """
+    from sheaf.annual.core import Country, build_demand_system
+
     subst_scale = 0.6 if substitution else 0.0
 
     rows = [dict(d) for d in DATA]
@@ -292,7 +293,7 @@ def subst_scale_band(scales=(0.0, 0.3, 0.6, 0.9)):
     """Yield (scale, countries, transport, grains, freight) for sensitivity runs."""
     for s in scales:
         # build_countries only exposes on/off; rebuild manually at each scale
-        from .core import build_demand_system, Country
+        from sheaf.annual.core import Country, build_demand_system
         rows = [dict(d) for d in DATA]
         prod_named = np.sum([r["prod"] for r in rows], axis=0)
         cons_named = np.sum([r["cons"] for r in rows], axis=0)

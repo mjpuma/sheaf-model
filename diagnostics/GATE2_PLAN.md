@@ -5,7 +5,7 @@ paper title. “P4/P5” were research questions, not a queue
 (`diagnostics/PAPER_STACK.md`).
 **Clock:** `diagnostics/GAME_CLOCK.md` (Headey 2011).
 **Host:** Gate 0 24-step wheat market in `sheaf/dynamic_crop.py`.
-**Not the host:** annual SPE + IBR in `sheaf/core.py` (`demo.py`) — that
+**Not the host:** annual SPE + IBR in `sheaf.annual` (`scripts/annual/demo.py`) — that
 is the TWIST-era leftover. Substitution stays **off**. AMIS diary stays
 **off**. CropParams / ρ / σ are not retuned. **Gate 0 and Gate 1 are
 not re-run.**
@@ -67,7 +67,7 @@ shocked exporter.
 Gate 0 has **one world/ask price** per crop. A ban does not create a
 cheaper domestic CPI. Grain that is not offered stays as **stock**.
 World *p* does not enter the food-security term. Annual SHEAF
-(`core.py`) has node prices from a spatial QP; do not equate the hosts.
+(`sheaf.annual`) has node prices from a spatial QP; do not equate the hosts.
 
 ## Action rule (Headey-flavored, illustrative)
 
