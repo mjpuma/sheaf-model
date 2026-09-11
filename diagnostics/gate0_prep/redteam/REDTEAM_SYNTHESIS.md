@@ -3,6 +3,8 @@
 Three independent adversarial passes (optimisation, clearing, census)
 plus the earlier A1–A5 sweep. This file is the adjudication, not a
 vote. Measurements live under `optimisation/`, `clearing/`, `census/`.
+Per-axis write-ups: `optimisation/REDTEAM_OPTIMISATION.md`,
+`clearing/REDTEAM_CLEARING.md`, `census/REDTEAM_CENSUS.md`.
 Scripts under `scripts/scratch/redteam_*.py`.
 
 **Goal the principal investigator set:** SHEAF Gate 0 as strong or

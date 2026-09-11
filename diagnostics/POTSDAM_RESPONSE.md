@@ -82,9 +82,11 @@ This matters beyond bookkeeping because of what the conditional was
 silently doing to a comparison. The restriction sign test compares a
 restriction-only run against a no-restriction baseline; the baseline is
 matched, so it is pinned at exactly the reference, while the treatment is
-priced by the ask law, whose quiet level is 0.66 and 0.71 of the reference
-for wheat and maize. The measured lift therefore included the release of
-that pin, biased down by 27 points for maize.
+priced by the ask law, whose quiet trade-weighted offer price is 0.81 and
+0.71 of the reference for wheat and maize (`gate0_prep/a1/A1B_CALM_FIXED_POINT.md`).
+The measured lift therefore included the release of that pin, biased down
+by 27 points for maize (unpinned τ-leg base 98.2 vs pinned 135.4 $/t;
+`gate0_prep/a2/A2D_TAU_ATTRIBUTION.md`).
 
 The repair needs no equation change: perturb the baseline harvest by one
 part per million so it leaves the matched regime and both legs share a price

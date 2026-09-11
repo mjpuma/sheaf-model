@@ -45,9 +45,10 @@ in the repo as the record of method:
 | A1c | Does the calm branch touch a scored result? | **done** — no (0/144 in both scored legs) | `gate0_prep/a1/A1C_CALM_REACH.md` |
 | A2 | Is `p^scar` already an optimisation principle? | **done** — yes for the scarcity term; the blend is not | [`gate0_prep/a2/`](gate0_prep/a2/) |
 | A2b–f | Price flexibility; monotonicity; the pin's reach into the τ column and the sign test | **done** — the sweep's headline | `gate0_prep/a2/A2{B,C,D,E,F}_*.md` |
-| A3 | Size of the contemporaneous-demand gap; is `p=G(p)` well posed? | running | `gate0_prep/a3/` |
-| A4 | Cover rule's implied shadow value; cause of the exporter floor | running | `gate0_prep/a4/` |
-| A5 | Channel ablation: which channel carries which crisis | running | `gate0_prep/a5/` |
+| A3 | Size of the contemporaneous-demand gap; is `p=G(p)` well posed? | **done** — gap 0.3–0.9%; well posed at the root, not globally contractive | `gate0_prep/a3/A3_REPORT.md` |
+| A4 | Cover rule's implied shadow value; cause of the exporter floor | **done** — implied \(r\) sign is a coin-flip; uniform \(s_i\) is the floor | `gate0_prep/a4/A4_REPORT.md` |
+| A5 | Channel ablation: which channel carries which crisis | **done** — 2007/08 restriction-carried; 2010/11 ask-dynamics for wheat/maize | `gate0_prep/a5/A5_REPORT.md` |
+| RT | Agrimate red team: dead dest-reweight → CES source shares; exporter FOC prototyped | **done** — CES shipped (`929cec4`); exporter FOC tested and **rejected** (pre-CES maize +0.712 → +0.339; not shipped) | `gate0_prep/redteam/REDTEAM_SYNTHESIS.md`, `optimisation/REDTEAM_OPTIMISATION.md`, `clearing/REDTEAM_CLEARING.md`, `census/REDTEAM_CENSUS.md`, `VERIFICATION.md` |
 
 ### A1 findings (all four confirmed; details in `gate0_prep/a1/`)
 
@@ -141,7 +142,9 @@ maize **+0.778 / ×2.20 / ×1.59**, rice **+0.678 / ×1.72 / ×0.82**.
 
 **Prototyped, not shipped:** exporter FOC in place of the ask law.
 Restores the quiet-market rest point without the pin and passes asserts;
-destroys crisis amplitude (maize corr +0.78 → +0.34).
+destroys crisis amplitude. Like-for-like on the pre-CES ask law: maize
+corr +0.712 → +0.339 (`foc_scores.csv`). Independent verification:
+[`gate0_prep/redteam/VERIFICATION.md`](gate0_prep/redteam/VERIFICATION.md).
 
 **Their hard-bounds claim is false.** All-three-hard-bounds maize corr
 +0.71 → +0.22.

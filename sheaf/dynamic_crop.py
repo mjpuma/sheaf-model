@@ -113,8 +113,9 @@ class CropParams:
     ask_alpha: float = 0.15
     ask_target_fill: float = 0.70
     # CES substitution elasticity over origins (importer source shares).
-    # Destination-share reweighting is algebraically the identity and is
-    # not used; see `_ask_reweight_src`.
+    # Destination-share reweighting is algebraically the identity (a
+    # row-constant cancels) and is kept as a documented no-op; the live
+    # channel is `_ask_reweight_src`.
     ask_comp_elast: float = 1.25
     ask_beta: float = 0.18
     # reduced_form — survivors mark up when preferred sources are blocked
@@ -132,10 +133,11 @@ class CropParams:
     #
     # So the sign condition does NOT pin this parameter. It remains
     # load-bearing for crisis amplitude (setting it to 0 moves maize corr
-    # +0.712 → +0.414 and rice 2007/08 ×1.72 → ×1.01 vs observed ×1.84), so
-    # it is not spurious either. Treat it as a reduced-form amplitude
-    # parameter awaiting an external basis, shared across crops and years,
-    # and not fit to 2008. See diagnostics/gate0_prep/a2/.
+    # +0.778 → +0.520 after CES; it was +0.712 → +0.414 before) and rice
+    # 2007/08 ×1.72 → ×1.01 vs observed ×1.84, so it is not spurious
+    # either. Treat it as a reduced-form amplitude parameter awaiting an
+    # external basis, shared across crops and years, and not fit to 2008.
+    # See diagnostics/gate0_prep/a2/.
     ask_rival: float = 0.80
     # structural — harvest foresight blend; pulse definition
     foresight_phi: float = 0.55
