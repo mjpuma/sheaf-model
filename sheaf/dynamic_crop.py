@@ -694,7 +694,14 @@ def _simulate_window(
 
         shipped_sum = float(shipped.sum())
         if shipped_sum > 1e-12:
-            p_trade = float(np.dot(ask, shipped) / shipped_sum)
+            # Value shipments at the ask that ALLOCATED them (ask_path[:, t]),
+            # not the ask updated later in this step. `ask` has already been
+            # advanced to q_{t+1} above, and using it here priced step t's
+            # trade at step t+1's offers — a rally-directional bias of +2.2%
+            # (wheat), +1.9% (maize), +3.9% (rice) through 2007/08 on a term
+            # carrying ω of p*. Agrimate Eq. D.4 is explicit that the
+            # transaction price is the offer the request responded to.
+            p_trade = float(np.dot(ask_path[:, t], shipped) / shipped_sum)
         else:
             p_trade = p
 

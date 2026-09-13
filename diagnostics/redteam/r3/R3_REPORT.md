@@ -80,12 +80,12 @@ is taken.
 
 | # | Agrimate process | SHEAF Gate 0 equivalent (`dynamic_crop.py`) | Information available to Agrimate | Information available to SHEAF | Verdict |
 |---|---|---|---|---|---|
-| 1 | Harvest: learn \(H^{(t)}\) and \(\{\hat H^{(t+k)}\}\) | `avail = stock + H[:, t]` (L593); `H_exp`, `H_ahead`, `lean_h` precomputed L577–586 | \(H^{(t)}\) exactly; \(\hat H^{(t+k)}\) with lag-decaying \(w_k\) | \(H^{(t)}\) exactly in `avail`; \(\phi H^{(t+k)}+(1-\phi)H^{\mathrm{seas}}\) with \(\phi\) **flat in \(k\)** | **weaker in shape, weaker in total** (see §2a) |
-| 2 | Policy update: learn \(\Delta^{(t)}\), forecast \(\hat\Delta^{(t+k)}\) over phase | `cuts[:, t]` applied to current-step offers (L612); no forecast anywhere | current cut **plus** known remaining phase length | current cut only | **weaker** (see §2b) |
+| 1 | Harvest: learn \(H^{(t)}\) and \(\{\hat H^{(t+k)}\}\) | `avail = stock + H[:, t]` (L593); `H_exp`, `H_ahead`, `lean_h` precomputed L576–585 | \(H^{(t)}\) exactly; \(\hat H^{(t+k)}\) with lag-decaying \(w_k\) | \(H^{(t)}\) exactly in `avail`; \(\phi H^{(t+k)}+(1-\phi)H^{\mathrm{seas}}\) with \(\phi\) **flat in \(k\)** | **weaker in shape, weaker in total** (see §2a) |
+| 2 | Policy update: learn \(\Delta^{(t)}\), forecast \(\hat\Delta^{(t+k)}\) over phase | `cuts[:, t]` applied to current-step offers (L611); no forecast anywhere | current cut **plus** known remaining phase length | current cut only | **weaker** (see §2b) |
 | 3 | Sales: fulfil last step's requests at last step's offer price (Eq. D.4) | `_bilateral_clear` on `A_eff` built from the **inherited** ask (L616–618); shipments then valued at the **updated** ask (L667) | allocation and valuation use the *same* price | allocation uses \(q_{t}\), valuation uses \(q_{t+1}\) | **defect** (see §2e) |
-| 4 | Expectation formation: \(N_{hor}\) profit-max sales plan, adjusted by \(\hat\Delta\) | static residual rule \(O_{i,t}=\max(0,\mathrm{avail}-d-T)(1-\tau_t)\) (L612); \(T\) from `lean_gap` | own + rivals' expected future sales, own storage, expected restriction | own current availability, own lean gap | **weaker** (D — no intertemporal plan) |
-| 5 | Communication: exchange **planned** sales, then set next-step offer prices | ask update L646–651 from own realised `fill` and aggregate `block_frac`; used at \(t{+}1\) | rivals' *planned* \(t{+}1\) sales | own *realised* \(t\) fill + aggregate realised blockage | **weaker in content, equivalent in timing** (see §2d) |
-| 6 | Delivery: \(N_{del}=2\)-step shipping lag, consumer price from delivery | shipments arrive same step (`received`, L618) | 2-step delivery queue | none | **weaker** (D; Agrimate reports results insensitive to \(N_{del}\), Tbl. F.1) |
+| 4 | Expectation formation: \(N_{hor}\) profit-max sales plan, adjusted by \(\hat\Delta\) | static residual rule \(O_{i,t}=\max(0,\mathrm{avail}-d-T)(1-\tau_t)\) (L611); \(T\) from `lean_gap` | own + rivals' expected future sales, own storage, expected restriction | own current availability, own lean gap | **weaker** (D — no intertemporal plan) |
+| 5 | Communication: exchange **planned** sales, then set next-step offer prices | ask update L647–651 from own realised `fill` and aggregate `block_frac`; used at \(t{+}1\) | rivals' *planned* \(t{+}1\) sales | own *realised* \(t\) fill + aggregate realised blockage | **weaker in content, equivalent in timing** (see §2d) |
+| 6 | Delivery: \(N_{del}=2\)-step shipping lag, consumer price from delivery | shipments arrive same step (`received`, L617) | 2-step delivery queue | none | **weaker** (D; Agrimate reports results insensitive to \(N_{del}\), Tbl. F.1) |
 | 7 | Consumption: on consumer price and availability | `consumption = min(desired, max(0, avail - shipped + received))` (L622) | consumer price | \(p_{t-1}\) via `desired_flex` (L595) | **equivalent** |
 | 8 | Accounting: update delivery queue | — (no queue) | — | — | **weaker** (D, same as #6) |
 | 9 | Procurement: demand requests sent, received next step | `demand = food_need + rebuild` (L610) using \(p_{t-1}\) | offer prices received last step, storage target, future deliveries | \(p_{t-1}\), lean-gap target, safety stock | **equivalent** on the price lag; weaker on future deliveries |
@@ -103,7 +103,7 @@ is taken.
 \(H^{\mathrm{exp}}_{i,t}=\phi H_{i,t}+(1-\phi)H^{\mathrm{seas}}_{i,t}\) and
 \(L_{i,t}=\max(0,\sum_{k=0}^{h_t}C_{i,t+k}-\sum_{k=0}^{h_t}H^{\mathrm{exp}}_{i,t+k})\).
 
-*Implementation located.* `_simulate_window` L577–586: `H_exp` is built once,
+*Implementation located.* `_simulate_window` L576–585: `H_exp` is built once,
 before the loop, from the **realised** harvest array `H` at weight
 `foresight_phi` and the climatological `H_seasonal` at \(1-\phi\);
 `lean_h = steps_to_harvest_pulse(H_exp, ...)`;
@@ -176,7 +176,7 @@ is in-sample smoothing at data-preparation time, and Agrimate does the same
 
 Agrimate Eq. D.2 gives the issuing region's supplier the remaining length of
 the current restriction phase; SHEAF's exporter sees only `cuts[:, t]`
-(L612, L644, L657). So SHEAF is **strictly less informed**. Three pieces of
+(L611, L644, L657). So SHEAF is **strictly less informed**. Three pieces of
 evidence bound how much that matters.
 
 1. **The information is nearly degenerate in SHEAF's own AMIS data**
@@ -231,7 +231,7 @@ That structure is where the prototype (V1) goes.
 **Classification D/E, confidence 85%.**
 
 Agrimate's Communication (process 5) has suppliers exchange **planned** sales
-and then set the offer prices used *next* step. SHEAF's ask update (L646–651)
+and then set the offer prices used *next* step. SHEAF's ask update (L647–651)
 also runs at the end of step \(t\) and sets the ask used at \(t{+}1\), so the
 *timing* is the same. The *content* is not: SHEAF's exporter sees its own
 realised `fill` and an aggregate realised `block_frac`, never a rival's
@@ -253,8 +253,8 @@ notation, \(p^{\mathrm{tr}}\) must use \(q_{i,t}\), the ask that was in force.
 
 *Implementation located.* `_simulate_window`:
 - L616 `A_eff = _ask_reweight_dest(A, ask, ...)` — allocation uses the
-  **inherited** ask (recorded as `ask_path[:, t]` at L615).
-- L646–651 `ask = ...` — the ask is **updated in place**.
+  **inherited** ask (recorded as `ask_path[:, t]` at L614).
+- L647–651 `ask = ...` — the ask is **updated in place**.
 - L667 `p_trade = float(np.dot(ask, shipped) / shipped_sum)` — the **same
   shipments** are valued at the **updated** ask, i.e. \(q_{i,t+1}\).
 
@@ -294,9 +294,9 @@ if the coauthors state that the updated ask was intended.
 - `desired_flex` uses the incoming \(p_{t-1}\) (L595) — matches Agrimate, whose
   demand requests carry the previous step's offer price (Eq. D.3–D.4).
   **Equivalent, H.**
-- `cuts[:, t]` hits the current step's offers (L612) — Policy update precedes
+- `cuts[:, t]` hits the current step's offers (L611) — Policy update precedes
   Sales in Agrimate D.3. **Equivalent, H.**
-- `ask_path[:, t]` is stored *before* the update (L615), so the recorded ask
+- `ask_path[:, t]` is stored *before* the update (L614), so the recorded ask
   series is the pre-update one and `A_eff` uses the same value. **Consistent.**
 - `locked` / `free` use the post-trade `stock` with the pre-trade `target`
   (L653–658) — matches README's \(\mathrm{free}_t=\sum_i S_{i,t+1}-\sum_i
@@ -432,13 +432,14 @@ Against all ten axes in CLAUDE.md.
 | interpretability | improves: transaction price = allocation price | improves: "forecast reach", not an opaque blend weight | neutral |
 | new parameters | **0** | **−1 net** (+2 sourced, −1 free) | 0 |
 | new state variables | **0** | 0 | 0 |
-| runtime cost | **0%** | +≈8% of a 3-crop score (~10 s → ~11 s) | +≈5% |
+| runtime cost | **0%** | not resolvable above noise: `r3_runtime.csv` gives V0 0.621 s, V1 0.650 s, V3 0.651 s best-of-3 on a 3-crop run, and V3 *cannot* cost anything, so the +4.8% both show is timing noise | same |
 | continuity with lineage | **closer** (Eq. D.4 exactly) | **closer** (Eq. D.1 exactly, same 24-step clock, same defaults) | closer in letter, but the information is degenerate in SHEAF's data |
 | publication benefit | high: pre-empts the obvious referee question "why is your transaction price not the price the trade responded to?" | moderate: lets §8 say "Agrimate's Eq. D.1 with its published defaults" instead of defending a free \(\phi\) | low |
 | verdict | **passes decisively** | **passes, with the maize \(N_{for}\) sensitivity disclosed** | **fails** |
 
-V1's runtime and the maize sensitivity are the only real costs, and the
-sensitivity is the reason it is second rather than first. V4 fails the budget
+The maize \(N_{for}\) sensitivity is V1's only real cost, and it is the reason
+V1 is second rather than first; its extra prepare-time loops do not resolve
+above timing noise. V4 fails the budget
 on scientific benefit alone.
 
 ---
@@ -483,7 +484,8 @@ incoherence alone (measured impact ≤0.001 correlation).
 ## 7. Artifacts
 
 Scripts (`scripts/scratch/`): `r3_01_lookahead.py`, `r3_02_prototypes.py`,
-`r3_03_falsify.py`, `r3_04_signed_and_figs.py`, `r3_05_maize_spike.py`.
+`r3_03_falsify.py`, `r3_04_signed_and_figs.py`, `r3_05_maize_spike.py`,
+`r3_06_runtime.py`.
 
 Reports (this directory): `R3_01_LOOKAHEAD.md`, `R3_02_PROTOTYPES.md`,
 `R3_03_FALSIFY.md`, `R3_04_SIGNED.md`, `R3_05_BOUNDARY.md`.
@@ -492,7 +494,7 @@ CSVs: `r3_lookahead_summary.csv`, `r3_lookahead_lagweights.csv`,
 `r3_prototype_scores.csv`, `r3_prototype_asserts.csv`,
 `r3_v1_nfor_sensitivity.csv`, `r3_v1_phi_inert.csv`,
 `r3_ask_double_update.csv`, `r3_ask_double_update_signed.csv`,
-`r3_amis_phase_lengths.csv`, `r3_boundary_artefact.csv`.
+`r3_amis_phase_lengths.csv`, `r3_boundary_artefact.csv`, `r3_runtime.csv`.
 
 Figures: `figures/scratch/r3/r3_fig1_lag_weights.png`,
 `figures/scratch/r3/r3_fig2_price_paths.png`.
@@ -502,7 +504,7 @@ three official baselines; the look-ahead information measurement; all six
 prototype variants with full score and 72 assert runs; the \(N_{for}\)/
 \(\tau_{for}\) sensitivity grid; the \(\phi\)-inertness test; the signed and
 unsigned \(p^{tr}\) gap; AMIS phase-length statistics; the boundary-artefact
-measurement. Reasoned (not executed): the Agrimate process-order and equation
+measurement; the runtime timings. Reasoned (not executed): the Agrimate process-order and equation
 extraction (read from the supplied text, cited by line); the claim that
 crop-condition forecasting is empirically reliable at 1–3 months; the
 attribution of the maize 2006-11 artefact to the calendar-year anomaly switch

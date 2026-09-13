@@ -89,8 +89,9 @@ OFFER_R1 = """        demand = food_need + rebuild
         _xbar = np.maximum(0.0, avail - desired - target)
         _L = float(max(1, int(lean_h[t])))
         _sy = t % STEPS_PER_YEAR
-        _Rref = _r1_ref(_R1, "xstar", _sy)
-        _xrf = _r1_ref(_R1, "xref", _sy)
+        _ix = t if str(_R1.get("ref_mode")) == "path" else _sy
+        _Rref = _r1_ref(_R1, "xstar", _ix)
+        _xrf = _r1_ref(_R1, "xref", _ix)
         if t == 0:
             _q_oth = np.maximum(_Rref - _xrf, 1e-9)
         if _R1.get("foc"):
@@ -263,6 +264,8 @@ def default_R1(crop: str, **kw) -> dict:
 def refs_from(q: np.ndarray, mode: str = "scalar"):
     """Reference sales levels X* (world) and x*_i (own) from a calm path."""
     n, T = q.shape
+    if mode == "path":
+        return q.sum(axis=0), q.copy()
     ny = max(T // 24, 1)
     blk = q[:, : ny * 24].reshape(n, ny, 24)
     xref_s = blk.mean(axis=1)                       # (n, 24)

@@ -25,9 +25,9 @@ DIAG = ROOT / "diagnostics"
 OUT = DIAG / "redteam" / "r5"
 TMP = Path("/tmp/r5fig")
 
-FAO_BLUE = (86, 180, 233)
-MODEL_ORANGE = (230, 126, 34)
-TOL = 60.0
+FAO_BLUE = (0, 159, 218)
+MODEL_ORANGE = (227, 114, 34)
+TOL = 45.0
 
 # Panel bounding boxes in the 600 dpi page-9 render, found by inspection of
 # the axes frames (see r5_digitise_agrimate_fig4a.py for the same technique).
@@ -75,26 +75,37 @@ def y_ticks(arr, left, top, bot, n_expected):
     return out
 
 
-def bars(arr, rgb, left, right, top, bot, zero_row, scale):
-    d = np.linalg.norm(arr - np.array(rgb, float), axis=2)
-    m = d < TOL
-    m[:top, :] = False
-    m[bot + 1:, :] = False
-    m[:, :left] = False
-    m[:, right + 1:] = False
-    cols = np.where(m.sum(axis=0) > 5)[0]
-    out = []
-    for c0, c1 in _group(cols, gap=6):
-        if c1 - c0 < 8:          # legend swatches / stray marks
-            continue
-        sub = m[:, c0:c1 + 1]
-        rows = np.where(sub.any(axis=1))[0]
-        lo, hi = rows.min(), rows.max()
-        # the bar runs from the zero line to its far end
-        val = (zero_row - lo) * scale if abs(zero_row - lo) > abs(zero_row - hi) \
-            else (zero_row - hi) * scale
-        out.append(dict(x0=int(c0), x1=int(c1), value=float(val)))
-    return out
+def bar_value(arr, rgb, band, top, bot, zero_row, scale):
+    """Height of the coloured run that touches the zero line inside `band`.
+
+    Walking out from the zero line (rather than taking the colour's extreme
+    row in the column) keeps the in-panel legend swatch, which shares the
+    horizontal extent of the 2009 bars, out of the measurement. The model
+    bars are dotted, so a row counts as filled if a quarter of the band is
+    coloured.
+    """
+    c0, c1 = band
+    d = np.linalg.norm(arr[top:bot + 1, c0:c1 + 1] -
+                       np.array(rgb, float), axis=2)
+    on = (d < TOL).mean(axis=1) > 0.25
+    z = int(round(zero_row)) - top
+    idx = np.where(on)[0]
+    if idx.size == 0:
+        return 0.0
+    # contiguous runs, tolerating the grey zero gridline drawn over the bars
+    best = None
+    for lo, hi in _group(idx, gap=8):
+        dist = 0 if lo <= z <= hi else min(abs(lo - z), abs(hi - z))
+        if dist <= 15 and (best is None or dist < best[0]):
+            best = (dist, lo, hi)
+    if best is None:
+        return 0.0
+    _, lo, hi = best
+    return float((z - lo) * scale) if (z - lo) >= (hi - z) \
+        else float(-(hi - z) * scale)
+
+
+YEAR_CENTRES = (1016, 1180, 1345, 1509, 1674, 1839)   # x ticks 2006..2011
 
 
 def digitise_panel(arr, frame, gridvals):
@@ -104,9 +115,15 @@ def digitise_panel(arr, frame, gridvals):
     fit = np.polyfit(ticks, gridvals, 1)          # value = a*row + b
     scale = -fit[0]                                # value units per pixel up
     zero_row = float((0.0 - fit[1]) / fit[0])
-    fao = bars(arr, FAO_BLUE, left, right, top, bot, zero_row, scale)
-    mod = bars(arr, MODEL_ORANGE, left, right, top, bot, zero_row, scale)
-    return left, right, top, bot, fao, mod
+    out = []
+    for i, xc in enumerate(YEAR_CENTRES):
+        out.append(dict(
+            year=2006 + i,
+            fao=bar_value(arr, FAO_BLUE, (xc - 45, xc - 5),
+                          top, bot, zero_row, scale),
+            full_model=bar_value(arr, MODEL_ORANGE, (xc + 5, xc + 45),
+                                 top, bot, zero_row, scale)))
+    return out
 
 
 def main() -> None:
@@ -119,17 +136,13 @@ def main() -> None:
                            PANELS["stock_change"]["tick_values"])
 
     rows = []
-    for name, (left, right, top, bot, fao, mod) in [
-            ("supply_change", supply), ("stock_change", stock)]:
-        fao = sorted(fao, key=lambda r: r["x0"])
-        mod = sorted(mod, key=lambda r: r["x0"])
-        print(f"{name}: {len(fao)} FAO bars, {len(mod)} model bars")
-        for i, (f, m) in enumerate(zip(fao, mod)):
-            rows.append(dict(panel=name, year=2006 + i,
-                             fao=round(f["value"], 2),
-                             full_model=round(m["value"], 2),
-                             sign_agree=int(np.sign(f["value"]) ==
-                                            np.sign(m["value"]))))
+    for name, recs in [("supply_change", supply), ("stock_change", stock)]:
+        for r in recs:
+            rows.append(dict(panel=name, year=r["year"],
+                             fao=round(r["fao"], 2),
+                             full_model=round(r["full_model"], 2),
+                             sign_agree=int(np.sign(r["fao"]) ==
+                                            np.sign(r["full_model"]))))
     ag = pd.DataFrame(rows)
     ag.to_csv(OUT / "agrimate_fig4be_digitised.csv", index=False)
     print(ag.to_string(index=False))

@@ -11,13 +11,19 @@ to prototype an Agrimate-style oligopolistic channel:
 ``mp_form``     : "exp"    log mu_i = alpha * (s_i - s_ref_i)   (linearised
                            Lerner, safe for all shares)
                   "lerner" mu_i = (1 - alpha*s_ref_i)/(1 - alpha*s_i), capped
-``alloc_mode``  : "shipped"  A-row reweight exactly as shipped (a no-op, see
-                             ``reweight_is_noop``)
-                  "source"   CES-over-sources reweight of S by offer price
-                             (Agrimate Eq. 8c with sigma = ask_comp_elast)
-                  "agrimate" source CES allocation + proportional supplier
+``alloc_mode``  : "shipped"  exactly HEAD: dest reweight (an algebraic no-op)
+                             + CES source reweight `_ask_reweight_src`
+                  "nosrc"    pre-929cec4 behaviour: raw S, no origin CES.
+                             Isolates what the CES origin channel does.
+                  "agrimate" CES source allocation + proportional supplier
                              rationing (no exporter destination-mix cap)
 ``ask_rival``   : override via ``params`` overrides on ``prepare_crop_run``.
+
+REVISION 2026-09-13 (R4 resumed). The inherited replica was written against
+the tree *before* two baseline moves and no longer matched HEAD:
+  * d4830c8  bounds the scarcity ratio when free < 0 <= twin (R0)
+  * 929cec4  wires `_ask_reweight_src` into `_simulate_window` (CES origins)
+Both are now mirrored below and re-verified to machine precision.
 
 Scoring uses ``_corr`` / ``_hike`` imported from
 ``scripts/score_subannual_crop.py`` so the numbers are the official ones.
@@ -45,6 +51,7 @@ from sheaf.data_usda import load_price_series_monthly
 from sheaf.dynamic_crop import (
     CropPrep,
     _ask_reweight_dest,
+    _ask_reweight_src,
     _bilateral_clear,
     _repair_vietnam_rice_e0,
     prepare_crop_run,
@@ -56,10 +63,14 @@ from score_subannual_crop import _corr, _hike  # official metrics
 
 CROPS = ("wheat", "maize", "rice")
 OBS_HIKES = {"wheat": (1.82, 1.16), "maize": (1.84, 1.44), "rice": (1.84, 0.79)}
-# published shipped-baseline scores (diagnostics/gate0_prep/a5/)
+# Official shipped-baseline scores at HEAD (63e716d), reproduced by running
+# `scripts/score_subannual_crop.py --crop <c>` on 2026-09-13. These supersede
+# BOTH the pre-R0 numbers (0.720/0.712/0.678) and the post-R0/pre-CES numbers
+# (0.720/0.781/0.678) quoted in the R4 brief: commit 929cec4 (CES origins)
+# moved wheat and maize again.
 SHIPPED = {
-    "wheat": (0.720, 2.27, 1.45),
-    "maize": (0.712, 1.97, 1.70),
+    "wheat": (0.728, 2.28, 1.45),
+    "maize": (0.778, 2.20, 1.59),
     "rice": (0.678, 1.72, 0.82),
 }
 
@@ -230,14 +241,16 @@ def simulate_r4(
         ask_eff = ask * markup
 
         if alloc_mode == "shipped":
+            # HEAD dynamic_crop.py L645-648
+            A_eff = _ask_reweight_dest(A, ask_eff, p0, gamma=sigma)
+            S_eff = _ask_reweight_src(S, ask_eff, p0, gamma=sigma)
+            shipped, received, ship = _bilateral_clear(
+                offers, demand, A_eff, S_eff, subst=params.residual_subst)
+        elif alloc_mode == "nosrc":
+            # pre-929cec4: destination reweight only, i.e. raw S
             A_eff = _ask_reweight_dest(A, ask_eff, p0, gamma=sigma)
             shipped, received, ship = _bilateral_clear(
                 offers, demand, A_eff, S, subst=params.residual_subst)
-        elif alloc_mode == "source":
-            A_eff = _ask_reweight_dest(A, ask_eff, p0, gamma=sigma)
-            S_eff = _source_reweight(S, ask_eff, p0, sigma)
-            shipped, received, ship = _bilateral_clear(
-                offers, demand, A_eff, S_eff, subst=params.residual_subst)
         elif alloc_mode == "agrimate":
             S_eff = _source_reweight(S, ask_eff, p0, sigma)
             shipped, received, ship = _agrimate_clear(
@@ -283,8 +296,12 @@ def simulate_r4(
         else:
             twin = float(free_twin[t])
             floor0 = 0.05 * safety_w
-            shift = floor0 + max(0.0, -min(free, twin))
-            ratio = (twin + shift) / (free + shift)
+            if free < 0.0 <= twin:
+                # HEAD dynamic_crop.py L706-714 (commit d4830c8, R0 fix)
+                ratio = (twin + floor0) / (0.10 * float(stock.sum()) + floor0)
+            else:
+                shift = floor0 + max(0.0, -min(free, twin))
+                ratio = (twin + shift) / (free + shift)
             u0 = float(unmet_twin[t]) if unmet_twin is not None else 0.0
             u_anom = max(0.0, unmet_frac - u0)
             calm = (abs(free - twin) < 1e-6 and u_anom < 1e-9
@@ -494,3 +511,11 @@ def reweight_is_noop(prep: CropPrep, gamma: float = 1.25) -> float:
     ask = prep.p0 * np.exp(rng.normal(0, 0.4, size=prep.A.shape[0]))
     A_eff = _ask_reweight_dest(prep.A, ask, prep.p0, gamma=gamma)
     return float(np.max(np.abs(A_eff - prep.A)))
+
+
+def src_reweight_dev(prep: CropPrep, gamma: float = 1.25) -> float:
+    """Same probe for the *source* reweight — the live Armington channel."""
+    rng = np.random.default_rng(0)
+    ask = prep.p0 * np.exp(rng.normal(0, 0.4, size=prep.S.shape[0]))
+    S_eff = _ask_reweight_src(prep.S, ask, prep.p0, gamma=gamma)
+    return float(np.max(np.abs(S_eff - prep.S)))
