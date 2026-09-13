@@ -98,15 +98,18 @@ def static_substitution(crop: str) -> pd.DataFrame:
             off = base["offers"][:, t].copy()
             dem = base["demand"][:, t].copy()
             ask = base["ask"][:, t].copy()
-            A_eff = A                                    # reweight is a no-op
+            A_eff = A                  # destination reweight is the identity
+            # HEAD allocates on the CES origin mix (929cec4), so the shipped
+            # arm must use S_eff too; the only remaining difference from the
+            # Agrimate arm is then the exporter destination-mix row cap.
             S_eff = _source_reweight(S, ask, p0, sigma)
             # baseline (no block)
-            sh0, _, _ = _bilateral_clear(off, dem, A_eff, S, subst=subst)
+            sh0, _, _ = _bilateral_clear(off, dem, A_eff, S_eff, subst=subst)
             ag0, _, _ = _agrimate_clear(off, dem, S_eff, subst)
             # blocked
             offb = off.copy()
             offb[i] = 0.0
-            shb, rvb, _ = _bilateral_clear(offb, dem, A_eff, S, subst=subst)
+            shb, rvb, _ = _bilateral_clear(offb, dem, A_eff, S_eff, subst=subst)
             # CES re-allocation: drop i from the source mix and renormalise
             S_blk = S_eff.copy()
             S_blk[i, :] = 0.0

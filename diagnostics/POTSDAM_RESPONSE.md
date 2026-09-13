@@ -107,6 +107,29 @@ Maize moved under change 1 as well, because the reference run is rebuilt
 under the same law, so the scarcity ratio sees the new allocation. That is
 a consequence of making a documented mechanism real, not a retune.
 
+**And one consequence we should report against ourselves.** Both defects
+existed character-for-character in the Gate 1 coupled host as well, so we
+fixed them there too. Gate 1's central invariant survives — at zero
+substitution the coupled model still reproduces the independent Gate 0
+prices exactly — but one of its hard bars, requiring that switching on
+cross-commodity substitution raise rice's 2007/08 hike, now fails at the
+largest substitution setting, returning ×0.984 where it needs to exceed 1.
+It had been passing at ×1.039, and it still passes at the intermediate
+setting. Reverting either fix alone does not restore it.
+
+The mechanism is legible rather than mysterious: maize's spurious
+factor-of-four spike was a spurious source of spillover into rice, and
+removing the pathology removed the spillover it was generating. Our reading
+is that a bar which was passing by four per cent, and whose verdict is set
+by a numerical artefact in a different commodity, was not measuring what it
+was built to measure — and that rice is undershooting its observed ×1.84
+hike at every substitution setting anyway, so the sign of its
+substitution-response is a second-order property of an already-short
+amplitude. But we are not going to revert a correctness fix to keep a bar
+green, nor quietly restate the bar, without telling you first.
+`diagnostics/redteam/r0/R0L_GATE1_CONSEQUENCE.md` has the attribution table
+and three options.
+
 **Note corrections (no score effect).** The scarcity regulariser is 5% of
 world safety stock plus a state-dependent term, not a small constant, and
 biases the rice scarcity ratio by 35% on average. The unmet-demand channel

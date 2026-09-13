@@ -181,13 +181,24 @@ def _simulate_coupled(preps: list[CropPrep], eta: np.ndarray,
             unmet_path[g][t] = unmet_frac
 
             shipped_sum = float(shipped.sum())
-            p_trade = (float(np.dot(ask_g, shipped) / shipped_sum)
+            # Value shipments at the ask that ALLOCATED them (ask_path, set
+            # at the top of the step and used by _ask_reweight_*), not the
+            # ask_g just updated above. Mirrors the same fix in
+            # dynamic_crop._simulate_window; Agrimate Eq. D.4.
+            p_trade = (float(np.dot(ask_path[g][:, t], shipped) / shipped_sum)
                        if shipped_sum > 1e-12 else p[g])
 
             twin = float(pr.free_twin[t])
             floor0 = 0.05 * safety_w[g]
-            shift = floor0 + max(0.0, -min(free, twin))
-            ratio = (twin + shift) / (free + shift)
+            if free < 0.0 <= twin:
+                # Unbounded otherwise: the shift would reduce the denominator
+                # to floor0 and the ratio would be twin/floor0, set by the
+                # regulariser rather than by scarcity. Mirrors the same fix
+                # in dynamic_crop._simulate_window.
+                ratio = (twin + floor0) / (0.10 * float(st.sum()) + floor0)
+            else:
+                shift = floor0 + max(0.0, -min(free, twin))
+                ratio = (twin + shift) / (free + shift)
             u0 = float(pr.unmet_twin[t])
             u_anom = max(0.0, unmet_frac - u0)
             calm = (abs(free - twin) < 1e-6 and u_anom < 1e-9
