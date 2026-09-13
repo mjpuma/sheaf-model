@@ -12,7 +12,7 @@ Parameters: see `diagnostics/GATE0_PARAMETERIZATION.md`.
 
 ## Parameters (`CropParams`)
 ```
-CropParams(crop='rice', elast=-0.2, stu_target=0.18, max_stu=0.22, seasonal_buffer_steps=0.0, pipeline_max_steps=0, rebuild_lambda=0.08, warehouse_lambda=0.08, inv_eta=0.95, smooth=0.65, trade_w=0.72, unmet_kappa=2.5, block_kappa=4.5, ask_alpha=0.15, ask_target_fill=0.7, ask_comp_elast=1.25, ask_beta=0.18, ask_rival=0.8, foresight_phi=0.55, harvest_pulse_frac=0.12, residual_subst=0.15, twin_harvest='seasonal', shock_mode='full', industrial_nodes=(), ind_base_years=(2000, 2004))
+CropParams(crop='rice', elast=-0.2, stu_target=0.18, max_stu=0.22, seasonal_buffer_steps=0.0, pipeline_max_steps=0, rebuild_lambda=0.08, warehouse_lambda=0.08, inv_eta=0.95, smooth=0.65, trade_w=0.72, unmet_kappa=2.5, block_kappa=4.5, ask_alpha=0.15, ask_target_fill=0.7, ask_comp_elast=1.25, ask_beta=0.18, ask_rival=0.8, foresight_phi=0.55, harvest_pulse_frac=0.12, residual_subst=0.15, twin_harvest='seasonal', shock_mode='full', industrial_nodes=(), ind_base_years=(2000, 2004), ask_fill_ref='fixed', spec_kappa=0.0, carry_rate_annual=0.05, pin_calm=True)
 ```
 
 ## Monthly price vs Pink Sheet

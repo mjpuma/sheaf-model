@@ -95,9 +95,12 @@ for the τ column, whose base window *is* the pinned stretch.
    (+4.7% / +48.8% / +16.0%). Crossing bisected under both tests: **0.755**
    as written (A5 independently got 0.751), **clears at 0.0** corrected —
    though maize's corrected margin is only +4.7%, so nearly binding, not
-   slack. It is *not* spurious — at 0.0, maize corr +0.712 → +0.414 and rice
-   07/08 ×1.72 → ×1.01. So it is a reduced-form amplitude parameter with no
-   external basis. Category **F**, 95–100%. **Open decision** (see
+   slack. It is *not* spurious — on current code, at 0.0, maize corr
+   +0.792 → +0.551 and rice 07/08 ×1.54 → ×1.01, though wheat's correlation
+   *improves* (+0.687 → +0.700) while its 07/08 hike collapses ×2.09 → ×1.46,
+   so the parameter buys amplitude rather than fit. A reduced-form amplitude
+   parameter with no external basis. Category **F**, 95–100%. **Open
+   decision** (see
    `POTSDAM_RESPONSE.md` §2). This reclassifies A5's finding 1 from H;
    adjudication recorded in `gate0_prep/a5/ADJUDICATION_ASK_RIVAL.md`.
 3. **Maize 2007/08 flips demand-led → restriction-led** (τ ×1.10 → ×1.69,
@@ -135,10 +138,44 @@ for the τ column, whose base window *is* the pinned stretch.
 Synthesis: [`gate0_prep/redteam/REDTEAM_SYNTHESIS.md`](gate0_prep/redteam/REDTEAM_SYNTHESIS.md).
 Potsdam letter updated.
 
-**Shipped:** CES source-share reweight (`_ask_reweight_src`). Destination
-reweight was the identity (`ask_comp_elast` inert). All twelve asserts
-pass. New official full-leg scores: wheat **+0.728 / ×2.28 / ×1.45**,
-maize **+0.778 / ×2.20 / ×1.59**, rice **+0.678 / ×1.72 / ×0.82**.
+**Shipped, three changes.** (1) CES source-share reweight
+(`_ask_reweight_src`); destination reweight was the identity, so
+`ask_comp_elast` was inert. (2) **Bounded scarcity ratio** in the
+asymmetric case where accessible stock goes negative while the reference
+stays positive — the ratio there was `twin/floor0`, set by the regulariser
+rather than by scarcity (maize 35.1, price ×4.13 in one step), and it made
+maize's correlation irreproducible (spread 0.557 under a ~1%
+recalibration, now 0.051). (3) **Value shipments at the ask that allocated
+them** rather than at the ask updated later in the same step — a
+rally-directional bias of +2.2/+1.9/+3.9% through 2007/08, against
+Agrimate Eq. D.4. Changes 2 and 3 were also applied to the Gate 1 coupled
+host, which carried the same two blocks verbatim.
+
+All twelve asserts pass. Current official full-leg scores: wheat
+**+0.687 / ×2.09 / ×1.31**, maize **+0.792 / ×2.05 / ×1.52**, rice
+**+0.676 / ×1.54 / ×0.84**. Total absolute error over the six crisis
+windows falls 1.421 → 1.060; wheat loses 0.033 correlation and rice's
+2007/08 undershoot deepens. Those are costs of correctness fixes, not
+justifications — none of the three was selected on a score.
+
+**Open consequence:** Gate 1's σ = 0 identity still holds exactly, but its
+spillover-sign hard bar now fails for rice at σ = 0.6 (×0.984, was
+×1.039; σ = 0.3 still passes at ×1.029). Reverting either fix alone does
+not restore it. Three options for the coauthors in
+[`../diagnostics/redteam/r0/R0L_GATE1_CONSEQUENCE.md`](redteam/r0/R0L_GATE1_CONSEQUENCE.md).
+
+**New parity findings from reading the paper and ODD supplement directly**
+([`redteam/r0/`](redteam/r0/)): measured price flexibility 5.49/2.96/4.88
+against Agrimate's α of 3.0–3.5, so the earlier worry that SHEAF's price
+map is three to four times too flat was **false**; but the price map has a
+step discontinuity at zero anomaly, −9.5% (wheat) and −22.6% (maize),
+which is the sharpest form of the rest-point problem. Parameter counts are
+≈20 (SHEAF) against ≈21 (Agrimate, two of them per-region vectors), so the
+count criticism does not survive — provenance is the real issue. Agrimate's
+ρ and δ are both 0 at default, so no FOC repair needs an interest rate, and
+its `x_min = 0.2` is a citable precedent for an optimiser stabiliser. Its
+baseline is a Nash-periodic equilibrium where ours is a climatological
+twin, which is a genuine gap.
 
 **Prototyped, not shipped:** exporter FOC in place of the ask law.
 Restores the quiet-market rest point without the pin and passes asserts;

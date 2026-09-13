@@ -132,12 +132,18 @@ class CropParams:
     # (+4.7%), as do wheat (+48.8%) and rice (+16.0%).
     #
     # So the sign condition does NOT pin this parameter. It remains
-    # load-bearing for crisis amplitude (setting it to 0 moves maize corr
-    # +0.778 → +0.520 after CES; it was +0.712 → +0.414 before) and rice
-    # 2007/08 ×1.72 → ×1.01 vs observed ×1.84, so it is not spurious
-    # either. Treat it as a reduced-form amplitude parameter awaiting an
-    # external basis, shared across crops and years, and not fit to 2008.
-    # See diagnostics/gate0_prep/a2/.
+    # load-bearing for crisis amplitude, and the effect survived every
+    # subsequent fix. Current code, setting it to 0:
+    #   wheat corr +0.687 → +0.700, 2007/08 ×2.09 → ×1.46 (obs ×1.82)
+    #   maize corr +0.792 → +0.551, 2007/08 ×2.05 → ×1.54 (obs ×1.84)
+    #   rice  corr +0.676 → +0.334, 2007/08 ×1.54 → ×1.01 (obs ×1.84)
+    # Note wheat's correlation *improves* at zero while its 2007/08 hike
+    # collapses — the parameter is buying amplitude, not fit, and only for
+    # maize and rice does it buy both. So it is not spurious, and it is not
+    # uniformly beneficial either. Treat it as a reduced-form amplitude
+    # parameter awaiting an external basis, shared across crops and years,
+    # and not fit to 2008. See diagnostics/gate0_prep/a2/ and
+    # diagnostics/gate0_prep/a5/ADJUDICATION_ASK_RIVAL.md.
     ask_rival: float = 0.80
     # structural — harvest foresight blend; pulse definition
     foresight_phi: float = 0.55
@@ -154,6 +160,21 @@ class CropParams:
     industrial_nodes: tuple[str, ...] = ()
     # structural — years that define the pre-mandate FSI baseline
     ind_base_years: tuple[int, int] = (2000, 2004)
+    # reduced_form — fill reference in the ask law. "fixed" is the shipped
+    # global θ = ask_target_fill (no rest point at p0). "twin" uses each
+    # country's same-step fill on the frozen-ask twin, so a matched run has
+    # fill ≡ θ and the ask law is still at the first step.
+    ask_fill_ref: str = "fixed"
+    # reduced_form — one-period commercial store-vs-sell on the residual
+    # above the cover target. 0 = shipped cover-only rule. Motive is
+    # E[p]/p − (1+r) with E[p] = same fortnight last year (else p0) and
+    # r = carry_rate_annual / STEPS_PER_YEAR. Positive motive withholds;
+    # negative dumps. Not Agrimate's finite-horizon NLP.
+    spec_kappa: float = 0.0
+    carry_rate_annual: float = 0.05
+    # structural — pin p* = p0 when the run matches the twin. Default on
+    # (shipped). Off is the rest-point test: the algebra must hold alone.
+    pin_calm: bool = True
 
 
 def default_crop_params(crop: str) -> CropParams:
@@ -247,6 +268,7 @@ class CropPrep:
     free_twin: np.ndarray
     unmet_twin: np.ndarray
     spin_up_years: int
+    fill_twin: np.ndarray | None = None
 
 
 def _psd_annual(crop: str, countries: list[str],
@@ -581,6 +603,8 @@ def _simulate_window(
         free_twin: np.ndarray | None = None,
         unmet_twin: np.ndarray | None = None,
         H_seasonal: np.ndarray | None = None,
+        fill_twin: np.ndarray | None = None,
+        freeze_ask: bool = False,
 ) -> tuple[np.ndarray, ...]:
     n, T = H.shape
     C_step = C_flex + C_ind
