@@ -1,0 +1,115 @@
+{
+  "params": [
+    "elast",
+    "stu_target",
+    "max_stu",
+    "rebuild_lambda",
+    "warehouse_lambda",
+    "inv_eta",
+    "smooth",
+    "trade_w",
+    "unmet_kappa",
+    "block_kappa",
+    "ask_alpha",
+    "ask_target_fill",
+    "ask_comp_elast",
+    "ask_beta",
+    "ask_rival",
+    "foresight_phi",
+    "harvest_pulse_frac",
+    "residual_subst"
+  ],
+  "metrics": [
+    "wheat.corr",
+    "wheat.h0708",
+    "wheat.h1011",
+    "maize.corr",
+    "maize.h0708",
+    "maize.h1011",
+    "rice.corr",
+    "rice.h0708",
+    "rice.h1011"
+  ],
+  "collinear_tol": 0.95,
+  "negligible_norm": 0.1,
+  "stable_collinear_pairs": [
+    {
+      "a": "ask_alpha",
+      "b": "ask_target_fill",
+      "abs_cos_h010": 0.9609135726342063,
+      "abs_cos_h020": 0.9680254104918364
+    },
+    {
+      "a": "block_kappa",
+      "b": "ask_rival",
+      "abs_cos_h010": 0.9885266903538026,
+      "abs_cos_h020": 0.974323638465653
+    },
+    {
+      "a": "max_stu",
+      "b": "warehouse_lambda",
+      "abs_cos_h010": 0.9798884807548522,
+      "abs_cos_h020": 0.9776448358419723
+    }
+  ],
+  "svd": [
+    {
+      "h": 0.1,
+      "singular_values": [
+        6.312029503385942,
+        2.907240884683374,
+        2.3000323015856874,
+        2.1577420525258892,
+        1.2525005837874648,
+        0.8679541893580843,
+        0.7708773217293017,
+        0.42433650538920575,
+        0.14349461243145153
+      ],
+      "cond_number": 43.98791980013358,
+      "n_dirs_99pct": 7,
+      "n_dirs_above_1pct_of_top": 9,
+      "n_params": 18,
+      "n_metrics": 9
+    },
+    {
+      "h": 0.2,
+      "singular_values": [
+        10.02101158549466,
+        7.939752841009914,
+        4.18057683776842,
+        2.7018692509587057,
+        1.7333063959709092,
+        1.2407348334109565,
+        0.9909207655464388,
+        0.48808881971398294,
+        0.4186068916970721
+      ],
+      "cond_number": 23.93895510145217,
+      "n_dirs_99pct": 6,
+      "n_dirs_above_1pct_of_top": 9,
+      "n_params": 18,
+      "n_metrics": 9
+    }
+  ],
+  "norms_h010": {
+    "trade_w": 4.517799684530213,
+    "smooth": 2.3516236296667326,
+    "ask_target_fill": 2.233396141790155,
+    "inv_eta": 2.2137263062575214,
+    "ask_rival": 2.2108487903270206,
+    "ask_alpha": 2.182261306388347,
+    "foresight_phi": 2.0004328241706433,
+    "stu_target": 1.6300750256155903,
+    "harvest_pulse_frac": 1.6175649251524644,
+    "max_stu": 1.4249362545149997,
+    "warehouse_lambda": 1.4013788707601154,
+    "elast": 0.9094463111472567,
+    "rebuild_lambda": 0.8638297489213445,
+    "block_kappa": 0.7322390676685374,
+    "ask_beta": 0.4583430835135448,
+    "unmet_kappa": 0.38235103650356833,
+    "residual_subst": 0.3767320171620617,
+    "ask_comp_elast": 0.0
+  }
+}

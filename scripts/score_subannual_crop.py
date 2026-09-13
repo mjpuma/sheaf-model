@@ -32,8 +32,10 @@ from sheaf.dynamic_crop import (
     assert_amis_raises_price,
     assert_no_spring_spike,
     assert_twin_identity,
+    prepare_crop_run,
     result_to_monthly,
     run_crop_dynamics,
+    simulate_prep,
 )
 
 # Named AMIS episodes scored on the official matched split (full vs shocks).
@@ -421,6 +423,23 @@ def main():
         trio = [("production", sh), ("demand", dem), ("restriction", tau)]
         return max(trio, key=lambda kv: kv[1])[0]
 
+    # The tau leg is shock-free, so before its first AMIS episode it matches
+    # the twin and the calm branch in _simulate_window pins it at exactly p0.
+    # That pinned stretch is the base window of the 2007/08 ratio, while the
+    # peak is priced by the ask/scarcity law, whose quiet level is well below
+    # p0. The ratio therefore mixes the release of the pin with the
+    # restriction effect. Perturbing harvest by 1e-6 takes the leg out of the
+    # matched regime so base and peak share a price law.
+    # See diagnostics/gate0_prep/a2/ and A2D_TAU_ATTRIBUTION.md.
+    prep_tau = prepare_crop_run(
+        crop, start_year=args.start, end_year=args.end,
+        use_amis=True, use_shocks=False, use_demand=False,
+        use_industrial=False)
+    tau_up = result_to_monthly(
+        simulate_prep(prep_tau, harvest=prep_tau.H * (1.0 - 1e-6)))
+    tau_u07 = _hike(tau_up, "model_price", 2006, 6, 2008, 3)
+    tau_u10 = _hike(tau_up, "model_price", 2009, 6, 2011, 2)
+
     lines.append("")
     lines.append("## Attribution (which isolated leg carries the hike)")
     lines.append(
@@ -429,6 +448,17 @@ def main():
     lines.append(
         f"- 2010/11: shocks×{sh_h10:.2f}  demand×{dem_h10:.2f}  tau×{tau_h10:.2f} "
         f"(full×{full_h10:.2f}) — {_lead(sh_h10, dem_h10, tau_h10)}-led")
+    lines.append(
+        f"- **tau column, unpinned baseline**: 2007/08 ×{tau_u07:.2f} "
+        f"(vs ×{tau_h07:.2f} above), 2010/11 ×{tau_u10:.2f} "
+        f"(vs ×{tau_h10:.2f}) — "
+        f"{_lead(sh_h07, dem_h07, tau_u07)}-led / "
+        f"{_lead(sh_h10, dem_h10, tau_u10)}-led")
+    lines.append(
+        "  The tau leg's base window is pinned at p0 by the calm branch, so "
+        "the ratio above understates the restriction channel. The unpinned "
+        "line is the like-for-like measurement; both are printed until the "
+        "coauthors settle which is the headline.")
 
     if crop == "maize" and full.industrial is not None:
         usa = full.countries.index("USA") if "USA" in full.countries else None

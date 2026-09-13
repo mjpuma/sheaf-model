@@ -1,0 +1,7 @@
+{
+  "max_abs_A_eff_minus_A": 2.220446049250313e-16,
+  "wheat_max_dev_over_gamma": 8.881784197001252e-16,
+  "maize_max_dev_over_gamma": 0.0,
+  "rice_max_dev_over_gamma": 2.220446049250313e-16,
+  "exact_noop_confirmed": true
+}

@@ -3,7 +3,7 @@
 Types (who plays, buffer, intensity) are slow. Actions ``τ_t`` respond to
 the crisis path. Default players: Russia (harvest shock) and Kazakhstan
 (neighbor, no own harvest cut). Not the annual SPE game in
-``sheaf/core.py``. Headey (2011) is the clock.
+``sheaf.annual``. Headey (2011) is the clock.
 See diagnostics/GAME_CLOCK.md.
 """
 from __future__ import annotations

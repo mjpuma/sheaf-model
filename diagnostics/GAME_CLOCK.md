@@ -4,29 +4,25 @@
 global food crisis: The role of trade shocks. *Food Policy* 36: 136–146.
 
 This file is the architecture lock for **who chooses what, on which
-clock**. It is not a 2008/10 score and not an invitation to retune
-Gate 0 or Gate 1.
+clock**. It is not a 2008/10 score. It is not an invitation to retune
+Gate 0 because Headey exists. Returning to Gate 0 after coauthor
+consultation on the *market* is [`DEVELOPMENT.md`](DEVELOPMENT.md).
 
-## Do Gate 0 or Gate 1 need to be re-run?
+**Headey does not, by itself, force a Gate 0 re-run.** Colleague
+questions about how the *market* forms \(p\) do — see
+[`DEVELOPMENT.md`](DEVELOPMENT.md). Headey is why the diary is
+first-order and why the market is sub-annual. He does not pick
+`CropParams`. Official `gate0_*_report.md` files are snapshots until
+the baseline is revised.
 
-**No.**
-
-| Layer | Substitution | Game | Why a re-run would be wasted |
+| Layer | Substitution | Game | Headey alone |
 |---|---|---|---|
-| **Gate 0** | off | off (AMIS diary) | Headey is why the diary is first-order and why the market is sub-annual. He does not change `CropParams`, harvest calendars, LOWESS shocks, Armington E0, or the AMIS→cut map. Official scores in `diagnostics/gate0_*_report.md` stay the scores. |
-| **Gate 1** | on (`σ ∈ {0, 0.3, 0.6}`) | off | Headey’s wheat→rice demand surge is *motivation* that grains spill. It is not a reason to densify `σ`, pick `σ*`, graft annual Slutsky `M_i` onto the spine, or unpause `dynamic_grains.py`. The frozen claim in `overleaf/gate1_whitepaper/` stands. |
+| **Gate 0** | off | off (AMIS diary) | Not a reason to retune. Consultation on \(p\), storage, asks **is**. |
+| **Gate 1** | on (`σ ∈ {0, 0.3, 0.6}`) | off | Not a reason to densify `σ` or pick `σ*`. Paused until Gate 0 is one we will stand behind. |
 
-Re-running those scripts would reproduce the same tables. Do not treat
-this clock note as a new hindcast or substitution experiment.
-
-**What does get a run:** the policy beta on the 24-step spine
-(`python3 scripts/score_gate2_beta.py`). Official Gate 0 / Gate 1 paths remain
-`use_amis=True` and do not call `sheaf/dynamic_policy.py`.
-
-**Cascade (in):** Russia harvest ×0.50, Kazakhstan neighbor, same types.
-Harvest diversion, not ban-on-ban IBR. Still synthetic. Still not a
-2008 score. Not a new paper title. Further on this layer, if anything:
-an importer scramble or a stock *announcement*.
+**What does not get a run right now:** Gate 2 beta. Pause until the
+Gate 0 baseline is settled. `use_amis=True` paths still do not call
+`sheaf/dynamic_policy.py`.
 
 ## Two timescales
 
@@ -50,17 +46,18 @@ Conflating them into one annual `τ_i` is what the leftover host does.
 
 ## Where the leftover is
 
-`sheaf/core.py` `ExportRestrictionGame` + `demo.py` is the **TWIST-era
-annual SPE prototype**: one tax per year, node prices from a Takayama–
-Judge QP, consumer surplus at `p_i`. It was the right game when the
-market itself was annual. Gate 0 retired that market for crisis work
+`sheaf.annual` `ExportRestrictionGame` + `scripts/annual/demo.py` is the
+**TWIST-era annual SPE prototype**: one tax per year, node prices from a
+Takayama–Judge QP, consumer surplus at `p_i`. It was the right game when
+the market itself was annual. Gate 0 retired that market for crisis work
 (`ARCHITECTURE.md`, `diagnostics/LEVEL1_INTERROGATION.md`). Agrimate
 never had an endogenous game — AMIS is a diary — so there was no
 template for “governments choose on the 24-step clock,” and the Nash
-layer stayed on `core.py`. That is a leftover, not the 2007/08 object.
+layer stayed on the annual host. That is parked in `sheaf/annual/`, not
+the 2007/08 object.
 
-`demo.py` may still run the annual prototype. Crisis hindcasts and the
-crisis game do not.
+`python scripts/annual/demo.py` still runs that prototype. Crisis
+hindcasts and the crisis game do not.
 
 ## Where the live game sits
 

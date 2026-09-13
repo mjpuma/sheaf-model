@@ -1,0 +1,70 @@
+% SHEAF Gate 0 discussion — options after coauthor consultation.
+% Overleaf: zip this folder and upload. Compile pdfLaTeX + BibTeX.
+% Figures: python scripts/render_gate0_flows.py (from repo root).
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{amsmath,amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage[round,authoryear]{natbib}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{setspace}
+\usepackage{array}
+\setstretch{1.12}
+
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue}
+\graphicspath{{figures/}}
+\bibliographystyle{apalike}
+
+% Figures are drawn at page width with 11pt type; do not height-cap
+% (that was shrinking the labels).
+\newcommand{\flowfig}[2]{%
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{#1}
+\caption{#2}
+\end{figure}}
+
+\title{SHEAF Gate~0 after the Agrimate sitting\\
+\large what the two-week market does, and what we might change}
+\author{Working discussion (not a journal submission)}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This is a discussion note, not a results paper. Gate~0 is the two-week
+grain market on which the rest of SHEAF rests: a single crop at a time,
+historically observed export restrictions imposed exogenously, no
+substitution among wheat, rice, and maize, and no endogenous policy
+choice. Coauthors asked how the world price is determined, which object
+``baseline'' refers to, why available grain is withheld rather than sold,
+and whether the price update should derive from an optimisation problem.
+We state the two-week recursion in full --- in words, then as equations
+with every symbol defined at the point of use and carrying explicit units
+--- and set each proposed alternative against the equation it would
+replace and the measurement that would distinguish it. Four figures.
+Nothing is decided here. Cross-commodity substitution and the restriction
+game remain deferred until this market is one we would publish as stated.
+\end{abstract}
+
+\tableofcontents
+\vspace{1em}
+
+\input{sections/howto.tex}
+\input{sections/notation.tex}
+\input{sections/dynamics.tex}
+\input{sections/options.tex}
+\input{sections/diagnostics.tex}
+\input{sections/order.tex}
+
+\bibliography{refs}
+
+\end{document}

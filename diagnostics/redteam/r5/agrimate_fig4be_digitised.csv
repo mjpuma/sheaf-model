@@ -1,0 +1,13 @@
+panel,year,fao,full_model,sign_agree
+supply_change,2006,-0.63,-1.28,1
+supply_change,2007,-2.77,-2.26,1
+supply_change,2008,1.5,-3.74,0
+supply_change,2009,0.48,-0.23,0
+supply_change,2010,-2.13,-0.48,1
+supply_change,2011,1.16,-0.97,0
+stock_change,2006,-3.39,-4.38,1
+stock_change,2007,-0.97,-2.75,1
+stock_change,2008,4.56,8.3,1
+stock_change,2009,5.22,3.65,1
+stock_change,2010,-0.15,-4.84,1
+stock_change,2011,2.51,2.47,1

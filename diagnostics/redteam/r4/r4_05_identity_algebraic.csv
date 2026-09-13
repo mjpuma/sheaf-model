@@ -1,0 +1,4 @@
+crop,n,n_zero_rows,zero_rows,n_rows_off_unit,dev_on_shipped_A,dev_on_unnormalised_A
+wheat,18,2,Vietnam;Nigeria,0,1.1102230246251565e-16,0.9578341275982615
+maize,18,2,Vietnam;Nigeria,0,1.1102230246251565e-16,0.9777383543989951
+rice,18,1,Nigeria,0,1.1102230246251565e-16,0.9995630315106812

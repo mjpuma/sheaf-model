@@ -1,0 +1,9 @@
+model,panel,source,n_agree,n,frac
+"Agrimate (wheat, digitised Fig. 4b/e)",stock_change,FAOSTAT,6,6,1.0
+"Agrimate (wheat, digitised Fig. 4b/e)",supply_change,FAOSTAT,3,6,0.5
+SHEAF Gate 0 (maize),consumption_change,USDA PSD,1,5,0.2
+SHEAF Gate 0 (rice),consumption_change,USDA PSD,1,5,0.2
+SHEAF Gate 0 (wheat),consumption_change,USDA PSD,3,5,0.6
+SHEAF Gate 0 (maize),stock_change,USDA PSD,3,5,0.6
+SHEAF Gate 0 (rice),stock_change,USDA PSD,4,5,0.8
+SHEAF Gate 0 (wheat),stock_change,USDA PSD,3,5,0.6

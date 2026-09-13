@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="604" height="498" viewBox="0 0 604 498" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">
+<rect width="604" height="498" fill="#ffffff"/>
+<text x="28" y="28" font-size="16" font-weight="600" fill="#18181b">Baselines — four objects that feed the map</text>
+<text x="28" y="48" font-size="12" fill="#52525b">B0 name them — Scarcity uses the twin. p0 is the numeraire. Spin-up is 2 years. Twin holds p = p0.</text>
+<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#71717a"/></marker></defs>
+<path d="M 112.0 140.0 C 112.0 171.0, 112.0 171.0, 112.0 202.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 302.0 140.0 C 302.0 171.0, 112.0 171.0, 112.0 202.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 112.0 250.0 C 112.0 226.0, 302.0 226.0, 302.0 202.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 302.0 250.0 C 302.0 281.0, 112.0 281.0, 112.0 312.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 302.0 140.0 C 302.0 226.0, 112.0 226.0, 112.0 312.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 492.0 140.0 C 492.0 226.0, 112.0 226.0, 112.0 312.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 112.0 360.0 C 112.0 336.0, 302.0 336.0, 302.0 312.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 302.0 140.0 C 302.0 171.0, 492.0 171.0, 492.0 202.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 302.0 250.0 C 302.0 281.0, 492.0 281.0, 492.0 312.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 492.0 250.0 C 492.0 281.0, 492.0 281.0, 492.0 312.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 492.0 140.0 C 492.0 226.0, 492.0 226.0, 492.0 312.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 302.0 360.0 C 302.0 336.0, 492.0 336.0, 492.0 312.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 492.0 360.0 C 492.0 391.0, 112.0 391.0, 112.0 422.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<rect x="28.0" y="92.0" width="168" height="48" rx="6" fill="#f4f4f5" stroke="#71717a" stroke-width="1.0"/>
+<text x="112.0" y="120.0" text-anchor="middle" font-size="11" fill="#3f3f46">2005 PSD stocks</text>
+<rect x="218.0" y="92.0" width="168" height="48" rx="6" fill="#f4f4f5" stroke="#71717a" stroke-width="1.0"/>
+<text x="302.0" y="120.0" text-anchor="middle" font-size="11" fill="#3f3f46">Hseas climatology</text>
+<rect x="408.0" y="92.0" width="168" height="48" rx="6" fill="#f4f4f5" stroke="#71717a" stroke-width="1.0"/>
+<text x="492.0" y="120.0" text-anchor="middle" font-size="11" fill="#3f3f46">p0 Pink Sheet</text>
+<rect x="28.0" y="202.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="112.0" y="230.0" text-anchor="middle" font-size="11" fill="#18181b">2-year spin-up</text>
+<rect x="218.0" y="202.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="302.0" y="230.0" text-anchor="middle" font-size="11" fill="#18181b">opening S</text>
+<rect x="28.0" y="312.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="112.0" y="340.0" text-anchor="middle" font-size="11" fill="#18181b">twin run τ≡0</text>
+<rect x="218.0" y="312.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="302.0" y="340.0" text-anchor="middle" font-size="11" fill="#18181b">free_twin</text>
+<rect x="408.0" y="202.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="492.0" y="230.0" text-anchor="middle" font-size="11" fill="#18181b">H × (1+LOWESS)</text>
+<rect x="408.0" y="312.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="492.0" y="340.0" text-anchor="middle" font-size="11" fill="#18181b">treatment map</text>
+<rect x="28.0" y="422.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="112.0" y="450.0" text-anchor="middle" font-size="11" fill="#18181b">p path</text>
+</svg>

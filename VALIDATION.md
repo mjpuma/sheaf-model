@@ -66,7 +66,7 @@ ARCHITECTURE.md (24 steps/yr). Temporal resolution is where SHEAF now competes.
 Drive the **Gate 0 24-step spine** with production anomalies *only*, let
 governments choose **actions** `τ_{i,t}` on that clock, and keep **types**
 (food-security weights, who plays) slow — Headey (2011), not the annual
-Nash in `sheaf/core.py`. Fit types on a declared training window, then
+Nash in `sheaf.annual`. Fit types on a declared training window, then
 score restrictors / timing / severity / prices on a **held-out** window.
 The two-player beta (Russia harvest, Kazakhstan neighbor) with labeled
 illustrative knobs is a mechanism check, not that score

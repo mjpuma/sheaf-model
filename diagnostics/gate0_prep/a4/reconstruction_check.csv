@@ -1,0 +1,4 @@
+crop,max_abs_offer_recon_err_mmt,n_countries,n_steps,stu_target,max_stu,p0
+wheat,0.0,18,144,0.2,0.28,213.5463324652778
+maize,0.0,18,144,0.16,0.18,135.44442165709597
+rice,0.0,18,144,0.18,0.22,338.990734667104
