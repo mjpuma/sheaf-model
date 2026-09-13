@@ -124,7 +124,18 @@ def sigma_sweep() -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def head_check() -> str:
+    import subprocess
+    sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
+                         cwd=Path(__file__).resolve().parents[2],
+                         capture_output=True, text=True).stdout.strip()
+    flag = "OK" if sha == L.HEAD_SHA else f"MOVED (lib pinned {L.HEAD_SHA})"
+    print(f"git HEAD = {sha}  [{flag}]")
+    return sha
+
+
 def main():
+    head_check()
     print("=== (i)/(ii) replica parity vs HEAD + official scores ===")
     v = validate()
     v.to_csv(OUT / "r4_04_validate.csv", index=False)

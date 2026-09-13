@@ -9,11 +9,32 @@ Scripts under `scripts/scratch/redteam_*.py`.
 
 **Goal the principal investigator set:** SHEAF Gate 0 as strong or
 stronger than Agrimate on economic realism and optimisation, then
-update the Potsdam letter. **What we actually shipped:** one coding
-bug that was also an optimisation gap (dead Armington competition).
-**What we did not ship:** an exporter FOC in place of the ask law,
-two-sided unmet demand, tatonnement, or Agrimate's commercial
+update the Potsdam letter. **What we actually shipped:** three
+changes, each repairing an internal inconsistency rather than
+recalibrating — the dead Armington competition (this pass), plus two
+from a parallel pass that read the Agrimate paper and ODD supplement
+directly, namely a bounded scarcity ratio in the asymmetric
+negative-accessible-stock regime and valuing shipments at the offer
+price that allocated them (Agrimate Eq. D.4). Those two are written up
+in `diagnostics/redteam/r0/R0_REPORT.md` and adjudicated in
+`diagnostics/redteam/ADJUDICATION_R2_R3.md`. **What we did not ship:**
+an exporter FOC in place of the ask law, two-sided unmet demand,
+tatonnement, price-responsive restock demand, or Agrimate's commercial
 store-versus-sell agent. Each was prototyped and scored.
+
+**Current official scores after all three** (supersedes the table in
+"What was shipped" below, which reports change 1 only):
+
+| crop | corr | 2007/08 | 2010/11 | observed |
+|---|---|---|---|---|
+| wheat | **+0.687** | ×2.09 | ×1.31 | ×1.82, ×1.16 |
+| maize | **+0.792** | ×2.05 | ×1.52 | ×1.84, ×1.44 |
+| rice | **+0.676** | ×1.54 | ×0.84 | ×1.84, ×0.79 |
+
+Total absolute error over all six hike windows falls 1.421 → 1.060.
+Wheat loses 0.033 correlation and rice's 2007/08 undershoot deepens;
+those are the costs of the correctness fixes, not their justification.
+All twelve assertions pass.
 
 ## Scorecard (Gate 0 vs Agrimate)
 
@@ -31,7 +52,16 @@ economic model of the 2007/08 crisis market, not a higher correlation.
 | Glut / surplus | Price falls when stock is abundant (their sitting question) | Surplus **does** lower the price through the scarcity ratio, roughly symmetrically at 1–2% shocks (`clr_glut_permanent.csv`). The unmet channel is one-sided and is a different object | **H** — their glut question is already answered. Two-sided unmet is not the glut channel and mixed the scores |
 | Restrictions | Exogenous | Gate 0: exogenous AMIS. Gate 2: endogenous (claimed contribution) | SHEAF stronger **as a research programme** (E). Gate 0 is a usable host: exporter revenue at own \(q_i\) vs world \(p\) differs by 5–15% (`clr_gate2_revenue.csv`), so a government incentive is representable, but the two-price seam is real |
 | Expectations | Adaptive, stay close unless new info (their instruction) | Blend \(\phi H+(1-\phi)H^{\mathrm{seas}}\) over the lean window. Mean lead 5–8 steps, not 10 years. Agrimate-equivalent \(\phi\) is 0.75/0.48/0.80 vs our 0.55/0.50/0.55 | Close enough (D). Adaptive EWMA moves scores by at most 0.41 on their probe metric; not a defect |
-| Parameter count | Fewer free reduced-form knobs (inferred) | 18 scored knobs, 3 exact collinear pairs (`ask_alpha`~\(`ask_target_fill\), `block_kappa`~\(`ask_rival\), `max_stu`~\(`warehouse_lambda`)). `ask_comp_elast` was **exactly** inert; it is not, after the CES fix. Hard bounds do **not** reproduce official scores (maize corr \(+0.71\to+0.22\) with all three hard bounds) | Their "hard bounds would give similar behaviour" is **false** (H, 95–100%). Collinearity of `ask_rival` with `block_kappa` is the live identification issue (F) |
+| Scarcity ratio, extreme regime | Isoelastic inverse demand on a flow, bounded by construction (Suppl. D.7.4.1) | **Was** unbounded when accessible stock went negative while the reference stayed positive: ratio 35.1, price ×4.13 in one step, and maize's correlation not reproducible (spread 0.557 under a 1% recalibration). **Now** floored on physical stock in that case only | Was Agrimate stronger (**C, 95–100%**). Now **parity** (H). Wheat and rice bit-identical; maize spread 0.557 → 0.051 |
+| Transaction pricing | Transaction price is the offer the request responded to (Eq. D.4, explicit) | **Was** shipments allocated at the pre-update ask and valued at the post-update ask, a rally-directional bias of +2.2/+1.9/+3.9% through 2007/08. **Now** valued at the allocating ask | Was Agrimate stronger (**B, 95%**). Now **parity** (H) |
+| Price-response steepness | \(\alpha=3\) world, \(\alpha_I=3.5\) international, on flows | Measured price flexibility \(d\log p/d\log H\) = 5.49 / 2.96 / 4.88 | **Parity or better (H, 80–95%).** Our prior that SHEAF was 3–4× too flat was **false** — the exponents apply to different state variables |
+| Continuity of the price map | Continuous in the state | **Step discontinuity at zero anomaly:** mean price −9.5% (wheat), −22.6% (maize) for an infinitesimal shortfall, smooth and monotone beyond | **Agrimate stronger (A, 95–100%).** Sharpest form of the rest-point problem; the FOC would fix it by construction |
+| Effective demand elasticity | Purchaser CES, ≈ −0.35 | 86–99% of market demand in a price-free restock branch; measured −0.05 / −0.11 / −0.09 | **Agrimate stronger (D, 95%).** CES form raises ours to −0.38/−0.48/−0.40 for <0.02 corr. Not shipped — specification question, not a bug |
+| Discounting and decay in storage | \(\rho=0\) **and** \(\delta=0\) at default (Tbl. D.8); only \(p_{\rm sto}=0.1/N_{\rm year}\) bites | No \(r\), no decay | **Closer to parity than assumed (D).** Any FOC repair needs no interest rate to stay in the lineage |
+| Optimiser stabiliser | \(x_{\min}=0.2\): ≥20% of expected sales spread evenly (Tbl. D.8) | n/a — no optimiser | **Precedent, not a gap.** If a SHEAF FOC needs a stabiliser, that is parity, citable |
+| Reference state | Nash equilibrium, annually periodic storage and sales (Suppl. D.7.4.1) | Climatological twin, no equilibrium imposed. Measured: start-of-year stock converges geometrically, stable to a few tenths of a %/yr by 2010 | **Agrimate stronger (E, 90%).** Ours is periodic in practice but not by construction |
+| Attribution design | §5.4 uses the same three scenarios and reports restrictions as the leading 2007/08 and 2010/11 driver for wheat | Same design, three crops | **Priority question, not a defect (F).** Gate 0 agrees with a published Agrimate result; what is new is the cross-commodity span |
+| Parameter count | **Counted, not inferred: ≈21 numerical parameters** (Tbl. D.8 fifteen agent + Tbl. D.1 two timescales + two harvest-expectation + Tbl. D.10 two), two of them per-region vectors over 28 regions | 20 numerical `CropParams` fields (24 less 4 structural); 18 scored knobs, 3 exact collinear pairs (`ask_alpha`~\(`ask_target_fill\), `block_kappa`~\(`ask_rival\), `max_stu`~\(`warehouse_lambda`)). `ask_comp_elast` was **exactly** inert; it is not, after the CES fix. Hard bounds do **not** reproduce official scores (maize corr \(+0.71\to+0.22\) with all three hard bounds) | Their "hard bounds would give similar behaviour" is **false** (H, 95–100%). Collinearity of `ask_rival` with `block_kappa` is the live identification issue (F) |
 
 ## The FOC idea, resolved
 
@@ -74,6 +104,21 @@ remains load-bearing after the fix (maize corr \(+0.778\to+0.520\) at
 zero).
 
 ## What a referee would reject us for
+
+**Added by the parallel pass, and arguably ahead of storage in
+severity: we were reporting a score that was not reproducible.** Maize's
+published correlation of +0.712 moved to +0.276 or +0.832 under a ~1%
+change in the in-sample climatology, and nothing in how we reported it
+would have exposed that. The cause is now fixed and the spread is 0.051,
+but the lesson generalises past this one number: a headline fit should be
+published with its spread under perturbation, or it is not evidence. Wheat
+(0.006) and rice (0.000) show the diagnostic discriminates rather than
+condemning everything.
+
+**Second, the price map is discontinuous at its own reference** — a step
+of −9.5% (wheat) and −22.6% (maize) for an infinitesimal shortfall. This
+is the rest-point problem stated as a property of the map rather than of a
+convention, and it is materially harder to defend in print.
 
 The cover rule is not an intertemporal decision. Agrimate's commercial
 agent chooses store versus sell from expected profit; we offer the

@@ -20,10 +20,12 @@ to prototype an Agrimate-style oligopolistic channel:
 ``ask_rival``   : override via ``params`` overrides on ``prepare_crop_run``.
 
 REVISION 2026-09-13 (R4 resumed). The inherited replica was written against
-the tree *before* two baseline moves and no longer matched HEAD:
+the tree *before* three baseline moves and no longer matched HEAD:
   * d4830c8  bounds the scarcity ratio when free < 0 <= twin (R0)
   * 929cec4  wires `_ask_reweight_src` into `_simulate_window` (CES origins)
-Both are now mirrored below and re-verified to machine precision.
+  * 0f07bc8  values p_trade at the allocating (pre-update) ask
+All three are mirrored below and re-verified to machine precision. The
+measurement HEAD is recorded in ``HEAD_SHA`` and re-checked by ``r4_04``.
 
 Scoring uses ``_corr`` / ``_hike`` imported from
 ``scripts/score_subannual_crop.py`` so the numbers are the official ones.
@@ -62,16 +64,19 @@ from sheaf.seasonal import rolling_ahead_variable, steps_to_harvest_pulse
 from score_subannual_crop import _corr, _hike  # official metrics
 
 CROPS = ("wheat", "maize", "rice")
+# Commit the R4 measurements were taken against. Other threads are committing
+# to sheaf/ concurrently; r4_04 re-reads git HEAD and warns if it has moved.
+HEAD_SHA = "0f07bc8"
 OBS_HIKES = {"wheat": (1.82, 1.16), "maize": (1.84, 1.44), "rice": (1.84, 0.79)}
-# Official shipped-baseline scores at HEAD (63e716d), reproduced by running
+# Official shipped-baseline scores at HEAD 0f07bc8, reproduced by running
 # `scripts/score_subannual_crop.py --crop <c>` on 2026-09-13. These supersede
-# BOTH the pre-R0 numbers (0.720/0.712/0.678) and the post-R0/pre-CES numbers
-# (0.720/0.781/0.678) quoted in the R4 brief: commit 929cec4 (CES origins)
-# moved wheat and maize again.
+# the pre-R0 numbers (0.720/0.712/0.678), the post-R0/pre-CES numbers
+# (0.720/0.781/0.678) quoted in the R4 brief, and the post-CES/pre-D.4
+# numbers (0.728/0.778/0.678) measured earlier in this same session.
 SHIPPED = {
-    "wheat": (0.728, 2.28, 1.45),
-    "maize": (0.778, 2.20, 1.59),
-    "rice": (0.678, 1.72, 0.82),
+    "wheat": (0.687, 2.09, 1.31),
+    "maize": (0.792, 2.05, 1.52),
+    "rice": (0.676, 1.54, 0.84),
 }
 
 
@@ -251,6 +256,13 @@ def simulate_r4(
             A_eff = _ask_reweight_dest(A, ask_eff, p0, gamma=sigma)
             shipped, received, ship = _bilateral_clear(
                 offers, demand, A_eff, S, subst=params.residual_subst)
+        elif alloc_mode == "nodest":
+            # HEAD with `_ask_reweight_dest` deleted outright (A used raw).
+            # If the dest reweight is a no-op *in situ*, this is bit-identical
+            # to alloc_mode="shipped".
+            S_eff = _ask_reweight_src(S, ask_eff, p0, gamma=sigma)
+            shipped, received, ship = _bilateral_clear(
+                offers, demand, A, S_eff, subst=params.residual_subst)
         elif alloc_mode == "agrimate":
             S_eff = _source_reweight(S, ask_eff, p0, sigma)
             shipped, received, ship = _agrimate_clear(
@@ -284,10 +296,12 @@ def simulate_r4(
         unmet = max(0.0, total_d - float(received.sum()))
         unmet_frac = unmet / max(total_d, 1e-9)
 
-        # shipped code evaluates p_trade on the *updated* ask vector
+        # HEAD dynamic_crop.py L694-704 (commit 0f07bc8): value shipments at
+        # the ask that ALLOCATED them (ask_path[:, t], i.e. pre-update), not
+        # the ask advanced later in the step. With a markup on, the allocating
+        # price is ask_eff.
         shipped_sum = float(shipped.sum())
-        ask_idx = ask * markup
-        p_trade = (float(np.dot(ask_idx, shipped) / shipped_sum)
+        p_trade = (float(np.dot(ask_eff, shipped) / shipped_sum)
                    if shipped_sum > 1e-12 else p)
 
         p_scar = np.nan
