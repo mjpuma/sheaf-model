@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Detailed Gate 0 diagnostics for one crop (wheat / maize / rice).
+"""LEGACY Gate 0 diagnostics for one crop (wheat / maize / rice).
+
+This is **not** the Agrimate-faithful default. The documented Gate 0 run is
+``python scripts/run_agrimate_wheat.py``. This script still scores the
+pre-rewrite ask-dominated spine (``sheaf.dynamic_crop``).
+"""
 
 Runs the ask-dominated single-crop spine alone (no cross-grain substitution).
 Writes CSVs, a multi-panel figure, and a markdown report proving:

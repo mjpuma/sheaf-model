@@ -23,22 +23,22 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from .calendar24 import STEPS_PER_YEAR, n_steps
-from .calibration import GRAINS, P0
-from .data_faostat import (
+from sheaf.calendar24 import STEPS_PER_YEAR, n_steps
+from sheaf.calibration import GRAINS, P0
+from sheaf.data_faostat import (
     SHEAF_NODE_MAP,
     aggregate_to_nodes,
     bilateral_shares,
     load_trade_matrix,
 )
-from .data_usda import (
+from sheaf.data_usda import (
     detrend_anomalies,
     load_amis_restrictions,
     load_psd_country,
     load_psd_use_split,
     load_price_series_monthly,
 )
-from .seasonal import (
+from sheaf.seasonal import (
     harvest_path,
     load_harvest_calendar,
     rolling_ahead_variable,
@@ -819,7 +819,7 @@ def prepare_crop_run(
         params = replace(params, **overrides)
 
     if countries is None:
-        from .calibration import DATA
+        from sheaf.calibration import DATA
         countries = [d["name"] for d in DATA] + ["RestOfWorld"]
 
     if p0 is None:
@@ -981,7 +981,7 @@ def simulate_prep(prep: CropPrep, cuts: np.ndarray | None = None,
 
 
 def result_to_monthly(res: CropSimResult) -> pd.DataFrame:
-    from .calendar24 import monthly_mean_from_steps
+    from sheaf.calendar24 import monthly_mean_from_steps
     px = monthly_mean_from_steps(res.price, res.start_year, res.end_year)
     stu = monthly_mean_from_steps(res.stock.sum(axis=0),
                                   res.start_year, res.end_year)

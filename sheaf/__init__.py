@@ -1,21 +1,20 @@
 """SHEAF -- Substitution, Heterogeneous agents, Equilibrium, And Fragility.
 
-Crisis heartbeat: 24-step Gate 0 spine (``dynamic_crop``), optional
-substitution (``dynamic_coupled``), Headey-clock actions
-(``dynamic_policy``).
+Crisis heartbeat: Agrimate-faithful Gate 0 (``sheaf.agrimate``). The pre-rewrite
+ask/scarcity spine remains importable from ``sheaf.dynamic_crop`` /
+``sheaf.legacy`` and is **not** the documented default.
 
 The annual SPE prototype is parked in ``sheaf.annual`` (not exported here).
-Import it explicitly when you want a year-scale outer loop or the old QP.
 """
+from .agrimate import AgrimateResult, run_agrimate, wheat_params
 from .calendar24 import STEPS_PER_YEAR
 from .calibration import GRAINS
-from .dynamic_crop import CropParams, default_crop_params, run_crop_dynamics
 
 __all__ = [
-    "CropParams",
+    "AgrimateResult",
     "GRAINS",
     "STEPS_PER_YEAR",
-    "default_crop_params",
-    "run_crop_dynamics",
+    "run_agrimate",
+    "wheat_params",
 ]
-__version__ = "0.3.0-subannual"
+__version__ = "0.4.0-agrimate-gate0"

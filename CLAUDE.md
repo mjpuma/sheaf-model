@@ -2,10 +2,18 @@
 
 This file is the constitution for a multi-agent scientific verification
 process on the SHEAF model. It orients Claude Code (including parallel
-sub-agents) working in this repository. Its purpose right now is
-preparation: mapping the repository and establishing the rules of evidence
-the audit must follow. **It is not an invitation to start auditing, fixing,
-or refactoring** — see Ground Rules. No audit work begins from this document.
+sub-agents) working in this repository.
+
+**Gate 0 economics:** the Agrimate-faithful host and modelling contract live
+in [`diagnostics/GATE0_CONTRACT.md`](diagnostics/GATE0_CONTRACT.md) and
+`sheaf/agrimate/`. This audit constitution does not override that contract.
+Do not treat `sheaf/dynamic_crop.py` / `sheaf/legacy/` as the current
+baseline.
+
+Its purpose right now is preparation: mapping the repository and establishing
+the rules of evidence the audit must follow. **It is not an invitation to
+start auditing, fixing, or refactoring** — see Ground Rules. No audit work
+begins from this document.
 
 ## Governing principle
 

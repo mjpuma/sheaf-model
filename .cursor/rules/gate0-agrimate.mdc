@@ -1,0 +1,12 @@
+---
+description: Agrimate is the Gate 0 baseline; no silent legacy fallback
+alwaysApply: true
+---
+
+Gate 0 is the Agrimate-faithful host in `sheaf/agrimate/`
+(`diagnostics/GATE0_CONTRACT.md`). Cite Kuhla et al. 2025 / supplement §D
+for baseline mechanisms. Economic departures need an approved record in
+`diagnostics/GATE0_DEPARTURES.md` before coding. Keep baseline, legacy
+(`sheaf/legacy/`), and extension results labelled separately. If the new
+host fails to solve, report it; do not restore the fill-target ask, calm
+price pin, scarcity blend, or rival markup from `sheaf/dynamic_crop.py`.

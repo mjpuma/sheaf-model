@@ -78,15 +78,28 @@ monthly Pink Sheet prices for scoring.
 illustrative table in `sheaf/calibration.py` (optionally overlaid with USDA
 quantities). See [`sheaf/annual/README.md`](sheaf/annual/README.md).
 
-### 8. Gate 0 sub-annual crop spine (Agrimate-aligned)
+### 8. Gate 0 (Agrimate baseline)
 
-Implementation: `sheaf/dynamic_crop.py` (wheat wrap: `sheaf/dynamic_wheat.py`).
-Clock: $T_y=24$ steps per year
-($\Delta t \approx 15.2$ days). Quantities in million tonnes (MMT); prices in
-real \$/tonne (Pink Sheet deflator). **One crop at a time** until Gate 0 is green
-for wheat, maize, and rice (`diagnostics/GATE0_PER_CROP_PLAN.md`).
+**Default host:** `sheaf/agrimate/` — independent implementation of Kuhla et al.
+(2025) supplement §D, wheat application. Contract:
+[`diagnostics/GATE0_CONTRACT.md`](diagnostics/GATE0_CONTRACT.md). Spec map:
+[`diagnostics/GATE0_SPEC_MATRIX.md`](diagnostics/GATE0_SPEC_MATRIX.md).
 
-#### Notation
+```bash
+python scripts/run_agrimate_wheat.py
+```
+
+Clock: $T_y=24$ (Agrimate §4.1). Quantities in MMT; reported world price is the
+volume-weighted international transaction-price *index* scaled by the 2006
+real Pink Sheet wheat mean. 28 Agrimate regions (Tbl. C.1 reconstruction).
+Nash initialisation is not the dynamic baseline and does not pin the unforced
+world price.
+
+**Legacy benchmark** (pre-rewrite ask / scarcity map): `sheaf/legacy/`,
+`python scripts/score_legacy_crop.py --crop wheat`. The notation table below
+describes that legacy host; it is not the Agrimate baseline.
+
+#### Legacy notation (ask/scarcity host)
 
 | Symbol | Meaning | Default / source |
 |---|---|---|
@@ -423,12 +436,12 @@ Agrimate-style figures: `python scripts/make_agrimate_comparison.py`.
 
 ```bash
 pip install -r requirements.txt
-python scripts/score_subannual_crop.py --crop wheat
+python scripts/run_agrimate_wheat.py
 ```
 
-That is the crisis smoke test (Gate 0 wheat, 24-step map). Official reports:
-`diagnostics/gate0_*_report.md`. Substitution band: `scripts/score_gate1.py`.
-Policy beta: `scripts/score_gate2_beta.py`.
+That is the documented Gate 0 wheat reference run. Report:
+`diagnostics/gate0_agrimate/validation.md`. Legacy ask/scarcity scores:
+`python scripts/score_legacy_crop.py --crop wheat`.
 
 The parked annual SPE (Black Sea shock on the yearly QP):
 
@@ -439,9 +452,9 @@ python scripts/annual/demo.py
 Minimal crisis use in code:
 
 ```python
-from sheaf import run_crop_dynamics
+from sheaf import run_agrimate
 
-result = run_crop_dynamics("wheat", start_year=2006, end_year=2011)
+result = run_agrimate()  # wheat, Agrimate-faithful host
 ```
 
 Annual prototype (only when you want the yearly QP):
@@ -458,13 +471,15 @@ df = model.run(periods=12, shocks={5: shock_matrix, 6: shock_matrix})
 
 ```
 sheaf/
-  dynamic_crop.py     # Gate 0 24-step market (crisis heartbeat)
-  dynamic_coupled.py  # Gate 1 isoelastic substitution on that spine
+  agrimate/           # Gate 0 default: Agrimate-faithful wheat host
+  legacy/             # frozen pre-rewrite Gate 0 (labelled benchmark)
+  dynamic_crop.py     # same legacy host (Gate 1 still imports this)
+  dynamic_coupled.py  # Gate 1 isoelastic substitution on the legacy spine
   dynamic_policy.py   # Gate 2: slow types, Headey-clock τ_t
   annual/             # parked yearly SPE + year-Nash (import sheaf.annual)
-  calibration.py      # node names, GRAINS, RHO, illustrative DATA
-  core.py             # ImportError shim → sheaf.annual
-scripts/score_subannual_crop.py  # crisis smoke test / official P1
+scripts/run_agrimate_wheat.py    # documented Gate 0 reference run
+scripts/score_legacy_crop.py     # legacy benchmark scorer
+archive/legacy-gate0/            # frozen scratch; not the live host
 scripts/score_gate1.py
 scripts/score_gate2_beta.py
 scripts/annual/demo.py           # Black Sea shock on the parked annual host

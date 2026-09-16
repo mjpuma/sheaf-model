@@ -1,6 +1,9 @@
 """Gate 1: three Gate 0 crops coupled by isoelastic cross-price demand.
 
-``subst_scale=0`` must recover three independent ``run_crop_dynamics`` paths.
+``subst_scale=0`` must recover three independent legacy ``run_crop_dynamics``
+paths. This module still hosts Gate 1 on ``sheaf.dynamic_crop`` (legacy Gate 0).
+It is not wired to ``sheaf.agrimate`` until an approved substitution extension
+exists (`diagnostics/GATE0_EXTENSION_PLAN.md`).
 Industrial/ethanol use does not substitute. CropParams stay locked.
 See diagnostics/GATE1_PLAN.md.
 """
