@@ -11,8 +11,9 @@ implementation, not a verified replication.
 | Harvest expectation | Eq. D.1 | φ blend | `equations.expected_harvest` | `test_harvest_weights_d1a` |
 | Restriction expectation | Eq. D.2 | current τ | `expected_restriction` | `test_restriction_expectation_d2` |
 | Sales | Eq. D.3 | residual offers | `fulfill_sales` | `test_sales_domestic_priority_and_restriction` |
-| Supplier plan | D.11–D.21 | fill-target ask | `optimize.solve_supplier_plan` | `test_supplier_plan_respects_availability` |
-| Inverse demand | D.7; αI D.8=3.5 | scarcity blend | `inverse_demand` | `test_inverse_demand_normalised` |
+| Supplier plan | D.11–D.21 | fill-target ask | `optimize.solve_supplier_plan` | `test_supplier_plan_respects_availability`; G0-N: fractions + rolling horizon |
+| Inverse demand | D.7; αI D.8=3.5 | scarcity blend | `inverse_demand` | world XI* scale (`test_international_inverse_demand_uses_world_scale`) |
+| Rivals' expected XI | D.22; τ_exp D.8 | n/a | `model.py` `q_oth` | 2006 smoke: offer floor binds = 0 |
 | αD,r | D.10 / D.9 | n/a | `wheat_data.py` | `test_alpha_d10_matches_export_share` |
 | Purchaser CES | D.30 | Armington | `purchaser_demand` | `test_purchaser_demand_sums_when_prices_equal` |
 | Consumer CES | D.35 | isoelastic food | `consumption_ces` | `test_consumption_capped_and_price_response` |

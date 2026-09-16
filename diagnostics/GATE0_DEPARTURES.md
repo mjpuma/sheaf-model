@@ -20,6 +20,32 @@ A1 USDA PSD not FAOSTAT Food Balances; A2 E0 shares rescaled; A3 A_d not E.30
 (Egypt 0.17); A4 A_c income-group proxies; A5 restriction weights inside
 multi-country regions; A6 inverse-demand floor 0.05 (numerical).
 
+## G0-N numerical representation (not economic departures)
+
+N1 **Fraction parameterization.** `(fd, fi) ∈ [0,1]^{2N}` maps onto
+`{XD ≥ 0, XI ≥ 0, S ≥ 0}`. Equivalent feasible set to D.11–D.21, not a
+different objective. Replaces L-BFGS on unbounded sales with a `1e12`
+infeasibility cliff and `xmin = 1e-6` sales bounds (those bounds made
+off-season `H = 0` plans infeasible).
+
+N2 **Rolling forthcoming year.** Planning window is `[t, t+Nyear)` with
+D.1 weights from the current step. Calendar-year replan from January with
+start-of-year harvest already in `S0` double-counted realised `H` and was
+infeasible mid-year. Closer to D.1 than the previous host.
+
+N3 **Jacobi IBR inside the step.** Each region best-responds to last-step
+expected rivals (D.22), then all plans update. Gauss–Seidel (28 stacked
+replies in one step) is not a stage Nash and raced isoelastic Cournot onto
+A6.
+
+N4 **D.7 international scale.** Argument is `(XI_r + Q_{-r}) / XI*_world`
+with `XI*_world` the per-step year-average (wheat_data note; Agrimate
+`X*_I` scalar). Own-region `XI*_r` as denominator made Nash-scale `q ≫ 1`.
+
+Agrimate Tbl. D.8 `x_min = 0.2` as a *share of expected sales* and linear
+`p_sto` are **not** implemented here; they are G0-S source items. `ζ0`
+quadratic storage cost remains until G0-S.
+
 ## Proposed extensions (not implemented)
 
 E1 cross-crop substitution (≠ origin CES). E2 government restriction game

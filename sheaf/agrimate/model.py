@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from time import perf_counter
 
 import numpy as np
 
@@ -39,6 +40,10 @@ class AgrimateResult:
     notes: list[str] = field(default_factory=list)
     consumption: np.ndarray | None = None
     xi_ship: np.ndarray | None = None
+    floor_binds: int = 0
+    unconverged_solves: int = 0
+    plan_residual: float = 0.0
+    runtime_s: float = 0.0
 
     def to_monthly_price(self) -> np.ndarray:
         p = np.asarray(self.price_usd, float)
@@ -102,7 +107,9 @@ class AgrimateSim:
         self.n_steps = self.n_years * self.n_y
 
     def harvest_at(self, t: int) -> np.ndarray:
+        t = max(int(t), 0)
         y, ys = divmod(t, self.n_y)
+        y = min(y, self.n_years - 1)
         H = self.data.H_star[:, ys]
         if self.use_anomalies:
             H = H * (1.0 + self.data.anomaly[:, y])
@@ -110,6 +117,9 @@ class AgrimateSim:
 
     def delta_at(self, t: int) -> np.ndarray:
         if not self.use_restrictions:
+            return np.zeros(self.n_r)
+        col = self.data.delta.shape[1]
+        if t < 0 or t >= col:
             return np.zeros(self.n_r)
         return self.data.delta[:, t]
 
@@ -143,16 +153,81 @@ class AgrimateSim:
         xi_path = np.zeros((n_r, T))
         failed = 0
         fallback = 0
+        unconverged = 0
+        floor_binds = 0
+        floor_binds_plan = 0
+        plan_residual = 0.0
 
         shares = d.T_star.copy()
         rs = shares.sum(axis=0, keepdims=True)
         shares = np.divide(shares, np.maximum(rs, 1e-12))
+        # D.22 rivals' expected international sales; τ_exp = 0.5 Nyear
+        q_oth = np.maximum(d.XI_world - d.XI_star, 1e-9)
+        w_exp = 1.0 / max(p.tau_exp * n_y, 1.0)
 
+        t0 = perf_counter()
         for t in range(T):
             # 1 harvest  2 policy
             H = self.harvest_at(t)
             delta = self.delta_at(t)
-            # 3 sales (previous plan for this step)
+            # Rolling forthcoming year [t, t+Nyear): D.1 weights from *now*,
+            # not from January of the calendar year. S0 is start-of-step stock
+            # (harvest of this step is H[0] of the horizon — no double count).
+            H_roll = np.stack([self.harvest_at(t + k) for k in range(n_y)], axis=1)
+            H_star_roll = np.stack([d.H_star[:, (t + k) % n_y] for k in range(n_y)], axis=1)
+            # 4 plan then 3 sales: execute step 0 of the new programme.
+            # Jacobi IBR: every region best-responds to last expected rivals
+            # (D.22), not to 28 Gauss–Seidel replies inside the step.
+            frozen_d = plan_d.copy()
+            frozen_i = plan_i.copy()
+            new_d = plan_d.copy()
+            new_i = plan_i.copy()
+            xi_ship0 = np.zeros(n_r)
+            for r in range(n_r):
+                others = np.full(n_y, q_oth[r])
+                x0_d = np.empty(n_y)
+                x0_i = np.empty(n_y)
+                for k in range(n_y):
+                    tt = min(t + k, T - 1)
+                    x0_d[k] = frozen_d[r, tt]
+                    x0_i[k] = frozen_i[r, tt]
+                dhat = expected_restriction(float(delta[r]), n_y)
+                Hhat = expected_harvest(H_star_roll[r], H_roll[r], n_y)
+                # D.7 international argument is world volume / world XI*
+                # (scalar year-average per step). Domestic uses own XD*.
+                sol = solve_supplier_plan(
+                    Hhat, float(S_p[r]), others,
+                    d.XI_world, d.XD_star[r],
+                    p.alpha_i, float(d.alpha_d[r]), p,
+                    delta_hat=dhat, x0=np.concatenate([x0_d, x0_i]),
+                )
+                if not sol["success"]:
+                    failed += 1
+                if sol["fallback"]:
+                    fallback += 1
+                if not sol["converged"]:
+                    unconverged += 1
+                floor_binds_plan += int(sol["floor_binds"])
+                plan_residual = max(plan_residual, float(sol["residual"]))
+                if sol["success"]:
+                    for k in range(n_y):
+                        tt = t + k
+                        if tt < T:
+                            new_d[r, tt] = sol["xd"][k]
+                            new_i[r, tt] = sol["xi"][k]
+                    xi_ship0[r] = float(sol["xi_ship"][0])
+                else:
+                    xi_ship0[r] = frozen_i[r, t] * (1.0 - delta[r])
+            plan_d, plan_i = new_d, new_i
+            star_w = max(float(d.XI_world), 1e-8)
+            for r in range(n_r):
+                q_i_arg = (xi_ship0[r] + q_oth[r]) / star_w
+                if q_i_arg <= p.demand_arg_floor:
+                    floor_binds += 1
+                offer[r] = float(inverse_demand(q_i_arg, p.alpha_i, p.lam_demand,
+                                                p.demand_arg_floor))
+                if abs(offer[r] - 1.0) < p.iota:
+                    offer[r] = 1.0
             sold_d = np.zeros(n_r)
             sold_i = np.zeros(n_r)
             avail = S_p + H
@@ -161,41 +236,8 @@ class AgrimateSim:
                 sold_d[r], sold_i[r] = sd, si
                 S_p[r] = update_producer_storage(S_p[r], H[r], sd, si, p.delta_loss)
             xi_path[:, t] = sold_i
-            # 4 plan for remaining year (re-solve each step; horizon = n_year)
-            y, ys = divmod(t, n_y)
-            H_year = np.stack([self.harvest_at(y * n_y + k) for k in range(n_y)], axis=1)
-            for r in range(n_r):
-                others = np.zeros(n_y)
-                for k in range(n_y):
-                    tt = min(y * n_y + k, T - 1)
-                    others[k] = float(plan_i[:, tt].sum() - plan_i[r, tt])
-                dhat = expected_restriction(float(delta[r]), n_y)
-                Hhat = expected_harvest(d.H_star[r], H_year[r], n_y)
-                x0 = np.concatenate([d.XD_star_path[r], d.XI_star_path[r]])
-                sol = solve_supplier_plan(
-                    Hhat, float(S_p[r]), others,
-                    d.XI_star_path[r], d.XD_star_path[r],
-                    p.alpha_i, float(d.alpha_d[r]), p,
-                    delta_hat=dhat, x0=x0,
-                )
-                if not sol["success"]:
-                    failed += 1
-                if sol["fallback"]:
-                    fallback += 1
-                if sol["success"] and not sol["fallback"]:
-                    for k in range(n_y):
-                        tt = y * n_y + k
-                        if tt < T:
-                            plan_d[r, tt] = sol["xd"][k]
-                            plan_i[r, tt] = sol["xi"][k]
-                q_next = sol["xi"][(ys + 1) % n_y] if (sol["success"] and not sol["fallback"]) else plan_i[r, min(t + 1, T - 1)]
-                oth_next = others[(ys + 1) % n_y]
-                star_w = float(d.XI_star_path[:, (ys + 1) % n_y].sum())
-                q_i_arg = (q_next + oth_next) / max(star_w, 1e-8)
-                offer[r] = float(inverse_demand(q_i_arg, p.alpha_i, p.lam_demand,
-                                                p.demand_arg_floor))
-                if abs(offer[r] - 1.0) < p.iota:
-                    offer[r] = 1.0
+            realized_oth = np.maximum(float(sold_i.sum()) - sold_i, 0.0)
+            q_oth = (1.0 - w_exp) * q_oth + w_exp * realized_oth
             # 6 delivery: push today's international sales, pop lag
             ship = sold_i.copy()
             ship_p = offer.copy()
@@ -226,18 +268,26 @@ class AgrimateSim:
             S_p_path[:, t] = S_p
             S_c_path[:, t] = S_c
 
+        runtime_s = float(perf_counter() - t0)
         notes = list(d.notes)
         notes.append(
             f"Nash IBR: {nash['iterations']} iters, err={nash['err']:.3e}, "
             f"success={nash['success']}.")
         notes.append(
-            f"Supplier solves: failed={failed}, fallback={fallback} of {n_r * T}.")
+            f"Supplier solves: failed={failed}, fallback={fallback}, "
+            f"unconverged={unconverged} of {n_r * T}.")
+        notes.append(
+            f"Inverse-demand floor binds: offer={floor_binds}, "
+            f"plan-path={floor_binds_plan}; max plan residual={plan_residual:.3e}; "
+            f"runtime={runtime_s:.1f}s.")
         return AgrimateResult(
             start_year=d.start_year, end_year=d.end_year, regions=d.regions,
             price_index=price_index, price_usd=price_index * d.p0,
             S_producer=S_p_path, S_consumer=S_c_path,
             failed_solves=failed, fallback_solves=fallback, nash=nash,
             notes=notes, consumption=C_path, xi_ship=xi_path,
+            floor_binds=floor_binds, unconverged_solves=unconverged,
+            plan_residual=plan_residual, runtime_s=runtime_s,
         )
 
 

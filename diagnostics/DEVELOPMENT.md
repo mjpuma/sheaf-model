@@ -47,15 +47,15 @@ L1–L8 (`GATE0_DEPARTURES.md`).
 applications. Do not accept them with inherited wheat knobs, and do not
 use them to wave Gate 0 through.
 
-Gate 0 is **not** currently at this bar. The host runs; Nash sales = harvest;
-12 unit tests pass; many dynamic supplier solves still fail. That is a
-solver/specification gap, not a license to open Gate 1.
+Gate 0 is **not** currently at the publication bar. **G0-N is met**
+(supplier programme solvent on the reference run; see the sequence table).
+Pink-Sheet scoring stays G0-H. Next is **G0-S**. G1/G2 stay blocked.
 
 ## Sequence (do not skip)
 
 | Stage | Work | Exit |
 |---|---|---|
-| **G0-N** | Make the supplier programme numerically solvent on the 24-step wheat year. Record residual, runtime, and when the inverse-demand floor binds. | Failed/fallback solves rare; storage feasible; price index O(1) without a pin. |
+| **G0-N** | Make the supplier programme numerically solvent on the 24-step wheat year. Record residual, runtime, and when the inverse-demand floor binds. | **Met on the 2003–11 reference run** (failed/fallback 0; residual 0; offer-floor 0; price index 0.0066–5.02 without a pin). Unconverged scipy 1043/6048 still feasible. Pink-Sheet scoring is G0-H. |
 | **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | Spec matrix updated; unresolved items labelled, not guessed. |
 | **G0-U** | Undisturbed / spin-up / restriction-off vs harvest-only vs full AMIS. Accounting identities each step. | Documented seasonal baseline; material balance. |
 | **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | Written score in `diagnostics/gate0_agrimate/`. Comparable to Agrimate or an explicit, sourced shortfall. |
@@ -80,13 +80,17 @@ approval.
   on the old map) stay in `archive/` or uncommitted. Do not resurrect them
   as the market.
 
-## Now (G0-N, then G0-S)
+## Now (G0-S)
 
-1. Diagnose why L-BFGS fails on the dynamic supplier plan (feasibility,
-   scaling, seasonal starred quantities, horizon). Prefer a faithful
-   constrained solve over a cheaper surrogate unless equivalence is shown.
-2. Obtain or confirm absence of Zenodo 14022004 (code) and 10688435 (data).
-   Until author binaries exist, keep the “independent implementation” label.
+1. **G0-N (done).** Always-feasible `(fd, fi)` plan, rolling forthcoming
+   year, Jacobi + D.22 others, D.7 world `XI*`. Reference run:
+   failed/fallback 0, residual 0, offer-floor 0, price index 0.0066–5.02
+   with no world-price pin. Details: `diagnostics/gate0_agrimate/validation.md`.
+2. **G0-S (next).** Source gaps that change economics: C.1 ISO list, D.8 vs
+   F.1, ζ0 vs linear `p_sto`, Tbl. D.8 `x_min` as a share of expected sales,
+   D.1b, E.27 support, FAOSTAT Food Balance vs USDA. Retrieve or confirm
+   absence of Zenodo 14022004 / 10688435. Unsent questions:
+   `GATE0_AGRIMATE_BRIEF.md`.
 3. Keep `python scripts/run_agrimate_wheat.py` as the only default run.
 4. Compare only under labelled configs: new host / Agrimate published /
    `sheaf/legacy`.

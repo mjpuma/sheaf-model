@@ -1,0 +1,7 @@
+Baseline quantities: USDA PSD 2007–09 mean, not FAOSTAT Food Balances (E.1.1).
+Trade pattern: FAOSTAT E0 2006–07, rescaled to USDA exports.
+A_d is not E.30; Egypt pinned to F.1 = 0.17.
+Starred XI*, XD*, C* used in inverse demand are per-step averages.
+Nash IBR: 0 iters, err=1.675e-16, success=True.
+Supplier solves: failed=0, fallback=0, unconverged=1043 of 6048.
+Inverse-demand floor binds: offer=0, plan-path=93113; max plan residual=0.000e+00; runtime=14.0s.

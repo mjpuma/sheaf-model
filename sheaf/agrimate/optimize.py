@@ -1,4 +1,11 @@
-"""Constrained supplier plan (D.11–D.21) and Nash IBR (D.50–D.55, δ=ρ=0)."""
+"""Constrained supplier plan (D.11–D.21) and Nash IBR (D.50–D.55, δ=ρ=0).
+
+Decision variables are domestic/international *fractions* of step availability.
+That is a mathematically equivalent representation of {XD ≥ 0, XI ≥ 0, S ≥ 0},
+not an economic departure: every (fd, fi) ∈ [0, 1]^{2N} maps to a feasible
+sales path, and every feasible sales path has a preimage (up to unused
+fractions when availability is zero).
+"""
 from __future__ import annotations
 
 import numpy as np
@@ -12,15 +19,156 @@ def apply_expected_restriction(xi: np.ndarray, delta_hat: np.ndarray) -> np.ndar
     return np.asarray(xi, float) * (1.0 - np.clip(delta_hat, 0.0, 1.0))
 
 
-def _storage_path(S0: float, H: np.ndarray, xd: np.ndarray, xi: np.ndarray,
-                  loss: float) -> np.ndarray:
-    n = len(H)
+def fractions_to_sales(
+        fd: np.ndarray,
+        fi: np.ndarray,
+        S0: float,
+        H: np.ndarray,
+        loss: float,
+        delta_hat: np.ndarray,
+        ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Map (fd, fi) ∈ [0, 1]^n to intended (xd, xi), shipped xi, and S ≥ 0.
+
+    At step t, availability A = (1 − loss) S_{t−1} + H_t. Domestic sales take
+    fd·A; intended international sales take fi of the remainder; shipped
+    international sales are scaled by (1 − Δ̂) as in D.2/D.3. Storage uses
+    shipped quantities, so S_t ≥ 0 identically.
+    """
+    n = int(H.size)
+    fd = np.clip(np.asarray(fd, float), 0.0, 1.0)
+    fi = np.clip(np.asarray(fi, float), 0.0, 1.0)
+    delta_hat = np.clip(np.asarray(delta_hat, float), 0.0, 1.0)
+    xd = np.empty(n)
+    xi_int = np.empty(n)
+    xi_ship = np.empty(n)
     S = np.empty(n)
-    s = S0
+    s = max(float(S0), 0.0)
+    one_m_d = 1.0 - delta_hat
     for t in range(n):
-        s = (1.0 - loss) * s + H[t] - xd[t] - xi[t]
-        S[t] = s
-    return S
+        A = (1.0 - loss) * s + H[t]
+        xd[t] = fd[t] * A
+        rest = A - xd[t]
+        xi_int[t] = fi[t] * rest
+        xi_ship[t] = xi_int[t] * one_m_d[t]
+        S[t] = rest - xi_ship[t]
+        s = S[t]
+    return xd, xi_int, xi_ship, S
+
+
+def sales_to_fractions(
+        xd: np.ndarray,
+        xi: np.ndarray,
+        S0: float,
+        H: np.ndarray,
+        loss: float,
+        delta_hat: np.ndarray,
+        ) -> tuple[np.ndarray, np.ndarray]:
+    """Project intended sales onto [0, 1] fractions (domestic first, then XI)."""
+    n = int(H.size)
+    xd = np.asarray(xd, float)
+    xi = np.asarray(xi, float)
+    delta_hat = np.clip(np.asarray(delta_hat, float), 0.0, 1.0)
+    fd = np.zeros(n)
+    fi = np.zeros(n)
+    s = max(float(S0), 0.0)
+    for t in range(n):
+        A = (1.0 - loss) * s + H[t]
+        if A <= 1e-15:
+            s = 0.0
+            continue
+        xd_t = min(max(xd[t], 0.0), A)
+        fd[t] = xd_t / A
+        rest = A - xd_t
+        if rest <= 1e-15:
+            s = 0.0
+            continue
+        xi_t = min(max(xi[t], 0.0), rest)
+        fi[t] = xi_t / rest
+        xi_ship = xi_t * (1.0 - delta_hat[t])
+        s = rest - xi_ship
+    return fd, fi
+
+
+def _inv_demand_dpdq(q: np.ndarray, alpha: float, lam: float, floor: float
+                     ) -> np.ndarray:
+    """∂p/∂q of D.7, zero where the numerical argument floor binds."""
+    q = np.asarray(q, float)
+    active = (q > floor).astype(float)
+    qf = np.maximum(q, floor)
+    if lam == 0.0:
+        return active * (-alpha) * np.power(qf, -alpha - 1.0)
+    u = lam + (1.0 - lam) * qf
+    return active * (-alpha) * np.power(np.maximum(u, 1e-15), -alpha - 1.0) * (1.0 - lam)
+
+
+def _plan_objective_grad(
+        z: np.ndarray,
+        H: np.ndarray,
+        S0: float,
+        xi_others: np.ndarray,
+        xi_star: np.ndarray,
+        xd_star: np.ndarray,
+        alpha_i: float,
+        alpha_d: float,
+        params: AgrimateParams,
+        delta_hat: np.ndarray,
+        ) -> tuple[float, np.ndarray]:
+    n = int(H.size)
+    fd = z[:n]
+    fi = z[n:]
+    loss = params.delta_loss
+    floor = params.demand_arg_floor
+    one_m_d = 1.0 - delta_hat
+
+    A = np.empty(n)
+    xd = np.empty(n)
+    rest = np.empty(n)
+    xi_int = np.empty(n)
+    xi_ship = np.empty(n)
+    S = np.empty(n)
+    s = max(float(S0), 0.0)
+    for t in range(n):
+        A[t] = (1.0 - loss) * s + H[t]
+        xd[t] = fd[t] * A[t]
+        rest[t] = A[t] - xd[t]
+        xi_int[t] = fi[t] * rest[t]
+        xi_ship[t] = xi_int[t] * one_m_d[t]
+        S[t] = rest[t] - xi_ship[t]
+        s = S[t]
+
+    q_i = (xi_ship + xi_others) / xi_star
+    q_d = xd / xd_star
+    p_i = np.asarray(inverse_demand(q_i, alpha_i, params.lam_demand, floor), float)
+    p_d = np.asarray(inverse_demand(q_d, alpha_d, params.lam_demand, floor), float)
+    rev = float(np.dot(p_i, xi_ship) + np.dot(p_d, xd))
+    s_star = max(float(H.mean()), 1e-8)
+    Sp = np.maximum(S, 0.0)
+    cost = params.zeta0 * float(np.mean((Sp / s_star) ** 2))
+    obj = -(rev - cost)
+
+    dp_i = _inv_demand_dpdq(q_i, alpha_i, params.lam_demand, floor)
+    dp_d = _inv_demand_dpdq(q_d, alpha_d, params.lam_demand, floor)
+    dobj_dxi_ship = -(p_i + xi_ship * dp_i / xi_star)
+    dobj_dxd = -(p_d + xd * dp_d / xd_star)
+    dobj_dS = params.zeta0 * (2.0 / n) * (Sp / (s_star ** 2))
+
+    dfd = np.zeros(n)
+    dfi = np.zeros(n)
+    adj_s = 0.0
+    for t in range(n - 1, -1, -1):
+        adj_S = dobj_dS[t] + adj_s
+        adj_rest = adj_S
+        adj_xi_ship = -adj_S + dobj_dxi_ship[t]
+        adj_xd = dobj_dxd[t]
+        adj_xi_int = adj_xi_ship * one_m_d[t]
+        dfi[t] = adj_xi_int * rest[t]
+        adj_rest = adj_rest + adj_xi_int * fi[t]
+        adj_A = adj_rest
+        adj_xd = adj_xd - adj_rest
+        dfd[t] = adj_xd * A[t]
+        adj_A = adj_A + adj_xd * fd[t]
+        adj_s = adj_A * (1.0 - loss)
+    return obj, np.concatenate([dfd, dfi])
 
 
 def solve_supplier_plan(
@@ -37,69 +185,79 @@ def solve_supplier_plan(
         ) -> dict:
     """Maximise supplier profit over (XD, XI) subject to storage ≥ 0.
 
-    Returns planned sales, storage path, success flag. Failed solves are
-    reported; the last feasible projection is returned rather than a legacy rule.
+    ``x0`` is concatenated *intended* sales (xd, xi), converted internally to
+    fractions. Failed/non-finite optimiser output falls back to that feasible
+    projection; it is not replaced by a legacy price rule.
     """
     n = int(H.size)
     H = np.asarray(H, float)
-    xi_star_step = np.broadcast_to(np.asarray(xi_star_step, float), (n,))
-    xd_star_step = np.broadcast_to(np.asarray(xd_star_step, float), (n,))
+    xi_others = np.broadcast_to(np.asarray(xi_others, float), (n,)).copy()
+    xi_star = np.maximum(np.broadcast_to(np.asarray(xi_star_step, float), (n,)), 1e-8)
+    xd_star = np.maximum(np.broadcast_to(np.asarray(xd_star_step, float), (n,)), 1e-8)
     if delta_hat is None:
         delta_hat = np.zeros(n)
     delta_hat = np.clip(np.asarray(delta_hat, float), 0.0, 1.0)
+    loss = params.delta_loss
 
-    def unpack(z):
-        xd = np.maximum(z[:n], 0.0)
-        xi = np.maximum(z[n:], 0.0) * (1.0 - delta_hat)
-        return xd, xi
-
-    def objective(z):
-        xd, xi = unpack(z)
-        S = _storage_path(S0, H, xd, xi, params.delta_loss)
-        if np.any(S < -1e-8):
-            return 1e12
-        q_i = (xi + xi_others) / np.maximum(xi_star_step, 1e-8)
-        q_d = xd / np.maximum(xd_star_step, 1e-8)
-        p_i = inverse_demand(q_i, alpha_i, params.lam_demand, params.demand_arg_floor)
-        p_d = inverse_demand(q_d, alpha_d, params.lam_demand, params.demand_arg_floor)
-        rev = float(np.dot(p_i, xi) + np.dot(p_d, xd))
-        # storage cost ζ0 (S/S*)^2 ; S* ~ mean harvest
-        s_star = max(float(H.mean()), 1e-8)
-        cost = params.zeta0 * float(np.mean((np.maximum(S, 0.0) / s_star) ** 2))
-        return -(rev - cost)
-
-    tot = float(H.sum() + max(S0, 0.0))
     if x0 is None:
-        x0 = np.concatenate([np.maximum(xd_star_step, 0.0), np.maximum(xi_star_step, 0.0)])
-        if x0.sum() <= 0:
-            x0 = np.full(2 * n, tot / max(2 * n, 1))
-    bounds = [(params.xmin, None)] * (2 * n)
-    res = minimize(objective, x0, method="L-BFGS-B", bounds=bounds,
-                   options={"maxiter": params.plan_maxiter, "ftol": 1e-8})
-    xd, xi = unpack(res.x)
-    S = _storage_path(S0, H, xd, xi, params.delta_loss)
-    feasible = bool(np.all(np.isfinite(S)) and np.min(S) >= -1e-6)
-    # If infeasible, project: scale sales so storage stays non-negative.
+        x0 = np.concatenate([
+            np.broadcast_to(np.maximum(np.asarray(xd_star_step, float), 0.0), (n,)).copy(),
+            np.broadcast_to(np.maximum(np.asarray(xi_star_step, float), 0.0), (n,)).copy(),
+        ])
+    x0 = np.asarray(x0, float).reshape(-1)
+    if x0.size != 2 * n:
+        x0 = np.concatenate([
+            np.broadcast_to(np.maximum(np.asarray(xd_star_step, float), 0.0), (n,)).copy(),
+            np.broadcast_to(np.maximum(np.asarray(xi_star_step, float), 0.0), (n,)).copy(),
+        ])
+    fd0, fi0 = sales_to_fractions(x0[:n], x0[n:], S0, H, loss, delta_hat)
+    z0 = np.concatenate([fd0, fi0])
+
+    def fun(z):
+        return _plan_objective_grad(
+            z, H, S0, xi_others, xi_star, xd_star,
+            alpha_i, alpha_d, params, delta_hat,
+        )
+
+    bounds = [(0.0, 1.0)] * (2 * n)
+    res = minimize(
+        fun, z0, method="L-BFGS-B", jac=True, bounds=bounds,
+        options={"maxiter": params.plan_maxiter, "ftol": 1e-8},
+    )
     fallback = False
+    z = np.asarray(res.x, float)
+    if z.size != 2 * n or not np.all(np.isfinite(z)):
+        z = z0
+        fallback = True
+    z = np.clip(z, 0.0, 1.0)
+    xd, xi_int, xi_ship, S = fractions_to_sales(z[:n], z[n:], S0, H, loss, delta_hat)
+    finite = bool(np.all(np.isfinite(xd)) and np.all(np.isfinite(xi_int))
+                  and np.all(np.isfinite(S)))
+    feasible = finite and bool(np.min(S) >= -1e-8)
     if not feasible:
         fallback = True
-        scale = 0.5
-        xd, xi = unpack(res.x) if np.all(np.isfinite(res.x)) else (x0[:n], x0[n:])
-        for _ in range(8):
-            S = _storage_path(S0, H, xd, xi, params.delta_loss)
-            if np.min(S) >= -1e-8:
-                feasible = True
-                break
-            xd *= scale
-            xi *= scale
-    success = bool(np.all(np.isfinite(xd)) and feasible)
+        xd, xi_int, xi_ship, S = fractions_to_sales(fd0, fi0, S0, H, loss, delta_hat)
+        finite = bool(np.all(np.isfinite(S)))
+        feasible = finite and bool(np.min(S) >= -1e-8)
+
+    q_i = (xi_ship + xi_others) / xi_star
+    q_d = xd / xd_star
+    floor = params.demand_arg_floor
+    floor_binds = int(np.sum(q_i <= floor + 1e-12) + np.sum(q_d <= floor + 1e-12))
+    residual = float(max(-np.min(S), 0.0)) if S.size else 0.0
     return {
         "xd": xd,
-        "xi": xi,
+        "xi": xi_int,
+        "xi_ship": xi_ship,
         "S": S,
-        "success": success,
+        "fd": np.clip(z[:n], 0.0, 1.0),
+        "fi": np.clip(z[n:], 0.0, 1.0),
+        "success": bool(feasible),
         "fallback": fallback,
+        "converged": bool(getattr(res, "success", False)) and not fallback,
         "nfev": int(getattr(res, "nfev", 0)),
+        "floor_binds": floor_binds,
+        "residual": residual,
     }
 
 

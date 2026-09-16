@@ -22,7 +22,9 @@ class AgrimateParams:
     eps_d: float = 0.2
     delta_loss: float = 0.0
     zeta0: float = 1.0  # wheat default missing from D.8; F text insensitive at 0.5/0
-    xmin: float = 1e-6
+    xmin: float = 1e-6  # unused as a sales bound (G0-N uses fd,fi ∈ [0,1])
+    # Tbl. D.8: τ_exp = 0.5 Nyear, rivals' expected international sales (D.22)
+    tau_exp: float = 0.5
     # inverse-demand argument floor (numerical; not Agrimate's world-price pin)
     demand_arg_floor: float = 0.05
     nash_max_iters: int = 20

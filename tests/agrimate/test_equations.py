@@ -68,9 +68,11 @@ def test_supplier_plan_respects_availability():
     p = AgrimateParams(plan_maxiter=20, nash_max_iters=2)
     H = np.ones(24) * 0.5
     sol = solve_supplier_plan(H, 0.0, np.ones(24) * 2.0, 2.0, 0.4, 3.5, 2.0, p)
-    sold = sol["xd"] + sol["xi"]
-    assert sold.sum() <= H.sum() + 1e-6 + 1e-6
-    assert np.min(sol["S"]) >= -1e-6
+    sold = sol["xd"] + sol["xi_ship"]
+    assert sold.sum() <= H.sum() + 1e-6
+    assert np.min(sol["S"]) >= -1e-8
+    assert sol["success"]
+    assert not sol["fallback"]
 
 
 def test_nash_periodic_and_clears_harvest():

@@ -81,6 +81,10 @@ of Zenodo 14022004 (code not retrieved).
 - regions: {len(res.regions)}
 - failed supplier solves: {res.failed_solves}
 - fallback: {res.fallback_solves}
+- unconverged (feasible but scipy not success): {res.unconverged_solves}
+- inverse-demand floor binds (offers): {res.floor_binds}
+- max plan residual: {res.plan_residual:.3e}
+- runtime: {res.runtime_s:.1f}s
 - Nash IBR: {res.nash['iterations']} err={res.nash['err']} success={res.nash['success']}
 - min S_p / S_c: {res.S_producer.min():.4f} / {res.S_consumer.min():.4f}
 - price index min/max: {res.price_index.min():.4f} / {res.price_index.max():.4f}
@@ -89,6 +93,21 @@ of Zenodo 14022004 (code not retrieved).
 
 A worse Pink-Sheet fit than the legacy host is not a reason to restore
 fill-target, calm pin, scarcity blend, or rival markup.
+
+## G0-N (supplier programme)
+
+Always-feasible `(fd, fi) ∈ [0, 1]` map of D.11–D.21; rolling forthcoming
+year `[t, t+Nyear)`; Jacobi IBR against D.22 expected rivals; D.7 argument
+`(XI_r + Q_{{-r}}) / XI*_world`. Not L1–L8. Success = finite and `S ≥ 0`.
+Unconverged counts scipy `success=False` on a still-feasible point.
+Plan-path floor hits are mostly off-season `XD = 0` when `H = S = 0`
+(domestic `q` at the numerical floor with zero sales). Offer-floor binds
+are the market-relevant count.
+
+2006-only smoke (same host): failed=0, fallback=0, offer-floor=0,
+price index ≈ 0.010–2.95, runtime ≈ 1.5 s. Pre-G0-N host: failed 344,
+fallback 417 of 672, price index ≈ 0.0006–1.00 because failed plans kept
+Nash offers.
 """
     (OUT / "validation.md").write_text(md)
     print(md)
