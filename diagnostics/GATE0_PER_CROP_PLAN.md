@@ -1,10 +1,10 @@
 # Gate 0 plan: per-crop Agrimate-style market before substitution / Level 2
 
-**Status:** accepted (2026-08-25). Official P1 scores, white paper, and
-Ukraine-war price hindcast are in `overleaf/gate0_whitepaper/`. Substitution
-(P3) is next; do not retune Gate 0 leftovers with crisis knobs.  
-**Replaces:** jumping to multi-grain substitution (`dynamic_grains` / spillover) before
-single-crop markets are proven.
+**Status (2026-09-16):** superseded as the living queue by
+[`DEVELOPMENT.md`](DEVELOPMENT.md). Wheat Gate 0 on `sheaf/agrimate/` must
+reach a publishable bar versus Agrimate **before** maize/rice acceptance
+and **before** Gate 1 / Gate 2. This file remains as the earlier
+per-crop scoring plan for the *legacy* host.
 
 ## Principle
 

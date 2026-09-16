@@ -5,9 +5,9 @@ substitution, policy, tipping, endogenous network. Those are questions
 the model might answer. They are **not** five papers that must be
 written in order, and they are not a license to skip the market.
 
-**Current work:** Gate 0 is open again after coauthor consultation.
-Living queue: [`diagnostics/DEVELOPMENT.md`](DEVELOPMENT.md). Do not
-treat Gate 1 / Gate 2 as the next coding task.
+**Current work:** Gate 0 wheat on `sheaf/agrimate/` until it is publishable
+against Agrimate. Living queue: [`diagnostics/DEVELOPMENT.md`](DEVELOPMENT.md).
+**Do not** treat Gate 1 / Gate 2 as the next coding task.
 
 What actually exists as writeups:
 

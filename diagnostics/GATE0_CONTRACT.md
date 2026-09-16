@@ -18,4 +18,7 @@ Otto, *Ecological Economics* 231 (2025) 108546; ODD supplement §D; wheat §E).
    *before* implementation.
 4. Keep baseline, legacy, and extension results labelled separately.
 5. Nash initialisation ≠ dynamic baseline (§D.5). Do not pin the unforced price.
-6. A prompt cannot prove economic fidelity.
+7. **No Gate 1 or Gate 2 until Gate 0 wheat is publishable** against Agrimate
+   (source fidelity, solver reliability, undisturbed dynamics, hindcast
+   levels and paths). See `diagnostics/DEVELOPMENT.md`. Leftover Gate 1/2
+   code is not a reason to open that work.

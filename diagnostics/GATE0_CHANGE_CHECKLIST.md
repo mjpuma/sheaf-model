@@ -6,3 +6,4 @@
 - [ ] Failed solves counted, not papered over with legacy rules
 - [ ] Results labelled baseline / legacy / extension
 - [ ] Unforced dynamics were not fixed by pinning the world price
+- [ ] Change does not open Gate 1 / Gate 2 work; G0-P in DEVELOPMENT.md is still the gate

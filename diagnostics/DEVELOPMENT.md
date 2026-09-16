@@ -1,240 +1,125 @@
 # Development plan
 
-**Current phase (2026-08-31):** return to **Gate 0**. The 24-step market is
-the baseline we have to be happy with after coauthor consultation. Gate 1
-and Gate 2 are paused on that spine. They are not the work now.
+**Current phase:** Gate 0 wheat, Agrimate-faithful host (`sheaf/agrimate/`).
+Gate 1 and Gate 2 are **blocked**. They stay blocked until Gate 0 is
+vetted at a **publishable** level: source-faithful, numerically reliable,
+and equal or better than Agrimate on Agrimate’s own wheat targets.
 
-This file is the living queue. Paper-shaped questions stay in
-[`PAPER_STACK.md`](PAPER_STACK.md). Clock (who chooses what, when) stays in
-[`GAME_CLOCK.md`](GAME_CLOCK.md). Parameter table for the *current* map:
-[`GATE0_PARAMETERIZATION.md`](GATE0_PARAMETERIZATION.md). Options after
-the Agrimate sitting: [`GATE0_DISCUSSION.md`](GATE0_DISCUSSION.md).
-Flow diagrams: [`GATE0_FLOWS.md`](GATE0_FLOWS.md) and
-[`figures/gate0_flows/`](../figures/gate0_flows/). Overleaf note (symbols,
-map \(F\), solution, four figures):
-[`overleaf/gate0_discussion/`](../overleaf/gate0_discussion/).
+That sequencing is the lesson from the last cycle. Shipping substitution
+and a policy sketch on an unpublishable market was a mistake. Do not
+repeat it.
 
-## What “open baseline” means
+Canonical contract: [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md).
+Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
+This file is the living queue.
 
-`diagnostics/gate0_*_report.md` are **snapshots** of the map as scored.
-They are not a freeze. Consultation can change the price law, storage
-object, asks, or expectations. If it does, we re-score and relabel.
+## What “publishable Gate 0” means
 
-Still not allowed:
+Agrimate (Kuhla, Kubiczek & Otto 2025, *Ecol. Econ.* 231:108546) is the
+bar, not the legacy SHEAF ask/scarcity scores. For **wheat**:
 
-- Crisis dummies or 2008-only knobs
-- Picking a preferred \(\sigma^\star\)
-- Treating `sheaf.annual` as the 2007/08 host
-- Silently mixing the yearly QP into `_simulate_window`
+1. **Source fidelity.** Supplier, purchaser, consumer, storage, restrictions,
+   timing, and world-price *definition* match the paper/supplement (or an
+   approved departure record). Equation-to-code review, not a prompt.
+2. **Numerical reliability.** Supplier plans converge. Constraint residuals
+   are small. Failed solves are counted and rare enough that they do not
+   set the price path. No fill-target, calm pin, scarcity blend, or rival
+   markup to make a test pass.
+3. **Undisturbed dynamics.** After spin-up, seasonal repeating behaviour
+   as Agrimate describes. Not a flat pinned world price.
+4. **Reference reproduction.** Same wheat case, data vintage, parameters,
+   and output definitions as closely as access allows. If Zenodo
+   14022004 / 10688435 are in hand, compare to author series (Fig. 4 and
+   regional supply/consumption/stocks). If they are not, say
+   “independent implementation,” not “replication.”
+5. **Historical performance.** Price *levels and seasonal paths*, not only
+   a correlation. Crisis hike ratios *and* quiet-year levels. Stocks,
+   consumption, and trade where Agrimate or USDA/FAO report them.
+6. **Controlled experiments.** Harvest-only vs harvest+restrictions, as in
+   Agrimate’s three scenarios. Domestic vs international responses.
 
-Headey (2011) still does **not**, by itself, force a Gate 0 re-run. Colleague
-questions about *how \(p\) is formed* do.
+**Pass rule:** items 1–3 must hold before we spend time judging 5.
+Item 5 is judged against Agrimate’s published wheat results, not against
+legacy SHEAF. A worse Pink-Sheet fit during debugging does **not** restore
+L1–L8 (`GATE0_DEPARTURES.md`).
 
-## Now — Gate 0 characterization sweep
+**Wheat only.** Maize and rice are later Agrimate-style single-crop
+applications. Do not accept them with inherited wheat knobs, and do not
+use them to wave Gate 0 through.
 
-**Deliverable to Potsdam is no longer a prompt pack.** It is (a) the
-corrected note, (b) measured results, (c) proposed next steps. Prompts stay
-in the repo as the record of method:
-[`audit_prompts/GATE0_MODEL_PROMPTS.md`](../audit_prompts/GATE0_MODEL_PROMPTS.md)
-(Part A = read-only characterization, Part B = gated changes).
+Gate 0 is **not** currently at this bar. The host runs; Nash sales = harvest;
+12 unit tests pass; many dynamic supplier solves still fail. That is a
+solver/specification gap, not a license to open Gate 1.
 
-| ID | Activity | Status | Artifacts |
-|---|---|---|---|
-| A1 | Note equations vs `_simulate_window`, symbol by symbol | **done** — all four seeded hypotheses confirmed | [`gate0_prep/a1/`](gate0_prep/a1/) |
-| A1b | Why the calm branch has work to do; is `θ` mis-set? | **done** — re-targeting `θ` rejected | `gate0_prep/a1/A1B_CALM_FIXED_POINT.md` |
-| A1c | Does the calm branch touch a scored result? | **done** — no (0/144 in both scored legs) | `gate0_prep/a1/A1C_CALM_REACH.md` |
-| A2 | Is `p^scar` already an optimisation principle? | **done** — yes for the scarcity term; the blend is not | [`gate0_prep/a2/`](gate0_prep/a2/) |
-| A2b–f | Price flexibility; monotonicity; the pin's reach into the τ column and the sign test | **done** — the sweep's headline | `gate0_prep/a2/A2{B,C,D,E,F}_*.md` |
-| A3 | Size of the contemporaneous-demand gap; is `p=G(p)` well posed? | **done** — gap 0.3–0.9%; well posed at the root, not globally contractive | `gate0_prep/a3/A3_REPORT.md` |
-| A4 | Cover rule's implied shadow value; cause of the exporter floor | **done** — implied \(r\) sign is a coin-flip; uniform \(s_i\) is the floor | `gate0_prep/a4/A4_REPORT.md` |
-| A5 | Channel ablation: which channel carries which crisis | **done** — 2007/08 restriction-carried; 2010/11 ask-dynamics for wheat/maize | `gate0_prep/a5/A5_REPORT.md` |
-| RT | Agrimate red team: dead dest-reweight → CES source shares; exporter FOC prototyped | **done** — CES shipped (`929cec4`); exporter FOC tested and **rejected** (pre-CES maize +0.712 → +0.339; not shipped) | `gate0_prep/redteam/REDTEAM_SYNTHESIS.md`, `optimisation/REDTEAM_OPTIMISATION.md`, `clearing/REDTEAM_CLEARING.md`, `census/REDTEAM_CENSUS.md`, `VERIFICATION.md` |
+## Sequence (do not skip)
 
-### A1 findings (all four confirmed; details in `gate0_prep/a1/`)
-
-1. **Scarcity regulariser is not small or constant.** \(f_t=0.05\sum_i s_i
-   +\max(0,-\min(F,F^{\mathrm{twin}}))\) = 6.4 / 6.5 / 3.9 MMT
-   (wheat/maize/rice), i.e. 4.8% / 3.1% / **10.3%** of mean accessible
-   stock. Bias vs the unregularised ratio: 2.2% / 3.4% / **35.4%** mean.
-   Accessible stock goes **negative** at 58/144 steps for rice — the world
-   holds less than its own lean cover — so for rice \(r_t\) is materially a
-   regularised quantity. Category **G** on the note; the second term is
-   defensible as implemented. Confidence 95–100% (reproduced).
-2. **The reference identity is enforced, not derived.** An explicit
-   conditional sets \(p^\star=p_0\) when the run matches the twin. Disable
-   it and the matched run drifts **25% / 34% / 19%** against a 2% test
-   tolerance. Root cause: realised matched-run fill is **0.54 / 0.32 /
-   0.62** against \(\theta=0.70\), so the ask law pushes offers down every
-   step with nothing happening — it has **no rest point at \(p_0\)**.
-   Category **G** on the claim; the underlying property is a real design
-   question (see A1b/A1c). Confidence 95–100%.
-3. **Unmet-demand channel is one-sided.** \(\Delta u=\max(0,u-u^{twin})\),
-   and the truncation binds at 92/59/100 of 144 steps. Category **G**.
-4. **\(p^{\mathrm{tr}}\) uses this step's asks**, not the lagged asks that
-   allocated the trade. Offer prices are updated twice in one causal chain.
-   Category **G**. Median per-step ask move $7.58 (wheat) — not negligible.
-
-**No code change recommended from A1 alone.** Removing the conditional
-breaks two of four robustness assertions; re-targeting \(\theta\) leaves
-19–20% drift and degrades maize corr +0.71 → +0.65. A1's fixes were to the
-note (`overleaf/gate0_discussion/`, now 19 pp.).
-
-### A2 findings — the sweep's headline
-
-A1c's "no scored number depends on the conditional" was **too strong**. It
-holds for the price correlation and the full/harvest-only hike ratios, not
-for the τ column, whose base window *is* the pinned stretch.
-
-1. **The restriction sign test was not like-for-like.** Its baseline leg is
-   pinned at \(p_0\) at every step while the τ leg is priced by the ask law,
-   whose quiet level is 0.66/0.71/0.96 × \(p_0\). Maize lift was biased down
-   27 pp. Category **B**, confidence 95–100%.
-2. **`ask_rival = 0.80` has lost its justification.** The comment claimed it
-   was the smallest value clearing the maize sign condition; on the
-   corrected test the condition holds at **0.0** for all three crops
-   (+4.7% / +48.8% / +16.0%). Crossing bisected under both tests: **0.755**
-   as written (A5 independently got 0.751), **clears at 0.0** corrected —
-   though maize's corrected margin is only +4.7%, so nearly binding, not
-   slack. It is *not* spurious — on current code, at 0.0, maize corr
-   +0.792 → +0.551 and rice 07/08 ×1.54 → ×1.01, though wheat's correlation
-   *improves* (+0.687 → +0.700) while its 07/08 hike collapses ×2.09 → ×1.46,
-   so the parameter buys amplitude rather than fit. A reduced-form amplitude
-   parameter with no external basis. Category **F**, 95–100%. **Open
-   decision** (see
-   `POTSDAM_RESPONSE.md` §2). This reclassifies A5's finding 1 from H;
-   adjudication recorded in `gate0_prep/a5/ADJUDICATION_ASK_RIVAL.md`.
-3. **Maize 2007/08 flips demand-led → restriction-led** (τ ×1.10 → ×1.69,
-   observed ×1.84); wheat ×1.70 → ×1.99. A5 reached the same conclusion by
-   ablation, independently. **Open decision: which is the headline.**
-
-### Fixes applied (commit `cafb8ba`) — no equation changed, no score moved
-
-- `prepare_crop_run` raises on unknown overrides (was silently dropping
-  them, so typo'd sensitivities reported "no effect"). Category **B**.
-- All four assertions take `**overrides`. Category **G**.
-- `assert_amis_raises_price` perturbs the baseline harvest by 1e-6 to leave
-  the matched regime. Maize lift +1.9% → +31.2%; all twelve still pass.
-- `score_subannual_crop.py` prints both τ ratios until the headline is
-  settled.
-
-### A3 / A5 in one line each
-
-- **A3** — the contemporaneous-demand gap is 0.3–0.9% of world desired use
-  (max 4.0% outside the spin-up year); one-step propagated price move
-  ≤ 4.11 $/t. The fixed point has exactly one root at all 432 steps,
-  \(|G'(p^\*)|\le 0.117\), Picard converges in ≤13 iterations from bad
-  starts — but \(G\) is **not** globally contractive (L_max 39.7) and has
-  two real jumps: the calm branch (≤36.8 $/t) and an uncatalogued
-  \(p^{\mathrm{tr}}\) fallback at L665–669 (≤11.7 $/t). So X1 needs a
-  bracketed solve with a residual check, not a bare iteration. Inclination:
-  record, do not adopt. The \(p^{\mathrm{tr}}\) fallback is now written
-  into the note as eq (13) — it was missing from our own equations.
-- **A5** — 2007/08 is restriction-carried in all three crops; 2010/11 is
-  ask-dynamics-carried for wheat and maize. No globally inert parameter, but
-  three exact conditional-inertness identities.
-
-### Red team vs Agrimate — shipped one fix
-
-Synthesis: [`gate0_prep/redteam/REDTEAM_SYNTHESIS.md`](gate0_prep/redteam/REDTEAM_SYNTHESIS.md).
-Potsdam letter updated.
-
-**Shipped, three changes.** (1) CES source-share reweight
-(`_ask_reweight_src`); destination reweight was the identity, so
-`ask_comp_elast` was inert. (2) **Bounded scarcity ratio** in the
-asymmetric case where accessible stock goes negative while the reference
-stays positive — the ratio there was `twin/floor0`, set by the regulariser
-rather than by scarcity (maize 35.1, price ×4.13 in one step), and it made
-maize's correlation irreproducible (spread 0.557 under a ~1%
-recalibration, now 0.051). (3) **Value shipments at the ask that allocated
-them** rather than at the ask updated later in the same step — a
-rally-directional bias of +2.2/+1.9/+3.9% through 2007/08, against
-Agrimate Eq. D.4. Changes 2 and 3 were also applied to the Gate 1 coupled
-host, which carried the same two blocks verbatim.
-
-All twelve asserts pass. Current official full-leg scores: wheat
-**+0.687 / ×2.09 / ×1.31**, maize **+0.792 / ×2.05 / ×1.52**, rice
-**+0.676 / ×1.54 / ×0.84**. Total absolute error over the six crisis
-windows falls 1.421 → 1.060; wheat loses 0.033 correlation and rice's
-2007/08 undershoot deepens. Those are costs of correctness fixes, not
-justifications — none of the three was selected on a score.
-
-**Open consequence:** Gate 1's σ = 0 identity still holds exactly, but its
-spillover-sign hard bar now fails for rice at σ = 0.6 (×0.984, was
-×1.039; σ = 0.3 still passes at ×1.029). Reverting either fix alone does
-not restore it. Three options for the coauthors in
-[`../diagnostics/redteam/r0/R0L_GATE1_CONSEQUENCE.md`](redteam/r0/R0L_GATE1_CONSEQUENCE.md).
-
-**New parity findings from reading the paper and ODD supplement directly**
-([`redteam/r0/`](redteam/r0/)): measured price flexibility 5.49/2.96/4.88
-against Agrimate's α of 3.0–3.5, so the earlier worry that SHEAF's price
-map is three to four times too flat was **false**; but the price map has a
-step discontinuity at zero anomaly, −9.5% (wheat) and −22.6% (maize),
-which is the sharpest form of the rest-point problem. Parameter counts are
-≈20 (SHEAF) against ≈21 (Agrimate, two of them per-region vectors), so the
-count criticism does not survive — provenance is the real issue. Agrimate's
-ρ and δ are both 0 at default, so no FOC repair needs an interest rate, and
-its `x_min = 0.2` is a citable precedent for an optimiser stabiliser. Its
-baseline is a Nash-periodic equilibrium where ours is a climatological
-twin, which is a genuine gap.
-
-**Prototyped, not shipped:** exporter FOC in place of the ask law.
-Restores the quiet-market rest point without the pin and passes asserts;
-destroys crisis amplitude. Like-for-like on the pre-CES ask law: maize
-corr +0.712 → +0.339 (`foc_scores.csv`). Independent verification:
-[`gate0_prep/redteam/VERIFICATION.md`](gate0_prep/redteam/VERIFICATION.md).
-
-**Their hard-bounds claim is false.** All-three-hard-bounds maize corr
-+0.71 → +0.22.
-
-**Remaining gap vs Agrimate:** store-versus-sell. Rice residual pool 47%.
-
-### Then
-
-- **A4** — measurements are in `gate0_prep/a4/`; write-up still open.
-  Storage is the remaining Agrimate contrast.
-- **Three open decisions**, all in `POTSDAM_RESPONSE.md`: the basis for
-  `ask_rival`; keep-and-document vs rebuild the offer-price law; which τ
-  ratio is the headline. None should be settled unilaterally.
-- **Deck** — `overleaf/sheaf_deck/` needs the A1/A2 corrections and the
-  CES / maize-score update. **Still deferred** until the user asks.
-
-## Paused
-
-| Layer | Status | Resume when |
+| Stage | Work | Exit |
 |---|---|---|
-| Gate 1 (`dynamic_coupled`, \(\sigma\in\{0,0.3,0.6\}\)) | Draft + snapshot scores | Gate 0 baseline is one we will stand behind |
-| Gate 2 beta (`dynamic_policy`) | Mechanism check only | Same |
-| Annual SPE (`sheaf.annual`) | Parked | A year-scale outer loop is actually wanted |
-| `dynamic_grains.py` | Still paused | Do not unpause to chase Gate 0 |
+| **G0-N** | Make the supplier programme numerically solvent on the 24-step wheat year. Record residual, runtime, and when the inverse-demand floor binds. | Failed/fallback solves rare; storage feasible; price index O(1) without a pin. |
+| **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | Spec matrix updated; unresolved items labelled, not guessed. |
+| **G0-U** | Undisturbed / spin-up / restriction-off vs harvest-only vs full AMIS. Accounting identities each step. | Documented seasonal baseline; material balance. |
+| **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | Written score in `diagnostics/gate0_agrimate/`. Comparable to Agrimate or an explicit, sourced shortfall. |
+| **G0-P** | Gate 0 note at publication standard (methods, data, hindcast, limits). No substitution, no government game. | You accept wheat Gate 0 as the SHEAF market paper / section. **This is the only gate that unlocks G1.** |
+| **G1** | Cross-crop substitution (wheat/rice/maize), distinct from Agrimate origin CES. Disabled G1 recovers G0. | Identity test + spillover experiments. No σ* fit to 2008. |
+| **G2** | Government restriction game, distinct from supplier oligopoly and from AMIS/E.4. Disabled G2 recovers E.4 Agrimate. | Mechanism tests on the *accepted* G0 host. Train/hold-out if estimated. |
 
-## Consultation themes already on the table
+G1 and G2 each need an approved departure record before code
+(`GATE0_DEPARTURES.md`, `GATE0_EXTENSION_PLAN.md`). Assistant-generated
+ideas and leftover `dynamic_coupled` / `dynamic_policy` code are **not**
+approval.
 
-These came out of the Agrimate sitting. They are questions for **our**
-Gate 0 code, not a rewrite list yet.
+## Hard stops
 
-- How \(p_t\) is formed (map, not a DE, not a per-step NLP)
-- Whether FAO/economists need an optimization principle under that update
-- What “baseline” names (twin, \(p_0\), climatology, spin-up)
-- No commercial store-vs-sell agent; target \(T=L+s\) instead
-- Export offers \(O\) vs FAOSTAT shares \(A,S\); one world \(p\) plus asks \(q_i\)
-- No carrying cost \(r\); why grain is not dumped this step
-- Adaptive harvest \(\phi\)-blend, not 10-year perfect foresight
-- Too many reduced-form knobs vs hard bounds (\(W\), clips, AMIS \(\tau\))
+- Do not implement or retune Gate 1 (`sheaf/dynamic_coupled.py`) or Gate 2
+  (`sheaf/dynamic_policy.py`) while any G0-N…G0-P box is open.
+- Do not treat legacy `diagnostics/gate0_*_report.md` or the Overleaf
+  ask/scarcity deck as evidence about the new host.
+- Do not move maize/rice onto the new host as an acceptance target.
+- Do not “fix” unforced prices by pinning them to the 2006 mean.
+- Dead-end artifacts (legacy red-team scratch, uncommitted Overleaf WIP
+  on the old map) stay in `archive/` or uncommitted. Do not resurrect them
+  as the market.
 
-## Identification (unchanged)
+## Now (G0-N, then G0-S)
 
-| Layer | Constraint |
-|---|---|
-| Gate 0 | Literature \(\varepsilon\), STU; reduced-form knobs shared across years; Agrimate official split (harvest ± AMIS, mean flex; USA maize industrial on) |
-| Gate 1 | Band only; no \(\sigma^\star\) |
-| Gate 2 | Types illustrative until a train/hold-out protocol exists |
+1. Diagnose why L-BFGS fails on the dynamic supplier plan (feasibility,
+   scaling, seasonal starred quantities, horizon). Prefer a faithful
+   constrained solve over a cheaper surrogate unless equivalence is shown.
+2. Obtain or confirm absence of Zenodo 14022004 (code) and 10688435 (data).
+   Until author binaries exist, keep the “independent implementation” label.
+3. Keep `python scripts/run_agrimate_wheat.py` as the only default run.
+4. Compare only under labelled configs: new host / Agrimate published /
+   `sheaf/legacy`.
 
-## Smoke tests
+Reference command:
 
 ```bash
-python scripts/score_subannual_crop.py --crop wheat
-python scripts/score_subannual_crop.py --crop maize
-python scripts/score_subannual_crop.py --crop rice
+python -m pytest tests/agrimate -q
+python scripts/run_agrimate_wheat.py
 ```
 
-Annual prototype (not Gate 0): `python scripts/annual/demo.py`.
+Legacy (labelled, not the bar):
+
+```bash
+python scripts/score_legacy_crop.py --crop wheat
+```
+
+## Prior cycle (legacy ask/scarcity host) — closed
+
+The 2026-08 characterization (A1–A5, red-team, Potsdam note) documented the
+**old** sequential map. It is useful as a record of why that map is not
+Agrimate. It is not a Gate 0 publication path.
+
+- Artifacts: `diagnostics/gate0_prep/`, `diagnostics/redteam/`,
+  `archive/legacy-gate0/`, `overleaf/gate0_discussion/`
+- Code: `sheaf/legacy/`, `sheaf/dynamic_crop.py` (Gate 1 still imports this
+  copy; do not extend it)
+
+Parked, not next:
+
+| Layer | Status |
+|---|---|
+| Gate 1 isoelastic substitution | Blocked until G0-P |
+| Gate 2 Headey-clock actions | Blocked until G0-P, then G1 identity |
+| Annual SPE `sheaf.annual` | Parked |
+| `dynamic_grains.py` | Paused |
