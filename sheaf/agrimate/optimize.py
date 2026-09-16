@@ -141,16 +141,36 @@ def _plan_objective_grad(
     p_i = np.asarray(inverse_demand(q_i, alpha_i, params.lam_demand, floor), float)
     p_d = np.asarray(inverse_demand(q_d, alpha_d, params.lam_demand, floor), float)
     rev = float(np.dot(p_i, xi_ship) + np.dot(p_d, xd))
-    s_star = max(float(H.mean()), 1e-8)
-    Sp = np.maximum(S, 0.0)
-    cost = params.zeta0 * float(np.mean((Sp / s_star) ** 2))
-    obj = -(rev - cost)
+    # Author get_unit_storage_costs with δ=ρ=0: −p_sto_step · (N, N−1, …, 1)
+    psto = params.p_sto_step
+    unit = -psto * (n - np.arange(n, dtype=float))
+    x_tot = xd + xi_ship
+    cost = float(np.dot(unit, x_tot - H))
+    # xmin quadratic penalty (producer_optimization.jl); ζ=0 ⇒ fully on
+    tot_possible = max(float(S0), 0.0) + float(H.sum())
+    xmin_each = params.xmin_share * tot_possible / max(n * 2.0, 1.0)
+    pw = 1.0 - float(params.zeta_penalty)
+    under_d = xd < xmin_each
+    under_i = xi_int < xmin_each
+    pen = 0.0
+    if pw > 0.0 and xmin_each > 0.0:
+        pen = float(np.sum((xd[under_d] - xmin_each) ** 2 * p_d[under_d])
+                    + np.sum((xi_int[under_i] - xmin_each) ** 2 * p_i[under_i]))
+    obj = -(rev - cost) + pw * pen
 
     dp_i = _inv_demand_dpdq(q_i, alpha_i, params.lam_demand, floor)
     dp_d = _inv_demand_dpdq(q_d, alpha_d, params.lam_demand, floor)
-    dobj_dxi_ship = -(p_i + xi_ship * dp_i / xi_star)
-    dobj_dxd = -(p_d + xd * dp_d / xd_star)
-    dobj_dS = params.zeta0 * (2.0 / n) * (Sp / (s_star ** 2))
+    dobj_dxi_ship = -(p_i + xi_ship * dp_i / xi_star) + unit
+    dobj_dxd = -(p_d + xd * dp_d / xd_star) + unit
+    if pw > 0.0 and xmin_each > 0.0:
+        dobj_dxd = dobj_dxd.copy()
+        dobj_dxi_int_extra = np.zeros(n)
+        dobj_dxd[under_d] += pw * 2.0 * (xd[under_d] - xmin_each) * p_d[under_d]
+        dobj_dxi_int_extra[under_i] = (
+            pw * 2.0 * (xi_int[under_i] - xmin_each) * p_i[under_i])
+    else:
+        dobj_dxi_int_extra = np.zeros(n)
+    dobj_dS = np.zeros(n)
 
     dfd = np.zeros(n)
     dfi = np.zeros(n)
@@ -160,7 +180,7 @@ def _plan_objective_grad(
         adj_rest = adj_S
         adj_xi_ship = -adj_S + dobj_dxi_ship[t]
         adj_xd = dobj_dxd[t]
-        adj_xi_int = adj_xi_ship * one_m_d[t]
+        adj_xi_int = adj_xi_ship * one_m_d[t] + dobj_dxi_int_extra[t]
         dfi[t] = adj_xi_int * rest[t]
         adj_rest = adj_rest + adj_xi_int * fi[t]
         adj_A = adj_rest

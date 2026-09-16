@@ -43,14 +43,13 @@ def test_sales_fraction_roundtrip_on_feasible_path():
     assert np.min(S2) >= -1e-12
 
 
-def test_zero_harvest_does_not_force_xmin_sales():
+def test_zero_harvest_plan_stays_feasible():
     p = AgrimateParams(plan_maxiter=15)
     H = np.zeros(24)
     sol = solve_supplier_plan(H, 2.0, np.ones(24), 0.2, 0.3, 3.5, 2.0, p)
     assert sol["success"]
     assert not sol["fallback"]
     assert np.min(sol["S"]) >= -1e-8
-    # No xmin lower bound on sales: the feasible set includes selling nothing.
     assert np.all(sol["xd"] >= -1e-12)
     assert np.all(sol["xi"] >= -1e-12)
 
@@ -68,8 +67,17 @@ def test_restriction_not_double_applied_in_returned_intended_sales():
     assert sol["xi_ship"][0] <= sol["xi"][0] + 1e-12
 
 
+def test_d8_xmin_penalty_is_soft_not_hard():
+    """Author x_minimum is a quadratic penalty (ζ=0), not a 1e-6 sales bound."""
+    p = AgrimateParams(plan_maxiter=15, xmin_share=0.2, zeta_penalty=0.0)
+    H = np.ones(24) * 0.5
+    sol = solve_supplier_plan(H, 0.0, np.ones(24) * 2.0, 2.0, 0.4, 3.5, 2.0, p)
+    assert sol["success"]
+    assert np.min(sol["S"]) >= -1e-8
+
+
 def test_supplier_plan_analytic_grad_matches_finite_difference():
-    p = AgrimateParams()
+    p = AgrimateParams(zeta_penalty=1.0, xmin_share=0.0)
     n = 8
     H = np.linspace(0.2, 0.8, n)
     S0 = 0.4

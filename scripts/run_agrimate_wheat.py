@@ -75,8 +75,10 @@ def main():
 
 Command: `python scripts/run_agrimate_wheat.py --start-year {args.start_year} --end-year {args.end_year}`
 
-Independent implementation of Kuhla et al. (2025) §D; not a bit-reproduction
-of Zenodo 14022004 (code not retrieved).
+Independent implementation of Kuhla et al. (2025) §D. Author code
+https://doi.org/10.5281/zenodo.14022004 retrieved 2026-09-16 as the
+executable specification (not copied into this package). Data deposit
+10688435 (150 MB) not unpacked.
 
 - regions: {len(res.regions)}
 - failed supplier solves: {res.failed_solves}
@@ -105,9 +107,16 @@ Plan-path floor hits are mostly off-season `XD = 0` when `H = S = 0`
 are the market-relevant count.
 
 2006-only smoke (same host): failed=0, fallback=0, offer-floor=0,
-price index ≈ 0.010–2.95, runtime ≈ 1.5 s. Pre-G0-N host: failed 344,
-fallback 417 of 672, price index ≈ 0.0006–1.00 because failed plans kept
-Nash offers.
+price index ≈ 0.045–3.67.
+
+## G0-S (source)
+
+Wheat defaults follow author `AgrimateParams` (αI=3.2, τ=0.1, σ=2, εc=0.1,
+p_sto=0.1/Nyear, x_min=0.2 penalty, ζ=0). C.1 wheat nodes are the 27-name
+`AgrimateRegionsWheat` list. E.27 and D.1 weights match author harvest and
+`expected_harvests.jl`. Tbl. D.8 αI=3.5 / τ=0.2 kept as `wheat_table_d8_defaults()`.
+Unresolved: β/τ_P local price, nested purchaser D.30a, FAOSTAT FB (A1),
+Fig. 4 author series (data zip not unpacked).
 """
     (OUT / "validation.md").write_text(md)
     print(md)

@@ -1,89 +1,85 @@
-"""Agrimate 28-region map (paper Fig. 2 / Suppl. Tbl. C.1).
+"""Agrimate wheat region map from Zenodo 14022004 ``AgrimateRegionsWheat``.
 
-C.1 itself was not in the cloned tree. This is a UN-M49 aggregation with the
-named countries from the main text carved out (USA, Australia, China,
-Argentina, Russia, Egypt, Kazakhstan, Ukraine, plus other large wheat
-nodes). North Africa follows the paper: Algeria, Libya, Morocco, Sudan,
-Tunisia, Western Sahara; Egypt is separate. Recorded as a specification
-question until C.1 is in hand.
+Paper Tbl. C.1 was described as 28 regions; the author wheat list is 27
+names (Egypt and Mexico are inside Northern / Central America; Pakistan and
+Turkey are singles; there is no Rest-of-World residual). Host follows the
+executable list. See ``diagnostics/GATE0_DEPARTURES.md``.
 """
 from __future__ import annotations
 
-from sheaf.data_faostat import EU_ISO3
-
-# Named countries in the wheat application (main text §4.1 / Fig. 2).
-SINGLES = {
+# Author ``AgrimateRegionsWheat`` (src/regions.jl), order preserved.
+REGION_ISO3: dict[str, list[str]] = {
     "Argentina": ["ARG"],
     "Australia": ["AUS"],
     "Brazil": ["BRA"],
     "Canada": ["CAN"],
-    "China": ["CHN"],
-    "Egypt": ["EGY"],
-    "European Union": list(EU_ISO3),
+    "China": ["CHN", "HKG", "MAC", "TWN"],
+    "EU-27": [
+        "AUT", "BEL", "BGR", "CYP", "CZE", "DEU", "DNK", "ESP", "EST", "FIN",
+        "FRA", "GRC", "HRV", "HUN", "IRL", "ITA", "LTU", "LUX", "LVA", "MLT",
+        "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "SWE",
+    ],
     "India": ["IND"],
     "Kazakhstan": ["KAZ"],
-    "Mexico": ["MEX"],
+    "Pakistan": ["PAK"],
     "Russia": ["RUS"],
-    "Ukraine": ["UKR"],
+    "Turkey": ["TUR"],
     "USA": ["USA"],
-}
-
-AGGREGATES = {
-    "Northern Africa": ["DZA", "LBY", "MAR", "SDN", "TUN", "ESH"],
-    "Eastern Africa": [
-        "BDI", "COM", "DJI", "ERI", "ETH", "KEN", "MDG", "MWI", "MUS", "MOZ",
-        "RWA", "SYC", "SOM", "SSD", "UGA", "TZA", "ZMB", "ZWE",
-    ],
-    "Middle Africa": ["AGO", "CMR", "CAF", "TCD", "COG", "COD", "GNQ", "GAB", "STP"],
-    "Southern Africa": ["BWA", "LSO", "NAM", "ZAF", "SWZ"],
-    "Western Africa": [
-        "BEN", "BFA", "CPV", "CIV", "GMB", "GHA", "GIN", "GNB", "LBR", "MLI",
-        "MRT", "NER", "NGA", "SEN", "SLE", "TGO",
-    ],
+    "Ukraine": ["UKR"],
     "Central America": [
-        "BLZ", "CRI", "SLV", "GTM", "HND", "NIC", "PAN", "CUB", "DOM", "HTI",
-        "JAM", "TTO", "BHS", "BRB", "ATG", "GRD", "LCA", "VCT", "KNA",
+        "ABW", "AIA", "ANT", "ATG", "BES", "BHS", "BLM", "BLZ", "BMU", "BRB",
+        "CRI", "CUB", "CUW", "CYM", "DMA", "DOM", "GLP", "GRD", "GTM", "HND",
+        "HTI", "JAM", "KNA", "LCA", "MAF", "MEX", "MSR", "MTQ", "NIC", "PAN",
+        "PRI", "SLV", "SXM", "TCA", "TTO", "VCT", "VGB", "VIR",
     ],
-    "South America": ["BOL", "CHL", "COL", "ECU", "GUY", "PRY", "PER", "SUR", "URY", "VEN"],
-    "Central Asia": ["KGZ", "TJK", "TKM", "UZB"],
-    "Eastern Asia": ["MNG", "PRK", "KOR", "JPN", "HKG", "MAC", "TWN"],
-    "South-Eastern Asia": [
-        "BRN", "KHM", "IDN", "LAO", "MYS", "MMR", "PHL", "SGP", "THA", "TLS", "VNM",
+    "Rest of Central Asia": ["KGZ", "TJK", "TKM", "UZB"],
+    "Eastern Africa": [
+        "ATF", "BDI", "COM", "DJI", "ERI", "ETH", "IOT", "KEN", "MDG", "MOZ",
+        "MUS", "MWI", "MYT", "REU", "RWA", "SOM", "SSD", "SYC", "TZA", "UGA",
+        "ZMB", "ZWE",
     ],
-    "Southern Asia": ["AFG", "BGD", "BTN", "IRN", "MDV", "NPL", "PAK", "LKA"],
-    "Western Asia": [
-        "ARM", "AZE", "BHR", "GEO", "IRQ", "ISR", "JOR", "KWT", "LBN", "OMN",
-        "QAT", "SAU", "SYR", "TUR", "ARE", "YEM", "PSE",
-    ],
+    "Rest of Eastern Asia": ["JPN", "KOR", "MNG", "PRK"],
     "Rest of Europe": [
-        "ALB", "AND", "BLR", "BIH", "GBR", "ISL", "LIE", "MKD", "MDA", "MNE",
-        "NOR", "SMR", "SRB", "CHE", "UKR_SKIP",
+        "ALA", "ALB", "AND", "BIH", "BLR", "CHE", "FRO", "GBR", "GGY", "GIB",
+        "IMN", "ISL", "JEY", "LIE", "MCO", "MDA", "MKD", "MNE", "NOR", "SCG",
+        "SJM", "SMR", "SRB", "VAT", "YUG", "XKX",
     ],
-    "Oceania": ["NZL", "FJI", "PNG", "WSM", "TON", "VUT", "SLB", "NCL", "PYF"],
-    "Rest of World": [],
+    "Middle Africa": ["AGO", "CAF", "CMR", "COD", "COG", "GAB", "GNQ", "STP", "TCD"],
+    "Northern Africa": ["DZA", "EGY", "ESH", "LBY", "MAR", "SDN", "TUN"],
+    "Rest of Oceania": [
+        "ASM", "CCK", "COK", "CXR", "FJI", "FSM", "GUM", "HMD", "JTN", "KIR",
+        "MHL", "MID", "MNP", "NCL", "NFK", "NIU", "NRU", "NZL", "PCN", "PLW",
+        "PNG", "PYF", "SLB", "TKL", "TON", "TUV", "UMI", "VUT", "WAK", "WLF",
+        "WSM",
+    ],
+    "Rest of South America": [
+        "BOL", "BVT", "CHL", "COL", "ECU", "FLK", "GUF", "GUY", "PER", "PRY",
+        "SGS", "SUR", "URY", "VEN",
+    ],
+    "Rest of Southern Asia": ["AFG", "BGD", "BTN", "IRN", "LKA", "MDV", "NPL"],
+    "Southeast Asia": [
+        "BRN", "IDN", "KHM", "LAO", "MMR", "MYS", "PHL", "SGP", "THA", "TLS", "VNM",
+    ],
+    "Southern Africa": ["BWA", "LSO", "NAM", "SWZ", "ZAF"],
+    "Western Africa": [
+        "BEN", "BFA", "CIV", "CPV", "GHA", "GIN", "GMB", "GNB", "LBR", "MLI",
+        "MRT", "NER", "NGA", "SEN", "SHN", "SLE", "TGO",
+    ],
+    "Rest of Western Asia": [
+        "ARE", "ARM", "AZE", "BHR", "GEO", "IRQ", "ISR", "JOR", "KWT", "LBN",
+        "OMN", "PSE", "QAT", "SAU", "SYR", "YEM", "YMD",
+    ],
 }
 
-# Rest of Europe must not include Ukraine (already a single). Filter below.
-REGION_ISO3: dict[str, list[str]] = {}
-REGION_ISO3.update(SINGLES)
-for name, isos in AGGREGATES.items():
-    REGION_ISO3[name] = [i for i in isos if i not in {"UKR_SKIP"}]
+REGION_NAMES: list[str] = list(REGION_ISO3.keys())
+assert len(REGION_NAMES) == 27, len(REGION_NAMES)
 
-# Ukraine is a single; drop from Rest of Europe if present
-REGION_ISO3["Rest of Europe"] = [
-    i for i in REGION_ISO3["Rest of Europe"] if i != "UKR"
-]
-
-# Stable order: singles then aggregates (28 names).
-REGION_NAMES: list[str] = list(SINGLES.keys()) + list(AGGREGATES.keys())
-assert len(REGION_NAMES) == 28, len(REGION_NAMES)
-
-# Tbl. D.9 named exporters (main-text wheat oligopolists). Others use Eq. D.10.
+# Tbl. D.9 named exporters. Others use Eq. D.10.
 D9_ALPHA = {
     "Argentina": 2.8,
     "Australia": 2.5,
     "Canada": 2.4,
-    "European Union": 2.2,
+    "EU-27": 2.2,
     "Kazakhstan": 2.6,
     "Russia": 3.0,
     "Ukraine": 2.7,

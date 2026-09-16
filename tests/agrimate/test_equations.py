@@ -19,7 +19,7 @@ from sheaf.agrimate.params import AgrimateParams
 def test_harvest_weights_d1a():
     w = harvest_weights(24)
     assert w.shape == (24,)
-    assert w[0] < w[-1]
+    assert w[0] > w[-1]  # near-term realised (author expected_harvests.jl)
     assert np.all(w >= 0) and np.all(w <= 1)
 
 

@@ -10,19 +10,27 @@ def clip01(x: np.ndarray | float) -> np.ndarray | float:
     return np.clip(x, 0.0, 1.0)
 
 
-def harvest_weights(n_year: int, steepness: float = 8.0) -> np.ndarray:
-    """Eq. D.1a logistic weights over the forthcoming year."""
-    n = np.arange(n_year, dtype=float)
-    mid = 0.5 * (n_year - 1)
-    w = 1.0 / (1.0 + np.exp(-steepness * (n - mid) / max(n_year, 1)))
-    w = (w - w.min()) / max(float(w.max() - w.min()), 1e-12)
-    return w
+def harvest_weights(n_year: int, n_for: int | None = None,
+                   tau_for_steps: float | None = None) -> np.ndarray:
+    """Eq. D.1 weights from Zenodo ``expected_harvests.jl``.
+
+    ``w = 1 / (1 + exp((n − N_for) / (0.17 τ_for)))`` on 1-based steps.
+    Near-term w ≈ 1 (realised harvest); far-term w ≈ 0 (baseline).
+    """
+    if n_for is None:
+        n_for = 3 * (n_year // 12)
+    if tau_for_steps is None:
+        tau_for_steps = 0.2 * n_year
+    n = np.arange(1, n_year + 1, dtype=float)
+    den = 0.17 * max(float(tau_for_steps), 1e-12)
+    return 1.0 / (1.0 + np.exp((n - n_for) / den))
 
 
 def expected_harvest(H_star_step: np.ndarray, H_realised: np.ndarray,
-                     n_year: int) -> np.ndarray:
-    """Eq. D.1. Second term uses realised H (not Ĥ; OCR D.1b is circular)."""
-    w = harvest_weights(n_year)
+                     n_year: int, n_for: int | None = None,
+                     tau_for_steps: float | None = None) -> np.ndarray:
+    """Eq. D.1. Second term is realised H (OCR D.1b is circular)."""
+    w = harvest_weights(n_year, n_for=n_for, tau_for_steps=tau_for_steps)
     return (1.0 - w) * H_star_step + w * H_realised
 
 

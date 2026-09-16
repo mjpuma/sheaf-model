@@ -46,12 +46,13 @@ def _psd_to_region(country_code: str, country_psd: str) -> str:
         return m[iso3]
     # fallback by name
     named = {
-        "United States": "USA", "Russia": "Russia", "European Union": "European Union",
+        "United States": "USA", "Russia": "Russia", "European Union": "EU-27",
         "Ukraine": "Ukraine", "Kazakhstan": "Kazakhstan", "Canada": "Canada",
         "Australia": "Australia", "Argentina": "Argentina", "Brazil": "Brazil",
-        "India": "India", "China": "China", "Egypt": "Egypt", "Mexico": "Mexico",
+        "India": "India", "China": "China", "Pakistan": "Pakistan",
+        "Turkey": "Turkey",
     }
-    return named.get(country_psd, "Rest of World")
+    return named.get(country_psd)
 
 
 @dataclass
@@ -81,10 +82,10 @@ class WheatData:
 
 
 def _income_ac(region: str) -> float:
-    if region == "Egypt":
-        return 0.34
-    high = {"USA", "Canada", "Australia", "European Union", "Rest of Europe", "Oceania"}
-    um = {"Russia", "Kazakhstan", "Brazil", "Mexico", "Argentina", "China", "Eastern Asia"}
+    # F.1 Egypt A_c=0.34 unused: Egypt is inside Northern Africa in C.1.
+    high = {"USA", "Canada", "Australia", "EU-27", "Rest of Europe", "Rest of Oceania"}
+    um = {"Russia", "Kazakhstan", "Brazil", "Argentina", "China", "Rest of Eastern Asia",
+          "Turkey"}
     if region in high:
         return 0.15
     if region in um:
@@ -101,12 +102,14 @@ def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
     notes = [
         "Baseline quantities: USDA PSD 2007–09 mean, not FAOSTAT Food Balances (E.1.1).",
         "Trade pattern: FAOSTAT E0 2006–07, rescaled to USDA exports.",
-        "A_d is not E.30; Egypt pinned to F.1 = 0.17.",
+        "C.1 wheat nodes: Zenodo 14022004 AgrimateRegionsWheat (27 names).",
+        "A_d is not E.30. F.1 Egypt 0.17 unused (Egypt is in Northern Africa).",
         "Starred XI*, XD*, C* used in inverse demand are per-step averages.",
     ]
     psd = load_psd_country("wheat")
     base = psd[(psd["year"] >= 2007) & (psd["year"] <= 2009)].copy()
     base["region"] = [_psd_to_region(c, n) for c, n in zip(base["country_code"], base["country_psd"])]
+    base = base.dropna(subset=["region"])
     g = base.groupby("region")[["production", "consumption", "exports", "imports", "ending_stocks"]].mean()
     H_ann = np.array([float(g["production"].get(r, 0.0)) for r in regions])
     C_ann = np.array([float(g["consumption"].get(r, 0.0)) for r in regions])
@@ -154,14 +157,15 @@ def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
     cal = load_harvest_calendar("wheat")
     cal_map = {str(r.country): (int(r.harvest_start_month), int(r.harvest_end_month))
                for r in cal.itertuples()}
-    sh = {"Argentina", "Australia", "Brazil", "Oceania", "Southern Africa", "South America"}
+    sh = {"Argentina", "Australia", "Brazil", "Rest of Oceania", "Southern Africa",
+          "Rest of South America"}
     profile = np.zeros((n_r, n_y))
     for i, r in enumerate(regions):
         if r in cal_map:
             a, b = cal_map[r]
         elif r == "USA":
             a, b = 6, 9
-        elif r == "European Union":
+        elif r == "EU-27":
             a, b = 7, 8
         elif r in sh:
             a, b = 11, 1
@@ -185,7 +189,7 @@ def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
     ])
     A_c = np.array([_income_ac(r) for r in regions])
     A_d = np.array([
-        0.17 if r == "Egypt" else float(np.clip(0.05 + 0.4 * (M_ann[i] / max(use_C[i], 1e-8)), 0.02, 0.9))
+        float(np.clip(0.05 + 0.4 * (M_ann[i] / max(use_C[i], 1e-8)), 0.02, 0.9))
         for i, r in enumerate(regions)
     ])
     alpha_d = np.array([
@@ -199,6 +203,7 @@ def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
     anomaly = np.zeros((n_r, len(years)))
     full = psd.copy()
     full["region"] = [_psd_to_region(c, n) for c, n in zip(full["country_code"], full["country_psd"])]
+    full = full.dropna(subset=["region"])
     prod = full.groupby(["region", "year"])["production"].sum().unstack("year")
     for i, r in enumerate(regions):
         if r not in prod.index:

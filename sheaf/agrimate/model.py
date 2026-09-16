@@ -192,7 +192,9 @@ class AgrimateSim:
                     x0_d[k] = frozen_d[r, tt]
                     x0_i[k] = frozen_i[r, tt]
                 dhat = expected_restriction(float(delta[r]), n_y)
-                Hhat = expected_harvest(H_star_roll[r], H_roll[r], n_y)
+                Hhat = expected_harvest(
+                    H_star_roll[r], H_roll[r], n_y,
+                    n_for=p.n_for, tau_for_steps=p.tau_for * n_y)
                 # D.7 international argument is world volume / world XI*
                 # (scalar year-average per step). Domestic uses own XD*.
                 sol = solve_supplier_plan(

@@ -16,9 +16,9 @@ to restore them.
 
 ## Data adaptations (not economic departures)
 
-A1 USDA PSD not FAOSTAT Food Balances; A2 E0 shares rescaled; A3 A_d not E.30
-(Egypt 0.17); A4 A_c income-group proxies; A5 restriction weights inside
-multi-country regions; A6 inverse-demand floor 0.05 (numerical).
+A1 USDA PSD not FAOSTAT Food Balances; A2 E0 shares rescaled; A3 A_d not E.30 (F.1 Egypt 0.17 unused: Egypt is inside Northern Africa);
+A4 A_c income-group proxies; A5 restriction weights inside multi-country
+regions; A6 inverse-demand floor 0.05 (numerical).
 
 ## G0-N numerical representation (not economic departures)
 
@@ -42,9 +42,15 @@ N4 **D.7 international scale.** Argument is `(XI_r + Q_{-r}) / XI*_world`
 with `XI*_world` the per-step year-average (wheat_data note; Agrimate
 `X*_I` scalar). Own-region `XI*_r` as denominator made Nash-scale `q ≫ 1`.
 
-Agrimate Tbl. D.8 `x_min = 0.2` as a *share of expected sales* and linear
-`p_sto` are **not** implemented here; they are G0-S source items. `ζ0`
-quadratic storage cost remains until G0-S.
+Agrimate Tbl. D.8 `x_min = 0.2` (quadratic penalty, ζ=0) and linear
+`p_sto = 0.1 / Nyear` are **implemented** (G0-S, from Zenodo 14022004).
+Author `ζ` is a penalty switch, not a storage-cost coefficient.
+
+S1 **C.1 count.** Paper said 28; author wheat list is 27. Host uses 27.
+S2 **D.8 vs executable.** Host wheat defaults follow author code (αI=3.2,
+τ=0.1, σ=2, εc=0.1, α_nash=3). Tbl. D.8 3.5/0.2 is `wheat_table_d8_defaults()`.
+S3 **β / τ_P** local price adjustment: present in author params, not wired.
+S4 **D.30a** purchaser upper tier (commodity vs compound good): not wired.
 
 ## Proposed extensions (not implemented)
 

@@ -47,16 +47,16 @@ L1–L8 (`GATE0_DEPARTURES.md`).
 applications. Do not accept them with inherited wheat knobs, and do not
 use them to wave Gate 0 through.
 
-Gate 0 is **not** currently at the publication bar. **G0-N is met**
-(supplier programme solvent on the reference run; see the sequence table).
-Pink-Sheet scoring stays G0-H. Next is **G0-S**. G1/G2 stay blocked.
+Gate 0 is **not** currently at the publication bar. **G0-N and G0-S are met**
+against retrieved author code. Next is **G0-U** (undisturbed dynamics).
+Pink-Sheet scoring stays G0-H. G1/G2 stay blocked.
 
 ## Sequence (do not skip)
 
 | Stage | Work | Exit |
 |---|---|---|
 | **G0-N** | Make the supplier programme numerically solvent on the 24-step wheat year. Record residual, runtime, and when the inverse-demand floor binds. | **Met on the 2003–11 reference run** (failed/fallback 0; residual 0; offer-floor 0; price index 0.0066–5.02 without a pin). Unconverged scipy 1043/6048 still feasible. Pink-Sheet scoring is G0-H. |
-| **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | Spec matrix updated; unresolved items labelled, not guessed. |
+| **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | **Met for retrieved code.** 27-region C.1 wheat list, author params, p_sto, x_min penalty, E.27, D.1 weights. Unresolved labelled (β, D.30a, FAOSTAT FB, data zip). |
 | **G0-U** | Undisturbed / spin-up / restriction-off vs harvest-only vs full AMIS. Accounting identities each step. | Documented seasonal baseline; material balance. |
 | **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | Written score in `diagnostics/gate0_agrimate/`. Comparable to Agrimate or an explicit, sourced shortfall. |
 | **G0-P** | Gate 0 note at publication standard (methods, data, hindcast, limits). No substitution, no government game. | You accept wheat Gate 0 as the SHEAF market paper / section. **This is the only gate that unlocks G1.** |
@@ -80,20 +80,17 @@ approval.
   on the old map) stay in `archive/` or uncommitted. Do not resurrect them
   as the market.
 
-## Now (G0-S)
+## Now (G0-U)
 
-1. **G0-N (done).** Always-feasible `(fd, fi)` plan, rolling forthcoming
-   year, Jacobi + D.22 others, D.7 world `XI*`. Reference run:
-   failed/fallback 0, residual 0, offer-floor 0, price index 0.0066–5.02
-   with no world-price pin. Details: `diagnostics/gate0_agrimate/validation.md`.
-2. **G0-S (next).** Source gaps that change economics: C.1 ISO list, D.8 vs
-   F.1, ζ0 vs linear `p_sto`, Tbl. D.8 `x_min` as a share of expected sales,
-   D.1b, E.27 support, FAOSTAT Food Balance vs USDA. Retrieve or confirm
-   absence of Zenodo 14022004 / 10688435. Unsent questions:
-   `GATE0_AGRIMATE_BRIEF.md`.
-3. Keep `python scripts/run_agrimate_wheat.py` as the only default run.
-4. Compare only under labelled configs: new host / Agrimate published /
-   `sheaf/legacy`.
+1. **G0-N (done).** Always-feasible supplier plan; reference run solvent.
+2. **G0-S (done against retrieved code).** Zenodo 14022004 in hand. Wheat
+   C.1 is 27 author names; params follow `AgrimateParams`; p_sto and x_min
+   penalty; E.27 and D.1 from author. Unresolved labelled in
+   `GATE0_AGRIMATE_BRIEF.md`. Data 10688435 not unpacked (G0-H).
+3. **G0-U (next).** Restriction-off / harvest-only / full AMIS; accounting
+   identities; seasonal baseline after spin-up. No figures until that
+   baseline is documented. No world-price pin.
+4. Keep `python scripts/run_agrimate_wheat.py` as the only default run.
 
 Reference command:
 

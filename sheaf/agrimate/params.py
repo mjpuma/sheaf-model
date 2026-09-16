@@ -1,4 +1,4 @@
-"""Wheat defaults from supplement Tbl. D.8 (conflicts with F.1 recorded)."""
+"""Wheat defaults from Zenodo 14022004 AgrimateParams (conflicts with Tbl. D.8 recorded)."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -10,21 +10,25 @@ from sheaf.calendar24 import STEPS_PER_YEAR
 class AgrimateParams:
     n_year: int = STEPS_PER_YEAR
     n_del: int = 2  # Ndel = Nyear/12
-    # Tbl. D.8
-    alpha_i: float = 3.5
-    alpha_nash: float = 3.5
+    # Author code defaults (AgrimateModel.jl). Tbl. D.8 has αI=3.5, τ=0.2.
+    alpha_i: float = 3.2
+    alpha_nash: float = 3.0
     lam_demand: float = 0.0
-    tau_storage: float = 0.2  # in years; code uses tau_storage * n_year steps
+    tau_storage: float = 0.1  # years; code uses tau_storage * n_year steps
     iota: float = 0.001
     rho_pref: float = 0.5
-    sigma_ces: float = 6.0
-    eps_c: float = 0.15
-    eps_d: float = 0.2
+    sigma_ces: float = 2.0
+    eps_c: float = 0.1
+    eps_d: float = 1.0 / 3.0
     delta_loss: float = 0.0
-    zeta0: float = 1.0  # wheat default missing from D.8; F text insensitive at 0.5/0
-    xmin: float = 1e-6  # unused as a sales bound (G0-N uses fd,fi ∈ [0,1])
-    # Tbl. D.8: τ_exp = 0.5 Nyear, rivals' expected international sales (D.22)
+    rho_interest: float = 0.0
+    p_sto_annual: float = 0.1  # Tbl. D.8; producer uses p_sto/Nyear per step
+    xmin_share: float = 0.2  # of total possible sales, spread over N×2 markets
+    zeta_penalty: float = 0.0  # 0 = xmin penalty on; 1 = off
     tau_exp: float = 0.5
+    n_for_months: int = 3
+    tau_for: float = 0.2
+    beta_loc: float = 0.05  # local price adjustment; not yet wired
     # inverse-demand argument floor (numerical; not Agrimate's world-price pin)
     demand_arg_floor: float = 0.05
     nash_max_iters: int = 20
@@ -35,12 +39,25 @@ class AgrimateParams:
     def tau_steps(self) -> float:
         return self.tau_storage * self.n_year
 
+    @property
+    def n_for(self) -> int:
+        return self.n_for_months * (self.n_year // 12)
+
+    @property
+    def p_sto_step(self) -> float:
+        return self.p_sto_annual / self.n_year
+
 
 def wheat_params() -> AgrimateParams:
-    """Tbl. D.8 wheat defaults."""
+    """Author-code wheat defaults (Zenodo 14022004)."""
     return AgrimateParams()
 
 
+def wheat_table_d8_defaults() -> AgrimateParams:
+    """Tbl. D.8 column (not the executable default): αI=3.5, τ=0.2 Nyear."""
+    return AgrimateParams(alpha_i=3.5, alpha_nash=3.5, tau_storage=0.2)
+
+
 def wheat_published_sensitivity_defaults() -> AgrimateParams:
-    """Tbl. F.1 column (not used). αI=3.2, τ=0.1 Nyear."""
+    """Tbl. F.1 / author code: αI=3.2, τ=0.1 Nyear."""
     return AgrimateParams(alpha_i=3.2, alpha_nash=3.2, tau_storage=0.1)

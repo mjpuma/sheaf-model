@@ -1,4 +1,8 @@
-"""Raised-cosine harvest profiles (supplement Eq. E.27–E.28)."""
+"""Raised-cosine harvest profiles (supplement Eq. E.27–E.28).
+
+Support matches Zenodo 14022004 ``raised_cosine_harvest_distribution``
+(duration_in_s=1.2), not the OCR reading |d−dmid|≤1.2 days.
+"""
 from __future__ import annotations
 
 import numpy as np
@@ -13,37 +17,35 @@ def _month_to_doy(month: int, end: bool = False) -> float:
     return float(mdays[: month - 1].sum()) + 1.0
 
 
-def raised_cosine_daily(start_month: int, end_month: int, n_days: int = 365
-                        ) -> np.ndarray:
-    """Eq. (E.27). Wraps if start_month > end_month.
+def raised_cosine_daily(start_month: int, end_month: int, n_days: int = 365,
+                        duration_in_s: float = 1.2) -> np.ndarray:
+    """Eq. (E.27) as in author ``harvest_distributions.py``.
 
-    Printed condition |d−dmid| ≤ 1.2 is dimensionally days and cannot be
-    right for a months-long harvest. Support used: |d−dmid| ≤ 0.6 Δd.
+    ``s = duration / duration_in_s``; support |d − dmid| ≤ s; fold a 3-year
+    window back onto the calendar year.
     """
-    if start_month <= end_month:
-        d_beg = _month_to_doy(start_month, end=False)
-        d_end = _month_to_doy(end_month, end=True)
-        span = d_end - d_beg + 1.0
-        mid = 0.5 * (d_beg + d_end)
-        d = np.arange(1, n_days + 1, dtype=float)
-        dist = np.abs(d - mid)
-    else:
-        d_beg = _month_to_doy(start_month, end=False)
-        d_end = _month_to_doy(end_month, end=True)
-        span = (n_days - d_beg + 1) + d_end
-        mid = (d_beg + span / 2.0 - 1.0) % n_days + 1.0
-        d = np.arange(1, n_days + 1, dtype=float)
-        dist = np.minimum(np.abs(d - mid), n_days - np.abs(d - mid))
-    h = np.zeros(n_days)
-    half = 0.6 * max(span, 1.0)
-    inside = dist <= half
-    h[inside] = (1.0 + np.cos(1.2 * dist[inside] / max(span, 1.0) * np.pi)) / max(
-        0.6 * span, 1e-9)
-    s = h.sum()
-    if s <= 0:
+    d_beg = _month_to_doy(start_month, end=False)
+    d_end = _month_to_doy(end_month, end=True)
+    start_day = d_beg
+    end_day = d_end
+    if end_day < start_day:
+        end_day += n_days
+    duration = end_day - start_day + 1.0
+    s = duration / max(duration_in_s, 1e-12)
+    days = np.arange(1, 3 * n_days + 1, dtype=float)
+    start_shift = start_day + n_days
+    end_shift = end_day + n_days
+    mid = 0.5 * (start_shift + end_shift)
+    dist = np.abs(days - mid)
+    h3 = np.zeros(3 * n_days)
+    inside = dist <= s
+    h3[inside] = 1.0 + np.cos((days[inside] - mid) / s * np.pi)
+    h = h3[:n_days] + h3[n_days:2 * n_days] + h3[2 * n_days:3 * n_days]
+    tot = h.sum()
+    if tot <= 0:
         h[:] = 1.0 / n_days
     else:
-        h /= s
+        h /= tot
     return h
 
 
