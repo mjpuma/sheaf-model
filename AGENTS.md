@@ -7,6 +7,7 @@ changing `sheaf/agrimate/`, Gate 0 docs, or the default entry point.
 - **Default run:** `PYTHONPATH=. python scripts/run_agrimate_validation.py`
 - **Solver smoke:** `PYTHONPATH=. python scripts/run_agrimate_wheat.py`
 - **Protocol:** [`diagnostics/GATE0_VALIDATION.md`](diagnostics/GATE0_VALIDATION.md)
+- **Prompt list (one per session):** [`diagnostics/GATE0_PROMPTS.md`](diagnostics/GATE0_PROMPTS.md)
 - **Legacy benchmark:** `python scripts/score_legacy_crop.py --crop wheat`
 - **Do not** silently restore legacy Gate 0 economics if the new host fails.
 - **Do not** implement substitution or the policy game inside the baseline.
