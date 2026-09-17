@@ -11,6 +11,7 @@ repeat it.
 
 Canonical contract: [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md).
 Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
+Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md).
 This file is the living queue.
 
 ## What “publishable Gate 0” means
@@ -101,6 +102,8 @@ approval.
    That is a G0-H score, not a reason to restore L1–L8. G0-U exit is the
    **workflow**, not publication-quality hindcast.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
+5. **Next session:** paste **P1** from [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
+   (accounting identities). One prompt per session after that.
 
 Reference command:
 
