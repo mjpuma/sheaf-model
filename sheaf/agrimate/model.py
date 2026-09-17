@@ -22,7 +22,7 @@ from .equations import (
 )
 from .optimize import nash_ibr, solve_supplier_plan
 from .params import AgrimateParams, wheat_params
-from .wheat_data import WheatData, prepare_wheat
+from .wheat_data import WheatData, prepare_wheat, international_destination_shares
 
 
 @dataclass
@@ -148,9 +148,12 @@ class AgrimateSim:
         S_c = np.maximum(d.Psi * n_y * d.C_star, 0.0)
         offer = np.ones(n_r)
         p_c = np.ones(n_r)
-        # delivery queue: length n_del, each slot (n_r, n_r) international + domestic vector
+        # delivery queue: Ndel steps of exporter-indexed XI and offer prices.
+        # Arrivals to consumers are T* destination shares of that XI (E.1),
+        # not the exporter's own lagged shipments.
         q_i = [np.zeros(n_r) for _ in range(p.n_del)]
         q_p = [np.ones(n_r) for _ in range(p.n_del)]
+        dest = international_destination_shares(d.T_star)
 
         price_index = np.ones(T)
         S_p_path = np.zeros((n_r, T))
@@ -252,27 +255,27 @@ class AgrimateSim:
             H_path[:, t] = H
             realized_oth = np.maximum(float(sold_i.sum()) - sold_i, 0.0)
             q_oth = (1.0 - w_exp) * q_oth + w_exp * realized_oth
-            # 6 delivery: push today's international sales, pop lag
-            ship = sold_i.copy()
-            ship_p = offer.copy()
-            q_i.append(ship)
-            q_p.append(ship_p)
-            arrive = q_i.pop(0)
-            arrive_p = q_p.pop(0)
-            # 7–9 consume / account / procure
-            world_vol = float(np.sum(arrive))
+            # 6 delivery: queue exporter XI; world price on that lag; consumers
+            # receive T* destination allocation of the same lag (E.1), not own XI.
+            q_i.append(sold_i.copy())
+            q_p.append(offer.copy())
+            xi_lag = q_i.pop(0)
+            p_lag = q_p.pop(0)
+            world_vol = float(np.sum(xi_lag))
             if world_vol > 1e-12:
-                p_w = float(np.dot(arrive, arrive_p) / world_vol)
+                p_w = float(np.dot(xi_lag, p_lag) / world_vol)
             else:
                 p_w = float(price_index[t - 1] if t else 1.0)
             price_index[t] = p_w
+            arrive = dest.T @ xi_lag
             for s in range(n_r):
                 prices = np.maximum(offer * (1.0 + 0.0 * d.nu[s]), 1e-8)
                 bud = max(d.A_d[s] * d.C_star[s] * n_y * max(p_w, 1e-8) / n_y, 1e-8)
-                # extra storage demand
                 S_star = d.Psi[s] * n_y * d.C_star[s]
                 extra = extra_storage_demand(S_c[s], S_star, p.tau_steps)
-                q = purchaser_demand(prices, bud + max(extra, 0.0) * p_w, p.sigma_ces, shares[:, s])
+                # D.30 CES origin request is computed; quantity delivered is T*
+                # until D.30a/CES rationing is wired (P4). Not discarded as inflow.
+                _ = purchaser_demand(prices, bud + max(extra, 0.0) * p_w, p.sigma_ces, shares[:, s])
                 inflow = float(arrive[s]) + float(sold_d[s])
                 p_c[s] = consumer_price_mix(p_w, inflow, p_c[s], S_c[s])
                 cons = consumption_ces(p_c[s], d.A_c[s], p.eps_c, d.C_star[s])

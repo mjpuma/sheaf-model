@@ -5,7 +5,7 @@ Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
 [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md). Protocol:
 [`GATE0_VALIDATION.md`](GATE0_VALIDATION.md).
 
-**Now:** paste **P2**. Everything above P2 is done. Everything below P2
+**Now:** paste **P3**. Everything above P3 is done. Everything below P3
 is later.
 
 ## Shared preamble (prepend to every prompt)
@@ -43,8 +43,8 @@ diagnostics/gate0_agrimate/. One prompt, one PR-sized change.
 | P0b | G0-S author-code alignment (27 regions, p_sto, x_min, E.27, D.1) | **done** |
 | P0c | Three-scenario workflow + AMIS column fix | **done** |
 | P1 | Accounting identities each step | **done** |
-| **P2** | Diagnose undisturbed drift (do not pin) | **next** |
-| P3 | Wire or label β/τ_P from author code | queued |
+| P2 | Diagnose undisturbed drift (do not pin) | **done** |
+| **P3** | Wire or label β/τ_P from author code | **next** |
 | P4 | Wire or label D.30a upper-tier purchaser | queued |
 | P5 | Characterize unconverged scipy (do not paper over) | queued |
 | P6 | Run OAT sensitivity; do not retune | queued |

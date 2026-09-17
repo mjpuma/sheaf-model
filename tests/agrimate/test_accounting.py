@@ -62,6 +62,29 @@ def test_2006_harvest_amis_path_identities():
     assert report.ok, report_markdown_head(report)
 
 
+def test_international_sales_are_not_echoed_to_the_exporter():
+    """P2: arrive used to be own lagged XI. T* must send grain to importers."""
+    from sheaf.agrimate.wheat_data import international_destination_shares
+    params = wheat_params()
+    data = prepare_wheat(start_year=2006, end_year=2006, params=params)
+    dest = international_destination_shares(data.T_star)
+    assert dest.shape == (27, 27)
+    assert np.allclose(dest.sum(axis=1), 1.0)
+    res = run_agrimate(
+        data=data, params=params,
+        use_anomalies=False, use_restrictions=False,
+        start_year=2006, end_year=2006,
+    )
+    i_us = data.regions.index("USA")
+    i_ea = data.regions.index("Eastern Africa")
+    xi, sd, inf = res.xi_ship, res.sold_domestic, res.inflow
+    echo = np.max(np.abs(inf[i_us, 2:] - sd[i_us, 2:] - xi[i_us, :-2]))
+    assert echo > 0.1, "USA inflow still equals sold_d + own lagged XI"
+    assert float(inf[i_ea].sum()) > float(sd[i_ea].sum()) + 0.5
+    report = check_result(res, data, params)
+    assert report.ok, report_markdown_head(report)
+
+
 def report_markdown_head(report) -> str:
     if not report.violations:
         return "ok"

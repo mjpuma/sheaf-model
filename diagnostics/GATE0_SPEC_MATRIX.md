@@ -29,5 +29,6 @@ bit-reproduction. Data 10688435 not unpacked.
 | OAT sensitivity | diagnostic around author params | n/a | `oat_settings()` | αI=3.2 default; Bai 10 listed, not adopted |
 | Exporter pulse grid | prescribed Δ, G0-H/P | n/a | `restriction_pulse` | not G2 |
 | Step accounting | D.6 / D.3 / consumer clip | n/a | `accounting.py` | `test_2006_harvest_amis_path_identities` |
+| International delivery | E.1 T* to importers, Ndel lag | own-XI echo (bug) | `international_destination_shares` | `test_international_sales_are_not_echoed_to_the_exporter` |
 
 Unresolved (labelled, not guessed): β/τ_P local price; D.30a upper-tier purchaser; FAOSTAT FB vs USDA; paper 28 vs code 27; D.8 αI=3.5 vs code 3.2.

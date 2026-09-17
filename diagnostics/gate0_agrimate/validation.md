@@ -25,9 +25,9 @@ This run is G0: single crop, AMIS prescribed. Do not retune L1–L8.
 
 | scenario | failed | fallback | unconverged | floor | residual | runtime_s | pidx min/max |
 |---|---:|---:|---:|---:|---:|---:|---|
-| undisturbed | 0 | 0 | 1583 | 0 | 0.000e+00 | 14.1 | 0.0145 / 3.1681 |
-| harvest | 0 | 0 | 1628 | 0 | 0.000e+00 | 19.5 | 0.0105 / 3.1681 |
-| harvest_amis | 0 | 0 | 1743 | 0 | 0.000e+00 | 19.8 | 0.0113 / 3.1681 |
+| undisturbed | 0 | 0 | 1583 | 0 | 0.000e+00 | 14.2 | 0.0145 / 3.1681 |
+| harvest | 0 | 0 | 1628 | 0 | 0.000e+00 | 19.1 | 0.0105 / 3.1681 |
+| harvest_amis | 0 | 0 | 1743 | 0 | 0.000e+00 | 19.6 | 0.0113 / 3.1681 |
 
 ## Prices vs Pink Sheet (2006–11)
 
@@ -51,17 +51,17 @@ because FAOSTAT FB is not in this repository).
 | scenario | field | corr | RMSE | mean model | mean USDA |
 |---|---|---:|---:|---:|---:|
 | undisturbed | production | 0.000 | 38.68 | 542.25 | 519.40 |
-| undisturbed | consumption | -0.576 | 35.65 | 503.38 | 520.12 |
-| undisturbed | ending_stocks | 0.892 | 302.35 | 455.88 | 157.43 |
-| undisturbed | stock_to_use | 0.804 | 0.62 | 0.91 | 0.30 |
+| undisturbed | consumption | -0.466 | 48.00 | 538.80 | 520.12 |
+| undisturbed | ending_stocks | 0.737 | 48.06 | 200.88 | 157.43 |
+| undisturbed | stock_to_use | 0.584 | 0.09 | 0.38 | 0.30 |
 | harvest | production | 0.795 | 29.55 | 541.54 | 519.40 |
-| harvest | consumption | -0.744 | 47.63 | 488.53 | 520.12 |
-| harvest | ending_stocks | 0.927 | 332.23 | 479.85 | 157.43 |
-| harvest | stock_to_use | 0.827 | 0.72 | 0.99 | 0.30 |
+| harvest | consumption | 0.204 | 39.31 | 531.38 | 520.12 |
+| harvest | ending_stocks | 0.834 | 90.26 | 245.64 | 157.43 |
+| harvest | stock_to_use | 0.520 | 0.17 | 0.46 | 0.30 |
 | harvest_amis | production | 0.795 | 29.55 | 541.54 | 519.40 |
-| harvest_amis | consumption | -0.584 | 47.08 | 487.49 | 520.12 |
-| harvest_amis | ending_stocks | 0.936 | 342.29 | 489.97 | 157.43 |
-| harvest_amis | stock_to_use | 0.821 | 0.74 | 1.01 | 0.30 |
+| harvest_amis | consumption | 0.171 | 40.73 | 531.64 | 520.12 |
+| harvest_amis | ending_stocks | 0.699 | 94.68 | 248.09 | 157.43 |
+| harvest_amis | stock_to_use | 0.374 | 0.18 | 0.47 | 0.30 |
 
 ## G0-U undisturbed dynamics (after 2003–05 spin-up)
 
