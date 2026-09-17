@@ -49,7 +49,25 @@ Author `ζ` is a penalty switch, not a storage-cost coefficient.
 S1 **C.1 count.** Paper said 28; author wheat list is 27. Host uses 27.
 S2 **D.8 vs executable.** Host wheat defaults follow author code (αI=3.2,
 τ=0.1, σ=2, εc=0.1, α_nash=3). Tbl. D.8 3.5/0.2 is `wheat_table_d8_defaults()`.
-S3 **β / τ_P** local price adjustment: present in author params, not wired.
+S3 **β / τ_P** local price adjustment: **unwired, matching the wheat
+executable.** Author `AgrimateParams` has `β=0.05` and `τ_P=0.2` yr
+(`AgrimateModel.jl`). The update is
+`P_loc_tgt = P_loc · (D_tot / X̂)^β` (or 1 if `X̂ < ι X_avg` or baseline
+sales ≤ that cutoff), then
+`P_loc ← (1/τ_P) P_loc_tgt + (1 − 1/τ_P) P_loc` with `τ_P` in steps
+(`τ_P * N_year`). That combined factor is computed in `sales_step!` and
+written to output. It does **not** enter the wheat path:
+`two_markets=true` and `pl_opt=false` are the struct defaults and are
+never assigned in the retrieved tree; the two-market optimizer is called
+with `P_loc_domestic = 1`, `P_loc_foreign = 1` (passing
+`price_adjustment_factor_*` is commented out); domestic/foreign targets
+are hardcoded to 1, so those factors remain 1 from initialization; offer
+prices on `two_markets` use `expected_price_foreign/domestic` (× those
+unit factors). `pl_opt` would inject combined `P_loc` only on the
+non-`two_markets` branches. Host keeps `beta_loc=0.05`, `tau_p=0.2` as
+unused fields. Not a guessed local-price rule. Not a change to αI.
+Classification **H** (wheat path already pins P_loc = 1). Confidence
+95–100% (direct inspection of Zenodo 14022004 `producer.jl` / params).
 S4 **D.30a** purchaser upper tier (commodity vs compound good): not wired.
 
 ## Coding fix (not an economic departure)

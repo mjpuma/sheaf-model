@@ -28,7 +28,9 @@ class AgrimateParams:
     tau_exp: float = 0.5
     n_for_months: int = 3
     tau_for: float = 0.2
-    beta_loc: float = 0.05  # local price adjustment; not yet wired
+    # Author β, τ_P. Wheat two_markets path does not use them (P3 / S3).
+    beta_loc: float = 0.05
+    tau_p: float = 0.2  # years; author converts τ_P * N_year when used
     # inverse-demand argument floor (numerical; not Agrimate's world-price pin)
     demand_arg_floor: float = 0.05
     nash_max_iters: int = 20
