@@ -28,5 +28,6 @@ bit-reproduction. Data 10688435 not unpacked.
 | Three-scenario validation | Agrimate Fig. 4 design; Bai/Wada/Puma copy workflow | Pink-Sheet only | `validation.py` / `run_agrimate_validation.py` | prices **and** USDA supply/stocks |
 | OAT sensitivity | diagnostic around author params | n/a | `oat_settings()` | αI=3.2 default; Bai 10 listed, not adopted |
 | Exporter pulse grid | prescribed Δ, G0-H/P | n/a | `restriction_pulse` | not G2 |
+| Step accounting | D.6 / D.3 / consumer clip | n/a | `accounting.py` | `test_2006_harvest_amis_path_identities` |
 
 Unresolved (labelled, not guessed): β/τ_P local price; D.30a upper-tier purchaser; FAOSTAT FB vs USDA; paper 28 vs code 27; D.8 αI=3.5 vs code 3.2.
