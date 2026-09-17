@@ -1,0 +1,37 @@
+\section{Mathematics}
+\label{sec:math}
+
+The market loop is Gate~0 and is not restated (white paper \S3). This
+layer does not rewrite \texttt{\_simulate\_window}. It is two-pass: simulate
+open (\(\tau\equiv 0\)), then impose cuts, then simulate closed.
+
+Absolute stock floors fire every hungry season even in climatology --- the
+harvest calendar already drives the trough below Gate~0 competitive safety
+(\(\mathrm{stu\_target}\times C_{\mathrm{ann}}\)). The crisis object on
+this host is the climatology-relative ratio. For exporter \(i\), shock year
+\(T\),
+\begin{equation}
+\label{eq:tau}
+\tau_{i,t}
+=
+\begin{cases}
+\tau^{\mathrm{on}} & t\in T \text{ and } S_{i,t}/S^{\mathrm{calm}}_{i,t} < r, \\
+0 & \text{otherwise.}
+\end{cases}
+\end{equation}
+\(\tau^{\mathrm{on}}=0.6\) and \(r=0.85\) are illustrative types.
+\(S^{\mathrm{calm}}\) is the same model with climatology harvest and
+\(\tau\equiv 0\). Players share those types; only the shocked exporter
+gets the synthetic harvest multiplier.
+
+Nested year-open-loop grid, for the record (not the headline). For the
+shocked exporter, over \(\tau\in\{0,0.3,0.6,0.9\}\),
+\begin{equation}
+\label{eq:W}
+W(\tau)=\sum_{t\in T} p_t X_{i,t}
+\;-\;
+\alpha\max\bigl(0,\, s^{\mathrm{gov}}_i-\overline{S}_{i,T}\bigr)^2.
+\end{equation}
+Calm \(\Rightarrow \tau^\star=0\); shock \(\Rightarrow \tau^\star=0.6\).
+That intensity is what \(\tau^{\mathrm{on}}\) copies. World \(p\) does not
+enter the penalty.

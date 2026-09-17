@@ -1,0 +1,368 @@
+\section{The two-week market}
+\label{sec:dynamics}
+
+Each step advances the state
+\(\bigl(p_{t-1},\,q_{i,t-1},\,S_{i,t}\bigr)\) --- last period's world
+price, each exporter's offer price, and carry-in stocks --- given that
+period's harvest, policy, and demand shifters. The order of operations is
+fixed and there is no optimisation nested inside the step:
+
+\begin{enumerate}
+\item \textbf{Demand.} Each country forms desired domestic use. Food and
+      feed demand is price-responsive with a short-run elasticity; the
+      industrial (ethanol) component is not. Demand responds to the
+      \emph{previous} period's world price, and there is no separate
+      domestic price, so an export ban does not lower consumer prices in
+      the restricting country.
+\item \textbf{Precautionary cover.} Each country targets stocks sufficient
+      to cover consumption until the next harvest, plus a safety margin.
+      This is a target-stock rule, not an intertemporal arbitrage
+      condition.
+\item \textbf{Export supply and import demand.} Surplus above desired use
+      and the cover target is offered for export and then reduced by the
+      prevailing AMIS restriction. Importers post a food-deficit
+      requirement plus partial rebuilding toward their own cover target.
+\item \textbf{Bilateral allocation.} Trade follows the observed FAOSTAT
+      partner structure, reweighted toward cheaper offer prices, with a
+      residual pool when preferred links cannot clear.
+\item \textbf{Stock accounting.} Consumption and shipments are settled;
+      stocks above physical capacity are drawn down.
+\item \textbf{Offer-price adjustment.} Exporters raise offer prices when
+      their supply clears, cut them when it does not, and mark up when
+      importers' preferred suppliers are restricted.
+\item \textbf{World price.} The world price moves toward a target that
+      combines the trade-weighted offer price with a scarcity term
+      measured against an unshocked counterfactual, and is then smoothed.
+\end{enumerate}
+
+Three comparisons are worth stating at the outset, because the sitting
+raised each. Agrimate solves per-region constrained programmes at every
+step \citep{kuhla2025}; Gate~0 does not. Competitive storage in the
+Wright--Williams tradition holds grain when the expected price increase
+exceeds the cost of carry \citep{wright1982,williams1991}; Gate~0's cover
+rule contains no such arbitrage condition. Spatial price equilibrium
+determines price as the multiplier on regional balance
+\citep{samuelson1952,takayama1971}; Gate~0 determines it by an explicit
+adjustment rule.
+
+The \emph{twin} is a parallel run of the identical mechanism under
+climatological harvest, mean food and feed demand, no industrial excess,
+and no restrictions. Its price path is not scored. It supplies the
+counterfactual against which scarcity is measured, so ``tight'' means
+tight relative to a normal year rather than relative to an arbitrary
+constant.
+
+\flowfig{01_current_fortnight.pdf}{Order of operations within one
+two-week step. Each box is evaluated once; no inner solve.
+\label{fig:g0}}
+
+\subsection{Demand and precautionary cover}
+
+Desired domestic use is isoelastic in the lagged world price for the
+flexible (food and feed) component and inelastic for the industrial
+component:
+\begin{equation}
+d_{i,t}=C^{\mathrm{flex}}_{i,t}\left(\frac{p_{t-1}}{p_0}\right)^{\varepsilon}
++C^{\mathrm{ind}}_{i,t},
+\label{eq:demand}
+\end{equation}
+where \(d_{i,t}\) is desired demand of country \(i\) in period \(t\)
+(MMT per step), \(C^{\mathrm{flex}}_{i,t}\) is food-and-feed demand
+evaluated at the reference price (MMT per step), \(C^{\mathrm{ind}}_{i,t}\)
+is price-inelastic industrial use (MMT per step; the US maize ethanol
+residual, zero elsewhere), \(p_{t-1}\) is the previous period's world
+price (2010 \$/t), \(p_0\) is the reference price (2010 \$/t), and
+\(\varepsilon<0\) is the short-run own-price elasticity of demand.
+
+Expected harvest blends the current realisation with climatology:
+\begin{equation}
+H^{\mathrm{exp}}_{i,t}=\phi\,H_{i,t}+(1-\phi)\,H^{\mathrm{seas}}_{i,t},
+\label{eq:hexp}
+\end{equation}
+where \(H^{\mathrm{exp}}_{i,t}\) is expected harvest (MMT per step),
+\(H_{i,t}\) is realised harvest (MMT per step), \(H^{\mathrm{seas}}_{i,t}\)
+is the climatological harvest path (MMT per step), and
+\(\phi\in[0,1]\) is the weight on current information. Expectations are
+adaptive in this single sense; there is no multi-year forecast.
+
+The stock target is lean-season cover plus a safety margin:
+\begin{equation}
+T_{i,t}=L_{i,t}+s_i,
+\qquad
+s_i=\sigma^{\mathrm{stu}}\,C^{\mathrm{ann}}_i,
+\label{eq:target}
+\end{equation}
+where \(T_{i,t}\) is target stock (MMT), \(L_{i,t}\) is the shortfall of
+expected harvest against consumption over the interval to the next world
+harvest pulse (MMT), \(s_i\) is the safety stock (MMT),
+\(\sigma^{\mathrm{stu}}\) is the target stock-to-use ratio (years of use),
+and \(C^{\mathrm{ann}}_i\) is annual domestic use (MMT per year). The
+horizon is defined by the arrival of a fixed fraction of the annual
+\emph{world} harvest, so it is common across countries.
+
+\subsection{Export supply, import demand, and allocation}
+
+Export supply is residual surplus, net of policy:
+\begin{equation}
+O_{i,t}=\max\bigl(0,\;\mathrm{avail}_{i,t}-d_{i,t}-T_{i,t}\bigr)\,(1-\tau_{i,t}),
+\label{eq:offers}
+\end{equation}
+where \(O_{i,t}\) is export supply offered (MMT per step),
+\(\mathrm{avail}_{i,t}=S_{i,t}+H_{i,t}\) is grain available (MMT),
+\(S_{i,t}\) is carry-in stock (MMT), and \(\tau_{i,t}\in[0,1]\) is the
+export restriction intensity from the AMIS policy record (a ban maps to
+\(\approx 0.95\), an export tax to \(\approx 0.50\)).
+
+Import demand combines an immediate deficit with partial rebuilding:
+\begin{equation}
+D_{i,t}=\underbrace{\max\bigl(0,\,d_{i,t}-\mathrm{avail}_{i,t}\bigr)}_{\text{consumption deficit}}
++\lambda\,\max\bigl(0,\,T_{i,t}-\max(0,\mathrm{avail}_{i,t}-d_{i,t})\bigr),
+\label{eq:importdemand}
+\end{equation}
+where \(D_{i,t}\) is import demand (MMT per step) and \(\lambda\) is the
+partial-adjustment rate toward the stock target (per step). Equation
+\eqref{eq:importdemand} is a stock-adjustment specification, not a
+solution to a dynamic programme.
+
+Bilateral allocation is Armington on a prescribed network
+\citep{armington1969}. Importer source shares are the CES
+expenditure-minimising mix over origins,
+\begin{equation}
+\tilde S_{ij,t}\;\propto\;S_{ij}\left(\frac{p_0}{q_{i,t-1}}\right)^{\gamma},
+\qquad \sum_i \tilde S_{ij,t}=1,
+\label{eq:reweight}
+\end{equation}
+where \(S_{ij}\) is the observed FAOSTAT source share of importer \(j\)
+from exporter \(i\) (dimensionless; note \(S_{ij}\) is a share, whereas
+\(S_{i,t}\) is a stock), \(q_{i,t-1}\) is exporter \(i\)'s lagged offer
+price (2010 \$/t), and \(\gamma>0\) is the elasticity of substitution
+across origins. An earlier draft reweighted destination shares
+\(A_{ij}\) by the same factor and renormalised each exporter's row.
+That map is the identity: a row-constant cancels, so cheaper origins
+never gained share. Equation \eqref{eq:reweight} is the importer-side
+object that actually responds to relative offer prices, and is the
+first-order condition of a CES expenditure-minimisation problem. Shipments
+on each link are the short side,
+\begin{equation}
+X_{ij,t}=\min\bigl(O_{i,t}A_{ij},\;\tilde S_{ij,t}D_{j,t}\bigr),
+\label{eq:clear}
+\end{equation}
+where \(X_{ij,t}\) is the shipment from \(i\) to \(j\) (MMT per step) and
+\(A_{ij}\) is the observed destination share of exporter \(i\) to importer
+\(j\) (dimensionless). Unmatched supply then meets a fraction \(\nu\) of
+unmatched demand through a residual pool. Quantities therefore come from
+\eqref{eq:offers}--\eqref{eq:importdemand}; the trade matrix supplies only
+the pattern of partners.
+
+\subsection{Stock accounting and capacity}
+
+Realised consumption is bounded by post-trade availability:
+\begin{equation}
+C^{\mathrm{used}}_{i,t}=\min\Bigl(d_{i,t},\;
+\max\bigl(0,\,\mathrm{avail}_{i,t}-X^{\mathrm{out}}_{i,t}+X^{\mathrm{in}}_{i,t}\bigr)\Bigr),
+\label{eq:consumption}
+\end{equation}
+where \(C^{\mathrm{used}}_{i,t}\) is realised consumption (MMT per step),
+\(X^{\mathrm{out}}_{i,t}=\sum_j X_{ij,t}\) is total exports and
+\(X^{\mathrm{in}}_{i,t}=\sum_j X_{ji,t}\) total imports (MMT per step).
+Closing stock is the residual, less any drawdown of grain held above
+physical capacity:
+\begin{equation}
+S_{i,t+1}=S^{-}_{i,t+1}-\lambda_W\max\bigl(0,\,S^{-}_{i,t+1}-W_{i,t}\bigr),
+\qquad
+S^{-}_{i,t+1}=\max\bigl(0,\,\mathrm{avail}_{i,t}-X^{\mathrm{out}}_{i,t}
++X^{\mathrm{in}}_{i,t}-C^{\mathrm{used}}_{i,t}\bigr),
+\label{eq:stocks}
+\end{equation}
+where \(S_{i,t+1}\) is closing stock (MMT), \(S^{-}_{i,t+1}\) is closing
+stock before the capacity adjustment (MMT), \(W_{i,t}\) is storage
+capacity (MMT), and \(\lambda_W\) is the rate at which excess above
+capacity is drawn down (per step). This term removes grain physically; it
+is not a pecuniary cost of carry, and no interest rate appears anywhere in
+\eqref{eq:stocks}. Capacity is
+\begin{equation}
+W_{i,t}=\sigma^{\max}C^{\mathrm{ann}}_i
++\frac{n^{\mathrm{pipe}}}{24}\,C^{\mathrm{ann}}_i
++\mathbf{1}\{n^{\mathrm{pipe}}>0\}\,H_{i,t},
+\label{eq:capacity}
+\end{equation}
+where \(\sigma^{\max}\) is the maximum stock-to-use ratio (years of use)
+and \(n^{\mathrm{pipe}}\) is working inventory in steps (12 for wheat and
+maize, i.e.\ six months; 0 for rice, which harvests year-round).
+
+\subsection{Offer prices}
+
+Exporters adjust offer prices toward market conditions:
+\begin{equation}
+q_{i,t}=(1-\beta)\,q_{i,t-1}
+\exp\Bigl(\alpha\bigl(f_{i,t}-\theta\bigr)+\alpha_r\,b_t\,\mathbf{1}\{O_{i,t}>0\}\Bigr)
++\beta\,p_{t-1},
+\label{eq:ask}
+\end{equation}
+where \(q_{i,t}\) is exporter \(i\)'s offer price (2010 \$/t),
+\(f_{i,t}=X^{\mathrm{out}}_{i,t}/O_{i,t}\) is the fill rate
+(dimensionless), \(\theta\) is the fill rate at which the price is left
+unchanged, \(\alpha>0\) is the adjustment gain (per step), \(b_t\) is the
+share of world import demand whose preferred suppliers are restricted
+(dimensionless), \(\alpha_r\ge 0\) is the markup unrestricted exporters
+apply when rivals are blocked, and \(\beta\in[0,1]\) is the weight pulling
+offer prices toward the world price. Offer prices are bounded to
+\([0.45p_0,\,2.8p_0]\).
+
+Equation \eqref{eq:ask} is an adjustment rule: excess demand raises the
+price, excess supply lowers it. It is not the first-order condition of an
+exporter's profit-maximisation problem, and \(\alpha,\theta,\beta\) are
+not structural markups.
+
+\subsection{The world price}
+
+Define market-accessible stocks --- total stocks net of lean-season
+requirements and of grain sequestered behind restrictions:
+\begin{equation}
+\mathcal{F}_t=\sum_i S_{i,t+1}-\sum_i L_{i,t}
+-\sum_i \tau_{i,t}\max\bigl(0,\,S_{i,t+1}-T_{i,t}\bigr),
+\label{eq:free}
+\end{equation}
+where \(\mathcal{F}_t\) is market-accessible stock (MMT). The third term
+matters: without it, a restriction would register as abundance. Let
+\(\mathcal{F}^{\mathrm{twin}}_t\) be the same quantity in the twin, and
+define the scarcity ratio
+\begin{equation}
+r_t=\frac{\mathcal{F}^{\mathrm{twin}}_t+f_t}{\mathcal{F}_t+f_t},
+\qquad
+f_t=0.05\sum_i s_i+\max\bigl(0,\,-\min(\mathcal{F}_t,\mathcal{F}^{\mathrm{twin}}_t)\bigr),
+\label{eq:ratio}
+\end{equation}
+where \(f_t\) is a regulariser (MMT) keeping \eqref{eq:ratio} finite and
+positive. It is worth being explicit that \(f_t\) is neither small nor
+constant, because it changes how \eqref{eq:ratio} should be read. Its first
+term is 5\% of world safety stock: 6.4~MMT for wheat, 6.5 for maize, 3.9
+for rice, which is 4.8\%, 3.1\% and 10.3\% of mean accessible stock in the
+scored window. Against the unregularised ratio
+\(\mathcal{F}^{\mathrm{twin}}_t/\mathcal{F}_t\) it biases \(r_t\) by 2.2\%
+on average for wheat, 3.4\% for maize and 35.4\% for rice. The second term
+exists because \(\mathcal{F}_t\) as defined in \eqref{eq:free} can be
+negative --- the world can hold less than its own lean-season requirement
+--- which happens at 1 of 144 steps for maize and 58 of 144 for rice. Where
+that occurs the unregularised ratio is meaningless, so for rice in
+particular \(r_t\) is materially a regularised quantity rather than a ratio
+of stocks. The price target and its updating are
+\begin{align}
+p^{\mathrm{scar}}_t&=p_0\,r_t^{\eta}\bigl(1+\kappa_u\Delta u_t+\kappa_b b_t\bigr),
+\label{eq:pscar}\\[2pt]
+p^{\star}_t&=\omega\,p^{\mathrm{tr}}_t+(1-\omega)\,p^{\mathrm{scar}}_t,
+\label{eq:pstar}\\[2pt]
+p_t&=\rho\,p_{t-1}+(1-\rho)\,p^{\star}_t,
+\label{eq:pupdate}
+\end{align}
+where \(p^{\mathrm{scar}}_t\) is the scarcity price (2010 \$/t),
+\(\eta>0\) is the elasticity of price with respect to the inverse of
+accessible stocks, \(\kappa_u,\kappa_b\ge 0\) weight unmet demand and
+restriction blockage, \(p^{\mathrm{tr}}_t\) is the shipment-weighted mean
+offer price (2010 \$/t), \(\omega\in[0,1]\) is the weight on realised trade
+prices, \(p^{\star}_t\) is the within-period price target (2010 \$/t), and
+\(\rho\in[0,1]\) is the smoothing parameter. The world price is bounded to
+\([60,1200]\) \$/t.
+
+Two details of \eqref{eq:pscar}--\eqref{eq:pstar} are easy to state
+imprecisely and are worth pinning down. Before them, one omission. The
+trade-weighted offer price is undefined when nothing ships, and the
+implementation resolves that by falling back to the previous world price,
+\begin{equation}
+p^{\mathrm{tr}}_t=
+\begin{cases}
+\dfrac{\sum_i q_{i,t}\,x_{i,t}}{\sum_i x_{i,t}}, & \sum_i x_{i,t}>\epsilon,\\[2ex]
+p_{t-1}, & \text{otherwise,}
+\end{cases}
+\label{eq:ptrade}
+\end{equation}
+where \(x_{i,t}\) is the quantity country \(i\) actually ships in period
+\(t\) (MMT) and \(\epsilon=10^{-12}\) MMT. This is not a removable
+convention. As world shipments vanish the weighted mean tends to the offer
+price of whichever exporter still ships, which need not be \(p_{t-1}\), so
+\eqref{eq:ptrade} is genuinely discontinuous at the threshold: perturbing
+the price across it moves \(p^{\mathrm{tr}}_t\) by up to 12 \$/t. The
+threshold is not crossed on the scored paths, but it is reachable under
+price perturbation at a handful of steps, all of them where accessible
+stock is small or negative.
+
+Now the two details. First, the unmet-demand term is
+one-sided,
+\begin{equation}
+\Delta u_t=\max\bigl(0,\,u_t-u^{\mathrm{twin}}_t\bigr),
+\label{eq:unmet}
+\end{equation}
+where \(u_t\) is the share of world import demand left unmet and
+\(u^{\mathrm{twin}}_t\) its value in the twin. Unmet demand below the twin
+therefore cannot lower the price, whereas unmet demand above it raises the
+price. The truncation binds: \(u_t<u^{\mathrm{twin}}_t\) at 92 of 144 steps
+for wheat, 59 for maize and 100 for rice, so this is the usual case rather
+than an edge case. Second, the offer prices in \eqref{eq:ptrade} are this
+period's \(q_{i,t}\) from \eqref{eq:ask}, not the lagged \(q_{i,t-1}\) that
+entered the allocation in \eqref{eq:reweight}. Offer prices are therefore updated twice within one
+period's causal chain: once to allocate trade, once to price it.
+
+Equation \eqref{eq:pscar} is inverse-demand in form: price rises as
+accessible stocks fall relative to normal, with elasticity \(\eta\). The
+exponent is symmetric, so a surplus lowers the price and food and feed
+demand absorbs it; muting the abundance side left gluts sitting in store.
+Equations \eqref{eq:pstar}--\eqref{eq:pupdate} then mix that term with
+realised trade prices and smooth the result, so the world price is not
+required to lie on the inverse-demand schedule within the period. That is
+the honest gap, and it is the subject of \S\ref{sec:options}.
+
+\subsection{Properties, and one that is enforced rather than derived}
+
+\paragraph{Reference identity.}
+Suppose the crisis run matches the twin in accessible stocks, unmet import
+demand, and blockage: \(\mathcal{F}_t=\mathcal{F}^{\mathrm{twin}}_t\),
+\(\Delta u_t=0\), \(b_t=0\). Then \(r_t=1\) and \eqref{eq:pscar} gives
+\(p^{\mathrm{scar}}_t=p_0\). The implementation additionally sets
+\(p^{\star}_t=p_0\) outright in this case, by an explicit conditional on
+those three quantities. That conditional is doing real work, and an earlier
+draft of this note was wrong to describe the identity as following from the
+algebra.
+
+The algebra alone gives
+\(p^{\star}_t=\omega p^{\mathrm{tr}}_t+(1-\omega)p_0\), which equals
+\(p_0\) only if \(p^{\mathrm{tr}}_t=p_0\), i.e.\ only if offer prices rest
+at the reference. They do not. In a matched run --- climatological harvest,
+mean food and feed demand, no industrial excess, \(\tau\equiv 0\) ---
+realised fill sits well below the target \(\theta=0.70\), averaging 0.54
+for wheat, 0.32 for maize and 0.62 for rice, so \eqref{eq:ask} pushes offer
+prices down every period even with nothing happening. The trade-weighted
+offer price settles near \(0.81p_0\) for wheat and \(0.71p_0\) for maize.
+With the conditional removed, the world price in a matched run drifts 25\%
+for wheat, 34\% for maize and 19\% for rice, against the 2\% tolerance at
+which the twin-identity test is written. Re-targeting \(\theta\) to the
+realised matched-run fill does not repair this: the drift falls only to
+about 19\% for wheat and 20\% for maize, because the stationarity condition
+is per-exporter and the realised fill is highly dispersed across countries
+and periods.
+
+So the honest statement is that \eqref{eq:ask} has no rest point at \(p_0\)
+in a market with nothing happening, and the conditional is what makes the
+reference exact. Two things bound how much this matters. It changes no
+scored result: the conditional fires at 0 of 144 steps in the official
+harvest-plus-restrictions run and 0 of 144 in the harvest-only run, because
+any harvest anomaly breaks the equality immediately. But it is load-bearing
+for the model's own robustness tests, firing at all 144 steps of the matched
+run that the twin-identity test uses and at 24--32 steps of the
+restriction-only run that the restriction-raises-price test uses as its
+baseline. Whether to keep it and document it, or to rebuild \eqref{eq:ask}
+so that a quiet market is a genuine fixed point, is a live design question
+and is taken up in \S\ref{sec:options}.
+
+Note finally that \(\mathcal{F}^{\mathrm{twin}}_t\) oscillates seasonally,
+so the reference is a trajectory rather than a constant.
+
+\paragraph{Twin closure.}
+During the twin run the price is held at \(p_0\), so
+\(\mathcal{F}^{\mathrm{twin}}_t\) reflects physical availability and does
+not feed back through \eqref{eq:demand}. The twin is a control, not a
+second priced market.
+
+\paragraph{Mass balance.}
+Availability is exhausted by consumption, net trade, the change in stocks,
+and the capacity drawdown in \eqref{eq:stocks}. The drawdown is part of the
+specification and is reported, not absorbed silently.

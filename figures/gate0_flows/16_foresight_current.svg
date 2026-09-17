@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="604" height="498" viewBox="0 0 604 498" font-family="ui-sans-serif, Helvetica, Arial, sans-serif">
+<rect width="604" height="498" fill="#ffffff"/>
+<text x="28" y="28" font-size="16" font-weight="600" fill="#18181b">Foresight — thin expectations</text>
+<text x="28" y="48" font-size="12" fill="#52525b">E0 current — Harvest: φ-blend into the lean gap. Price: last fortnight. Lean clock is world-wide.</text>
+<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#71717a"/></marker></defs>
+<path d="M 112.0 140.0 C 112.0 171.0, 112.0 171.0, 112.0 202.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 302.0 140.0 C 302.0 171.0, 112.0 171.0, 112.0 202.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 112.0 250.0 C 112.0 281.0, 112.0 281.0, 112.0 312.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 112.0 360.0 C 112.0 391.0, 112.0 391.0, 112.0 422.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<path d="M 492.0 140.0 C 492.0 171.0, 302.0 171.0, 302.0 202.0" fill="none" stroke="#71717a" stroke-width="1.25" marker-end="url(#arr)"/>
+<rect x="28.0" y="92.0" width="168" height="48" rx="6" fill="#f4f4f5" stroke="#71717a" stroke-width="1.0"/>
+<text x="112.0" y="120.0" text-anchor="middle" font-size="11" fill="#3f3f46">H this step</text>
+<rect x="218.0" y="92.0" width="168" height="48" rx="6" fill="#f4f4f5" stroke="#71717a" stroke-width="1.0"/>
+<text x="302.0" y="120.0" text-anchor="middle" font-size="11" fill="#3f3f46">Hseas</text>
+<rect x="408.0" y="92.0" width="168" height="48" rx="6" fill="#f4f4f5" stroke="#71717a" stroke-width="1.0"/>
+<text x="492.0" y="120.0" text-anchor="middle" font-size="11" fill="#3f3f46">p last step</text>
+<rect x="28.0" y="202.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="112.0" y="230.0" text-anchor="middle" font-size="11" fill="#18181b">H^exp φ-blend</text>
+<rect x="28.0" y="312.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="112.0" y="340.0" text-anchor="middle" font-size="11" fill="#18181b">world lean clock</text>
+<rect x="28.0" y="422.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="112.0" y="450.0" text-anchor="middle" font-size="11" fill="#18181b">T = L + s</text>
+<rect x="218.0" y="202.0" width="168" height="48" rx="6" fill="#ffffff" stroke="#3f3f46" stroke-width="1.0"/>
+<text x="302.0" y="230.0" text-anchor="middle" font-size="11" fill="#18181b">d(p last)</text>
+</svg>

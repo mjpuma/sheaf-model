@@ -1,0 +1,88 @@
+\section{Sitting checklist}
+
+\begin{frame}{What is specified, not analysed}
+\topic{The crisis-host equations are now written in README \S8 the way the code runs them. This sitting verifies those equations; it does not reopen them as mismatches.}
+README \S8 is the specification. The former documentation gaps (lean
+window $k=0$, scarcity $\mathrm{shift}$, E0 as shares, $W$ without a
+$1.5s$ floor, residual pool, $h_t$, mean-flex $/24$, $p^{\mathrm{tr}}$)
+are written there and shown as green banners.
+
+What remains grey is the leftover annual SPE in \texttt{core.py}
+(README \S1--\S6), including that diagonal dominance is a construction
+device for $M$, not a remaining certificate. Gate~2 cascade is harvest
+diversion --- that is in the README, not a red box.
+
+\texttt{verify\_claims.py} re-derives the numbers. It is not a list of
+open fights with the code.
+\syms{$L$ lean gap (MMT) \symsep $\mathrm{shift}$ scarcity floor (MMT) \symsep $W$ warehouse (MMT) \symsep $h_t$ lean horizon (steps) \symsep $p^{\mathrm{tr}}$ trade-weighted ask (2010 \$/t) \symsep $M$ leftover slope (MMT/(\$/t)).}
+\end{frame}
+
+\begin{frame}[label=questions]{Questions for discussion}
+\topic{Five questions for the Agrimate authors. Not whether this is Deaton--Laroque --- it is not claimed to be.}
+The comparison that matters is Agrimate, not Deaton--Laroque.
+
+\begin{enumerate}
+\item Is the 24-step ask-dominated market a fair cousin of Agrimate's
+      commercial layer, or a different object we should name more
+      carefully? (Method of solution is its own jump.)
+\item Is an offer-cut $\tau$ the right translation of AMIS, versus
+      Agrimate's edge shutdown?
+\item Is Jacobi isoelastic $\eta$ the substitution you would put on this
+      spine, versus a nested CES / AIDS at the country?
+\item Is climatology-relative $S/S^{\mathrm{calm}}$ the right Headey
+      trigger, or do you want importer procurement and announcements
+      before any who-restricts score?
+\item Is an explicit ask/Armington map the right cousin of Agrimate's
+      per-step supplier / consumer / purchaser optimizations, or a
+      different object we should name more carefully?
+\end{enumerate}
+\syms{$\tau_{i,t}$ export-offer cut, a fraction in $[0,1]$, not a \$/t tax
+\symsep $\eta_{gh}$ isoelastic cross-grain demand exponents (dimensionless)
+\symsep $S^{\mathrm{open}}/S^{\mathrm{calm}}$ shocked-open stocks over
+climatology stocks at the same step (dimensionless) \symsep CES constant
+elasticity of substitution; AIDS almost-ideal demand system \symsep
+``ask'' $q_{i,t}$ an exporter's offer price (real 2010 \$/t).}
+\end{frame}
+
+\begin{frame}{Reproduce}
+\topic{How to re-derive every banner from the repo. Does not retune anything.}
+From the repository root (after \texttt{pip install -r requirements.txt}):
+
+\begin{center}
+\texttt{python3 overleaf/sheaf\_deck/verify\_claims.py}
+\end{center}
+
+Re-derives every match banner. Does not retune, does not write
+scores, does not unpause \texttt{dynamic\_grains.py}.
+
+Official locked scores remain:
+
+\texttt{diagnostics/gate0\_\{wheat,maize,rice\}\_report.md},
+\texttt{gate1\_report.md}, \texttt{gate2\_beta\_report.md}.
+
+Overleaf: zip \texttt{overleaf/sheaf\_deck/} and compile pdfLaTeX + BibTeX.
+\syms{\texttt{verify\_claims.py} re-derives every green banner from the live
+code; it prints 49 OK, 0 divergences, 0 failures \symsep
+\texttt{gate0\_*\_report.md} the locked per-crop Gate~0 scores \symsep
+\texttt{gate1\_report.md} the $\sigma\in\{0,0.3,0.6\}$ band \symsep
+\texttt{gate2\_beta\_report.md} the Headey-clock hard bars.}
+\end{frame}
+
+\begin{frame}{One-sentence summary}
+\topic{One sentence: what the crisis model is, and what the leftover annual code is not.}
+\hyperlink{sitmap}{\beamerreturnbutton{sitting map}}
+\vspace{0.3em}
+SHEAF's crisis model is a 24-step, ask-dominated, single-world-price
+market with AMIS offer cuts (Gate~0), Jacobi isoelastic cross-grain
+demand on that locked spine (Gate~1, no $\sigma^\star$), and a
+Headey-clock climatology-relative $\tau_t$ whose two-player cascade is
+harvest diversion (Gate~2 beta). The annual SPE plus year-Nash in
+\texttt{core.py} is still in the repository. It is the TWIST leftover,
+not the 2007/08 crisis host.
+\syms{24-step clock: $T_y=24$ steps per calendar year, $\Delta t\approx15.2$
+days \symsep ``ask-dominated'': the world price weights exporter asks
+$q_{i,t}$ (real 2010 \$/t) with weight $\omega$ and a scarcity term with
+$1-\omega$ \symsep $\tau_t$ export-offer cut (fraction in $[0,1]$)
+\symsep $\sigma$ cross-grain substitution scale (dimensionless); no
+$\sigma^\star$ is selected \symsep SPE spatial price equilibrium.}
+\end{frame}

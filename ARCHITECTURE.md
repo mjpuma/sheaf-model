@@ -84,14 +84,21 @@ targets; it is not the Gate 0 clock.
    substitution in demand and an endogenous restriction layer for Level 2.
 4. **Level 1:** impose AMIS restrictions as quantity cuts (ban≈95%, tax≈50%)
    or equivalent, not only mild annual $/t wedges.
-5. **Level 2:** endogenous restriction game on the same sub-annual clock
-   (held-out identification — after Gate 0).
+5. **Level 2:** endogenous restriction **actions** on the same sub-annual
+   clock. **Types** (food-security weights, who plays) are slow;
+   **actions** `τ_{i,t}` respond to conditions — Headey (2011), not an
+   annual Nash leftover. See `diagnostics/GAME_CLOCK.md`. Held-out
+   identification comes after Gate 0; Gate 0 and Gate 1 are **not**
+   re-run to host that game.
 
 ### Keep from current SHEAF
 
 - Multi-commodity demand / substitution as the differentiator vs Agrimate.
 - Node set + USDA/AMIS/Pink Sheet data plumbing (re-timed to steps).
 - Export-restriction *idea*; re-host on sub-annual information sets.
+  `sheaf.annual` keeps the yearly prototype (`scripts/annual/demo.py`). It is not the
+  crisis game. Headey (2011) is the clock: India/Vietnam October,
+  Thailand-in-March *discussing* a ban, Japan-in-May announcing stocks.
 
 ## Gate 0 (rewritten)
 
@@ -106,30 +113,27 @@ targets; it is not the Gate 0 clock.
 Annual hike-ratio scoring (`scripts/score_level1.py` as of 2026-08-22) is
 **provisional / demoted** — useful for data plumbing checks only, not Gate 0.
 
-## Implementation order (do not skip)
+## Implementation order
 
-**Locked reorder (2026-08-24):** finish **per-crop Agrimate-style markets** and
-detailed diagnostics **before** substitution or Level 2. See
-[`diagnostics/GATE0_PER_CROP_PLAN.md`](diagnostics/GATE0_PER_CROP_PLAN.md).
+**Per-crop 24-step markets first** (2026-08-24), then substitution, then
+the Headey-clock game. That order still holds. What changed: Gate 0 is
+**not frozen**. After coauthor consultation we return to the market
+([`diagnostics/DEVELOPMENT.md`](diagnostics/DEVELOPMENT.md)) before
+extending Gate 1 or Gate 2.
 
 1. Document + freeze clock (`STEPS_PER_YEAR=24`, 24-vs-26 note) — **done**.
-2. Sub-annual calendar helper (step ↔ date ↔ month; agricultural year) — **done**
-   (`sheaf/calendar24.py`).
-3. Seasonal production allocation from harvest calendars + PSD annual totals —
-   **done** (`sheaf/seasonal.py`, `data/crop_calendars/`; triangular peak months).
-4. **Per-crop dynamic core** (wheat → maize → rice), each alone:
-   stocks + bilateral trade + adaptive ask prices + exogenous AMIS —
-   world $p$ **ask-dominated** (`sheaf/dynamic_crop.py`; wheat wrap in
-   `dynamic_wheat.py`). Twin path = identity diagnostic only.
-   Parameters and defensibility: `diagnostics/GATE0_PARAMETERIZATION.md`.
-5. **Detailed per-crop Gate 0 diagnostics** (`scripts/score_subannual_crop.py`)
-   — price legs, stocks/STU, exporter AMIS bite, attribution, markdown report.
-   Wheat also keeps `score_subannual_wheat.py` as a thin entry point.
-6. Multi-commodity substitution on the sub-annual spine — **paused** until
-   step 5 is green for wheat, maize, and rice. (`dynamic_grains` / spillover
-   remain a prototype only.)
-7. Endogenous restriction game (Level 2) — **blocked** until per-crop Gate 0 hard
-   bars are green.
+2. Sub-annual calendar helper — **done** (`sheaf/calendar24.py`).
+3. Seasonal production allocation — **done** (`sheaf/seasonal.py`).
+4. **Per-crop dynamic core** — **in use**, open to revision.
+   `sheaf/dynamic_crop.py`. Twin path = identity diagnostic only.
+   Current table: `diagnostics/GATE0_PARAMETERIZATION.md`.
+5. **Per-crop diagnostics** — snapshot scores exist
+   (`scripts/score_subannual_crop.py`). Re-score after any named change.
+6. Multi-commodity substitution — **paused** until we will stand behind
+   Gate 0. `dynamic_grains` remains a prototype only.
+7. Endogenous restriction **actions** — **paused**. `sheaf/dynamic_policy.py`
+   is a two-player mechanism check, not a 2008 score. Annual IBR stays in
+   `sheaf.annual`.
 
 Commands:
 ```bash
@@ -145,5 +149,8 @@ python scripts/score_subannual_crop.py --crop rice
 - Kuhla, K., Kubiczek, P., Otto, C. (2025). Understanding agricultural market
   dynamics in times of crisis: the dynamic agent-based network model Agrimate.
   *Ecological Economics* 231, 108546. §4.1 (24 steps/yr), §5 (monthly hindcast).
+- Headey, D. (2011). Rethinking the global food crisis: The role of trade
+  shocks. *Food Policy* 36(2), 136–146. Monthly export volumes, dated
+  restrictions, import surges, announcement effects — the crisis game clock.
 - Sacks et al. (2010) / SAGE crop calendars; USDA FAS crop calendar charts.
 - Otto et al. acclimate (disequilibrium network lineage).

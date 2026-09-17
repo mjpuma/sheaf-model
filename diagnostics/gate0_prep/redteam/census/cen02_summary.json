@@ -1,0 +1,36 @@
+{
+  "n_param_rows": 20,
+  "n_distinct_values": 33,
+  "crop_specific": [
+    "elast",
+    "stu_target",
+    "max_stu",
+    "pipeline_max_steps",
+    "inv_eta",
+    "trade_w",
+    "block_kappa",
+    "foresight_phi"
+  ],
+  "deepest_free_rung": [
+    "R6 + epsilon = -0.20 shared",
+    12
+  ],
+  "hard_bound_material_cells": 17,
+  "official": {
+    "wheat": [
+      0.72,
+      2.27,
+      1.45
+    ],
+    "maize": [
+      0.712,
+      1.97,
+      1.7
+    ],
+    "rice": [
+      0.678,
+      1.72,
+      0.82
+    ]
+  }
+}

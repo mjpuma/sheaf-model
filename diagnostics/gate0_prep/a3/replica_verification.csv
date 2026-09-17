@@ -1,0 +1,4 @@
+crop,max_abs_dprice,max_abs_doffers,max_abs_dfree,max_abs_dstock,simprep_vs_run_max_dprice
+wheat,0.0,0.0,0.0,0.0,0.0
+maize,0.0,0.0,0.0,0.0,0.0
+rice,0.0,0.0,0.0,0.0,0.0

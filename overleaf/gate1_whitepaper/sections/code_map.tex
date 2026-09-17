@@ -3,7 +3,7 @@
 
 Line numbers refer to the commit that ships with this note. They will
 drift; function names are the stable map. Nothing in
-\texttt{sheaf/core.py} (annual SPE + export game) and nothing in
+\texttt{sheaf/core.py} (annual SPE leftover + year-Nash prototype) and nothing in
 \texttt{sheaf/dynamic\_grains.py} (paused prototype) is run by the
 hindcasts here.
 
@@ -19,7 +19,7 @@ band \(\{0,0.3,0.6\}\), hard bars, Fig.~\ref{fig:band} \\
 Coupled step &
 \texttt{sheaf/dynamic\_coupled.py}
 \texttt{\_simulate\_coupled} &
-Jacobi: \texttt{fac=exp(η log(p/p0))} then Gate~0 market \\
+Jacobi: demand factor $\exp(\eta\log(p/p_0))$, then Gate~0 market \\
 \(\eta\)~\eqref{eq:cross} &
 \texttt{cross\_price\_eta} &
 own \(\varepsilon\) from \texttt{default\_crop\_params};
@@ -42,6 +42,10 @@ Consumption diagnostic &
 \texttt{scripts/score\_gate1\_consumption.py} &
 calendar-year use vs country-sum PSD;
 not a retune target \\
+Country maps &
+\texttt{scripts/score\_whitepaper\_maps.py} &
+\(\Delta\)cons 2008, \(\sigma=0.6\) vs \(0\);
+one world price \(\Rightarrow\) wheat nearly uniform \\
 \bottomrule
 \end{tabular}
 \end{center}

@@ -8,6 +8,10 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{amsmath,amssymb}
+\usepackage[utf8]{inputenc}
+% pdfLaTeX cannot typeset U+03B7 inside \texttt. Math $\eta$ is preferred;
+% this maps any leftover Unicode eta so the project still compiles.
+\DeclareUnicodeCharacter{03B7}{$\eta$}
 \usepackage[round,authoryear]{natbib}
 \usepackage{hyperref}
 \usepackage{caption}
@@ -87,8 +91,11 @@ This note is that claim (Gate~1 / paper P3). It does four things.
 A supplement maps every new equation to functions in
 \texttt{sheaf/dynamic\_coupled.py} (\S\ref{sec:code}). The Gate~0 white
 paper remains the spine. An older annual market-clearing program in
-\texttt{sheaf/core.py} is the host for later papers. It is not run
-here~\citep{takayama1971,samuelson1952}.
+\texttt{sheaf/core.py} is a leftover TWIST-era prototype (one tax per
+year). It is not the crisis game and it is not run
+here~\citep{takayama1971,samuelson1952,headey2011}. Governments that
+choose bans do it on this 24-step spine; that is a later paper, and it
+does not require re-running Gate~0 or this substitution band.
 
 \textbf{What is switched on.} Food and feed can substitute among wheat,
 rice, and maize. The strength of that switching is a reported band, not a
@@ -144,7 +151,10 @@ SHEAF exists to put two things on that network that Agrimate does not:
 consumers switching among grains, and governments choosing restrictions
 rather than following a diary. Gate~0 was the first thing without the
 second. Gate~1 is the switching, still without the diary becoming a
-choice. Paper P4--P5 is the choice. It is not this paper.
+choice. Letting governments choose bans is later work on \emph{this}
+spine, with types slow and actions \(\tau_t\) responding to
+conditions~\citep{headey2011}. It is not this note, and this note does
+not need to be re-run to start it.
 
 Food-trade fragility work~\citep{puma2015} motivates looking at who buys
 from whom. Export restrictions as a way to keep domestic prices down are
@@ -307,6 +317,44 @@ the substitution increment, not a fit residual. Source:
 not invent a co-spike. Maize 2010 hike ratio at \(\sigma=0.6\) is a higher
 2009 base (\S\ref{sec:e5}).}
 \label{fig:band}
+\end{figure}
+
+\subsection{Country maps}
+
+World prices hide who moved. These maps are the same official split as
+the band, at $\sigma=0.6$ versus $\sigma=0$, calendar 2008 use. They are
+not a new score and not a reason to pick $\sigma^\star$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate1_map_dc_wheat_2008.png}
+\caption{Wheat 2008 calendar-year use, $\sigma=0.6$ versus $\sigma=0$,
+as a percent of the $\sigma=0$ path. Nearly uniform ($\sim{+}3.4\%$)
+because Gate~0 has \emph{one world price}: isoelastic food/feed scales
+with $p$, not with a domestic CPI. Country colour is not a substitution
+fingerprint. Disclose that.}
+\label{fig:g1-w}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate1_map_dc_rice_2008.png}
+\caption{Rice 2008 use, $\sigma=0.6$ versus $\sigma=0$. Sign is up
+everywhere named (substitution direction). Intensity varies where
+availability binds (India/Thailand higher than Vietnam). The Gate~0 rice
+AMIS map is the own-ban geography; this map is the spillover on top of
+that diary, not a replacement for it.}
+\label{fig:g1-r}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_gate1_map_dc_maize_2008.png}
+\caption{Maize 2008 use, $\sigma=0.6$ versus $\sigma=0$. Sign is up.
+Much of the named set is again nearly uniform: one world price. US
+maize industrial/ethanol does not substitute; that block is out of
+this map's isoelastic piece.}
+\label{fig:g1-m}
 \end{figure}
 
 \paragraph{Identity.}
@@ -529,7 +577,9 @@ stays AMIS-led and maize stays flat.
 \paragraph{Must disclose.}
 \(\sigma\in\{0,0.3,0.6\}\) was declared before looking at coupled scores.
 Rice 2008 in Pink Sheet is primarily an own-ban episode, not a clean
-wheat\(\to\)rice test. The 2010 maize hike-\emph{ratio} drop at
+wheat\(\to\)rice test. Wheat 2008 \(\Delta\)consumption at \(\sigma=0.6\)
+is nearly uniform across named nodes: one world price, not a spatial
+substitution fingerprint. The 2010 maize hike-\emph{ratio} drop at
 \(\sigma=0.6\) is a higher June 2009 base after the 2008 wheat--maize
 spillover, not a lower 2011 peak. In 2022 rice drifts up
 (\(\times 1.18\)) against a falling Pink Sheet (\(\times 0.91\)). Dual
@@ -542,7 +592,7 @@ and \(\Delta\)cons signs do not move. Shipment leftovers are untouched.
 That \(\sigma=0.6\) (or \(0.3\)) is estimated. That matching the 2008 rice
 spike validates substitution. That 2022 wheat corr (\(0.69\to 0.75\))
 selects \(\sigma\). That Gate~0 consumption/shipment leftovers are fixed.
-That governments choose bans (that is P4--P5).
+That governments choose bans (that is later work on this spine, not this note).
 
 \section{What still misses, on purpose}
 \label{sec:leftovers}

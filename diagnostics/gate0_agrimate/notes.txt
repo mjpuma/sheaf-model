@@ -1,0 +1,33 @@
+## undisturbed
+Baseline quantities: USDA PSD 2007–09 mean, not FAOSTAT Food Balances (E.1.1).
+Trade pattern: FAOSTAT E0 2006–07, rescaled to USDA exports.
+C.1 wheat nodes: Zenodo 14022004 AgrimateRegionsWheat (27 names).
+A_d is not E.30. F.1 Egypt 0.17 unused (Egypt is in Northern Africa).
+Starred XI*, XD*, C* used in inverse demand are per-step averages.
+AMIS wheat Δ: 491 region-steps, max=0.95, regions=['Argentina', 'China', 'India', 'Kazakhstan', 'Russia', 'Ukraine', 'Northern Africa'].
+Nash IBR: 0 iters, err=2.100e-16, success=True.
+Supplier solves: failed=0, fallback=0, unconverged=1583 of 5832.
+Inverse-demand floor binds: offer=0, plan-path=74110; max plan residual=0.000e+00; runtime=14.1s.
+
+## harvest
+Baseline quantities: USDA PSD 2007–09 mean, not FAOSTAT Food Balances (E.1.1).
+Trade pattern: FAOSTAT E0 2006–07, rescaled to USDA exports.
+C.1 wheat nodes: Zenodo 14022004 AgrimateRegionsWheat (27 names).
+A_d is not E.30. F.1 Egypt 0.17 unused (Egypt is in Northern Africa).
+Starred XI*, XD*, C* used in inverse demand are per-step averages.
+AMIS wheat Δ: 491 region-steps, max=0.95, regions=['Argentina', 'China', 'India', 'Kazakhstan', 'Russia', 'Ukraine', 'Northern Africa'].
+Nash IBR: 0 iters, err=2.100e-16, success=True.
+Supplier solves: failed=0, fallback=0, unconverged=1628 of 5832.
+Inverse-demand floor binds: offer=0, plan-path=68519; max plan residual=0.000e+00; runtime=19.5s.
+
+## harvest_amis
+Baseline quantities: USDA PSD 2007–09 mean, not FAOSTAT Food Balances (E.1.1).
+Trade pattern: FAOSTAT E0 2006–07, rescaled to USDA exports.
+C.1 wheat nodes: Zenodo 14022004 AgrimateRegionsWheat (27 names).
+A_d is not E.30. F.1 Egypt 0.17 unused (Egypt is in Northern Africa).
+Starred XI*, XD*, C* used in inverse demand are per-step averages.
+AMIS wheat Δ: 491 region-steps, max=0.95, regions=['Argentina', 'China', 'India', 'Kazakhstan', 'Russia', 'Ukraine', 'Northern Africa'].
+Nash IBR: 0 iters, err=2.100e-16, success=True.
+Supplier solves: failed=0, fallback=0, unconverged=1743 of 5832.
+Inverse-demand floor binds: offer=0, plan-path=68018; max plan residual=0.000e+00; runtime=19.8s.
+

@@ -1,4 +1,9 @@
-"""Single-crop Agrimate-style sub-annual market (Gate 0 per crop).
+"""LEGACY single-crop Gate 0 host (pre-Agrimate-rewrite).
+
+This module is the labelled benchmark, not the default. Use
+``sheaf.agrimate.run_agrimate`` / ``python scripts/run_agrimate_wheat.py``.
+To reproduce prior scores: ``python scripts/score_legacy_crop.py --crop wheat``.
+Gate 1 (``sheaf.dynamic_coupled``) still imports this host.
 
 One grain at a time on the 24-step clock: stocks, lean foresight, bilateral
 Armington trade, adaptive exporter ask prices, exogenous AMIS quantity cuts.
@@ -112,12 +117,38 @@ class CropParams:
     # reduced_form — ask adaptation (Agrimate-like offer prices)
     ask_alpha: float = 0.15
     ask_target_fill: float = 0.70
+    # CES substitution elasticity over origins (importer source shares).
+    # Destination-share reweighting is algebraically the identity (a
+    # row-constant cancels) and is kept as a documented no-op; the live
+    # channel is `_ask_reweight_src`.
     ask_comp_elast: float = 1.25
     ask_beta: float = 0.18
     # reduced_form — survivors mark up when preferred sources are blocked
     # (Agrimate oligopolist channel). Sign: >= 0. Zero ⇒ own-fill law only.
-    # 0.80 is the smallest shared value at which isolated maize τ does not
-    # cut world price (0.40 still cuts; not fit to 2008 peaks).
+    #
+    # This value was previously justified as "the smallest shared value at
+    # which isolated maize τ does not cut world price". That justification
+    # does not survive a like-for-like test. The old sign test compared an
+    # unpinned τ leg against a baseline leg that the calm branch in
+    # `_simulate_window` pins at exactly p0, while the ask law's own quiet
+    # level is ≈0.71·p0 for maize — so the test was measuring the release of
+    # that pin. With the baseline perturbed out of the calm regime
+    # (`assert_amis_raises_price`), maize clears the floor at ask_rival = 0.0
+    # (+4.7%), as do wheat (+48.8%) and rice (+16.0%).
+    #
+    # So the sign condition does NOT pin this parameter. It remains
+    # load-bearing for crisis amplitude, and the effect survived every
+    # subsequent fix. Current code, setting it to 0:
+    #   wheat corr +0.687 → +0.700, 2007/08 ×2.09 → ×1.46 (obs ×1.82)
+    #   maize corr +0.792 → +0.551, 2007/08 ×2.05 → ×1.54 (obs ×1.84)
+    #   rice  corr +0.676 → +0.334, 2007/08 ×1.54 → ×1.01 (obs ×1.84)
+    # Note wheat's correlation *improves* at zero while its 2007/08 hike
+    # collapses — the parameter is buying amplitude, not fit, and only for
+    # maize and rice does it buy both. So it is not spurious, and it is not
+    # uniformly beneficial either. Treat it as a reduced-form amplitude
+    # parameter awaiting an external basis, shared across crops and years,
+    # and not fit to 2008. See diagnostics/gate0_prep/a2/ and
+    # diagnostics/gate0_prep/a5/ADJUDICATION_ASK_RIVAL.md.
     ask_rival: float = 0.80
     # structural — harvest foresight blend; pulse definition
     foresight_phi: float = 0.55
@@ -134,6 +165,21 @@ class CropParams:
     industrial_nodes: tuple[str, ...] = ()
     # structural — years that define the pre-mandate FSI baseline
     ind_base_years: tuple[int, int] = (2000, 2004)
+    # reduced_form — fill reference in the ask law. "fixed" is the shipped
+    # global θ = ask_target_fill (no rest point at p0). "twin" uses each
+    # country's same-step fill on the frozen-ask twin, so a matched run has
+    # fill ≡ θ and the ask law is still at the first step.
+    ask_fill_ref: str = "fixed"
+    # reduced_form — one-period commercial store-vs-sell on the residual
+    # above the cover target. 0 = shipped cover-only rule. Motive is
+    # E[p]/p − (1+r) with E[p] = same fortnight last year (else p0) and
+    # r = carry_rate_annual / STEPS_PER_YEAR. Positive motive withholds;
+    # negative dumps. Not Agrimate's finite-horizon NLP.
+    spec_kappa: float = 0.0
+    carry_rate_annual: float = 0.05
+    # structural — pin p* = p0 when the run matches the twin. Default on
+    # (shipped). Off is the rest-point test: the algebra must hold alone.
+    pin_calm: bool = True
 
 
 def default_crop_params(crop: str) -> CropParams:
@@ -227,6 +273,7 @@ class CropPrep:
     free_twin: np.ndarray
     unmet_twin: np.ndarray
     spin_up_years: int
+    fill_twin: np.ndarray | None = None
 
 
 def _psd_annual(crop: str, countries: list[str],
@@ -453,7 +500,7 @@ def _repair_vietnam_rice_e0(E: pd.DataFrame, countries: list[str]) -> pd.DataFra
         load_trade_matrix("rice", window=_VNM_RICE_PATTERN_WINDOW),
         SHEAF_NODE_MAP)
     E_ref = E_ref.reindex(index=countries, columns=countries, fill_value=0.0)
-    row = E_ref.loc["Vietnam"].to_numpy(dtype=float)
+    row = E_ref.loc["Vietnam"].to_numpy(dtype=float, copy=True)
     i = countries.index("Vietnam")
     row[i] = 0.0
     s = float(row.sum())
@@ -474,8 +521,8 @@ def load_trade_shares(crop: str, countries: list[str],
     E = E.reindex(index=countries, columns=countries, fill_value=0.0)
     if crop.lower().strip() == "rice":
         E = _repair_vietnam_rice_e0(E, countries)
-    A = bilateral_shares(E, by="destination").to_numpy(dtype=float)
-    S = bilateral_shares(E, by="source").to_numpy(dtype=float)
+    A = bilateral_shares(E, by="destination").to_numpy(dtype=float, copy=True)
+    S = bilateral_shares(E, by="source").to_numpy(dtype=float, copy=True)
     np.fill_diagonal(A, 0.0)
     np.fill_diagonal(S, 0.0)
     row = A.sum(axis=1, keepdims=True)
@@ -487,11 +534,35 @@ def load_trade_shares(crop: str, countries: list[str],
 
 def _ask_reweight_dest(A: np.ndarray, ask: np.ndarray, p0: float,
                        gamma: float = 1.25) -> np.ndarray:
+    """Destination-share reweight. Algebraically the identity.
+
+    Each row of ``A`` is multiplied by a scalar ``(p0/q_i)^gamma`` and
+    then renormalised to sum 1, so the scalar cancels. Kept so existing
+    callers do not break; the live Armington channel is
+    ``_ask_reweight_src``.
+    """
     rel = (float(p0) / np.maximum(ask, 1e-6)) ** gamma
     A_eff = A * rel[:, None]
     row = A_eff.sum(axis=1, keepdims=True)
     np.divide(A_eff, row, out=A_eff, where=row > 0)
     return A_eff
+
+
+def _ask_reweight_src(S: np.ndarray, ask: np.ndarray, p0: float,
+                      gamma: float = 1.25) -> np.ndarray:
+    """CES source-share reweight: cheaper origins win importer share.
+
+    Column ``j`` of the result is importer ``j``'s expenditure-minimising
+    origin mix for a CES aggregator with elasticity of substitution
+    ``gamma`` and preference weights ``S[:, j]``. This is the channel
+    ``ask_comp_elast`` was documented as providing and that destination
+    reweighting cannot, because a row-scalar cancels.
+    """
+    rel = (float(p0) / np.maximum(ask, 1e-6)) ** gamma
+    S_eff = S * rel[:, None]
+    col = S_eff.sum(axis=0, keepdims=True)
+    np.divide(S_eff, col, out=S_eff, where=col > 0)
+    return S_eff
 
 
 def _bilateral_clear(offers: np.ndarray, demand: np.ndarray,
@@ -537,6 +608,8 @@ def _simulate_window(
         free_twin: np.ndarray | None = None,
         unmet_twin: np.ndarray | None = None,
         H_seasonal: np.ndarray | None = None,
+        fill_twin: np.ndarray | None = None,
+        freeze_ask: bool = False,
 ) -> tuple[np.ndarray, ...]:
     n, T = H.shape
     C_step = C_flex + C_ind
@@ -599,8 +672,9 @@ def _simulate_window(
         ask_path[:, t] = ask
 
         A_eff = _ask_reweight_dest(A, ask, p0, gamma=params.ask_comp_elast)
+        S_eff = _ask_reweight_src(S, ask, p0, gamma=params.ask_comp_elast)
         shipped, received, ship = _bilateral_clear(
-            offers, demand, A_eff, S, subst=params.residual_subst)
+            offers, demand, A_eff, S_eff, subst=params.residual_subst)
         recv_path[:, t] = received
         trade_path[:, :, t] = ship
 
@@ -649,7 +723,14 @@ def _simulate_window(
 
         shipped_sum = float(shipped.sum())
         if shipped_sum > 1e-12:
-            p_trade = float(np.dot(ask, shipped) / shipped_sum)
+            # Value shipments at the ask that ALLOCATED them (ask_path[:, t]),
+            # not the ask updated later in this step. `ask` has already been
+            # advanced to q_{t+1} above, and using it here priced step t's
+            # trade at step t+1's offers — a rally-directional bias of +2.2%
+            # (wheat), +1.9% (maize), +3.9% (rice) through 2007/08 on a term
+            # carrying ω of p*. Agrimate Eq. D.4 is explicit that the
+            # transaction price is the offer the request responded to.
+            p_trade = float(np.dot(ask_path[:, t], shipped) / shipped_sum)
         else:
             p_trade = p
 
@@ -659,8 +740,17 @@ def _simulate_window(
         else:
             twin = float(free_twin[t])
             floor0 = 0.05 * safety_w
-            shift = floor0 + max(0.0, -min(free, twin))
-            ratio = (twin + shift) / (free + shift)
+            if free < 0.0 <= twin:
+                # Lean requirement exceeds physical stock while the reference
+                # does not. The shift below would then reduce the denominator
+                # to floor0, making the ratio ≈ twin/floor0 — a number set by
+                # the regulariser rather than by scarcity (maize 2006-12a:
+                # ratio 35.1, price ×4.13 in one step). Floor the denominator
+                # on physical stock instead, which cannot go negative.
+                ratio = (twin + floor0) / (0.10 * float(stock.sum()) + floor0)
+            else:
+                shift = floor0 + max(0.0, -min(free, twin))
+                ratio = (twin + shift) / (free + shift)
             u0 = float(unmet_twin[t]) if unmet_twin is not None else 0.0
             u_anom = max(0.0, unmet_frac - u0)
             calm = (abs(free - twin) < 1e-6 and u_anom < 1e-9
@@ -719,9 +809,14 @@ def prepare_crop_run(
     if overrides:
         from dataclasses import fields, replace
         allowed = {f.name for f in fields(CropParams)} - {"crop"}
-        patch = {k: v for k, v in overrides.items() if k in allowed}
-        if patch:
-            params = replace(params, **patch)
+        unknown = sorted(set(overrides) - allowed)
+        if unknown:
+            # Silently dropping these returned the baseline path, so a typo'd
+            # sensitivity study reported "no effect" instead of failing.
+            raise TypeError(
+                f"unknown CropParams override(s): {unknown}. "
+                f"Valid fields: {sorted(allowed)}")
+        params = replace(params, **overrides)
 
     if countries is None:
         from .calibration import DATA
@@ -856,18 +951,28 @@ def run_crop_dynamics(
         use_demand=use_demand, use_industrial=use_industrial,
         stock_seed_year=stock_seed_year, spin_up_years=spin_up_years,
         trade_window=trade_window, **overrides)
+    return simulate_prep(prep)
 
+
+def simulate_prep(prep: CropPrep, cuts: np.ndarray | None = None,
+                  harvest: np.ndarray | None = None) -> CropSimResult:
+    """Run the Gate 0 market on an already-built ``CropPrep``.
+
+    ``cuts`` / ``harvest`` override the prep arrays without rebuilding
+    AMIS, trade shares, or the calm twin. Used by the Gate 2 policy beta.
+    """
+    H = prep.H if harvest is None else harvest
+    cuts_use = prep.cuts if cuts is None else cuts
     (price, stock_path, cons_path, exp_path,
      free_liq, unmet, offers, demand, ask, received, trade) = _simulate_window(
-        prep.H, prep.C_flex, prep.C_ind, prep.cuts, prep.stock0.copy(),
+        H, prep.C_flex, prep.C_ind, cuts_use, prep.stock0.copy(),
         prep.safety, prep.p0, prep.C_ann, prep.A, prep.S, prep.params,
         free_twin=prep.free_twin, unmet_twin=prep.unmet_twin,
         H_seasonal=prep.H_seas)
-
     return CropSimResult(
         crop=prep.crop, countries=prep.countries, start_year=prep.start_year,
-        end_year=prep.end_year, price=price, stock=stock_path, harvest=prep.H,
-        consumption=cons_path, exports=exp_path, export_cut=prep.cuts,
+        end_year=prep.end_year, price=price, stock=stock_path, harvest=H,
+        consumption=cons_path, exports=exp_path, export_cut=cuts_use,
         spin_up_years=prep.spin_up_years, free_liquid=free_liq,
         free_twin=prep.free_twin, unmet_frac=unmet, offers=offers,
         purchase_demand=demand, ask=ask, received=received, trade=trade,
@@ -888,10 +993,18 @@ def result_to_monthly(res: CropSimResult) -> pd.DataFrame:
 
 
 def assert_twin_identity(crop: str = "wheat", tol_price: float = 0.02,
-                         tol_free: float = 1.0) -> None:
-    """No harvest / demand / AMIS shocks ⇒ free ≡ twin and price flat at p0."""
+                         tol_free: float = 1.0, **overrides) -> None:
+    """No harvest / demand / AMIS shocks ⇒ free ≡ twin and price flat at p0.
+
+    Note what this does and does not establish. The flat price is delivered
+    by the calm branch in ``_simulate_window``, which sets ``p_star = p0``
+    outright once free ≡ twin. It is not evidence that the ask law returns to
+    p0 on its own — with that branch disabled the same run drifts 25 / 34 /
+    19 % (wheat / maize / rice). See ``diagnostics/gate0_prep/a1/``.
+    """
     res = run_crop_dynamics(crop, use_amis=False, use_shocks=False,
-                            use_demand=False, use_industrial=False)
+                            use_demand=False, use_industrial=False,
+                            **overrides)
     p0 = float(res.price[0])
     tail = res.price[STEPS_PER_YEAR:]
     rel = float(np.max(np.abs(tail - p0)) / max(p0, 1.0))
@@ -908,11 +1021,21 @@ def assert_twin_identity(crop: str = "wheat", tol_price: float = 0.02,
 
 
 def assert_amis_raises_price(crop: str = "wheat",
-                             min_lift: float | None = None) -> None:
+                             min_lift: float | None = None,
+                             **overrides) -> None:
     """Tau-only vs no-AMIS in the crop's primary ban window.
 
     Maize floor is 0 (must not *cut* world price). Offer-cut assert remains
     the quantity check.
+
+    The baseline leg is perturbed by one part per million of harvest so that
+    it leaves the matched regime. Without that, the calm branch in
+    ``_simulate_window`` pins the baseline at exactly p0 while the τ leg is
+    priced by the ask/scarcity law, whose quiet level is ≈0.66·p0 (wheat) and
+    ≈0.71·p0 (maize) — so the measured "lift" included the release of that
+    pin and was biased down by 27 pp for maize. The perturbation changes
+    physical quantities by 1e-6 and makes both legs share a price law.
+    See ``diagnostics/gate0_prep/a2/``.
     """
     if crop == "wheat":
         y0, m0, y1, m1 = 2010, 8, 2010, 12
@@ -928,9 +1051,12 @@ def assert_amis_raises_price(crop: str = "wheat",
     if min_lift is None:
         min_lift = floor
     tau = run_crop_dynamics(crop, use_amis=True, use_shocks=False,
-                            use_demand=False, use_industrial=False)
-    base = run_crop_dynamics(crop, use_amis=False, use_shocks=False,
-                             use_demand=False, use_industrial=False)
+                            use_demand=False, use_industrial=False,
+                            **overrides)
+    prep_base = prepare_crop_run(crop, use_amis=False, use_shocks=False,
+                                 use_demand=False, use_industrial=False,
+                                 **overrides)
+    base = simulate_prep(prep_base, harvest=prep_base.H * (1.0 - 1e-6))
     t0 = (y0 - tau.start_year) * STEPS_PER_YEAR + (m0 - 1) * 2
     t1 = (y1 - tau.start_year) * STEPS_PER_YEAR + (m1 - 1) * 2 + 2
     p_tau = float(np.mean(tau.price[t0:t1]))
@@ -943,7 +1069,7 @@ def assert_amis_raises_price(crop: str = "wheat",
 
 
 def assert_no_spring_spike(crop: str = "wheat",
-                           max_ratio: float = 1.25) -> None:
+                           max_ratio: float = 1.25, **overrides) -> None:
     """Lean-cover accounting must not create a fake spring spike on climatology.
 
     Full-path maize can still have a real NH lean (harvest in autumn); that is
@@ -951,7 +1077,7 @@ def assert_no_spring_spike(crop: str = "wheat",
     """
     res = run_crop_dynamics(
         crop, use_amis=False, use_shocks=False, use_demand=False,
-        use_industrial=False)
+        use_industrial=False, **overrides)
     m = result_to_monthly(res)
     spring = float(m[m.month.isin([3, 4])]["model_price"].mean())
     autumn = float(m[m.month.isin([9, 10])]["model_price"].mean())
@@ -963,7 +1089,8 @@ def assert_no_spring_spike(crop: str = "wheat",
 
 def assert_amis_cuts_exports(crop: str = "wheat",
                              max_offer_ratio: float | None = None,
-                             max_ship_ratio: float | None = None) -> None:
+                             max_ship_ratio: float | None = None,
+                             **overrides) -> None:
     # Wheat Russia ban ≈0.95 → very low offers; maize/rice quotas/taxes milder.
     if max_offer_ratio is None:
         max_offer_ratio = 0.20 if crop == "wheat" else 0.70
@@ -971,9 +1098,11 @@ def assert_amis_cuts_exports(crop: str = "wheat",
         max_ship_ratio = 0.85 if crop == "wheat" else 0.95
     country, y0, m0, y1, m1 = _EXPORTER_WINDOWS[crop]
     tau = run_crop_dynamics(crop, use_amis=True, use_shocks=False,
-                            use_demand=False, use_industrial=False)
+                            use_demand=False, use_industrial=False,
+                            **overrides)
     base = run_crop_dynamics(crop, use_amis=False, use_shocks=False,
-                             use_demand=False, use_industrial=False)
+                             use_demand=False, use_industrial=False,
+                             **overrides)
     if country not in tau.countries:
         raise AssertionError(f"{crop}: {country} not in node set")
     i = tau.countries.index(country)

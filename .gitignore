@@ -8,7 +8,8 @@ level1_hindcast.csv
 .venv/
 # Full PSD dump is regenerable from the vendored zip (~193 MB)
 data/usda_psd/psd_alldata.csv
-# Local copies of Kuhla et al. 2025 (copyrighted; do not commit)
-agrimate/
+# Local copies of Kuhla et al. 2025 (copyrighted; do not commit).
+# Anchored at repo root so sheaf/agrimate/ and tests/agrimate/ stay trackable.
+/agrimate/
 # Convenience Overleaf zips (the folders are the source of truth)
 overleaf/*.zip

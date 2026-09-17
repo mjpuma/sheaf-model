@@ -1,0 +1,129 @@
+\section{Symbols, units, and parameter classes}
+\label{sec:notation}
+
+Countries are indexed by \(i\) (importer \(j\) where a bilateral pair is
+needed) and two-week periods by \(t\), with \(\Delta t\approx 15.2\) days
+and exactly two periods per calendar month. Quantities are in million
+tonnes (MMT); flows are MMT per period. Prices are in constant 2010 US
+dollars per tonne. Shares are dimensionless and sum to one over the
+relevant index.
+
+One notational collision is worth flagging: \(S_{i,t}\) denotes a
+\emph{stock} in MMT, while \(S_{ij}\) denotes the FAOSTAT \emph{source
+share} of importer \(j\) from exporter \(i\), a dimensionless fraction.
+The trade matrices supply bilateral structure only; all traded volumes are
+determined by the offer and import-demand equations.
+
+Every symbol below is also defined in place at the equation where it first
+appears, so \S\ref{sec:dynamics} can be read without returning here.
+
+\subsection{State, forcing, and derived quantities}
+
+\begin{longtable}{>{\raggedright}p{0.17\textwidth}
+                 >{\raggedright}p{0.53\textwidth}
+                 p{0.20\textwidth}}
+\caption{Quantities. Stocks and harvests in MMT; prices in constant 2010
+\$/t.}
+\label{tab:symbols}\\
+\toprule
+Symbol & Definition & Unit \\
+\midrule
+\endfirsthead
+\toprule
+Symbol & Definition & Unit \\
+\midrule
+\endhead
+\multicolumn{3}{l}{\emph{State}}\\
+\(p_t\) & World price of the crop. Demand in period \(t\) uses \(p_{t-1}\). & \$/t \\
+\(q_{i,t}\) & Offer (export) price posted by exporter \(i\). & \$/t \\
+\(S_{i,t}\) & Carry-in stock held by country \(i\) at the start of period \(t\). & MMT \\
+\midrule
+\multicolumn{3}{l}{\emph{Forcing}}\\
+\(H_{i,t}\) & Realised harvest arriving in period \(t\). & MMT / step \\
+\(H^{\mathrm{seas}}_{i,t}\) & Climatological harvest: window-mean production distributed over the calendar. & MMT / step \\
+\(\tau_{i,t}\) & Export restriction intensity from the AMIS record; the fraction of the offer removed (ban \(\approx0.95\), export tax \(\approx0.50\)). & fraction \\
+\(C^{\mathrm{flex}}_{i,t}\) & Food and feed demand evaluated at the reference price \(p_0\). & MMT / step \\
+\(C^{\mathrm{ind}}_{i,t}\) & Price-inelastic industrial demand (US maize ethanol residual; zero elsewhere). & MMT / step \\
+\(C^{\mathrm{ann}}_i\) & Annual domestic use, used to scale stock targets and capacity. & MMT / year \\
+\(p_0\) & Reference price: start-year mean of the World Bank Pink Sheet, deflated to 2010 dollars. & \$/t \\
+\midrule
+\multicolumn{3}{l}{\emph{Derived within the period}}\\
+\(\mathrm{avail}_{i,t}\) & Grain available, \(S_{i,t}+H_{i,t}\). & MMT \\
+\(d_{i,t}\) & Desired demand of country \(i\), Eq.~\eqref{eq:demand}. & MMT / step \\
+\(H^{\mathrm{exp}}_{i,t}\) & Expected harvest, Eq.~\eqref{eq:hexp}. & MMT / step \\
+\(T_{i,t}\) & Target stock: lean-season cover plus safety stock, Eq.~\eqref{eq:target}. & MMT \\
+\(L_{i,t}\) & Lean-season cover: expected consumption shortfall to the next world harvest pulse. & MMT \\
+\(s_i\) & Safety stock, \(\sigma^{\mathrm{stu}}C^{\mathrm{ann}}_i\). & MMT \\
+\(O_{i,t}\) & Export supply offered after restriction, Eq.~\eqref{eq:offers}. & MMT / step \\
+\(D_{i,t}\) & Import demand: consumption deficit plus partial rebuilding, Eq.~\eqref{eq:importdemand}. & MMT / step \\
+\(A_{ij}\) & FAOSTAT destination share of exporter \(i\) to importer \(j\); \(\sum_j A_{ij}=1\). & fraction \\
+\(S_{ij}\) & FAOSTAT source share of importer \(j\) from exporter \(i\); \(\sum_i S_{ij}=1\). & fraction \\
+\(\tilde S_{ij,t}\) & Importer source shares, CES-reweighted toward low offer prices, Eq.~\eqref{eq:reweight}. & fraction \\
+\(X_{ij,t}\) & Bilateral shipment from \(i\) to \(j\), Eq.~\eqref{eq:clear}. & MMT / step \\
+\(X^{\mathrm{out}}_{i,t},X^{\mathrm{in}}_{i,t}\) & Total exports and imports of country \(i\). & MMT / step \\
+\(C^{\mathrm{used}}_{i,t}\) & Realised consumption after trade, Eq.~\eqref{eq:consumption}. & MMT / step \\
+\(W_{i,t}\) & Storage capacity, Eq.~\eqref{eq:capacity}. Excess above it is physically drawn down, not charged a carrying cost. & MMT \\
+\(f_{i,t}\) & Fill rate: share of exporter \(i\)'s offer that shipped. & fraction \\
+\(b_t\) & Blockage: share of world import demand whose preferred suppliers are restricted. & fraction \\
+\(u_t,\ \Delta u_t\) & Share of import demand unmet, and its excess over the twin. & fraction \\
+\(\mathcal{F}_t\) & Market-accessible stock, Eq.~\eqref{eq:free}. & MMT \\
+\(\mathcal{F}^{\mathrm{twin}}_t\) & The same measure in the unshocked twin run. & MMT \\
+\(r_t\) & Scarcity ratio \(\mathcal{F}^{\mathrm{twin}}_t/\mathcal{F}_t\), regularised, Eq.~\eqref{eq:ratio}. & 1 \\
+\(p^{\mathrm{tr}}_t\) & Shipment-weighted mean offer price. & \$/t \\
+\(p^{\mathrm{scar}}_t\) & Scarcity price, Eq.~\eqref{eq:pscar}. & \$/t \\
+\(p^{\star}_t\) & Within-period price target, Eq.~\eqref{eq:pstar}. & \$/t \\
+\bottomrule
+\end{longtable}
+
+\subsection{Parameters and current values}
+
+Parameters are classified as \textbf{L} (literature-sourced: elasticities,
+stock-to-use norms), \textbf{S} (definitional --- part of the model's
+specification, such as the clock, the restriction mapping, and the
+calendars), or \textbf{R} (reduced-form: the sign is economically
+motivated, the magnitude is not a structural elasticity, and the value is
+not retuned crisis by crisis).
+
+Parameters carrying the unit ``per step'' are gains in the discrete
+two-week update. They are not continuous-time rates and should not be
+divided by \(\Delta t\) to obtain a physical frequency.
+
+\begin{longtable}{lccccl}
+\caption{Current default values. ``Per step'' refers to the two-week
+update.}
+\label{tab:params}\\
+\toprule
+Symbol & Wheat & Maize & Rice & Class & Unit \\
+\midrule
+\endfirsthead
+\toprule
+Symbol & Wheat & Maize & Rice & Class & Unit \\
+\midrule
+\endhead
+\(\varepsilon\) own-price elasticity & \(-0.15\) & \(-0.25\) & \(-0.20\) & L & elasticity \\
+\(\sigma^{\mathrm{stu}}\) safety stock-to-use & 0.20 & 0.16 & 0.18 & L & years of use \\
+\(\sigma^{\max}\) capacity stock-to-use & 0.28 & 0.18 & 0.22 & L & years of use \\
+\(n^{\mathrm{pipe}}\) working inventory & 12 & 12 & 0 & S & steps \\
+\(\lambda\) stock-adjustment rate & 0.08 & 0.08 & 0.08 & R & per step \\
+\(\lambda_W\) capacity drawdown & 0.08 & 0.08 & 0.08 & R & per step \\
+\(\eta\) scarcity elasticity & 1.00 & 0.85 & 0.95 & R & inverse elast. \\
+\(\rho\) price smoothing & 0.65 & 0.65 & 0.65 & R & weight \\
+\(\omega\) weight on offer prices & 0.70 & 0.80 & 0.72 & R & weight \\
+\(\kappa_u\) unmet-demand weight & 2.5 & 2.5 & 2.5 & R & 1 \\
+\(\kappa_b\) blockage weight & 4.0 & 4.0 & 4.5 & R & 1 \\
+\(\alpha\) offer-price gain & 0.15 & 0.15 & 0.15 & R & per step \\
+\(\theta\) neutral fill rate & 0.70 & 0.70 & 0.70 & R & fraction \\
+\(\gamma\) origin-substitution & 1.25 & 1.25 & 1.25 & R & 1 \\
+\(\beta\) pull toward \(p_t\) & 0.18 & 0.18 & 0.18 & R & weight \\
+\(\alpha_r\) rival markup & 0.80 & 0.80 & 0.80 & R & per step \\
+\(\phi\) weight on current harvest & 0.55 & 0.50 & 0.55 & R & weight \\
+\(\nu\) residual pool & 0.15 & 0.15 & 0.15 & S & fraction \\
+world harvest pulse & 0.12 & 0.12 & 0.12 & S & fraction of year \\
+\bottomrule
+\end{longtable}
+
+Offer prices are bounded to \([0.45p_0,\,2.8p_0]\) and the world price to
+\([60,1200]\) \$/t. The rival markup \(\alpha_r\) was set by the
+requirement that maize export restrictions, applied in isolation, must not
+\emph{reduce} the world price --- a sign condition, not a fit to the
+2007/08 peak.

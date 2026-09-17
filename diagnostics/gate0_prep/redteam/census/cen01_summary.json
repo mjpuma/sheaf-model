@@ -1,0 +1,45 @@
+{
+  "round_trip_max_abs": 0.0,
+  "worst_by_family": {
+    "Agrimate w_n equivalent": 0.2696260882446644,
+    "adaptive EWMA (backward)": 0.4144834786501898,
+    "baseline (phi blend)": 0.0,
+    "climatology belief": 0.303650669618295,
+    "static blend": 0.303650669618295
+  },
+  "lead_profile": [
+    {
+      "lean_mean": 5.791666666666667,
+      "lean_median": 5.0,
+      "lean_max": 14,
+      "lean_p90": 12.0,
+      "share_lead_le6": 0.7887129427205859,
+      "share_lead_gt9": 0.09229372323271193,
+      "phi_agrimate_equiv": 0.7542984551955638,
+      "crop": "wheat",
+      "phi_default": 0.55
+    },
+    {
+      "lean_mean": 8.0,
+      "lean_median": 7.0,
+      "lean_max": 19,
+      "lean_p90": 16.0,
+      "share_lead_le6": 0.5137501200009678,
+      "share_lead_gt9": 0.33848915632384297,
+      "phi_agrimate_equiv": 0.48383839827864894,
+      "crop": "maize",
+      "phi_default": 0.5
+    },
+    {
+      "lean_mean": 5.0625,
+      "lean_median": 4.0,
+      "lean_max": 11,
+      "lean_p90": 10.0,
+      "share_lead_le6": 0.8358350257897154,
+      "share_lead_gt9": 0.04935978551464672,
+      "phi_agrimate_equiv": 0.8039852297130643,
+      "crop": "rice",
+      "phi_default": 0.55
+    }
+  ]
+}

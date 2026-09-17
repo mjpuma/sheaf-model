@@ -29,9 +29,16 @@ dynamics are still missing:
    that overstates own-grain spikes and misses the other markets. In SHEAF the
    no-substitution case is a *special limit* (`σ = 0`), not the model.
 
-Both sit on a **trade network** cleared each period. Cross-grain substitution and the
-endogenous game stay blocked until the per-crop Gate 0 spine is green
-(`diagnostics/PAPER_STACK.md`).
+Both sit on a **trade network** cleared each **fortnight** (Gate 0: 24
+steps/year). Crisis papers keep substitution and the game as separate
+switches: Gate 0 is both off (AMIS diary); Gate 1 is substitution on,
+game off; the crisis game is types slow / actions on that same 24-step
+clock (`diagnostics/GAME_CLOCK.md`). Headey (2011) is the guiding
+account of why those actions have dates, not marketing years.
+
+The annual SPE (Takayama–Judge QP + year-Nash) is **parked** in
+[`sheaf/annual/`](sheaf/annual/README.md) so it can be imported later as a
+slow outer loop. It is not the default API and **not** the 2007/08 object.
 
 ![harvest shocks versus export restrictions, 2006–11](figures/fig1_gate0_prices.png)
 
@@ -39,269 +46,84 @@ endogenous game stay blocked until the per-crop Gate 0 spine is green
 alone miss the 2008 rice spike and understate 2007/08 wheat; adding observed export
 restrictions (AMIS) produces both. That is why SHEAF has a strategic layer —
 restrictions are first-order, not a residual. Agrimate takes those restrictions as
-given; SHEAF's next step is to let exporters choose them. Substitution is the other
-missing piece, and is still off in this figure.*
+given. SHEAF’s destination is to let exporters choose them on that same
+two-week clock; **Gate 0 wheat must be publishable versus Agrimate before
+Gate 1 or Gate 2** ([`diagnostics/DEVELOPMENT.md`](diagnostics/DEVELOPMENT.md)).
+Characteristic government types (how much they care about domestic food)
+can be sticky; the decision is not. Substitution is the other missing
+piece, and is still off in this figure.
 
 ## Mathematical formulation
 
-SHEAF has two related formulations:
+Crisis work uses the **24-step Gate 0 spine** (`sheaf/dynamic_crop.py`,
+§8 below). The baseline market is open to revision after colleague
+consultation; existing `diagnostics/gate0_*_report.md` scores are
+snapshots, not a freeze.
 
-1. **Annual multi-commodity SPE + export game** (`sheaf/core.py`, §§1–6) — the
-   original market / strategic / storage layers.
-2. **Gate 0 per-crop sub-annual spine** (`sheaf/dynamic_crop.py`, §8) — Agrimate-aligned
-   24-step/year bilateral stock–trade dynamics with **ask-dominated** world prices.
-   Harvest forcing is climatology × **LOWESS anomaly** (not raw PSD year totals;
-   in-sample means turn post-2008 yield growth into a fake 2006 crash — §8).
-   Run wheat, maize, and rice **separately** first
-   (`scripts/score_subannual_crop.py --crop …`). Cross-grain substitution and
-   Level 2 are blocked until all three single-crop Gate 0 reports are green
-   (`diagnostics/GATE0_PER_CROP_PLAN.md`).
-
-Crisis validation (Gate 0) uses §8. The annual SPE remains a reference / outer
-diagnostic and the multi-commodity / Level-2 host. Symbols are defined in the
-notation tables of each subsection.
-
-### Notation (annual SPE layers, §§1–5)
-
-| Symbol | Meaning |
-|---|---|
-| $i,j \in \{1,\dots,n\}$ | countries (network nodes) |
-| $g,h \in \{1,\dots,G\}$ | grains (wheat, rice, maize) |
-| $D_i \in \mathbb{R}^{G}_{\ge 0}$ | consumption vector of country $i$ |
-| $a_i \in \mathbb{R}^{G}$ | demand intercept (choke consumption, i.e. demand at zero price) |
-| $p_i \in \mathbb{R}^{G}$ | domestic price vector of country $i$ |
-| $f^g_{ij} \ge 0$ | bilateral flow of grain $g$ from $i$ to $j$ |
-| $Q^g_i$ | baseline production; $\xi^g_i$ production-shock multiplier |
-| $A^g_i$ | available supply after storage |
-| $M_i \in \mathbb{R}^{G\times G}$ | country $i$ demand-slope matrix (symmetric PD) |
-| $D_{0},\ p_{0}$ | baseline consumption and reference prices (calibration anchors) |
-| $\tau^g_i \ge 0$ | export-tax-equivalent (restriction); $m^g_j$ import tariff |
-| $c_{ij},\ \phi_g,\ \psi_{ij}$ | transport cost, grain freight factor, route (chokepoint) multiplier |
-| $R^g_i,\ \bar R^g_i$ | reserve (stock) level and storage capacity |
-| $r,\ t$ | discount rate; time-period index |
-
-### 1. Demand system (cross-commodity substitution)
-
-Each country has a linear demand system over all grains, with **demand intercept**
-$a_i\in\mathbb{R}^{G}$ (choke consumption, the demand at zero price) and slope matrix $M_i$,
-
-$$D_i = a_i - M_i\, p_i, \qquad p_i = M_i^{-1}(a_i - D_i),$$
-
-with $M_i$ **symmetric positive-definite**. Symmetry is the Slutsky/integrability
-condition: it guarantees a scalar consumer-benefit potential $W_i$ whose gradient is
-the inverse demand,
-
-$$W_i(D_i) = (M_i^{-1} a_i)^\top D_i - \tfrac12\, D_i^\top M_i^{-1} D_i,
-\qquad \nabla_{D_i} W_i = M_i^{-1}(a_i - D_i) = p_i,$$
-
-and positive-definiteness makes $W_i$ **strictly concave** (since $M_i \succ 0 \iff
-M_i^{-1}\succ 0$), which is what keeps the market program well-posed. Consumer
-surplus is the potential net of expenditure,
-
-$$CS_i(D_i) = W_i(D_i) - p_i^\top D_i,$$
-
-which reduces to the familiar triangle $\tfrac12\sum_g (D^g_i)^2/\beta^g_i$ in the
-one-grain, constant-slope case (with $\beta^g_i=b_g$, the own-price slope).
-
-**Construction of $M_i$ from data.** Given baseline consumption $D_{0}$, reference
-prices $p_{0}$, own-price elasticities $\varepsilon_g<0$, and a symmetric
-substitutability matrix $\rho_{gh}\in[0,1)$ with zero diagonal, define own slopes
-and cross terms
-
-$$b_g = -\,\varepsilon_g\, \frac{D_{0,g}}{p_{0,g}} \;>\;0,
-\qquad
-S_{gh} = \sigma\,\rho_{gh}\,\sqrt{b_g b_h}\ \ (g\neq h),\quad S_{gg}=0,$$
-
-$$M_i = \mathrm{diag}(b) - S \quad\text{(symmetrised)},\qquad
-a_i = D_{0} + M_i\, p_{0}.$$
-
-Here $\sigma \ge 0$ (`subst_scale`) is a global substitution strength. Off-diagonals
-of $M_i$ are $-S_{gh}\le 0$, i.e. $\partial D^g_i/\partial p^h_i = -M_{i,gh} \ge 0$
-for substitutes: a higher price of grain $h$ raises demand for grain $g$. Rows of
-$S$ are rescaled if needed to enforce strict diagonal dominance, which guarantees
-$M_i \succ 0$. The intercept calibration ensures $D_i = D_0$ at $p_i = p_0$.
-
-### 2. Market layer: multi-commodity spatial price equilibrium
-
-Given availabilities $A^g_i$ and policies $(\tau,m)$, all grains clear **jointly** as
-one concave quadratic program (Samuelson–Takayama–Judge net-social-payoff form):
-
-$$\max_{D\ge 0,\ f\ge 0}\ \ \sum_{i=1}^{n} W_i(D_i)\;-\;\sum_{g=1}^{G}\sum_{i,j} K^g_{ij}\, f^g_{ij}$$
-
-$$\text{s.t.}\quad
-A^g_i + \sum_{k} f^g_{ki} - \sum_{k} f^g_{ik} - D^g_i = 0 \quad \forall i,g,
-\qquad f^g_{ii}=0,$$
-
-where the delivered marginal cost on a route bundles transport and trade policy,
-
-$$K^g_{ij} = c_{ij}\,\phi_g\,\psi_{ij} \;+\; \tau^g_i \;+\; m^g_j .$$
-
-Commodities are coupled **only** through the off-diagonal (cross-price) terms of each
-$W_i$; the network couples countries through the balance constraints and $K$.
-
-**Equilibrium interpretation.** Let $\lambda^g_i$ be the multiplier on the balance
-constraint. At the optimum $\lambda^g_i = p^g_i$ (the recovered domestic price), and
-the KKT/complementary-slackness conditions are the classical spatial-arbitrage
-(Enke–Samuelson) relations
-
-$$p^g_j - p^g_i \le K^g_{ij}, \qquad f^g_{ij}\,\big(K^g_{ij} - (p^g_j - p^g_i)\big) = 0 .$$
-
-Grain moves $i\to j$ only when the price gap exactly covers the delivered marginal
-cost; an export tax $\tau^g_i$ raises every route out of $i$ and thus widens the wedge
-between $i$'s domestic price and world prices — the mechanism of insulation. Strict
-concavity of $\sum_i W_i$ gives a unique equilibrium consumption/price allocation
-(flows may be non-unique when routes tie).
-
-### 3. Storage layer
-
-Two stock types adjust availability before clearing,
-$A^g_i = Q^g_i\,\xi^g_i - \Delta^{\mathrm{mkt},g}_i - \Delta^{\mathrm{gov},g}_i$,
-with $\Delta>0$ a build (removed from supply) and $\Delta<0$ a release. Expectations
-are adaptive/mean-reverting toward a normal price $p^{\mathrm{norm}}_g$,
-
-$$p^{e}_{i,g} = p^{\mathrm{prev}}_{i,g} + \kappa\,(p^{\mathrm{norm}}_g - p^{\mathrm{prev}}_{i,g}).$$
-
-**Competitive (market-responsive) storage** follows a Wright–Williams / Deaton–Laroque
-arbitrage rule with a carrying-cost deadband $\theta$: with signal
-$s = p^{e}_{i,g}/(1+r) - p^{\mathrm{ref}}_{i,g}$, where the reference price
-$p^{\mathrm{ref}}$ is the **previous period's** realised domestic price
-$p^{\mathrm{prev}}$ (so private storage responds to a contemporaneous harvest
-shock with a one-period lag — a disclosed prototype timing choice, not a
-simultaneous TWIST/Agrimate-style rule),
-
-$$\Delta^{\mathrm{mkt},g}_i =
-\begin{cases}
-\gamma^g_i\big(s - \theta\,\mathrm{sgn} s\big), & |s|>\theta,\\[2pt]
-0, & |s|\le\theta,
-\end{cases}
-\qquad \text{clipped to } [-R^g_i,\ \bar R^g_i - R^g_i].$$
-
-Stocks are built when the discounted expected price exceeds the current price by more
-than the carrying cost, and released in the opposite case. Expectations mean-revert
-toward a target chosen so the storage rule's rest point equals mean $p_0$
-(not raw $p^{\mathrm{norm}}$).
-
-**Strategic (government) buffer stocks** release in a crisis and rebuild toward a
-target stock-to-use ratio $\vartheta^g_i$ in calm periods. The quantity-leg shortfall
-is the **gap after normal baseline trade**
-$\Sigma = D^g_{0,i} - A^{\text{(pre-gov)}} - \max(D^g_{0,i}-Q^g_i,\,0)$
-(so structural importers are calm at $\xi=1$, and exporters enter crisis only when
-pre-gov availability falls below domestic baseline needs), with trigger price
-$p^{\mathrm{trig}}$,
-
-$$\Delta^{\mathrm{gov},g}_i =
-\begin{cases}
--\,\min\!\big(\eta_{\mathrm{rel}}\,R^g_i,\ \max(\Sigma,0)\big) \ \text{or}\ -\eta_{\mathrm{rel}}R^g_i, & \text{crisis } (p^{\mathrm{ref}}>p^{\mathrm{trig}} \ \text{or}\ \Sigma>0),\\[2pt]
-+\,\eta_{\mathrm{bld}}\big(\vartheta^g_i D^g_{0,i} - R^g_i\big)_+, & \text{calm (and not crisis)}.
-\end{cases}$$
-
-### 4. Strategic layer: export-restriction game
-
-Each exporting government chooses a non-negative export-tax-equivalent vector
-$\tau_i = (\tau^g_i)_g$ (a ban corresponds to a large $\tau$) to maximise national
-welfare, taking other governments' choices as given:
-
-$$\mathcal{W}_i(\tau) = CS_i \;+\; \underbrace{\sum_g p_{i,g} Q_{i,g}}_{\text{producer income } \Pi_i}
-\;-\; \underbrace{\sum_g w_{i,g}\,\big(p_{i,g}-\bar p_{i,g}\big)_+^{2}}_{\text{food-security penalty } \Phi_i}
-\;+\; \zeta \underbrace{\sum_g \tau^g_i X^g_i}_{\text{terms-of-trade } \Psi_i},$$
-
-where $(x)_+ = \max(x,0)$, $X^g_i$ is net exports, $w_{i,g}\ge 0$ weights the political
-cost of high domestic staple prices, $\bar p_{i,g}$ is the tolerated price, and
-$\zeta$ (`revenue_weight`, default $0$) optionally activates a terms-of-trade motive.
-Producer income uses **baseline** production $Q$ (not shocked or post-storage sales) as a
-fixed policy weight in $\Pi_i$ — intentional in this prototype, not realised farm receipts.
-Crucially every term depends on $\tau$ through the market map $p(\tau), D(\tau), X(\tau)$
-of §2. The one-sided quadratic penalty is flat until the domestic price breaches
-$\bar p_{i,g}$ and convex above it, which reproduces the observed regime switch: trade
-stays open in calm periods and restrictions appear only in price spikes.
-
-A **Nash equilibrium** is a profile $\tau^\star$ with
-
-$$\tau_i^\star \in \arg\max_{0\le \tau_i \le \bar\tau}\ \mathcal{W}_i\big(\tau_i, \tau_{-i}^\star\big)\quad \forall i .$$
-
-It is computed by **iterated best response** over the equilibrium map: each exporter's
-$\tau^g_i$ is line-searched on a grid $\{0,\dots,\bar\tau\}$ (re-solving the market QP
-for every candidate), sweeping exporters until $\max_{i,g}|\tau^{(k+1)} - \tau^{(k)}|
-< \epsilon$. Because $\mathcal{W}_i$ is non-concave in $\tau$ (the penalty kink,
-the network), this returns an approximate/discretised equilibrium rather than a proven
-unique one — standard for this class of policy games.
-
-**Why states, not firms, are the strategic players.** The strategic instrument is an
-export restriction — a sovereign lever no firm can pull — so the object of study fixes
-the players. Agribusiness is not absent: the competitive market layer of §2 *is*
-traders arbitraging price gaps across the network. The firm optimises within the
-rules; the state sets them. Oligopolistic traders with market power are a natural
-third agent class for future work, but for the export-ban question the first-order
-driver is state policy.
-
-### 5. Temporal dynamics (annual SPE orchestrator)
-
-Each **annual** period $t$ in `SheafModel` executes: (i) form expectations $p^e$;
-(ii) set storage $\Delta^{\mathrm{mkt}},\Delta^{\mathrm{gov}}$ and hence availability
-$A_t$; (iii) a **stress gate** solves the market at $\tau=0$ and plays the game only
-if $\max_{i,g} p_{i,g} > \mu\,p^{\mathrm{norm}}_g$; (iv) clear the market / equilibrium
-game to get $p_t, D_t, f_t$; (v) update reserves
-$R_{t+1} = \max(0,\ R_t + \Delta_t)$. Shocks enter as $\xi^g_i(t)$ and chokepoint
-multipliers $\psi_{ij}(t)$.
-
-**Gate 0 crisis hindcasts do not use this annual clock.** They use the 24-step/year
-spine in §8 (`ARCHITECTURE.md`).
-
-### 6. The single-commodity models as a limiting case
-
-> **Proposition.** If $\sigma = 0$ (equivalently $\rho \equiv 0$), then $S = 0$ and
-> each $M_i = \mathrm{diag}(b_i)$ is diagonal. The benefit potential separates,
-> $W_i(D_i) = \sum_g W^g_i(D^g_i)$, so the market QP of §2 decomposes into $G$
-> **independent** single-commodity spatial price equilibria, and national welfare
-> $\mathcal{W}_i$ decouples across grains so the export game is played independently
-> per grain. SHEAF then reduces to $G$ parallel single-commodity strategic-trade
-> models of the TWIST/Agrimate class.
-
-Consequently those models are the **zero-substitution boundary** of SHEAF, and the
-substitution contribution is precisely the deviation from that boundary — the object
-`demo.py` measures (a wheat shock spilling into rice and maize only when $\sigma>0$).
+The **annual SPE** (linear demand, yearly QP, lagged-price storage,
+$/t Nash) is parked in [`sheaf/annual/README.md`](sheaf/annual/README.md).
+Pull it in with `from sheaf.annual import SheafModel`. Do not treat it as
+the crisis heartbeat.
 
 ### 7. From data to parameters
 
 **Gate 0 wheat spine (§8):** USDA PSD country production, consumption, and ending
-stocks (`sheaf/data_usda.py`); FAOSTAT bilateral E0 shares
-(`sheaf/data_faostat.py`); AMIS export-restriction schedules; harvest calendars in
-`data/crop_calendars/`; monthly Pink Sheet prices for scoring.
+stocks (`sheaf/data_usda.py`); FAOSTAT bilateral E0 **share pattern**
+(`sheaf/data_faostat.py`) — E0 magnitudes are unit-agnostic and are never
+used as tonnes; only row/column shares $A,S$ enter the spine; AMIS
+export-restriction schedules; harvest calendars in `data/crop_calendars/`;
+monthly Pink Sheet prices for scoring.
 
-**Annual SPE prototype:** `demo.py` / `SheafModel` still use the illustrative table
-in `sheaf/calibration.py` (optionally overlaid with USDA quantities). Own- and
-cross-price elasticities $(\varepsilon_g,\rho_{gh})$ and policy weights
-$(w_{i,g}, \bar p_{i,g})$ remain illustrative pending Level-2 calibration
-(`VALIDATION.md`).
+**Annual SPE prototype (parked):** `sheaf.annual.SheafModel` still uses the
+illustrative table in `sheaf/calibration.py` (optionally overlaid with USDA
+quantities). See [`sheaf/annual/README.md`](sheaf/annual/README.md).
 
-### 8. Gate 0 sub-annual crop spine (Agrimate-aligned)
+### 8. Gate 0 (Agrimate baseline)
 
-Implementation: `sheaf/dynamic_crop.py` (wheat wrap: `sheaf/dynamic_wheat.py`).
-Clock: $T_y=24$ steps per year
-($\Delta t \approx 15.2$ days). Quantities in million tonnes (MMT); prices in
-real \$/tonne (Pink Sheet deflator). **One crop at a time** until Gate 0 is green
-for wheat, maize, and rice (`diagnostics/GATE0_PER_CROP_PLAN.md`).
+**Default host:** `sheaf/agrimate/` — independent implementation of Kuhla et al.
+(2025) supplement §D, wheat application. Contract:
+[`diagnostics/GATE0_CONTRACT.md`](diagnostics/GATE0_CONTRACT.md). Spec map:
+[`diagnostics/GATE0_SPEC_MATRIX.md`](diagnostics/GATE0_SPEC_MATRIX.md).
+Validation protocol:
+[`diagnostics/GATE0_VALIDATION.md`](diagnostics/GATE0_VALIDATION.md).
 
-#### Notation
+```bash
+PYTHONPATH=. python scripts/run_agrimate_validation.py
+```
+
+Single-path solver smoke: `PYTHONPATH=. python scripts/run_agrimate_wheat.py`.
+
+Clock: $T_y=24$ (Agrimate §4.1). Quantities in MMT; reported world price is the
+volume-weighted international transaction-price *index* scaled by the 2006
+real Pink Sheet wheat mean. 27 Agrimate wheat nodes (`AgrimateRegionsWheat`).
+Nash initialisation is not the dynamic baseline and does not pin the unforced
+world price.
+
+**Legacy benchmark** (pre-rewrite ask / scarcity map): `sheaf/legacy/`,
+`python scripts/score_legacy_crop.py --crop wheat`. The notation table below
+describes that legacy host; it is not the Agrimate baseline.
+
+#### Legacy notation (ask/scarcity host)
 
 | Symbol | Meaning | Default / source |
 |---|---|---|
 | $i,j$ | SHEAF nodes (17 named + Rest-of-World) | `calibration.DATA` |
 | $t$ | sub-annual step index | $24$ per calendar year |
 | $H_{i,t}$ | harvest inflow (MMT/step) | climatology × LOWESS anomaly × calendar |
-| $C_{i,t}$ | baseline food use (MMT/step) | PSD consumption $/24$ |
+| $C_{i,t}$ | baseline food/feed use (MMT/step) | official P1: mean-flex $/24$ |
 | $S_{i,t}$ | end-of-step stocks (MMT) | state variable |
-| $\mathrm{avail}_{i,t}$ | $S_{i,t}+H_{i,t}$ | — |
+| $\mathrm{avail}_{i,t}$ | $S_{i,t}+H_{i,t}$ | identity, every step |
 | $p_t$ | world price (\$/t) | state; smoothed |
 | $p_0$ | reference price | mean real Pink Sheet in start year |
 | $\varepsilon$ | food demand price elasticity | crop-specific (`CropParams.elast`) |
 | $\tau_{i,t}\in[0,1]$ | AMIS export quantity cut | ban $0.95$, tax $0.50$, … |
-| $A_{ij}$ | destination share of $i$'s exports to $j$ | FAOSTAT E0 (diag $0$) |
-| $S_{ij}$ | source share of $j$'s imports from $i$ | FAOSTAT E0 (diag $0$) |
+| $A_{ij}$ | destination share of $i$'s exports to $j$ | FAOSTAT E0 **row shares** (diag $0$; E0 is not tonnes) |
+| $S_{ij}$ | source share of $j$'s imports from $i$ | FAOSTAT E0 **column shares** (diag $0$) |
 | $q_{i,t}$ | exporter **ask** price (\$/t) | adapts to fill rates |
 | $\lambda$ | stock-rebuild speed per step | $0.08$ |
 | $\phi$ | weight on realized harvest in foresight | $0.55$ (maize $0.40$) |
-| $\eta$ | scarcity-price inverse elasticity | $\approx 1.0$ |
+| $\eta$ | scarcity-price inverse elasticity | $\approx 1.0$ (`inv_eta`) |
+| $\mathrm{shift}_t$ | scarcity-ratio floor | $0.05\sum_i s_i$ plus a non-negativity pad |
 | $\rho$ | price smoothing toward $p^\star$ | $0.65$ |
 | $\kappa_u,\kappa_b$ | unmet-anomaly and preferred-block weights | crop-specific |
 | $\alpha,\theta$ | ask-adjustment speed and target fill | $0.15$, $0.70$ |
@@ -331,6 +153,15 @@ where \(\hat Y\) is a per-country LOWESS trend on a padded PSD history
 (`detrend_anomalies` in `sheaf/data_usda.py`, Agrimate's method) and the
 annual total is then spread with triangular month weights.
 
+**Calendar weights.** For a harvest window of $N$ months with peak index
+$i_{\mathrm{peak}}$ along that window,
+$$
+w_m \propto \max\bigl(N-|i_m-i_{\mathrm{peak}}|,1\bigr)
+$$
+on months in the window and $0$ elsewhere; then each month is split
+equally across its two half-month steps so $\sum_t w_{i,t}=1$ over a year
+(`harvest_month_weights`, `step_weights_from_months`).
+
 **Why this matters.** An in-sample 2006–11 *mean* is contaminated by post-2008
 trend growth. World wheat 2006 is about **−9% vs that mean** but only **−4% vs
 LOWESS**. The model then treats 2006/07 as a crash (false May spike) and
@@ -346,18 +177,40 @@ surpluses as well as shortfalls.
 Rice calendars are multi-crop (kharif + rabi / early + late) except Vietnam,
 whose autumn pulse is kept so the 2008 ban still hits offers.
 
+**Availability.** At the start of every step,
+$$\mathrm{avail}_{i,t}=S_{i,t}+H_{i,t}.$$
+
+**Official P1 step demand.** Year-by-year flex is a sensitivity
+(`use_demand=True`). The locked score uses **mean flex**, split uniformly:
+$$
+\overline{C}^{\mathrm{flex}}_i=\frac{1}{Y}\sum_y C^{\mathrm{flex}}_{i,y},
+\qquad
+C^{\mathrm{flex}}_{i,t}=\overline{C}^{\mathrm{flex}}_i/24.
+$$
+Industrial (USA maize FSI excess) is year-by-year when
+`use_industrial=True`, then $/24$. Pipeline food used in $W$ is
+$C_i^{\mathrm{ann}}/24$, not the shocked flex path.
+
 #### Lean foresight and targets
 
-Let $h_t$ be steps to the next global harvest pulse (cumulative future world
-harvest $\ge 12\%$ of mean annual world $H$). Expected harvest for foresight is
-the blend
-$$H^{\mathrm{exp}}_{i,t}=\phi\,H_{i,t}+(1-\phi)\,H^{\mathrm{seas}}_{i,t},$$
-where $H^{\mathrm{seas}}$ is the mean-year seasonal path. Then
+Let $h_t$ be steps to the next global harvest pulse: the smallest $h\ge 1$
+such that cumulative **world** harvest ahead reaches $12\%$ of mean annual
+world $H$ (cap $24$; `steps_to_harvest_pulse`),
 $$
-L_{i,t}=\max\Bigl(0,\ \sum_{k=1}^{h_t} C_{i,t+k}-\sum_{k=1}^{h_t} H^{\mathrm{exp}}_{i,t+k}\Bigr),
+h_t=\min\Bigl\{h\ge 1:\ \sum_{k=1}^{h} H^{\mathrm{world}}_{t+k}
+\ge 0.12\,\overline{H}^{\mathrm{world}}\Bigr\}.
+$$
+All countries share this clock. Expected harvest for foresight is the blend
+$$H^{\mathrm{exp}}_{i,t}=\phi\,H_{i,t}+(1-\phi)\,H^{\mathrm{seas}}_{i,t},$$
+where $H^{\mathrm{seas}}$ is the mean-year seasonal path. The lean gap
+**includes the current step** ($k=0$ through $h_t$):
+$$
+L_{i,t}=\max\Bigl(0,\ \sum_{k=0}^{h_t} C_{i,t+k}-\sum_{k=0}^{h_t} H^{\mathrm{exp}}_{i,t+k}\Bigr),
 \qquad
 T_{i,t}=L_{i,t}+s_i.
 $$
+(`rolling_ahead_variable` sums $t+1,\ldots,t+h_t$; `_simulate_window`
+adds $C_{i,t}$ and $H^{\mathrm{exp}}_{i,t}$.)
 
 #### Demand, offers, and AMIS
 
@@ -410,11 +263,31 @@ scored Vietnam window is a 2008 tax. Not FAOSTAT bilateral crisis volumes.
 
 #### Adaptive ask prices and Armington clear
 
-Destination shares are ask-reweighted,
-$$\tilde A_{ij}\propto A_{ij}\,(p_0/q_{i,t})^{\gamma}\quad(\text{rows renormed}),$$
-then
-$$\mathrm{ship}_{ij}=\min\bigl(O_{i,t}\tilde A_{ij},\,D_{j,t}S_{ij}\bigr),$$
-with a residual pool that can fill at most fraction $\nu$ of leftover demand.
+Importer source shares are the CES mix (cheaper origins gain share),
+$$\tilde S_{ij}\propto S_{ij}\,(p_0/q_{i,t})^{\gamma}\quad(\text{columns renormed}),$$
+then preferred links clear as
+$$\mathrm{ship}^0_{ij}=\min\bigl(O_{i,t}A_{ij},\,D_{j,t}\tilde S_{ij}\bigr).$$
+Destination-row reweighting \(\tilde A_{ij}\propto A_{ij}(p_0/q_{i,t})^{\gamma}\)
+(`_ask_reweight_dest`) is the identity and does not allocate trade; the
+live channel is `_ask_reweight_src`.
+
+Leftover offers and leftover demand form a residual pool that can fill at
+most fraction $\nu$ of leftover demand (`_bilateral_clear`):
+$$
+\mathrm{offer}^{\mathrm{left}}_i=\max\bigl(0,O_{i,t}-\textstyle\sum_j\mathrm{ship}^0_{ij}\bigr),
+\quad
+\mathrm{demand}^{\mathrm{left}}_j=\max\bigl(0,D_{j,t}-\textstyle\sum_i\mathrm{ship}^0_{ij}\bigr),
+$$
+$$
+\mathrm{take}_j=\nu\,\mathrm{demand}^{\mathrm{left}}_j,
+\qquad
+\mathrm{fill}=\min\Bigl(1,\;
+\frac{\sum_i\mathrm{offer}^{\mathrm{left}}_i}{\sum_j\mathrm{take}_j}\Bigr),
+$$
+leftover offers are allocated by leftover-demand weights
+$w_j\propto\mathrm{take}_j\cdot\mathrm{fill}$, and columns are clipped so
+no importer receives more than that cap. $\mathrm{ship}=\mathrm{ship}^0+\mathrm{ship}^1$.
+E0 never supplies the tonnes; $O$ and $D$ do.
 Fill rates update asks (sold-out $\Rightarrow$ raise ask; leftover $\Rightarrow$ cut):
 $$
 q_{i,t+1}
@@ -443,14 +316,24 @@ b_t=\frac{\sum_{i,j} S_{ij}\,\tau_{i,t}\,D_{j,t}}{\max(\sum_j D_{j,t},\epsilon)}
 \quad
 \Delta u_t=\max(0,u_t-u^{\mathrm{twin}}_t).
 $$
-Trade-weighted ask $p^{\mathrm{tr}}_t=\sum_i q_{i,t}\mathrm{shipped}_{i,t}/\sum_i\mathrm{shipped}_{i,t}$
-(or $p_t$ if no trade). Scarcity signal
+Trade-weighted ask
+$$
+p^{\mathrm{tr}}_t=\frac{\sum_i q_{i,t}\,\mathrm{shipped}_{i,t}}{\sum_i\mathrm{shipped}_{i,t}}
+$$
+(or the incoming $p_t$ if no trade). The scarcity ratio uses a
+**state-dependent floor**, not a free constant $f$:
+$$
+\mathrm{shift}_t=0.05\sum_i s_i+\max\bigl(0,\,-\min(\mathrm{free}_t,F^{\mathrm{twin}}_t)\bigr),
+\qquad
+r_t=\frac{F^{\mathrm{twin}}_t+\mathrm{shift}_t}{\mathrm{free}_t+\mathrm{shift}_t}.
+$$
+The $0.05\sum s_i$ term keeps $r_t$ defined when free cover is small; the
+second term is zero unless free or twin goes negative. Scarcity signal
 $$
 p^{\mathrm{scar}}_t=p_0\cdot r_t^{\eta_{\mathrm{eff}}}
 \cdot\bigl(1+\kappa_u\Delta u_t+\kappa_b b_t\bigr),
 $$
-with $r_t=(F^{\mathrm{twin}}_t+f)/(\mathrm{free}_t+f)$ and $\eta_{\mathrm{eff}}=\eta$
-(symmetric in surplus and shortage). Then
+with $\eta_{\mathrm{eff}}=\eta$ (symmetric in surplus and shortage). Then
 $$
 p^\star_t=\omega\,p^{\mathrm{tr}}_t+(1-\omega)\,p^{\mathrm{scar}}_t,
 \qquad
@@ -459,11 +342,70 @@ $$
 If the path matches the twin (calm), $p^\star_t=p_0$ by construction
 (`assert_twin_identity`).
 
+**Opening stocks.** PSD ending stocks in `stock_seed_year` (default 2005)
+are clipped to carry,
+$$
+S_{i,0}=\min\bigl(R^{\mathrm{end}}_{i,\mathrm{seed}},\,
+\max(\mathtt{max\_stu}\,C_i^{\mathrm{ann}},\,1.5 s_i)\bigr),
+$$
+then optionally spun up `spin_up_years=2` on climatology harvest, mean
+flex, no industrial, no AMIS. The $1.5s$ floor is an **opening** clip
+only; warehouse $W$ uses $\mathtt{max\_stu}\,C$ with no $1.5s$ term.
+
+#### Method of solution
+
+The crisis host does **not** solve a spatial price equilibrium, a
+complementarity problem, or a market-clearing root each step.
+`_simulate_window` evaluates an **explicit sequential map**
+$t=0,\ldots,T-1$. Lean horizons and rolling sums are computed once
+before the loop. Inside the step:
+
+1. $\mathrm{avail}_{i,t}=S_{i,t}+H_{i,t}$
+2. $d,L,T,D,O$ from closed-form algebra (isoelastic $d$ uses the
+   **incoming** $p_{t-1}$; $q_{i,t}$ is the ask inherited from $t-1$)
+3. $\tilde S$, Armington $\min$, residual pool (dense $n\times n$)
+4. consumption, stock update, soft warehouse clip
+5. ask update $\to q_{i,t+1}$
+6. $p^{\mathrm{tr}}$, $\mathrm{shift}$, $r$, $p^{\mathrm{scar}}$,
+   $p^\star$, then $p_t=\rho\,p_{t-1}+(1-\rho)\,p^\star_t$
+
+There is no inner iteration to a within-step fixed point. The
+path-matched twin is a **second** forward pass of the same map
+(mean-flex $C$, seasonal $H$, $\tau\equiv 0$). Complexity is
+$O(Tn^2)$ per crop ($n=18$). Implementation is NumPy; `cvxpy` is not
+imported on this path. **SHEAF stays in Python.** Agrimate's Julia is
+because they solve per-step agent optimizations, not because the same
+map is faster in Julia. The same map would be the same algorithm in
+either language.
+
+**Gate 1.** One Jacobi factor $\mathrm{fac}=\exp(\eta\log(p/p_0))$ from
+the three *start-of-step* world prices, then $G$ independent Gate 0
+maps. Not a simultaneous three-crop fixed point and not Gauss–Seidel.
+
+**Gate 2.** Three forward passes of the Gate 0 map (climatology, open
+shocked harvest, then shocked harvest with $\tau_t$). The ratio rule is
+a threshold, not an optimization. Nested-year grid BR is a leftover
+diagnostic for $\tau^{\mathrm{on}}$.
+
+**LOWESS** (prepare time only): tricube local linear, one $2\times 2$
+weighted least-squares solve per sample point (`data_usda._lowess`).
+
+**Parked annual host** (`sheaf.annual`): concave QP via cvxpy
+(CLARABEL → SCS → OSQP) and year-IBR. Not the crisis object.
+
+Agrimate (Kuhla et al. 2025) is a different object: each region’s
+supplier, consumer, and purchaser solve constrained optimizations every
+step (finite-horizon expected profit; CES under budget). That is why
+their model is Julia (optional MPI). SHEAF’s crisis host does not solve
+those agent problems.
+
 #### Robustness asserts
 
 `assert_twin_identity`, `assert_amis_raises_price`, `assert_amis_cuts_exports`,
 `assert_no_spring_spike` — run by `scripts/score_subannual_crop.py --crop …`.
-Paper stack (P1 now; substitution / game later): `diagnostics/PAPER_STACK.md`.
+Questions the model might answer (hindcast, substitution, who restricts,
+club, tipping, network) — not a queue of papers:
+`diagnostics/PAPER_STACK.md`. Clock: `diagnostics/GAME_CLOCK.md`.
 Agrimate-style figures: `python scripts/make_agrimate_comparison.py`.
 
 ### References
@@ -492,25 +434,40 @@ Agrimate-style figures: `python scripts/make_agrimate_comparison.py`.
 - Falkendal, T., Otto, C., Schewe, J., Jägermeyr, J., Konar, M., Kummu, M., Watkins, B., & Puma, M. J. (2021). Grain export restrictions during COVID-19 risk food insecurity in many low- and middle-income countries. *Nature Food*, 2(1), 11–14. https://doi.org/10.1038/s43016-020-00211-7
 - Kuhla, K., Kubiczek, P., & Otto, C. (2025). Understanding agricultural market dynamics in times of crisis: the dynamic agent-based network model Agrimate. *Ecological Economics*, 231, 108546. https://doi.org/10.1016/j.ecolecon.2025.108546
 
-*Note on the TWIST/Agrimate lineage.* TWIST (Trade With Storage; Schewe et al. 2017, applied in Falkendal et al. 2021) reproduces annual world wheat prices from a stylised price–supply curve but does not resolve the trade network or export restrictions. Agrimate (Kuhla et al. 2025) adds a dynamic agent-based network with commercial and strategic stockholding and hindcasts 2007/08 and 2010/11, taking export restrictions as an exogenous AMIS schedule. Both are single-commodity. SHEAF exists to put **endogenous strategy** (governments choose restrictions) and **cross-grain substitution** on that network — see Gate 0 above for why restrictions are first-order, and §6 for the zero-substitution limit.
+*Note on the TWIST/Agrimate lineage.* TWIST (Trade With Storage; Schewe et al. 2017, applied in Falkendal et al. 2021) reproduces annual world wheat prices from a stylised price–supply curve but does not resolve the trade network or export restrictions. Agrimate (Kuhla et al. 2025) adds a dynamic agent-based network with commercial and strategic stockholding and hindcasts 2007/08 and 2010/11, taking export restrictions as an exogenous AMIS schedule. Both are single-commodity. SHEAF exists to put **endogenous strategy** (governments choose restrictions) and **cross-grain substitution** on that network. Headey (2011) is the account of *when* those restrictions and import surges happen — months, not years — so the crisis game belongs on Agrimate’s 24-step clock, not on TWIST’s annual SPE. Gate 0 is why restrictions are first-order, with AMIS still prescribed; Gate 1’s $\sigma=0$ identity is the zero-substitution limit on the live host. The annual $\sigma=0$ proposition lives in `sheaf/annual/README.md`.
 
 ## Quick start
 
 ```bash
 pip install -r requirements.txt
-python demo.py
+PYTHONPATH=. python scripts/run_agrimate_validation.py
 ```
 
-The demo runs a Black Sea wheat shock (Russia −40%, Ukraine −50%) under two
-regimes — substitution on (full annual SPE) and off (single-commodity limit) — plus a
-no-shock counterfactual for each, and writes `sheaf_results.csv` and four figures
-(including `figures/fig1_coupling.png`, the substitution spillover illustration).
-Crisis hindcasts use the Gate 0 spine, not this demo: `scripts/score_subannual_crop.py`.
+That is the documented Gate 0 wheat validation (undisturbed / harvest-only /
+harvest+AMIS; prices and USDA supply/stocks). Report:
+`diagnostics/gate0_agrimate/validation.md`. Protocol:
+`diagnostics/GATE0_VALIDATION.md`. Solver smoke:
+`PYTHONPATH=. python scripts/run_agrimate_wheat.py`. Legacy ask/scarcity scores:
+`python scripts/score_legacy_crop.py --crop wheat`.
 
-Minimal use in code:
+The parked annual SPE (Black Sea shock on the yearly QP):
+
+```bash
+python scripts/annual/demo.py
+```
+
+Minimal crisis use in code:
 
 ```python
-from sheaf import build_countries, SheafModel
+from sheaf import run_agrimate
+
+result = run_agrimate()  # wheat, Agrimate-faithful host
+```
+
+Annual prototype (only when you want the yearly QP):
+
+```python
+from sheaf.annual import build_countries, SheafModel
 
 countries, transport, grains, freight = build_countries(substitution=True)
 model = SheafModel(countries, transport, grains, freight_mult=freight)
@@ -521,39 +478,52 @@ df = model.run(periods=12, shocks={5: shock_matrix, 6: shock_matrix})
 
 ```
 sheaf/
-  core.py          # demand system, spatial equilibrium, export game, storage, orchestrator
-  calibration.py   # the 3-grain prototype dataset (swap this for real data)
-demo.py            # Black Sea shock scenario + figures
-figures/           # generated example figures
+  agrimate/           # Gate 0 default: Agrimate-faithful wheat host
+  legacy/             # frozen pre-rewrite Gate 0 (labelled benchmark)
+  dynamic_crop.py     # same legacy host (Gate 1 still imports this)
+  dynamic_coupled.py  # Gate 1 isoelastic substitution on the legacy spine
+  dynamic_policy.py   # Gate 2: slow types, Headey-clock τ_t
+  annual/             # parked yearly SPE + year-Nash (import sheaf.annual)
+scripts/run_agrimate_validation.py  # G0 three-scenario validation (default)
+scripts/run_agrimate_wheat.py       # single harvest+AMIS solver smoke
+scripts/score_legacy_crop.py     # legacy benchmark scorer
+archive/legacy-gate0/            # frozen scratch; not the live host
+scripts/score_gate1.py
+scripts/score_gate2_beta.py
+scripts/annual/demo.py           # Black Sea shock on the parked annual host
+diagnostics/DEVELOPMENT.md       # living queue: G0 wheat until publishable vs Agrimate
+diagnostics/GATE0_DISCUSSION.md  # sitting questions → options (before prompts)
+diagnostics/GATE0_FLOWS.md       # captions for the flow diagrams
+figures/gate0_flows/             # Gate 0 current-map vs option SVGs
+overleaf/gate0_discussion/       # Overleaf: plain + economic + each figure
+diagnostics/GAME_CLOCK.md
 ```
 
 ## Extending it
 
-- **Grains** — the commodity dimension is an extensible list. Adding barley,
-  sorghum, or rye is appending entries to `GRAINS`, `P0`, `OWN_ELAST`, the `RHO`
-  substitution matrix, and per-country production/consumption — no re-architecting.
-- **Real data** — replace `calibration.py`. Production and consumption from
-  FAOSTAT / USDA PSD; the demand system takes baseline `(D0, p0, own_elast)` plus a
-  substitutability matrix `rho`; validate baseline flows against BACI / COMTRADE.
-- **Chokepoints** — `route_multiplier` scales the cost of a corridor, so a
-  Bosphorus / Bab-el-Mandeb / Hormuz disruption enters the same machinery as a
-  production shock.
-- **Terms-of-trade motive** — `ExportRestrictionGame(revenue_weight=…)` adds an
-  export-tax-revenue term; with substitution on, a flatter residual demand curve
-  changes the optimal restriction, an interaction unavailable to no-substitution
-  or no-strategy models.
+- **Grains** — Gate 1 is blocked until wheat Gate 0 is accepted
+  (`diagnostics/DEVELOPMENT.md`). Do not add crops to chase an unvetted market.
+- **Real data** — crisis quantities already come from USDA PSD / FAOSTAT E0
+  shares / AMIS / Pink Sheet. The illustrative `DATA` table is node names plus
+  the parked annual prototype.
+- **Annual outer loop** — `from sheaf.annual import SheafModel` when you want
+  a year-scale diagnostic or slow types. Do not mix that clock into
+  `dynamic_crop._simulate_window`.
+- **Chokepoints / terms-of-trade** — those knobs live on the parked annual QP
+  (`sheaf/annual/README.md`), not on the 24-step map.
 
 ## Caveats
 
-This is a **prototype**. Gate 0 (`sheaf/dynamic_crop.py`) now runs 2006–11
-per-crop hindcasts against Pink Sheet with AMIS restrictions prescribed; that is
-P1, not an estimated game. The annual SPE calibration in `sheaf/calibration.py`
-is order-of-magnitude realistic but illustrative — do not read the magnitudes as
-estimates. Demand and supply there are linear, production is short-run inelastic
-within a period, and Nash is an iterated-best-response approximation on a discrete
-tax grid (`game_grid=13` by default, ~10 $/t steps). Private storage uses lagged
-prices by design. Cross-grain substitution and the endogenous restriction game
-remain blocked until Gate 0 is green (`diagnostics/PAPER_STACK.md`).
+This is a **prototype**. Gate 0 (`sheaf/dynamic_crop.py`) runs 2006–11
+per-crop hindcasts against Pink Sheet with AMIS restrictions prescribed
+(`diagnostics/gate0_*_report.md`). Those scores are snapshots of the current
+baseline; the market is open to revision after colleague consultation.
+Do not silently fit 2008 (no crisis dummies, no hidden $\sigma^\star$).
+Gate 1 puts substitution on that spine (`diagnostics/gate1_report.md`).
+The annual SPE in `sheaf/annual/` is illustrative — linear demand, inelastic
+within-year production, discretised Nash on a tax grid. It is not the
+2007/08 game. On the crisis spine, types are illustrative; actions `τ_t`
+are state-contingent and not scored against who banned in 2008.
 
 ## License
 
