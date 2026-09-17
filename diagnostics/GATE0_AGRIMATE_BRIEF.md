@@ -9,10 +9,17 @@ Closed from the executable model (not guessed):
 3. **C.1 wheat:** `AgrimateRegionsWheat` is **27** names (Egypt in Northern Africa, Mexico in Central America, Pakistan and Turkey singles, no RoW). Paper text said 28.
 4. **E.27:** `duration_in_s=1.2` means `s = duration/1.2`, support `|d−dmid|≤s`. Printed `|d−dmid|≤1.2` was OCR.
 5. **D.1:** `w = 1/(1+exp((n−N_for)/(0.17 τ_for)))` with N_for=3 months, τ_for=0.2 yr. Near-term realised.
+6. **β=0.05 / τ_P=0.2:** present in `AgrimateParams` and computed in
+   `sales_step!`, but **not used on the wheat executable path**. Defaults
+   `two_markets=true`, `pl_opt=false` are never overridden. Two-market
+   optimizer is passed `P_loc_domestic = P_loc_foreign = 1` (live factors
+   commented out). Domestic/foreign targets are hardcoded to 1, so those
+   factors stay at the init value 1. Combined `P_loc_tgt = P (D_tot/X̂)^β`
+   is logged only. Host leaves `beta_loc` / `tau_p` unwired (matches the
+   wheat path; not a guessed local-price rule).
 
 Still open:
 
-6. **β=0.05 / τ_P=0.2:** local price adjustment; not wired.
 7. **D.30a upper-tier purchaser** (ε_d, A_d budget share vs compound good).
 8. FAOSTAT Food Balance arrays vs USDA PSD.
 9. Confirm whether published Fig. 4 used the 27-region wheat list and F.1 αI=3.2.
