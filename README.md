@@ -84,14 +84,18 @@ quantities). See [`sheaf/annual/README.md`](sheaf/annual/README.md).
 (2025) supplement §D, wheat application. Contract:
 [`diagnostics/GATE0_CONTRACT.md`](diagnostics/GATE0_CONTRACT.md). Spec map:
 [`diagnostics/GATE0_SPEC_MATRIX.md`](diagnostics/GATE0_SPEC_MATRIX.md).
+Validation protocol:
+[`diagnostics/GATE0_VALIDATION.md`](diagnostics/GATE0_VALIDATION.md).
 
 ```bash
-python scripts/run_agrimate_wheat.py
+PYTHONPATH=. python scripts/run_agrimate_validation.py
 ```
+
+Single-path solver smoke: `PYTHONPATH=. python scripts/run_agrimate_wheat.py`.
 
 Clock: $T_y=24$ (Agrimate §4.1). Quantities in MMT; reported world price is the
 volume-weighted international transaction-price *index* scaled by the 2006
-real Pink Sheet wheat mean. 28 Agrimate regions (Tbl. C.1 reconstruction).
+real Pink Sheet wheat mean. 27 Agrimate wheat nodes (`AgrimateRegionsWheat`).
 Nash initialisation is not the dynamic baseline and does not pin the unforced
 world price.
 
@@ -436,11 +440,14 @@ Agrimate-style figures: `python scripts/make_agrimate_comparison.py`.
 
 ```bash
 pip install -r requirements.txt
-python scripts/run_agrimate_wheat.py
+PYTHONPATH=. python scripts/run_agrimate_validation.py
 ```
 
-That is the documented Gate 0 wheat reference run. Report:
-`diagnostics/gate0_agrimate/validation.md`. Legacy ask/scarcity scores:
+That is the documented Gate 0 wheat validation (undisturbed / harvest-only /
+harvest+AMIS; prices and USDA supply/stocks). Report:
+`diagnostics/gate0_agrimate/validation.md`. Protocol:
+`diagnostics/GATE0_VALIDATION.md`. Solver smoke:
+`PYTHONPATH=. python scripts/run_agrimate_wheat.py`. Legacy ask/scarcity scores:
 `python scripts/score_legacy_crop.py --crop wheat`.
 
 The parked annual SPE (Black Sea shock on the yearly QP):
@@ -477,7 +484,8 @@ sheaf/
   dynamic_coupled.py  # Gate 1 isoelastic substitution on the legacy spine
   dynamic_policy.py   # Gate 2: slow types, Headey-clock τ_t
   annual/             # parked yearly SPE + year-Nash (import sheaf.annual)
-scripts/run_agrimate_wheat.py    # documented Gate 0 reference run
+scripts/run_agrimate_validation.py  # G0 three-scenario validation (default)
+scripts/run_agrimate_wheat.py       # single harvest+AMIS solver smoke
 scripts/score_legacy_crop.py     # legacy benchmark scorer
 archive/legacy-gate0/            # frozen scratch; not the live host
 scripts/score_gate1.py

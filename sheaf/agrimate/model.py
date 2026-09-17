@@ -40,10 +40,16 @@ class AgrimateResult:
     notes: list[str] = field(default_factory=list)
     consumption: np.ndarray | None = None
     xi_ship: np.ndarray | None = None
+    harvest: np.ndarray | None = None
+    sold_domestic: np.ndarray | None = None
+    p_consumer: np.ndarray | None = None
+    inflow: np.ndarray | None = None
     floor_binds: int = 0
     unconverged_solves: int = 0
     plan_residual: float = 0.0
     runtime_s: float = 0.0
+    use_anomalies: bool = True
+    use_restrictions: bool = True
 
     def to_monthly_price(self) -> np.ndarray:
         p = np.asarray(self.price_usd, float)
@@ -151,6 +157,10 @@ class AgrimateSim:
         S_c_path = np.zeros((n_r, T))
         C_path = np.zeros((n_r, T))
         xi_path = np.zeros((n_r, T))
+        H_path = np.zeros((n_r, T))
+        sold_d_path = np.zeros((n_r, T))
+        p_c_path = np.zeros((n_r, T))
+        inflow_path = np.zeros((n_r, T))
         failed = 0
         fallback = 0
         unconverged = 0
@@ -238,6 +248,8 @@ class AgrimateSim:
                 sold_d[r], sold_i[r] = sd, si
                 S_p[r] = update_producer_storage(S_p[r], H[r], sd, si, p.delta_loss)
             xi_path[:, t] = sold_i
+            sold_d_path[:, t] = sold_d
+            H_path[:, t] = H
             realized_oth = np.maximum(float(sold_i.sum()) - sold_i, 0.0)
             q_oth = (1.0 - w_exp) * q_oth + w_exp * realized_oth
             # 6 delivery: push today's international sales, pop lag
@@ -267,6 +279,8 @@ class AgrimateSim:
                 cons = min(cons, S_c[s] + inflow)
                 S_c[s] = max(S_c[s] + inflow - cons, 0.0)
                 C_path[s, t] = cons
+                inflow_path[s, t] = inflow
+                p_c_path[s, t] = p_c[s]
             S_p_path[:, t] = S_p
             S_c_path[:, t] = S_c
 
@@ -288,8 +302,12 @@ class AgrimateSim:
             S_producer=S_p_path, S_consumer=S_c_path,
             failed_solves=failed, fallback_solves=fallback, nash=nash,
             notes=notes, consumption=C_path, xi_ship=xi_path,
+            harvest=H_path, sold_domestic=sold_d_path,
+            p_consumer=p_c_path, inflow=inflow_path,
             floor_binds=floor_binds, unconverged_solves=unconverged,
             plan_residual=plan_residual, runtime_s=runtime_s,
+            use_anomalies=self.use_anomalies,
+            use_restrictions=self.use_restrictions,
         )
 
 

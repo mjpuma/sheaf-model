@@ -16,3 +16,15 @@ def test_c1_wheat_nodes_match_author_list():
     assert d.C_star.sum() < 80.0
     assert d.H_annual.sum() > 400.0
     assert d.delta.shape[1] == 24
+
+
+def test_amis_wheat_delta_nonempty_in_2008():
+    """OECD columns are PolicyMeasure_Name / CommodityClass_Name, not Measure."""
+    from sheaf.agrimate.restrictions import restriction_matrix
+    d = restriction_matrix(list(REGION_NAMES), 2007, 2008, crop="wheat")
+    assert d.max() >= 0.5
+    assert d.sum() > 0
+    # named 2007/08 exporters in the OECD wheat slice
+    for name in ("Argentina", "Ukraine", "Russia", "India"):
+        i = REGION_NAMES.index(name)
+        assert d[i].max() > 0, name

@@ -12,12 +12,15 @@ from this package.
 from .params import AgrimateParams, wheat_params
 from .model import AgrimateResult, AgrimateSim, run_agrimate
 from .wheat_data import prepare_wheat
+from .validation import SCENARIOS, run_three_scenarios
 
 __all__ = [
     "AgrimateParams",
     "AgrimateResult",
     "AgrimateSim",
+    "SCENARIOS",
     "prepare_wheat",
     "run_agrimate",
+    "run_three_scenarios",
     "wheat_params",
 ]
