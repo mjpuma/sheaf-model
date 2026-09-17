@@ -102,8 +102,10 @@ approval.
    That is a G0-H score, not a reason to restore L1–L8. G0-U exit is the
    **workflow**, not publication-quality hindcast.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
-5. **Next session:** paste **P1** from [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
-   (accounting identities). One prompt per session after that.
+5. **P1 (done).** Step identities on 2006 harvest+AMIS: D.6, consumer clip,
+   D.3 sales, finite paths. Report: `diagnostics/gate0_agrimate/accounting.md`.
+   **Next session:** paste **P2** from [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
+   (undisturbed drift; do not pin).
 
 Reference command:
 
