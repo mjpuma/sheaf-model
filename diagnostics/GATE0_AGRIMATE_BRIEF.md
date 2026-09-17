@@ -16,3 +16,8 @@ Still open:
 7. **D.30a upper-tier purchaser** (ε_d, A_d budget share vs compound good).
 8. FAOSTAT Food Balance arrays vs USDA PSD.
 9. Confirm whether published Fig. 4 used the 27-region wheat list and F.1 αI=3.2.
+
+Recorded, not a question for Agrimate: Bai/Wada/Puma copy uses α_foreign=10
+as a 2017–25 fit. Host keeps author 3.2. Their finding that one parameter
+set cannot fit both 2008 and 2022 is a G0-H question, not a split-calibration
+of this 2006–11 run.

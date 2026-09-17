@@ -25,5 +25,8 @@ bit-reproduction. Data 10688435 not unpacked.
 | Baseline quantities | FAOSTAT FB E.1 | USDA+E0 | USDA PSD + E0 rescale | labelled A1 |
 | Storage cost | Tbl. D.8 p_sto=0.1 / Nyear | cover rule | `optimize.py` unit costs | G0-S |
 | x_min | Tbl. D.8 0.2 even spread | n/a | quadratic penalty, ζ=0 | G0-S |
+| Three-scenario validation | Agrimate Fig. 4 design; Bai/Wada/Puma copy workflow | Pink-Sheet only | `validation.py` / `run_agrimate_validation.py` | prices **and** USDA supply/stocks |
+| OAT sensitivity | diagnostic around author params | n/a | `oat_settings()` | αI=3.2 default; Bai 10 listed, not adopted |
+| Exporter pulse grid | prescribed Δ, G0-H/P | n/a | `restriction_pulse` | not G2 |
 
 Unresolved (labelled, not guessed): β/τ_P local price; D.30a upper-tier purchaser; FAOSTAT FB vs USDA; paper 28 vs code 27; D.8 αI=3.5 vs code 3.2.

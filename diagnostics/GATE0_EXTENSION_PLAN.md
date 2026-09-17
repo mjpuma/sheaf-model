@@ -4,12 +4,20 @@
 `diagnostics/DEVELOPMENT.md` (stage G0-P). Do not implement these in
 `sheaf/agrimate/`.
 
-Recorded SHEAF objectives, which are **different mechanisms**:
+Gate 0 is an Agrimate copy. A parallel copy (Bai/Wada/Puma) is being
+validated on the same three-scenario workflow. **The only planned SHEAF
+differentiator versus that copy** is the pair below, added after G0-P:
 
-1. **E1 — Cross-crop substitution** (wheat/rice/maize on the demand side).
+1. **E1 / G1 — Cross-crop substitution** (wheat/rice/maize on the demand side).
    This is not Agrimate’s origin CES σ over exporters of one grain.
-2. **E2 — Endogenous export-restriction game** among governments.
-   This is not Agrimate’s supplier oligopoly (αI / αD) and not AMIS/E.4.
+   Disabled G1 recovers the single-crop G0 run.
+2. **E2 / G2 — Endogenous export-restriction game** among governments.
+   This is not Agrimate’s supplier oligopoly (αI / αD), not AMIS/E.4, and
+   not the prescribed exporter-at-a-time Δ grid (`restriction_pulse`).
+   Disabled G2 recovers E.4 Agrimate.
+
+Until G0-P, validation of this host uses the Agrimate-copy protocol in
+`GATE0_VALIDATION.md` (three scenarios; prices + supply + stocks).
 
 ## Sequence after G0-P only
 

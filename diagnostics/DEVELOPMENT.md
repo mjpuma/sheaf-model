@@ -48,8 +48,12 @@ applications. Do not accept them with inherited wheat knobs, and do not
 use them to wave Gate 0 through.
 
 Gate 0 is **not** currently at the publication bar. **G0-N and G0-S are met**
-against retrieved author code. Next is **G0-U** (undisturbed dynamics).
-Pink-Sheet scoring stays G0-H. G1/G2 stay blocked.
+against retrieved author code. **G0-U is the three-scenario validation
+workflow** (`diagnostics/GATE0_VALIDATION.md`): undisturbed / harvest-only /
+harvest+AMIS, scoring prices **and** supply/stocks. Pink-Sheet scoring stays
+G0-H. G1/G2 stay blocked. The only SHEAF differentiator versus an Agrimate
+copy (including the Bai/Wada/Puma copy) is that G1 substitution and G2
+government games will be added **after** G0-P.
 
 ## Sequence (do not skip)
 
@@ -57,7 +61,7 @@ Pink-Sheet scoring stays G0-H. G1/G2 stay blocked.
 |---|---|---|
 | **G0-N** | Make the supplier programme numerically solvent on the 24-step wheat year. Record residual, runtime, and when the inverse-demand floor binds. | **Met on the 2003–11 reference run** (failed/fallback 0; residual 0; offer-floor 0; price index 0.0066–5.02 without a pin). Unconverged scipy 1043/6048 still feasible. Pink-Sheet scoring is G0-H. |
 | **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | **Met for retrieved code.** 27-region C.1 wheat list, author params, p_sto, x_min penalty, E.27, D.1 weights. Unresolved labelled (β, D.30a, FAOSTAT FB, data zip). |
-| **G0-U** | Undisturbed / spin-up / restriction-off vs harvest-only vs full AMIS. Accounting identities each step. | Documented seasonal baseline; material balance. |
+| **G0-U** | Undisturbed / harvest-only / harvest+AMIS. Accounting identities. Score prices **and** USDA supply/stocks. Ukraine / Eastern Africa mechanism panels. OAT diagnostic without retuning. Protocol: `GATE0_VALIDATION.md`. | Three-scenario report in `diagnostics/gate0_agrimate/`; documented seasonal baseline; material balance. |
 | **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | Written score in `diagnostics/gate0_agrimate/`. Comparable to Agrimate or an explicit, sourced shortfall. |
 | **G0-P** | Gate 0 note at publication standard (methods, data, hindcast, limits). No substitution, no government game. | You accept wheat Gate 0 as the SHEAF market paper / section. **This is the only gate that unlocks G1.** |
 | **G1** | Cross-crop substitution (wheat/rice/maize), distinct from Agrimate origin CES. Disabled G1 recovers G0. | Identity test + spillover experiments. No σ* fit to 2008. |
@@ -87,16 +91,23 @@ approval.
    C.1 is 27 author names; params follow `AgrimateParams`; p_sto and x_min
    penalty; E.27 and D.1 from author. Unresolved labelled in
    `GATE0_AGRIMATE_BRIEF.md`. Data 10688435 not unpacked (G0-H).
-3. **G0-U (next).** Restriction-off / harvest-only / full AMIS; accounting
-   identities; seasonal baseline after spin-up. No figures until that
-   baseline is documented. No world-price pin.
-4. Keep `python scripts/run_agrimate_wheat.py` as the only default run.
+3. **G0-U (this).** Three-scenario runner `scripts/run_agrimate_validation.py`.
+   Bai/Wada/Puma workflow structure (scenarios, prices+stocks+supply,
+   mechanism panels, OAT). Author defaults unchanged (αI=3.2, not Bai's 10).
+   G1/G2 recorded as later recovery tests, not implemented.
+4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
 
 Reference command:
 
 ```bash
 python -m pytest tests/agrimate -q
-python scripts/run_agrimate_wheat.py
+PYTHONPATH=. python scripts/run_agrimate_validation.py
+```
+
+Solver smoke (one harvest+AMIS path):
+
+```bash
+PYTHONPATH=. python scripts/run_agrimate_wheat.py
 ```
 
 Legacy (labelled, not the bar):

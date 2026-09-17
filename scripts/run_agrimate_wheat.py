@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Reference Agrimate-faithful Gate 0 wheat run.
+"""Reference Agrimate-faithful Gate 0 wheat run (single harvest+AMIS path).
 
-    python scripts/run_agrimate_wheat.py
+    PYTHONPATH=. python scripts/run_agrimate_wheat.py
 
-Writes diagnostics/gate0_agrimate/{prices.csv,validation.md,notes.txt}.
-Legacy comparison: python scripts/score_legacy_crop.py --crop wheat
+G0-U/H three-scenario validation (undisturbed / harvest-only / harvest+AMIS,
+prices and supply/stocks):
+
+    PYTHONPATH=. python scripts/run_agrimate_validation.py
+
+Writes diagnostics/gate0_agrimate/{prices.csv,validation.md,notes.txt} for this
+single path. Legacy comparison: python scripts/score_legacy_crop.py --crop wheat
 """
 from __future__ import annotations
 
@@ -70,10 +75,13 @@ def main():
     h08_o = _hike(both["pink_usd"], 2006, 2008)
     OUT.mkdir(parents=True, exist_ok=True)
     both.to_csv(OUT / "prices_2006_11.csv")
-    (OUT / "notes.txt").write_text("\n".join(res.notes) + "\n")
-    md = f"""# Agrimate Gate 0 wheat — validation snapshot
+    (OUT / "notes_single.txt").write_text("\n".join(res.notes) + "\n")
+    md = f"""# Agrimate Gate 0 wheat — single-path solver smoke
 
 Command: `python scripts/run_agrimate_wheat.py --start-year {args.start_year} --end-year {args.end_year}`
+
+Three-scenario G0-U/H report (does not overwrite this file):
+`PYTHONPATH=. python scripts/run_agrimate_validation.py` → `validation.md`.
 
 Independent implementation of Kuhla et al. (2025) §D. Author code
 https://doi.org/10.5281/zenodo.14022004 retrieved 2026-09-16 as the
@@ -118,7 +126,7 @@ p_sto=0.1/Nyear, x_min=0.2 penalty, ζ=0). C.1 wheat nodes are the 27-name
 Unresolved: β/τ_P local price, nested purchaser D.30a, FAOSTAT FB (A1),
 Fig. 4 author series (data zip not unpacked).
 """
-    (OUT / "validation.md").write_text(md)
+    (OUT / "validation_single.md").write_text(md)
     print(md)
 
 

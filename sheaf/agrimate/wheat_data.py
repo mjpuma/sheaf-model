@@ -228,3 +228,20 @@ def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
         anomaly=anomaly, delta=delta, p0=p0, start_year=start_year,
         end_year=end_year, notes=notes,
     )
+
+
+def psd_regional_annual(regions: list[str] | None = None) -> pd.DataFrame:
+    """USDA PSD wheat, aggregated to Agrimate wheat nodes (MMT / marketing year).
+
+    Coverage is incomplete: multi-country regions only include PSD members that
+    map through the conversion table. Use world-aggregate USDA for global scores.
+    """
+    regions = list(regions or REGION_NAMES)
+    psd = load_psd_country("wheat")
+    psd = psd.copy()
+    psd["region"] = [_psd_to_region(c, n) for c, n in zip(psd["country_code"], psd["country_psd"])]
+    psd = psd.dropna(subset=["region"])
+    psd = psd[psd["region"].isin(regions)]
+    cols = ["production", "consumption", "exports", "imports", "ending_stocks"]
+    g = psd.groupby(["region", "year"])[cols].sum().reset_index()
+    return g

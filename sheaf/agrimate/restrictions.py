@@ -92,5 +92,48 @@ def empty_delta(n_regions: int, n_steps: int) -> np.ndarray:
     return np.zeros((n_regions, n_steps))
 
 
+# Bai/Wada/Puma exporter-at-a-time list, mapped onto AgrimateRegionsWheat.
+# EU-28 in that note is EU-27 here. Used by a labelled G0-H experiment, not
+# by the default three-scenario run, and not by Gate 2.
+EXPORTER_PULSE_REGIONS = (
+    "Russia", "Canada", "EU-27", "USA", "Ukraine",
+    "Australia", "Argentina", "Kazakhstan", "Pakistan",
+)
+
+
+def restriction_pulse(
+    regions: list[str],
+    start_year: int,
+    end_year: int,
+    exporter: str,
+    intensity: float = 1.0,
+    duration_months: int = 12,
+    start: str = "2008-01-01",
+) -> np.ndarray:
+    """Synthetic one-exporter restriction on the 24-step clock.
+
+    Structure for a later exporter×intensity×duration grid (G0-H/P). Not a
+    government best-response (G2) and not the default AMIS/E.4 schedule.
+    """
+    n_r = len(regions)
+    n_steps = (end_year - start_year + 1) * STEPS_PER_YEAR
+    delta = np.zeros((n_r, n_steps))
+    if exporter not in regions:
+        raise KeyError(f"exporter {exporter!r} is not in the region list")
+    i = regions.index(exporter)
+    t0 = pd.Timestamp(start)
+    t1 = t0 + pd.DateOffset(months=int(duration_months)) - pd.Timedelta(days=1)
+    cut = float(np.clip(intensity, 0.0, 1.0))
+    for y in range(start_year, end_year + 1):
+        for ys in range(STEPS_PER_YEAR):
+            month = ys // 2 + 1
+            day = 8 if ys % 2 == 0 else 23
+            stamp = pd.Timestamp(year=y, month=month, day=day)
+            if t0 <= stamp <= t1:
+                t = (y - start_year) * STEPS_PER_YEAR + ys
+                delta[i, t] = cut
+    return delta
+
+
 # silence unused import if REGION_NAMES only used by callers
 _ = REGION_NAMES
