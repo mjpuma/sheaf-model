@@ -83,21 +83,59 @@ def update_producer_storage(S: float, harvest: float, sold_d: float, sold_i: flo
     return max((1.0 - delta_loss) * S + harvest - sold_d - sold_i, 0.0)
 
 
+def purchaser_commodity_quantity(price_index: float, A_d: float, eps_d: float,
+                                 budget: float) -> float:
+    """D.30a: commodity quantity vs a compound good.
+
+    Author ``determine_demands`` global factor (wheat path, ``ε_d_adjust=false``)::
+
+        D = A_d P^{-ε_d} / (1 + A_d (P^{1-ε_d} - 1)) · B
+
+    Same algebraic form as D.35. ``budget`` is total purchaser B
+    (author ``mean(p* D*) / A_d*``). At P=1, D = A_d B.
+    """
+    p = max(float(price_index), 1e-12)
+    A = float(np.clip(A_d, 0.0, 1.0))
+    e = float(eps_d)
+    B = max(float(budget), 0.0)
+    den = 1.0 + A * (p ** (1.0 - e) - 1.0)
+    return float(max(A * (p ** (-e)) / max(den, 1e-12) * B, 0.0))
+
+
+def crop_budget_share(A_d_star: float, price_index: float, extra_demand: float,
+                      budget: float) -> float:
+    """Author ``determine_crop_budget_share`` (D.31b). Clipped to [0, 1]."""
+    B = max(float(budget), 1e-12)
+    A = float(A_d_star) + float(price_index) * float(extra_demand) / B
+    return float(np.clip(A, 0.0, 1.0))
+
+
 def purchaser_demand(prices: np.ndarray, budget: float, sigma: float,
-                     shares: np.ndarray) -> np.ndarray:
-    """CES demand D.30. ``shares`` are baseline value shares (sum 1)."""
+                     shares: np.ndarray, A_d: float | None = None,
+                     eps_d: float | None = None) -> np.ndarray:
+    """CES D.30, nested under D.30a when ``A_d`` is set.
+
+    Upper tier off (``A_d is None``): spend ``budget`` on origins (D.30 only).
+    Upper tier on: ``budget`` is total B; commodity quantity from D.30a, then
+    ``q_r = a_r (p_r / P)^{-σ} D``. ``A_d = 1`` recovers the off case.
+    """
     p = np.maximum(np.asarray(prices, float), 1e-12)
     s = np.maximum(np.asarray(shares, float), 0.0)
     if s.sum() <= 0:
         return np.zeros_like(p)
     s = s / s.sum()
-    # q_i ∝ s_i * p_i^{-σ}; spend s-weighted
-    q_prop = s * p ** (-sigma)
-    spend_prop = q_prop * p
-    tot = spend_prop.sum()
-    if tot <= 0:
-        return np.zeros_like(p)
-    return q_prop * (budget / tot)
+    if A_d is None:
+        q_prop = s * p ** (-sigma)
+        spend_prop = q_prop * p
+        tot = spend_prop.sum()
+        if tot <= 0:
+            return np.zeros_like(p)
+        return q_prop * (budget / tot)
+    if eps_d is None:
+        raise ValueError("eps_d is required when A_d is set (D.30a)")
+    P = ces_price_index(p, s, sigma)
+    D = purchaser_commodity_quantity(P, A_d, eps_d, budget)
+    return s * (p / max(P, 1e-12)) ** (-sigma) * D
 
 
 def ces_price_index(prices: np.ndarray, shares: np.ndarray, sigma: float) -> float:

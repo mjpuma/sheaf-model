@@ -16,7 +16,7 @@ bit-reproduction. Data 10688435 not unpacked.
 | Inverse demand | D.7; code αI=3.2 | scarcity blend | `inverse_demand` | world XI* scale |
 | Rivals' expected XI | D.22; τ_exp=0.5 | n/a | `model.py` `q_oth` | offer floor binds = 0 |
 | αD,r | D.10 / D.9 | n/a | `wheat_data.py` | `test_alpha_d10_matches_export_share` |
-| Purchaser CES | D.30 lower tier σ=2 | Armington | `purchaser_demand` | `test_purchaser_demand_sums_when_prices_equal` |
+| Purchaser CES | D.30 + D.30a; wheat `determine_demands` | Armington | `purchaser_demand` nested | `test_d30a_*`; A_d=1 recovers D.30 |
 | Consumer CES | D.35; εc=0.1 | isoelastic food | `consumption_ces` | `test_consumption_capped_and_price_response` |
 | Nash init | §D.5; α=3 | none / twin pin | `nash_ibr` | not a price pin |
 | World price | §5.2 international tx | blend + pin | `model.py` | index O(1) |
@@ -32,4 +32,4 @@ bit-reproduction. Data 10688435 not unpacked.
 | International delivery | E.1 T* to importers, Ndel lag | own-XI echo (bug) | `international_destination_shares` | `test_international_sales_are_not_echoed_to_the_exporter` |
 | Local price β, τ_P | author `AgrimateParams`; `determine_target_price_adjustment_factor` | n/a | unused fields on `AgrimateParams` | P3: wheat `two_markets` pins P_loc=1; `test_beta_loc_does_not_enter_supplier_plan` |
 
-Unresolved (labelled, not guessed): D.30a upper-tier purchaser; FAOSTAT FB vs USDA; paper 28 vs code 27; D.8 αI=3.5 vs code 3.2. β/τ_P closed as unused on the wheat path (S3).
+Unresolved (labelled, not guessed): FAOSTAT FB vs USDA; paper 28 vs code 27; D.8 αI=3.5 vs code 3.2. β/τ_P unused on wheat path (S3). D.30a formula wired; author x1=demand not copied (S4).

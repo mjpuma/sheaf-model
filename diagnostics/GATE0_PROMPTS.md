@@ -5,7 +5,7 @@ Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
 [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md). Protocol:
 [`GATE0_VALIDATION.md`](GATE0_VALIDATION.md).
 
-**Now:** paste **P4**. Everything above P4 is done. Everything below P4
+**Now:** paste **P5**. Everything above P5 is done. Everything below P5
 is later.
 
 ## Shared preamble (prepend to every prompt)
@@ -45,8 +45,8 @@ diagnostics/gate0_agrimate/. One prompt, one PR-sized change.
 | P1 | Accounting identities each step | **done** |
 | P2 | Diagnose undisturbed drift (do not pin) | **done** |
 | **P3** | Wire or label β/τ_P from author code | **done** (unwired; wheat path pins P_loc=1) |
-| **P4** | Wire or label D.30a upper-tier purchaser | **next** |
-| P5 | Characterize unconverged scipy (do not paper over) | queued |
+| **P4** | Wire or label D.30a upper-tier purchaser | **done** (formula wired; x1 still from plan) |
+| P5 | Characterize unconverged scipy (do not paper over) | **next** |
 | P6 | Run OAT sensitivity; do not retune | queued |
 | P7 | Unpack Zenodo 10688435; score vs Agrimate Fig. 4 | queued (G0-H) |
 | P8 | Honest 2006–11 hindcast writeup (levels and paths) | queued (G0-H) |

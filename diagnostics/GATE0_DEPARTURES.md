@@ -68,14 +68,26 @@ non-`two_markets` branches. Host keeps `beta_loc=0.05`, `tau_p=0.2` as
 unused fields. Not a guessed local-price rule. Not a change to αI.
 Classification **H** (wheat path already pins P_loc = 1). Confidence
 95–100% (direct inspection of Zenodo 14022004 `producer.jl` / params).
-S4 **D.30a** purchaser upper tier (commodity vs compound good): not wired.
+S4 **D.30a** purchaser upper tier: **wired as the demand-request formula.**
+Wheat path (`two_markets=true`, `ε_d_adjust=false`, never overridden) calls
+`determine_demands` with
+`D = A_d P^{-ε_d} / (1 + A_d (P^{1-ε_d} - 1)) · B` then
+`q_r = a_r (p_r/P)^{-σ} D`. Host `purchaser_demand(..., A_d, eps_d)` matches
+that; `A_d=1` recovers D.30-only spend of B. `B = C*/A_d` at p*=1 (author
+`mean(p* D*)/A_d*`). Extra demand enters via D.31b
+`A_d = clip(A_d* + P ΔD / B, 0, 1)`. A_d proxies are unchanged (A3; not a
+Pink-Sheet refit). Physical inflow remains T* + domestic sales. Author
+two-market `x1` is *fixed* to those requests; host supplier plan still
+sets current sales (labelled, not a guessed CES-rationing rule).
+Classification **H** for the formula (95–100%); remaining x1 gap is **D**.
 
 ## Coding fix (not an economic departure)
 
 B1 **International delivery (P2).** Pre-fix, lagged XI was credited to the
 *exporter* as consumer inflow (`inflow = sold_d + own XI_{t−Ndel}`). That
 is not D.3/E.1. Host now routes XI along row-normalised international T*.
-D.30 CES still does not ration quantities (P4). Not a world-price pin.
+D.30 CES / D.30a requests are computed; quantity delivered is still T*
+(author x1=demand is labelled, not copied). Not a world-price pin.
 
 ## Proposed extensions (not implemented)
 

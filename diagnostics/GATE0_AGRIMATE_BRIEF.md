@@ -17,10 +17,12 @@ Closed from the executable model (not guessed):
    factors stay at the init value 1. Combined `P_loc_tgt = P (D_tot/X̂)^β`
    is logged only. Host leaves `beta_loc` / `tau_p` unwired (matches the
    wheat path; not a guessed local-price rule).
+7. **D.30a:** wheat uses it. `ε_d_adjust=false` so `determine_demands`
+   (single ε_d=1/α=1/3, A_d, B) not the two-market ε_d split. Host formula
+   matches; A_d not refit. Inflow still T* (author x1=demand labelled).
 
 Still open:
 
-7. **D.30a upper-tier purchaser** (ε_d, A_d budget share vs compound good).
 8. FAOSTAT Food Balance arrays vs USDA PSD.
 9. Confirm whether published Fig. 4 used the 27-region wheat list and F.1 αI=3.2.
 

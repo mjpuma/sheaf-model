@@ -3,12 +3,15 @@ import numpy as np
 
 from sheaf.agrimate.equations import (
     alpha_domestic_d10,
+    ces_price_index,
     consumption_ces,
+    crop_budget_share,
     expected_harvest,
     expected_restriction,
     fulfill_sales,
     harvest_weights,
     inverse_demand,
+    purchaser_commodity_quantity,
     purchaser_demand,
 )
 from sheaf.agrimate.harvest import step_profile_from_months
@@ -55,6 +58,50 @@ def test_purchaser_demand_sums_when_prices_equal():
     s = np.array([0.1, 0.2, 0.3, 0.4])
     q = purchaser_demand(p, budget=10.0, sigma=6.0, shares=s)
     assert abs(float(np.dot(p, q)) - 10.0) < 1e-8
+
+
+def test_d30a_budget_exhaustion_on_commodity_share():
+    """Commodity spend equals D.30a value share of B, not the whole budget."""
+    prices = np.array([0.8, 1.1, 1.4, 0.9])
+    shares = np.array([0.1, 0.2, 0.3, 0.4])
+    B, A, e, sigma = 12.0, 0.25, 1.0 / 3.0, 2.0
+    q = purchaser_demand(prices, B, sigma, shares, A_d=A, eps_d=e)
+    P = ces_price_index(prices, shares, sigma)
+    spend = float(np.dot(prices, q))
+    value_share = A * P ** (1.0 - e) / (1.0 + A * (P ** (1.0 - e) - 1.0))
+    assert abs(spend - value_share * B) < 1e-8
+    D = purchaser_commodity_quantity(P, A, e, B)
+    assert abs(spend - P * D) < 1e-8
+    assert spend < B - 1e-6
+
+
+def test_d30a_off_recovers_lower_tier_when_A_d_is_one():
+    prices = np.array([0.7, 1.2, 0.9])
+    shares = np.array([0.2, 0.5, 0.3])
+    B, sigma = 8.0, 2.0
+    q_off = purchaser_demand(prices, B, sigma, shares)
+    q_on = purchaser_demand(prices, B, sigma, shares, A_d=1.0, eps_d=1.0 / 3.0)
+    assert np.allclose(q_off, q_on, atol=1e-10)
+    assert abs(float(np.dot(prices, q_off)) - B) < 1e-8
+
+
+def test_d30a_at_unit_price_is_A_d_times_budget():
+    D = purchaser_commodity_quantity(1.0, 0.3, 1.0 / 3.0, 10.0)
+    assert abs(D - 3.0) < 1e-12
+
+
+def test_d30a_quantity_falls_when_price_index_rises():
+    D1 = purchaser_commodity_quantity(1.0, 0.2, 1.0 / 3.0, 5.0)
+    D2 = purchaser_commodity_quantity(1.5, 0.2, 1.0 / 3.0, 5.0)
+    assert D2 < D1
+
+
+def test_crop_budget_share_clips_and_adds_extra_demand():
+    assert abs(crop_budget_share(0.2, 1.0, 0.0, 10.0) - 0.2) < 1e-12
+    A = crop_budget_share(0.2, 2.0, 1.0, 10.0)
+    assert abs(A - 0.4) < 1e-12
+    assert crop_budget_share(0.9, 1.0, 50.0, 10.0) == 1.0
+    assert crop_budget_share(0.1, 1.0, -50.0, 10.0) == 0.0
 
 
 def test_consumption_capped_and_price_response():
