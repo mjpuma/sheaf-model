@@ -48,6 +48,11 @@ Same design as Agrimate’s published wheat experiments and as the Bai note.
 | `harvest` | USDA PSD, on | off | harvest-only |
 | `harvest_amis` | on | AMIS / Tbl. E.4 | harvest + restrictions |
 
+OECD/AMIS aggregated CSV columns are `PolicyMeasure_Name` and
+`CommodityClass_Name`. Looking for `Measure`/`Commodity` left Δ = 0 on every
+2003–11 wheat step (harvest-only and harvest+AMIS were identical). The loader
+now uses the OECD names. Harvest vs harvest+AMIS must differ when AMIS binds.
+
 Spin-up 2003–05; score 2006–11. World price is the international transaction
 price already in `model.py`, not a calm pin.
 

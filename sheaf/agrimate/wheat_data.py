@@ -217,6 +217,12 @@ def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
                 anomaly[i, j] = float(an.loc[y])
 
     delta = restriction_matrix(regions, start_year, end_year, crop="wheat")
+    n_bind = int((delta > 0).sum())
+    bound = [r for i, r in enumerate(regions) if float(delta[i].max()) > 0]
+    notes.append(
+        f"AMIS wheat Δ: {n_bind} region-steps, max={float(delta.max()):.2f}, "
+        f"regions={bound or 'none'}."
+    )
     pink = load_price_series_monthly()
     p0 = float(pink[(pink["year"] == 2006)]["wheat"].mean())
     return WheatData(

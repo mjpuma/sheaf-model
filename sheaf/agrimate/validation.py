@@ -645,6 +645,9 @@ def write_report(
         f"- regions: {len(data.regions)}",
         f"- spin-up: {start_year}–{score_start - 1}; score: {score_start}–{score_end}",
         f"- data notes: {'; '.join(data.notes)}",
+        f"- AMIS wheat Δ region-steps: {int((data.delta > 0).sum())}; "
+        f"max={float(data.delta.max()):.2f}; "
+        f"regions={[r for i, r in enumerate(data.regions) if float(data.delta[i].max()) > 0]}",
         "",
         "## Solver (each scenario)",
         "",

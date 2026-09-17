@@ -1,41 +1,100 @@
-# Agrimate Gate 0 wheat — validation snapshot
+# Agrimate Gate 0 — three-scenario validation
 
-Command: `python scripts/run_agrimate_wheat.py --start-year 2003 --end-year 2011`
+Command: `python scripts/run_agrimate_validation.py --start-year 2003 --end-year 2011`
 
-Independent implementation of Kuhla et al. (2025) §D. Author code
-https://doi.org/10.5281/zenodo.14022004 retrieved 2026-09-16 as the
-executable specification (not copied into this package). Data deposit
-10688435 (150 MB) not unpacked.
+Independent Agrimate copy (Kuhla et al. 2025 §D; Zenodo 14022004 as
+executable spec, not copied). Workflow structure matches the Bai/Wada/Puma
+Agrimate-copy note (three scenarios; prices **and** supply/stocks;
+Ukraine / Eastern Africa mechanism panels; OAT diagnostic). Defaults
+remain author `AgrimateParams` (αI=3.2, not Bai's fitted α_foreign=10).
+Window is Agrimate wheat 2006–11, not that note's 2017–2025 paper.
+
+## SHEAF differentiators (later, blocked until G0-P)
+
+- **G1** Cross-crop substitution (wheat/rice/maize on the demand side). Disabled G1 recovers this single-crop G0 run.
+- **G2** Endogenous export-restriction game among governments. Disabled G2 recovers E.4 AMIS on this host. Not the 36-run exporter-at-a-time grid, which is a prescribed-Δ experiment.
+
+This run is G0: single crop, AMIS prescribed. Do not retune L1–L8.
 
 - regions: 27
-- failed supplier solves: 0
-- fallback: 0
-- unconverged (feasible but scipy not success): 1628
-- inverse-demand floor binds (offers): 0
-- max plan residual: 0.000e+00
-- runtime: 19.5s
-- Nash IBR: 0 err=2.100126312591429e-16 success=True
+- spin-up: 2003–2005; score: 2006–2011
+- data notes: Baseline quantities: USDA PSD 2007–09 mean, not FAOSTAT Food Balances (E.1.1).; Trade pattern: FAOSTAT E0 2006–07, rescaled to USDA exports.; C.1 wheat nodes: Zenodo 14022004 AgrimateRegionsWheat (27 names).; A_d is not E.30. F.1 Egypt 0.17 unused (Egypt is in Northern Africa).; Starred XI*, XD*, C* used in inverse demand are per-step averages.; AMIS wheat Δ: 491 region-steps, max=0.95, regions=['Argentina', 'China', 'India', 'Kazakhstan', 'Russia', 'Ukraine', 'Northern Africa'].
+- AMIS wheat Δ region-steps: 491; max=0.95; regions=['Argentina', 'China', 'India', 'Kazakhstan', 'Russia', 'Ukraine', 'Northern Africa']
+
+## Solver (each scenario)
+
+| scenario | failed | fallback | unconverged | floor | residual | runtime_s | pidx min/max |
+|---|---:|---:|---:|---:|---:|---:|---|
+| undisturbed | 0 | 0 | 1583 | 0 | 0.000e+00 | 14.1 | 0.0145 / 3.1681 |
+| harvest | 0 | 0 | 1628 | 0 | 0.000e+00 | 19.5 | 0.0105 / 3.1681 |
+| harvest_amis | 0 | 0 | 1743 | 0 | 0.000e+00 | 19.8 | 0.0113 / 3.1681 |
+
+## Prices vs Pink Sheet (2006–11)
+
+Indexed comparison in `figures/fig2_prices.png`. A worse Pink-Sheet
+fit than the legacy host is not a reason to restore L1–L8.
+
+| scenario | corr | RMSE $/t | 2007/08 hike model | hike obs | 2006 mean model | 2006 obs |
+|---|---:|---:|---:|---:|---:|---:|
+| undisturbed | -0.065 | 213.3 | ×4.78 | ×1.88 | 43.1 | 213.5 |
+| harvest | -0.160 | 205.7 | ×4.53 | ×1.88 | 65.3 | 213.5 |
+| harvest_amis | -0.082 | 197.6 | ×4.54 | ×1.88 | 65.3 | 213.5 |
+
+## Supply and stocks vs USDA world (2006–11)
+
+Model sums 27 AgrimateRegionsWheat nodes; USDA is the world aggregate.
+Level bias from missing coverage is expected; **anomaly correlation**
+is the performance number. FAOSTAT Food Balances remain labelled A1
+(Bai found FAO anomalies closer to prices in 2020–24; we stay on USDA
+because FAOSTAT FB is not in this repository).
+
+| scenario | field | corr | RMSE | mean model | mean USDA |
+|---|---|---:|---:|---:|---:|
+| undisturbed | production | 0.000 | 38.68 | 542.25 | 519.40 |
+| undisturbed | consumption | -0.576 | 35.65 | 503.38 | 520.12 |
+| undisturbed | ending_stocks | 0.892 | 302.35 | 455.88 | 157.43 |
+| undisturbed | stock_to_use | 0.804 | 0.62 | 0.91 | 0.30 |
+| harvest | production | 0.795 | 29.55 | 541.54 | 519.40 |
+| harvest | consumption | -0.744 | 47.63 | 488.53 | 520.12 |
+| harvest | ending_stocks | 0.927 | 332.23 | 479.85 | 157.43 |
+| harvest | stock_to_use | 0.827 | 0.72 | 0.99 | 0.30 |
+| harvest_amis | production | 0.795 | 29.55 | 541.54 | 519.40 |
+| harvest_amis | consumption | -0.584 | 47.08 | 487.49 | 520.12 |
+| harvest_amis | ending_stocks | 0.936 | 342.29 | 489.97 | 157.43 |
+| harvest_amis | stock_to_use | 0.821 | 0.74 | 1.01 | 0.30 |
+
+## G0-U undisturbed dynamics (after 2003–05 spin-up)
+
+Repeating seasonal harvest, no AMIS. Not a world-price pin.
+
+- post-spin-up price mean: 0.3191
+- within-window CV: 1.174
+- annual-mean min/max: 0.2020 / 0.3894
+- last/first annual-mean ratio (drift): 1.630
+- year-to-year seasonal-shape RMSE: 0.1604
 - min S_p / S_c: 0.0000 / 0.0000
-- price index min/max: 0.0105 / 3.1681
-- 2006–11 Pink Sheet corr: -0.160
-- 2007/08 hike model/obs: ×4.53 / ×1.88
 
-A worse Pink-Sheet fit than the legacy host is not a reason to restore
-fill-target, calm pin, scarcity blend, or rival markup.
+## Mechanism panels
 
-## G0-N (supplier programme)
+- Fig. 4 `Ukraine` supplier: harvest, producer stocks, exports, consumption.
+- Fig. 5 `Eastern Africa` purchaser: consumer price, inflow, consumption, stocks.
+These compare harvest-only vs harvest+AMIS on the 2006–11 AMIS diary,
+not a synthetic 36-run exporter grid (that grid is G0-H/P; see
+`restriction_pulse` in `restrictions.py`).
 
-Always-feasible `(fd, fi) ∈ [0, 1]` map of D.11–D.21; rolling forthcoming
-year `[t, t+Nyear)`; Jacobi IBR against D.22 expected rivals; D.7 argument
-`(XI_r + Q_{-r}) / XI*_world`. Not L1–L8. Success = finite and `S ≥ 0`.
+## Figures
 
-## G0-S (source)
+- `figures/fig1_coverage_trade.png`
+- `figures/fig2_prices.png`
+- `figures/fig3_supply_stocks.png`
+- `figures/fig4_ukraine_supplier.png`
+- `figures/fig5_eastern_africa_purchaser.png`
 
-Wheat defaults follow author `AgrimateParams` (αI=3.2, τ=0.1, σ=2, εc=0.1,
-p_sto=0.1/Nyear, x_min=0.2 penalty, ζ=0). C.1 wheat nodes are the 27-name
-`AgrimateRegionsWheat` list. E.27 and D.1 weights match author harvest and
-`expected_harvests.jl`. Tbl. D.8 αI=3.5 / τ=0.2 kept as `wheat_table_d8_defaults()`.
-Unresolved: β/τ_P local price, nested purchaser D.30a, FAOSTAT FB (A1),
-Fig. 4 author series (data zip not unpacked).
+## What this does not do
 
-2006-only smoke: failed=0, fallback=0, offer-floor=0, price index ≈ 0.045–3.67.
+- Does not retune αI, p_sto, or x_min from Pink Sheet or from Bai's table.
+- Does not split-calibrate 2008 vs 2022 (Bai's finding that one set cannot
+  fit both crises is recorded as an open G0-H question).
+- Does not implement G1 substitution or G2 government best-response.
+- Does not unpack Zenodo 10688435 (Agrimate Fig. 4 author series still G0-H).
+

@@ -95,6 +95,11 @@ approval.
    Bai/Wada/Puma workflow structure (scenarios, prices+stocks+supply,
    mechanism panels, OAT). Author defaults unchanged (αI=3.2, not Bai's 10).
    G1/G2 recorded as later recovery tests, not implemented.
+   First 2003–11 run is in `diagnostics/gate0_agrimate/` (AMIS Δ now binds:
+   491 region-steps; harvest vs harvest+AMIS no longer identical). Undisturbed
+   still drifts (annual-mean ratio 1.63); Pink-Sheet corr remains negative.
+   That is a G0-H score, not a reason to restore L1–L8. G0-U exit is the
+   **workflow**, not publication-quality hindcast.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
 
 Reference command:

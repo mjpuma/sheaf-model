@@ -34,16 +34,36 @@ _AMIS_ISO = {
 
 
 def _region_of_amis(name: str) -> str | None:
+    name = str(name).strip()
+    if name in REGION_NAMES:
+        return name
     iso = _AMIS_ISO.get(name)
     if iso is None:
         return None
     return iso3_to_region().get(iso)
 
 
+def _measure_name(row: pd.Series) -> str:
+    for col in ("PolicyMeasure_Name", "Measure", "Policy"):
+        if col in row.index and pd.notna(row[col]):
+            return str(row[col])
+    return ""
+
+
+def _commodity_series(amis: pd.DataFrame) -> pd.Series:
+    for col in ("CommodityClass_Name", "Commodity"):
+        if col in amis.columns:
+            return amis[col].astype(str)
+    return pd.Series([""] * len(amis), index=amis.index)
+
+
 def restriction_matrix(regions: list[str], start_year: int, end_year: int,
                        crop: str = "wheat") -> np.ndarray:
     """Δ[region, step] on the 24-step clock. Unweighted inside multi-country
     regions except single-country regions (export-share weights not rebuilt).
+
+    OECD/AMIS columns are PolicyMeasure_Name / CommodityClass_Name
+    (``data/amis_policies/export_restrictions_aggregated.csv``).
     """
     n_r = len(regions)
     n_steps = (end_year - start_year + 1) * STEPS_PER_YEAR
@@ -54,14 +74,13 @@ def restriction_matrix(regions: list[str], start_year: int, end_year: int,
     except FileNotFoundError:
         return delta
     grain = {"wheat": "Wheat", "rice": "Rice", "maize": "Maize"}[crop]
-    if "Commodity" in amis.columns:
-        amis = amis[amis["Commodity"].astype(str).str.contains(grain, case=False, na=False)]
+    amis = amis[_commodity_series(amis).str.contains(grain, case=False, na=False)]
     for _, row in amis.iterrows():
         country = str(row.get("Country_Name", row.get("Country", "")))
         region = _region_of_amis(country)
         if region is None or region not in idx:
             continue
-        meas = str(row.get("Measure", row.get("Policy", "")))
+        meas = _measure_name(row)
         cut = 0.0
         for k, v in _CUT.items():
             if k.lower() in meas.lower():
@@ -134,6 +153,3 @@ def restriction_pulse(
                 delta[i, t] = cut
     return delta
 
-
-# silence unused import if REGION_NAMES only used by callers
-_ = REGION_NAMES
