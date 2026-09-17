@@ -123,9 +123,9 @@ Wheat defaults follow author `AgrimateParams` (αI=3.2, τ=0.1, σ=2, εc=0.1,
 p_sto=0.1/Nyear, x_min=0.2 penalty, ζ=0). C.1 wheat nodes are the 27-name
 `AgrimateRegionsWheat` list. E.27 and D.1 weights match author harvest and
 `expected_harvests.jl`. Tbl. D.8 αI=3.5 / τ=0.2 kept as `wheat_table_d8_defaults()`.
-Unresolved: nested purchaser D.30a, FAOSTAT FB (A1),
-Fig. 4 author series (data zip not unpacked). β/τ_P: author wheat
-two_markets path pins P_loc=1; host leaves the fields unwired (S3).
+Unresolved: FAOSTAT FB (A1),
+Fig. 4 author series (data zip not unpacked). D.30a formula is wired;
+inflow is still T* (author x1=demand labelled, S4).
 """
     (OUT / "validation_single.md").write_text(md)
     print(md)

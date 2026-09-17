@@ -9,8 +9,10 @@ import numpy as np
 from sheaf.calendar24 import STEPS_PER_YEAR
 
 from .equations import (
+    ces_price_index,
     consumption_ces,
     consumer_price_mix,
+    crop_budget_share,
     expected_harvest,
     expected_restriction,
     extra_storage_demand,
@@ -270,12 +272,17 @@ class AgrimateSim:
             arrive = dest.T @ xi_lag
             for s in range(n_r):
                 prices = np.maximum(offer * (1.0 + 0.0 * d.nu[s]), 1e-8)
-                bud = max(d.A_d[s] * d.C_star[s] * n_y * max(p_w, 1e-8) / n_y, 1e-8)
                 S_star = d.Psi[s] * n_y * d.C_star[s]
                 extra = extra_storage_demand(S_c[s], S_star, p.tau_steps)
-                # D.30 CES origin request is computed; quantity delivered is T*
-                # until D.30a/CES rationing is wired (P4). Not discarded as inflow.
-                _ = purchaser_demand(prices, bud + max(extra, 0.0) * p_w, p.sigma_ces, shares[:, s])
+                # D.30a: B = C*/A_d at p*=1 (author mean(p* D*)/A_d*). Inflow
+                # remains T*+domestic; requests do not yet fix x1 (author does).
+                B = d.C_star[s] / max(float(d.A_d[s]), 1e-8)
+                P_idx = ces_price_index(prices, shares[:, s], p.sigma_ces)
+                A_t = crop_budget_share(d.A_d[s], P_idx, extra, B)
+                _ = purchaser_demand(
+                    prices, B, p.sigma_ces, shares[:, s],
+                    A_d=A_t, eps_d=p.eps_d,
+                )
                 inflow = float(arrive[s]) + float(sold_d[s])
                 p_c[s] = consumer_price_mix(p_w, inflow, p_c[s], S_c[s])
                 cons = consumption_ces(p_c[s], d.A_c[s], p.eps_c, d.C_star[s])
