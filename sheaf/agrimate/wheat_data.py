@@ -236,6 +236,24 @@ def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
     )
 
 
+def international_destination_shares(T_star: np.ndarray) -> np.ndarray:
+    """Row-normalised international T* (exporter → importer).
+
+    Domestic diagonal is dropped. An exporter with no international partners
+    keeps a unit weight on itself so XI is not deleted. This is E.1 pattern
+    routing, not D.30 CES reallocation.
+    """
+    T = np.asarray(T_star, float).copy()
+    np.fill_diagonal(T, 0.0)
+    row = T.sum(axis=1, keepdims=True)
+    dest = np.divide(T, np.maximum(row, 1e-12))
+    empty = row.ravel() <= 1e-12
+    dest[empty, :] = 0.0
+    for r in np.where(empty)[0]:
+        dest[r, r] = 1.0
+    return dest
+
+
 def psd_regional_annual(regions: list[str] | None = None) -> pd.DataFrame:
     """USDA PSD wheat, aggregated to Agrimate wheat nodes (MMT / marketing year).
 

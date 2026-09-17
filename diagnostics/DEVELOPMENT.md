@@ -102,10 +102,13 @@ approval.
    That is a G0-H score, not a reason to restore L1–L8. G0-U exit is the
    **workflow**, not publication-quality hindcast.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
-5. **P1 (done).** Step identities on 2006 harvest+AMIS: D.6, consumer clip,
-   D.3 sales, finite paths. Report: `diagnostics/gate0_agrimate/accounting.md`.
-   **Next session:** paste **P2** from [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
-   (undisturbed drift; do not pin).
+5. **P1 (done).** Step identities on 2006 harvest+AMIS.
+6. **P2 (done).** Delivery bug: lagged XI was credited to the *exporter*
+   as consumer inflow. T* now routes XI to importers. Stocks/who-eats are
+   fixed; world-price 1.63 ratio is unchanged (p_w is on XI, not on who
+   receives it). Writeup: `diagnostics/gate0_agrimate/undisturbed.md`.
+   Remaining non-periodic xd/xi split is labelled, not pinned.
+   **Next session:** paste **P3** (β/τ_P).
 
 Reference command:
 

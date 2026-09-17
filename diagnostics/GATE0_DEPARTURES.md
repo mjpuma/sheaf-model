@@ -52,6 +52,13 @@ S2 **D.8 vs executable.** Host wheat defaults follow author code (αI=3.2,
 S3 **β / τ_P** local price adjustment: present in author params, not wired.
 S4 **D.30a** purchaser upper tier (commodity vs compound good): not wired.
 
+## Coding fix (not an economic departure)
+
+B1 **International delivery (P2).** Pre-fix, lagged XI was credited to the
+*exporter* as consumer inflow (`inflow = sold_d + own XI_{t−Ndel}`). That
+is not D.3/E.1. Host now routes XI along row-normalised international T*.
+D.30 CES still does not ration quantities (P4). Not a world-price pin.
+
 ## Proposed extensions (not implemented)
 
 E1 cross-crop substitution (≠ origin CES). E2 government restriction game
