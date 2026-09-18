@@ -1,0 +1,33 @@
+Agrimate Fig. 4 author series
+=============================
+
+Source: Kuhla, Kilian (2024). Data repository for "Understanding
+agricultural market dynamics in times of crisis: the dynamic agent-based
+model Agrimate". Zenodo. https://doi.org/10.5281/zenodo.10688435
+Licence: CC-BY-4.0.
+
+Fetched 2026-09-18:
+
+- record id 10688435 (v.1.0, 2024-02-21), not the later 1.55 GB
+  versions/latest (14870541)
+- data.zip 150082861 bytes
+- md5 2f3809c66e78b72b3c74971051f89529
+
+Extracted only ``main_output/data/`` three wheat NetCDFs (baseline /
+FAO production anomalies / production+2007–2011 restrictions). The
+150 MB zip and the NetCDF files are **not** vendored in this package.
+
+Filenames:
+
+- agrimate_baseline=2007-2009_extra_regions=(Egypt=EGY)_regions=AgrimateEU28_start=2000-01-01.nc
+- agrimate_baseline=2007-2009_extra_regions=(Egypt=EGY)_production_anomalies=FAOsince-2005_regions=AgrimateEU28_start=2000-01-01.nc
+- agrimate_baseline=2007-2009_export_restrictions=2007-2011_extra_regions=(Egypt=EGY)_production_anomalies=FAOsince-2005_regions=AgrimateEU28_start=2000-01-01.nc
+
+World-market price follows author ``plot_wm_price_timeseries``
+(volume-weighted international transaction price). Quantities nansum'd;
+1000 tonne → MMT. Rebuild:
+
+    PYTHONPATH=. python scripts/score_agrimate_fig4.py \
+        --from-nc /path/to/main_output/data
+
+These CSVs are author output, not a PDF digitisation.

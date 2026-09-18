@@ -26,6 +26,12 @@ python -m pytest tests/agrimate -q
 PYTHONPATH=. python scripts/run_agrimate_validation.py
 ```
 
+Fig. 4 author-series score (does **not** re-run the host; P7):
+
+```bash
+PYTHONPATH=. python scripts/score_agrimate_fig4.py
+```
+
 Single-scenario solver smoke (harvest+AMIS only):
 
 ```bash
@@ -78,7 +84,9 @@ stage. Gate 0 scores both from the start.
 FAOSTAT Food Balances remain labelled A1. Bai found FAO anomalies closer to
 prices in 2020–24; we stay on USDA because FAOSTAT FB is not in the repo.
 
-Agrimate Fig. 4 author series: Zenodo 10688435 not unpacked (still G0-H).
+Agrimate Fig. 4 author series: Zenodo 10688435 unpacked (P7). Score in
+`diagnostics/gate0_agrimate/fig4.md`. Independent implementation, not a
+replication. PDF digitisation was not used.
 
 ## Sensitivity (diagnostic)
 
