@@ -123,7 +123,7 @@ EU-28 vs EU-27 is labelled, not equated. Only shared names below.
 Independent implementation, Fig. 4 series **in hand**, scored, **not
 a replication**. G0-U (3) fails on the host (drift 1.63 vs author
 1.00). G0-U (2) is N5, not a unique maximizer. Do not restore L1–L8.
-Do not retune αI. P8 writes the G0-H hindcast note from these numbers.
+Do not retune αI. See `hindcast.md` (P8) for the G0-H score.
 
 ## Files
 
