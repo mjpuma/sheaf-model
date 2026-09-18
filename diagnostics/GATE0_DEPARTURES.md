@@ -42,6 +42,13 @@ N4 **D.7 international scale.** Argument is `(XI_r + Q_{-r}) / XI*_world`
 with `XI*_world` the per-step year-average (wheat_data note; Agrimate
 `X*_I` scalar). Own-region `XI*_r` as denominator made Nash-scale `q ≫ 1`.
 
+N5 **Unconverged L-BFGS-B (P5).** Feasible fraction plans with scipy
+`success=False` (maxiter 1033 + ABNORMAL 710 = 1743/5832 on harvest+AMIS
+2003–11). Counted separately from failed/fallback. Default `plan_maxiter=40`
+kept: more iters move the price path, but 200 vs 400 disagree by a similar
+RMSE, so there is no demonstrated unique stationary point to adopt.
+Writeup: `diagnostics/gate0_agrimate/solver.md`. Not a pin and not L1–L8.
+
 Agrimate Tbl. D.8 `x_min = 0.2` (quadratic penalty, ζ=0) and linear
 `p_sto = 0.1 / Nyear` are **implemented** (G0-S, from Zenodo 14022004).
 Author `ζ` is a penalty switch, not a storage-cost coefficient.

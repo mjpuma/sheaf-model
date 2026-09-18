@@ -60,7 +60,7 @@ government games will be added **after** G0-P.
 
 | Stage | Work | Exit |
 |---|---|---|
-| **G0-N** | Make the supplier programme numerically solvent on the 24-step wheat year. Record residual, runtime, and when the inverse-demand floor binds. | **Met on the 2003–11 reference run** (failed/fallback 0; residual 0; offer-floor 0; price index 0.0066–5.02 without a pin). Unconverged scipy 1043/6048 still feasible. Pink-Sheet scoring is G0-H. |
+| **G0-N** | Make the supplier programme numerically solvent on the 24-step wheat year. Record residual, runtime, and when the inverse-demand floor binds. | **Feasible** on 2003–11 (failed/fallback 0; residual 0; offer-floor 0). Unconverged scipy **1743/5832** on harvest+AMIS is labelled N5 (`solver.md`); not first-order stationary. Pink-Sheet scoring is G0-H. |
 | **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | **Met for retrieved code.** 27-region C.1 wheat list, author params, p_sto, x_min penalty, E.27, D.1 weights. β/τ_P labelled unused on wheat path (P3). D.30a formula wired (P4); author x1=demand labelled. Unresolved labelled (FAOSTAT FB, data zip). |
 | **G0-U** | Undisturbed / harvest-only / harvest+AMIS. Accounting identities. Score prices **and** USDA supply/stocks. Ukraine / Eastern Africa mechanism panels. OAT diagnostic without retuning. Protocol: `GATE0_VALIDATION.md`. | Three-scenario report in `diagnostics/gate0_agrimate/`; documented seasonal baseline; material balance. |
 | **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | Written score in `diagnostics/gate0_agrimate/`. Comparable to Agrimate or an explicit, sourced shortfall. |
@@ -115,7 +115,11 @@ approval.
 8. **P4 (done).** D.30a is on the wheat path (`determine_demands`,
    `ε_d_adjust=false`). Host nested CES matches; A_d=1 recovers D.30.
    Inflow still T*+domestic; author x1=demand is labelled (S4).
-   **Next session:** paste **P5** (unconverged scipy).
+9. **P5 (done).** Unconverged = 1743/5832 on harvest+AMIS: feasible,
+   residual 0, scipy `success=False` (maxiter + ABNORMAL). Tighter
+   maxiter moves prices, but 200 vs 400 disagree as much as 40 vs 400.
+   Default `plan_maxiter=40` kept. Writeup: `diagnostics/gate0_agrimate/solver.md`.
+   **Next session:** paste **P6** (OAT sensitivity).
 
 Reference command:
 
