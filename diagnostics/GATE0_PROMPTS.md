@@ -5,7 +5,7 @@ Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
 [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md). Protocol:
 [`GATE0_VALIDATION.md`](GATE0_VALIDATION.md).
 
-**Now:** paste **P6**. Everything above P6 is done. Everything below P6
+**Now:** paste **P7**. Everything above P7 is done. Everything below P7
 is later.
 
 ## Shared preamble (prepend to every prompt)
@@ -47,8 +47,8 @@ diagnostics/gate0_agrimate/. One prompt, one PR-sized change.
 | **P3** | Wire or label β/τ_P from author code | **done** (unwired; wheat path pins P_loc=1) |
 | **P4** | Wire or label D.30a upper-tier purchaser | **done** (formula wired; x1 still from plan) |
 | **P5** | Characterize unconverged scipy (do not paper over) | **done** (counted; maxiter left at 40) |
-| P6 | Run OAT sensitivity; do not retune | **next** |
-| P7 | Unpack Zenodo 10688435; score vs Agrimate Fig. 4 | queued (G0-H) |
+| **P6** | Run OAT sensitivity; do not retune | **done** (2006–08; no default change) |
+| P7 | Unpack Zenodo 10688435; score vs Agrimate Fig. 4 | **next** (G0-H) |
 | P8 | Honest 2006–11 hindcast writeup (levels and paths) | queued (G0-H) |
 | P9 | Regional USDA supply/stocks (not only world) | queued (G0-H) |
 | P10 | FAOSTAT FB vs USDA (A1) — only if data exist | queued / maybe defer |

@@ -1,6 +1,6 @@
 # Agrimate Gate 0 — three-scenario validation
 
-Command: `python scripts/run_agrimate_validation.py --start-year 2003 --end-year 2011`
+Command: `python scripts/run_agrimate_validation.py --start-year 2003 --end-year 2011 --sensitivity`
 
 Independent Agrimate copy (Kuhla et al. 2025 §D; Zenodo 14022004 as
 executable spec, not copied). Workflow structure matches the Bai/Wada/Puma
@@ -25,9 +25,9 @@ This run is G0: single crop, AMIS prescribed. Do not retune L1–L8.
 
 | scenario | failed | fallback | unconverged | floor | residual | runtime_s | pidx min/max |
 |---|---:|---:|---:|---:|---:|---:|---|
-| undisturbed | 0 | 0 | 1583 | 0 | 0.000e+00 | 14.2 | 0.0145 / 3.1681 |
-| harvest | 0 | 0 | 1628 | 0 | 0.000e+00 | 19.1 | 0.0105 / 3.1681 |
-| harvest_amis | 0 | 0 | 1743 | 0 | 0.000e+00 | 19.6 | 0.0113 / 3.1681 |
+| undisturbed | 0 | 0 | 1583 | 0 | 0.000e+00 | 14.5 | 0.0145 / 3.1681 |
+| harvest | 0 | 0 | 1628 | 0 | 0.000e+00 | 19.5 | 0.0105 / 3.1681 |
+| harvest_amis | 0 | 0 | 1743 | 0 | 0.000e+00 | 19.9 | 0.0113 / 3.1681 |
 
 ## Prices vs Pink Sheet (2006–11)
 
@@ -97,4 +97,49 @@ not a synthetic 36-run exporter grid (that grid is G0-H/P; see
   fit both crises is recorded as an open G0-H question).
 - Does not implement G1 substitution or G2 government best-response.
 - Does not unpack Zenodo 10688435 (Agrimate Fig. 4 author series still G0-H).
+
+## OAT sensitivity (diagnostic, author defaults unchanged)
+
+Each named parameter is varied individually. α_foreign=10 is Bai's
+fit, shown as an alternative, not adopted.
+
+Window is harvest+AMIS **2006–08 simulation** (not the 2003–11 hindcast).
+Author defaults stay αI=3.2, p_sto=0.1, xmin=0.2, εc=0.1, σ=2.
+Bai αI=10 is listed, not adopted. A knob *moves* the 2008 hike if
+|Δ×| ≥ 0.10 versus that axis's author value; otherwise it does not.
+Unconverged scipy stays labelled (N5), not a retune.
+
+- `alpha_i` default 3.2 → 2008 hike ×2.31.
+  - moves: `alpha_i`=5 → ×2.95 (Δ=+0.63)
+  - moves: `alpha_i`=10 → ×3.58 (Δ=+1.26)
+- `p_sto_annual` default 0.1 → 2008 hike ×2.31.
+  - moves: `p_sto_annual`=0.05 → ×1.96 (Δ=-0.35)
+  - does not: `p_sto_annual`=0.15 → ×2.27 (Δ=-0.04)
+- `xmin_share` default 0.2 → 2008 hike ×2.31.
+  - moves: `xmin_share`=0.1 → ×2.21 (Δ=-0.10)
+- `eps_c` default 0.1 → 2008 hike ×2.31.
+  - does not: `eps_c`=0.2 → ×2.31 (Δ=+0.00)
+- `sigma_ces` default 2 → 2008 hike ×2.31.
+  - does not: `sigma_ces`=2.5 → ×2.31 (Δ=+0.00)
+
+**Moves 2008 hike:** `alpha_i`=5 → ×2.95 (Δ=+0.63); `alpha_i`=10 → ×3.58 (Δ=+1.26); `p_sto_annual`=0.05 → ×1.96 (Δ=-0.35); `xmin_share`=0.1 → ×2.21 (Δ=-0.10).
+**Does not:** `p_sto_annual`=0.15 → ×2.27 (Δ=-0.04); `eps_c`=0.2 → ×2.31 (Δ=+0.00); `sigma_ces`=2.5 → ×2.31 (Δ=+0.00).
+No parameter was adopted as a new default.
+εc and σ silent on world price is expected while D.30/D.35 do not
+set T*+domestic inflows (S4).
+
+| param | value | scenario | corr | hike_2008 | pidx_max | failed | unconverged |
+|---|---:|---|---:|---:|---:|---:|---:|
+| alpha_i | 3.2 | harvest_amis | -0.077 | ×2.31 | 3.769 | 0 | 611 |
+| alpha_i | 5.0 | harvest_amis | -0.087 | ×2.95 | 10.046 | 0 | 603 |
+| alpha_i | 10.0 | harvest_amis | -0.065 | ×3.58 | 473.490 | 0 | 721 |
+| p_sto_annual | 0.05 | harvest_amis | -0.191 | ×1.96 | 3.913 | 0 | 705 |
+| p_sto_annual | 0.1 | harvest_amis | -0.077 | ×2.31 | 3.769 | 0 | 611 |
+| p_sto_annual | 0.15 | harvest_amis | -0.241 | ×2.27 | 3.818 | 0 | 637 |
+| xmin_share | 0.1 | harvest_amis | -0.300 | ×2.21 | 3.943 | 0 | 455 |
+| xmin_share | 0.2 | harvest_amis | -0.077 | ×2.31 | 3.769 | 0 | 611 |
+| eps_c | 0.1 | harvest_amis | -0.077 | ×2.31 | 3.769 | 0 | 611 |
+| eps_c | 0.2 | harvest_amis | -0.077 | ×2.31 | 3.769 | 0 | 611 |
+| sigma_ces | 2.0 | harvest_amis | -0.077 | ×2.31 | 3.769 | 0 | 611 |
+| sigma_ces | 2.5 | harvest_amis | -0.077 | ×2.31 | 3.769 | 0 | 611 |
 
