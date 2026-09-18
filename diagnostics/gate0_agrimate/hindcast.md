@@ -175,9 +175,10 @@ a hindcast verdict:
 Sourced shortfall. Gate 0 wheat is **not** at the publication bar
 on historical performance (DEVELOPMENT item 5) and still fails
 item 3 (undisturbed). Do not restore L1–L8. Do not adopt Bai
-α_foreign=10. Do not pin 2006. Next: P9 regional USDA tables
-(coverage, not a fit). P12 methods note waits on an accepted G0-H
-picture; this note is that picture.
+α_foreign=10. Do not pin 2006. Regional USDA (P9): `regional.md`
+(coverage labelled; no xmin/p_sto fit). P12 methods note waits on
+an accepted G0-H picture; this note plus `regional.md` are that
+picture.
 
 ## Files
 
@@ -185,4 +186,5 @@ picture; this note is that picture.
 - `score_hindcast_quantities.csv` — USDA level vs anomaly
 - `figures/fig6_hindcast_seasonal.png`
 - `fig4.md` — P7 author-series score (unchanged)
+- `regional.md` — P9 named-node USDA (coverage, not a fit)
 

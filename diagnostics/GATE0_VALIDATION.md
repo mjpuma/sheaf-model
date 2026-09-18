@@ -38,6 +38,14 @@ G0-H hindcast note (does **not** re-run the host; P8):
 PYTHONPATH=. python scripts/score_agrimate_hindcast.py
 ```
 
+Regional USDA table (P9). Harvest is reconstructed from `H_annual`;
+consumption/stocks re-run the three scenarios without overwriting
+price CSVs:
+
+```bash
+PYTHONPATH=. python scripts/score_agrimate_regional.py
+```
+
 Single-scenario solver smoke (harvest+AMIS only):
 
 ```bash
@@ -94,6 +102,8 @@ Agrimate Fig. 4 author series: Zenodo 10688435 unpacked (P7). Score in
 `diagnostics/gate0_agrimate/fig4.md`. Independent implementation, not a
 replication. PDF digitisation was not used. G0-H writeup (P8):
 `diagnostics/gate0_agrimate/hindcast.md` — sourced shortfall, not a retune.
+Regional USDA (P9): `diagnostics/gate0_agrimate/regional.md` — coverage
+labelled (A8 China 0.50× / Eastern Africa 0.10×); no stock-level fit.
 
 ## Sensitivity (diagnostic)
 

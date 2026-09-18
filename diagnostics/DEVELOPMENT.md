@@ -63,7 +63,7 @@ government games will be added **after** G0-P.
 | **G0-N** | Make the supplier programme numerically solvent on the 24-step wheat year. Record residual, runtime, and when the inverse-demand floor binds. | **Feasible** on 2003–11 (failed/fallback 0; residual 0; offer-floor 0). Unconverged scipy **1743/5832** on harvest+AMIS is labelled N5 (`solver.md`); not first-order stationary. Pink-Sheet scoring is G0-H. |
 | **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | **Met for retrieved code.** 27-region C.1 wheat list, author params, p_sto, x_min penalty, E.27, D.1 weights. β/τ_P labelled unused on wheat path (P3). D.30a formula wired (P4); author x1=demand labelled. Unresolved labelled (FAOSTAT FB). Fig. 4 zip unpacked (P7); not a replication. |
 | **G0-U** | Undisturbed / harvest-only / harvest+AMIS. Accounting identities. Score prices **and** USDA supply/stocks. Ukraine / Eastern Africa mechanism panels. OAT diagnostic without retuning. Protocol: `GATE0_VALIDATION.md`. | Three-scenario report in `diagnostics/gate0_agrimate/`; documented seasonal baseline; material balance. |
-| **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | **P8 done:** `hindcast.md` is an explicit sourced shortfall (2006 $65 vs $213; hike ×4.54 vs Agrimate ×1.62 vs Pink ×1.88; seasonal max/min ~18× vs Agrimate 1.45×). Not a replication. P9 regional USDA tables. |
+| **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | **P8–P9 done:** `hindcast.md` sourced shortfall; `regional.md` named-node vs `psd_regional_annual()` (China 0.50× / EA 0.10× from A8 mean-of-members; no xmin/p_sto fit). P10 FAOSTAT FB if present. |
 | **G0-P** | Gate 0 note at publication standard (methods, data, hindcast, limits). No substitution, no government game. | You accept wheat Gate 0 as the SHEAF market paper / section. **This is the only gate that unlocks G1.** |
 | **G1** | Cross-crop substitution (wheat/rice/maize), distinct from Agrimate origin CES. Disabled G1 recovers G0. | Identity test + spillover experiments. No σ* fit to 2008. |
 | **G2** | Government restriction game, distinct from supplier oligopoly and from AMIS/E.4. Disabled G2 recovers E.4 Agrimate. | Mechanism tests on the *accepted* G0 host. Train/hold-out if estimated. |
@@ -137,7 +137,12 @@ approval.
     Production corr +0.795 vs USDA. Stock level **1.58×** USDA after P2
     (prompt's ~3× was the echo bug). AMIS adds May 2008, not the 2007
     spike. Bai αI=10 not adopted. `wheat_params()` unchanged.
-   **Next session:** paste **P9** (regional USDA tables).
+13. **P9 (done).** Regional USDA: `diagnostics/gate0_agrimate/regional.md`.
+    Named exporters + Eastern Africa vs `psd_regional_annual()` 2006–11.
+    Single-row nodes match production *means*; China 0.50× and Eastern
+    Africa 0.10× because `prepare_wheat` `groupby.mean()`s members (A8,
+    labelled, not fixed). No xmin/p_sto fit. `wheat_params()` unchanged.
+   **Next session:** paste **P10** (FAOSTAT FB vs USDA — only if data exist).
 
 Reference command:
 
