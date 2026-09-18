@@ -32,6 +32,12 @@ Fig. 4 author-series score (does **not** re-run the host; P7):
 PYTHONPATH=. python scripts/score_agrimate_fig4.py
 ```
 
+G0-H hindcast note (does **not** re-run the host; P8):
+
+```bash
+PYTHONPATH=. python scripts/score_agrimate_hindcast.py
+```
+
 Single-scenario solver smoke (harvest+AMIS only):
 
 ```bash
@@ -86,7 +92,8 @@ prices in 2020–24; we stay on USDA because FAOSTAT FB is not in the repo.
 
 Agrimate Fig. 4 author series: Zenodo 10688435 unpacked (P7). Score in
 `diagnostics/gate0_agrimate/fig4.md`. Independent implementation, not a
-replication. PDF digitisation was not used.
+replication. PDF digitisation was not used. G0-H writeup (P8):
+`diagnostics/gate0_agrimate/hindcast.md` — sourced shortfall, not a retune.
 
 ## Sensitivity (diagnostic)
 

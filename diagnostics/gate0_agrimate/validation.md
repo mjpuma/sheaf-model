@@ -90,7 +90,9 @@ not a synthetic 36-run exporter grid (that grid is G0-H/P; see
 - `figures/fig4_ukraine_supplier.png`
 - `figures/fig5_eastern_africa_purchaser.png`
 - `figures/fig4_author_vs_host_prices.png` (P7; author Fig. 4d vs host D.7)
+- `figures/fig6_hindcast_seasonal.png` (P8; month-of-year path)
 - `fig4.md` — author series score. Independent implementation, not a replication.
+- `hindcast.md` — G0-H 2006–11 score. Explicit sourced shortfall, not a retune.
 
 ## What this does not do
 
