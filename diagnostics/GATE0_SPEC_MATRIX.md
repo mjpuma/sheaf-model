@@ -3,7 +3,8 @@
 Sources: Kuhla et al. 2025, *Ecol. Econ.* 231, 108546. Author code
 https://doi.org/10.5281/zenodo.14022004 **retrieved 2026-09-16** as the
 executable specification (not copied). Independent implementation, not a
-bit-reproduction. Data 10688435 not unpacked.
+bit-reproduction. Data 10688435 unpacked for Fig. 4 series (P7); not a
+replication.
 
 | Mechanism | Agrimate source | Legacy SHEAF | New code | Verification |
 |---|---|---|---|---|
@@ -26,6 +27,7 @@ bit-reproduction. Data 10688435 not unpacked.
 | Storage cost | Tbl. D.8 p_sto=0.1 / Nyear | cover rule | `optimize.py` unit costs | G0-S |
 | x_min | Tbl. D.8 0.2 even spread | n/a | quadratic penalty, ζ=0 | G0-S |
 | Three-scenario validation | Agrimate Fig. 4 design; Bai/Wada/Puma copy workflow | Pink-Sheet only | `validation.py` / `run_agrimate_validation.py` | prices **and** USDA supply/stocks |
+| Fig. 4 author series | Zenodo 10688435 main_output NetCDF (AgrimateEU28+Egypt, FAO, αI=3.5) | PDF digitisation (unused) | `fig4.py` / `score_agrimate_fig4.py` | P7 `fig4.md`; independent, not replication |
 | OAT sensitivity | diagnostic around author params | n/a | `oat_settings()` | P6 2006–08: αI/p_sto/xmin move hike; εc/σ silent; Bai 10 listed, not adopted |
 | Exporter pulse grid | prescribed Δ, G0-H/P | n/a | `restriction_pulse` | not G2 |
 | Step accounting | D.6 / D.3 / consumer clip | n/a | `accounting.py` | `test_2006_harvest_amis_path_identities` |
@@ -33,4 +35,8 @@ bit-reproduction. Data 10688435 not unpacked.
 | Local price β, τ_P | author `AgrimateParams`; `determine_target_price_adjustment_factor` | n/a | unused fields on `AgrimateParams` | P3: wheat `two_markets` pins P_loc=1; `test_beta_loc_does_not_enter_supplier_plan` |
 | Unconverged L-BFGS-B | scipy `success=False` on feasible fraction plans | n/a | counted; `plan_maxiter=40` | P5 `solver.md`; not dropped |
 
-Unresolved (labelled, not guessed): FAOSTAT FB vs USDA; paper 28 vs code 27; D.8 αI=3.5 vs code 3.2. β/τ_P unused on wheat path (S3). D.30a formula wired; author x1=demand not copied (S4). Unconverged plans labelled N5.
+Unresolved (labelled, not guessed): FAOSTAT FB vs USDA; paper 28 vs code 27;
+D.8 αI=3.5 vs code 3.2. Fig. 4 used the D.8 αI=3.5 / EU28+Egypt / FAO
+executable (P7), not the 14022004 wheat defaults. β/τ_P unused on wheat
+path (S3). D.30a formula wired; author x1=demand not copied (S4).
+Unconverged plans labelled N5.

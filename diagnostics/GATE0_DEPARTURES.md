@@ -19,6 +19,10 @@ to restore them.
 A1 USDA PSD not FAOSTAT Food Balances; A2 E0 shares rescaled; A3 A_d not E.30 (F.1 Egypt 0.17 unused: Egypt is inside Northern Africa);
 A4 A_c income-group proxies; A5 restriction weights inside multi-country
 regions; A6 inverse-demand floor 0.05 (numerical).
+A7 **Fig. 4 experiment ≠ 14022004 wheat defaults (P7).** Author
+`main_output` NetCDF (10688435) is AgrimateEU28+Egypt, FAO anomalies,
+α_foreign=3.5, ζ=1, N_for=6, start 2000. Host remains AgrimateRegionsWheat
++ USDA + αI=3.2. Scored in `fig4.md`; not a reason to retune.
 
 ## G0-N numerical representation (not economic departures)
 

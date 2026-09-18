@@ -89,6 +89,8 @@ not a synthetic 36-run exporter grid (that grid is G0-H/P; see
 - `figures/fig3_supply_stocks.png`
 - `figures/fig4_ukraine_supplier.png`
 - `figures/fig5_eastern_africa_purchaser.png`
+- `figures/fig4_author_vs_host_prices.png` (P7; author Fig. 4d vs host D.7)
+- `fig4.md` — author series score. Independent implementation, not a replication.
 
 ## What this does not do
 
@@ -96,7 +98,8 @@ not a synthetic 36-run exporter grid (that grid is G0-H/P; see
 - Does not split-calibrate 2008 vs 2022 (Bai's finding that one set cannot
   fit both crises is recorded as an open G0-H question).
 - Does not implement G1 substitution or G2 government best-response.
-- Does not unpack Zenodo 10688435 (Agrimate Fig. 4 author series still G0-H).
+- Fig. 4 author series are scored in `fig4.md` (P7). Not a replication.
+  Host `AgrimateParams` were not retuned to the Fig. 4 NetCDF knobs.
 
 ## OAT sensitivity (diagnostic, author defaults unchanged)
 

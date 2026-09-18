@@ -61,9 +61,9 @@ government games will be added **after** G0-P.
 | Stage | Work | Exit |
 |---|---|---|
 | **G0-N** | Make the supplier programme numerically solvent on the 24-step wheat year. Record residual, runtime, and when the inverse-demand floor binds. | **Feasible** on 2003–11 (failed/fallback 0; residual 0; offer-floor 0). Unconverged scipy **1743/5832** on harvest+AMIS is labelled N5 (`solver.md`); not first-order stationary. Pink-Sheet scoring is G0-H. |
-| **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | **Met for retrieved code.** 27-region C.1 wheat list, author params, p_sto, x_min penalty, E.27, D.1 weights. β/τ_P labelled unused on wheat path (P3). D.30a formula wired (P4); author x1=demand labelled. Unresolved labelled (FAOSTAT FB, data zip). |
+| **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | **Met for retrieved code.** 27-region C.1 wheat list, author params, p_sto, x_min penalty, E.27, D.1 weights. β/τ_P labelled unused on wheat path (P3). D.30a formula wired (P4); author x1=demand labelled. Unresolved labelled (FAOSTAT FB). Fig. 4 zip unpacked (P7); not a replication. |
 | **G0-U** | Undisturbed / harvest-only / harvest+AMIS. Accounting identities. Score prices **and** USDA supply/stocks. Ukraine / Eastern Africa mechanism panels. OAT diagnostic without retuning. Protocol: `GATE0_VALIDATION.md`. | Three-scenario report in `diagnostics/gate0_agrimate/`; documented seasonal baseline; material balance. |
-| **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | Written score in `diagnostics/gate0_agrimate/`. Comparable to Agrimate or an explicit, sourced shortfall. |
+| **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | **P7 done:** author series in `fig4.md`. Independent implementation, not replication (host drift 1.63 vs author 1.00; hike ×4.54 vs ×1.62). P8 writes the hindcast note. |
 | **G0-P** | Gate 0 note at publication standard (methods, data, hindcast, limits). No substitution, no government game. | You accept wheat Gate 0 as the SHEAF market paper / section. **This is the only gate that unlocks G1.** |
 | **G1** | Cross-crop substitution (wheat/rice/maize), distinct from Agrimate origin CES. Disabled G1 recovers G0. | Identity test + spillover experiments. No σ* fit to 2008. |
 | **G2** | Government restriction game, distinct from supplier oligopoly and from AMIS/E.4. Disabled G2 recovers E.4 Agrimate. | Mechanism tests on the *accepted* G0 host. Train/hold-out if estimated. |
@@ -91,7 +91,7 @@ approval.
 2. **G0-S (done against retrieved code).** Zenodo 14022004 in hand. Wheat
    C.1 is 27 author names; params follow `AgrimateParams`; p_sto and x_min
    penalty; E.27 and D.1 from author. Unresolved labelled in
-   `GATE0_AGRIMATE_BRIEF.md`. Data 10688435 not unpacked (G0-H).
+   `GATE0_AGRIMATE_BRIEF.md`. Data 10688435 unpacked for Fig. 4 (P7).
 3. **G0-U (this).** Three-scenario runner `scripts/run_agrimate_validation.py`.
    Bai/Wada/Puma workflow structure (scenarios, prices+stocks+supply,
    mechanism panels, OAT). Author defaults unchanged (αI=3.2, not Bai's 10).
@@ -123,7 +123,14 @@ approval.
     the 2008 hike; Bai αI=10 raises it and blows pidx_max. εc and σ do not
     move world price (S4). `wheat_params()` unchanged (αI=3.2).
     CSV: `diagnostics/gate0_agrimate/score_sensitivity.csv`.
-   **Next session:** paste **P7** (Agrimate Fig. 4 zip).
+11. **P7 (done).** Zenodo 10688435 `data.zip` fetched (md5
+    `2f3809c66e78b72b3c74971051f89529`). Fig. 4 series scored in
+    `diagnostics/gate0_agrimate/fig4.md`. Independent implementation,
+    **not a replication**: author baseline last/first=1.004 vs host 1.63
+    (P2 unexplained); harvest+AMIS hike ×1.62 author vs ×4.54 host;
+    Fig. 4 executable is AgrimateEU28+Egypt, FAO anomalies, α_foreign=3.5,
+    ζ=1, N_for=6, git `old-demand-dynamics`. Host `AgrimateParams` unchanged.
+   **Next session:** paste **P8** (honest 2006–11 hindcast writeup).
 
 Reference command:
 
