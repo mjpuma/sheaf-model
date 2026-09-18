@@ -5,7 +5,7 @@ Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
 [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md). Protocol:
 [`GATE0_VALIDATION.md`](GATE0_VALIDATION.md).
 
-**Now:** paste **P9**. Everything above P9 is done. Everything below P9
+**Now:** paste **P10**. Everything above P10 is done. Everything below P10
 is later.
 
 ## Shared preamble (prepend to every prompt)
@@ -50,8 +50,8 @@ diagnostics/gate0_agrimate/. One prompt, one PR-sized change.
 | **P6** | Run OAT sensitivity; do not retune | **done** (2006–08; no default change) |
 | **P7** | Unpack Zenodo 10688435; score vs Agrimate Fig. 4 | **done** (series in hand; not a replication) |
 | **P8** | Honest 2006–11 hindcast writeup (levels and paths) | **done** (sourced shortfall; not a retune) |
-| P9 | Regional USDA supply/stocks (not only world) | **next** (G0-H) |
-| P10 | FAOSTAT FB vs USDA (A1) — only if data exist | queued / maybe defer |
+| **P9** | Regional USDA supply/stocks (not only world) | **done** (coverage labelled; no stock fit) |
+| P10 | FAOSTAT FB vs USDA (A1) — only if data exist | **next** / maybe defer |
 | P11 | Exporter-at-a-time pulse grid (not G2) | optional G0-H/P |
 | P12 | G0-P methods note | after P8 |
 | — | G1 substitution / G2 restriction game | **blocked until G0-P** |

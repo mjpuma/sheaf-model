@@ -29,6 +29,7 @@ replication.
 | Three-scenario validation | Agrimate Fig. 4 design; Bai/Wada/Puma copy workflow | Pink-Sheet only | `validation.py` / `run_agrimate_validation.py` | prices **and** USDA supply/stocks |
 | Fig. 4 author series | Zenodo 10688435 main_output NetCDF (AgrimateEU28+Egypt, FAO, αI=3.5) | PDF digitisation (unused) | `fig4.py` / `score_agrimate_fig4.py` | P7 `fig4.md`; independent, not replication |
 | G0-H hindcast note | Agrimate Fig. 4 + Pink Sheet levels and paths | price corr only | `hindcast.py` / `score_agrimate_hindcast.py` | P8 `hindcast.md`; sourced shortfall, no retune |
+| Regional USDA | `psd_regional_annual()` vs named nodes | world PSD only | `regional.py` / `score_agrimate_regional.py` | P9 `regional.md`; A8 mean-of-members labelled, no xmin fit |
 | OAT sensitivity | diagnostic around author params | n/a | `oat_settings()` | P6 2006–08: αI/p_sto/xmin move hike; εc/σ silent; Bai 10 listed, not adopted |
 | Exporter pulse grid | prescribed Δ, G0-H/P | n/a | `restriction_pulse` | not G2 |
 | Step accounting | D.6 / D.3 / consumer clip | n/a | `accounting.py` | `test_2006_harvest_amis_path_identities` |
