@@ -176,6 +176,27 @@ def replace_regions(res: AgrimateResult, regions: list[str]) -> AgrimateResult:
     )
 
 
+def test_oat_short_window_is_three_years():
+    d = prepare_wheat(2006, 2008)
+    assert d.start_year == 2006 and d.end_year == 2008
+    assert d.delta.shape == (27, 72)
+
+
+def test_oat_hike_summary_classifies_movers():
+    import pandas as pd
+    from sheaf.agrimate.validation import _oat_hike_summary
+    df = pd.DataFrame([
+        {"param": "alpha_i", "value": 3.2, "hike_2008_model": 4.50},
+        {"param": "alpha_i", "value": 10.0, "hike_2008_model": 2.00},
+        {"param": "sigma_ces", "value": 2.0, "hike_2008_model": 4.50},
+        {"param": "sigma_ces", "value": 2.5, "hike_2008_model": 4.51},
+    ])
+    text = "\n".join(_oat_hike_summary(df))
+    assert "Moves 2008 hike:" in text and "`alpha_i`=10" in text
+    assert "does not:" in text and "`sigma_ces`=2.5" in text
+    assert "No parameter was adopted" in text
+
+
 def test_author_defaults_not_replaced_by_replace():
     p = wheat_params()
     q = replace(p, alpha_i=10.0)

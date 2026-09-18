@@ -119,7 +119,11 @@ approval.
    residual 0, scipy `success=False` (maxiter + ABNORMAL). Tighter
    maxiter moves prices, but 200 vs 400 disagree as much as 40 vs 400.
    Default `plan_maxiter=40` kept. Writeup: `diagnostics/gate0_agrimate/solver.md`.
-   **Next session:** paste **P6** (OAT sensitivity).
+10. **P6 (done).** Short harvest+AMIS 2006–08 OAT. αI and low p_sto move
+    the 2008 hike; Bai αI=10 raises it and blows pidx_max. εc and σ do not
+    move world price (S4). `wheat_params()` unchanged (αI=3.2).
+    CSV: `diagnostics/gate0_agrimate/score_sensitivity.csv`.
+   **Next session:** paste **P7** (Agrimate Fig. 4 zip).
 
 Reference command:
 

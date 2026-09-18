@@ -26,7 +26,7 @@ bit-reproduction. Data 10688435 not unpacked.
 | Storage cost | Tbl. D.8 p_sto=0.1 / Nyear | cover rule | `optimize.py` unit costs | G0-S |
 | x_min | Tbl. D.8 0.2 even spread | n/a | quadratic penalty, ζ=0 | G0-S |
 | Three-scenario validation | Agrimate Fig. 4 design; Bai/Wada/Puma copy workflow | Pink-Sheet only | `validation.py` / `run_agrimate_validation.py` | prices **and** USDA supply/stocks |
-| OAT sensitivity | diagnostic around author params | n/a | `oat_settings()` | αI=3.2 default; Bai 10 listed, not adopted |
+| OAT sensitivity | diagnostic around author params | n/a | `oat_settings()` | P6 2006–08: αI/p_sto/xmin move hike; εc/σ silent; Bai 10 listed, not adopted |
 | Exporter pulse grid | prescribed Δ, G0-H/P | n/a | `restriction_pulse` | not G2 |
 | Step accounting | D.6 / D.3 / consumer clip | n/a | `accounting.py` | `test_2006_harvest_amis_path_identities` |
 | International delivery | E.1 T* to importers, Ndel lag | own-XI echo (bug) | `international_destination_shares` | `test_international_sales_are_not_echoed_to_the_exporter` |

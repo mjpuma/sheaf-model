@@ -599,6 +599,61 @@ def write_figures(
     return written
 
 
+def _oat_hike_summary(sensitivity: pd.DataFrame) -> list[str]:
+    """Which OAT knobs move the 2008 hike vs the author default. No retune."""
+    defaults = {
+        "alpha_i": 3.2,
+        "p_sto_annual": 0.10,
+        "xmin_share": 0.20,
+        "eps_c": 0.10,
+        "sigma_ces": 2.0,
+    }
+    lines = [
+        "Window is harvest+AMIS **2006–08 simulation** (not the 2003–11 hindcast).",
+        "Author defaults stay αI=3.2, p_sto=0.1, xmin=0.2, εc=0.1, σ=2.",
+        "Bai αI=10 is listed, not adopted. A knob *moves* the 2008 hike if",
+        "|Δ×| ≥ 0.10 versus that axis's author value; otherwise it does not.",
+        "Unconverged scipy stays labelled (N5), not a retune.",
+        "",
+    ]
+    movers: list[str] = []
+    still: list[str] = []
+    for param, g in sensitivity.groupby("param", sort=False):
+        d0 = defaults.get(str(param))
+        if d0 is None:
+            continue
+        match = g[np.isclose(g["value"].astype(float), float(d0))]
+        if match.empty:
+            continue
+        h0 = float(match.iloc[0]["hike_2008_model"])
+        lines.append(
+            f"- `{param}` default {d0:g} → 2008 hike ×{_fmt(h0, 2)}."
+        )
+        for _, r in g.iterrows():
+            v = float(r["value"])
+            if np.isclose(v, float(d0)):
+                continue
+            h = float(r["hike_2008_model"])
+            dh = h - h0
+            note = f"`{param}`={v:g} → ×{_fmt(h, 2)} (Δ={dh:+.2f})"
+            if abs(dh) >= 0.10:
+                movers.append(note)
+                lines.append(f"  - moves: {note}")
+            else:
+                still.append(note)
+                lines.append(f"  - does not: {note}")
+    lines += [
+        "",
+        "**Moves 2008 hike:** " + ("; ".join(movers) if movers else "none at |Δ×| ≥ 0.10") + ".",
+        "**Does not:** " + ("; ".join(still) if still else "none") + ".",
+        "No parameter was adopted as a new default.",
+        "εc and σ silent on world price is expected while D.30/D.35 do not",
+        "set T*+domestic inflows (S4).",
+        "",
+    ]
+    return lines
+
+
 def _fmt(x, nd=3) -> str:
     if x is None or (isinstance(x, float) and not np.isfinite(x)):
         return "nan"
@@ -626,7 +681,8 @@ def write_report(
         "# Agrimate Gate 0 — three-scenario validation",
         "",
         f"Command: `python scripts/run_agrimate_validation.py "
-        f"--start-year {start_year} --end-year {end_year}`",
+        f"--start-year {start_year} --end-year {end_year}"
+        f"{' --sensitivity' if sensitivity is not None else ''}`",
         "",
         "Independent Agrimate copy (Kuhla et al. 2025 §D; Zenodo 14022004 as",
         "executable spec, not copied). Workflow structure matches the Bai/Wada/Puma",
@@ -743,14 +799,18 @@ def write_report(
             "Each named parameter is varied individually. α_foreign=10 is Bai's",
             "fit, shown as an alternative, not adopted.",
             "",
-            "| param | value | scenario | corr | hike_2008 | pidx_max | failed |",
-            "|---|---:|---|---:|---:|---:|---:|",
+        ]
+        lines += _oat_hike_summary(sensitivity)
+        lines += [
+            "| param | value | scenario | corr | hike_2008 | pidx_max | failed | unconverged |",
+            "|---|---:|---|---:|---:|---:|---:|---:|",
         ]
         for _, r in sensitivity.iterrows():
             lines.append(
                 f"| {r['param']} | {r['value']} | {r['scenario']} | "
                 f"{_fmt(r.get('corr'))} | ×{_fmt(r.get('hike_2008_model'), 2)} | "
-                f"{_fmt(r.get('pidx_max'), 3)} | {int(r.get('failed', 0))} |"
+                f"{_fmt(r.get('pidx_max'), 3)} | {int(r.get('failed', 0))} | "
+                f"{int(r.get('unconverged', 0))} |"
             )
         lines.append("")
     path = out / "validation.md"
@@ -767,11 +827,16 @@ def run_sensitivity(
 ) -> pd.DataFrame:
     rows = []
     pink = pink_sheet_monthly()
+    # Do not reuse the 2003–11 hindcast arrays: run_agrimate ignores
+    # start_year/end_year when ``data`` is passed. Prepare the OAT window.
+    oat_data = prepare_wheat(start_year=start_year, end_year=end_year)
+    assert list(oat_data.regions) == list(data.regions)
+    n_solves = len(oat_data.regions) * oat_data.delta.shape[1]
     for name, value, params in oat_settings(extended=extended):
         for sc in scenarios:
             spec = SCENARIOS[sc]
             res = run_agrimate(
-                data=data, params=params,
+                data=oat_data, params=params,
                 use_anomalies=spec["use_anomalies"],
                 use_restrictions=spec["use_restrictions"],
                 start_year=start_year, end_year=end_year,
@@ -790,6 +855,7 @@ def run_sensitivity(
                 "pidx_max": float(np.nanmax(res.price_index)),
                 "failed": res.failed_solves,
                 "unconverged": res.unconverged_solves,
+                "n_solves": n_solves,
                 "runtime_s": res.runtime_s,
             })
     return pd.DataFrame(rows)
