@@ -191,6 +191,19 @@ def _plan_objective_grad(
     return obj, np.concatenate([dfd, dfi])
 
 
+def projected_grad_norm(z: np.ndarray, g: np.ndarray,
+                        lo: float = 0.0, hi: float = 1.0) -> float:
+    """Bound-constrained projected gradient (minimization, box [lo, hi])."""
+    z = np.asarray(z, float)
+    g = np.asarray(g, float)
+    pg = g.copy()
+    at_lo = z <= lo + 1e-12
+    at_hi = z >= hi - 1e-12
+    pg[at_lo] = np.minimum(pg[at_lo], 0.0)
+    pg[at_hi] = np.maximum(pg[at_hi], 0.0)
+    return float(np.linalg.norm(pg))
+
+
 def solve_supplier_plan(
         H: np.ndarray,
         S0: float,
@@ -265,6 +278,10 @@ def solve_supplier_plan(
     floor = params.demand_arg_floor
     floor_binds = int(np.sum(q_i <= floor + 1e-12) + np.sum(q_d <= floor + 1e-12))
     residual = float(max(-np.min(S), 0.0)) if S.size else 0.0
+    obj, grad = _plan_objective_grad(
+        np.clip(z, 0.0, 1.0), H, S0, xi_others, xi_star, xd_star,
+        alpha_i, alpha_d, params, delta_hat,
+    )
     return {
         "xd": xd,
         "xi": xi_int,
@@ -276,6 +293,11 @@ def solve_supplier_plan(
         "fallback": fallback,
         "converged": bool(getattr(res, "success", False)) and not fallback,
         "nfev": int(getattr(res, "nfev", 0)),
+        "nit": int(getattr(res, "nit", 0)),
+        "status": int(getattr(res, "status", -1)),
+        "message": str(getattr(res, "message", "")),
+        "obj": float(obj),
+        "pgnorm": projected_grad_norm(np.clip(z, 0.0, 1.0), grad),
         "floor_binds": floor_binds,
         "residual": residual,
     }

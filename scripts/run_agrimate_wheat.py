@@ -125,7 +125,8 @@ p_sto=0.1/Nyear, x_min=0.2 penalty, ζ=0). C.1 wheat nodes are the 27-name
 `expected_harvests.jl`. Tbl. D.8 αI=3.5 / τ=0.2 kept as `wheat_table_d8_defaults()`.
 Unresolved: FAOSTAT FB (A1),
 Fig. 4 author series (data zip not unpacked). D.30a formula is wired;
-inflow is still T* (author x1=demand labelled, S4).
+inflow is still T* (author x1=demand labelled, S4). Unconverged L-BFGS-B
+is counted (N5); `plan_maxiter` stays 40.
 """
     (OUT / "validation_single.md").write_text(md)
     print(md)

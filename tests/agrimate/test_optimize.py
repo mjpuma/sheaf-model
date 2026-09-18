@@ -148,3 +148,33 @@ def test_supplier_plan_counts_floor_and_is_feasible():
     assert (sol["xd"] + sol["xi_ship"]).sum() <= H.sum() + 1e-6
     assert sol["floor_binds"] >= 0
     assert sol["residual"] < 1e-8
+
+
+def test_unconverged_stays_feasible_and_is_not_fallback():
+    """Low maxiter: scipy success=False is still a feasible accepted point."""
+    p = AgrimateParams(plan_maxiter=1)
+    H = np.linspace(0.05, 1.2, 24)
+    sol = solve_supplier_plan(H, 0.3, np.ones(24) * 2.0, 2.0, 0.4, 3.2, 2.0, p)
+    assert sol["success"]
+    assert not sol["fallback"]
+    assert sol["residual"] < 1e-8
+    assert np.min(sol["S"]) >= -1e-8
+    assert "converged" in sol
+    if not sol["converged"]:
+        assert sol["nit"] <= p.plan_maxiter + 1
+
+
+def test_unconverged_is_counted_separately_from_failed():
+    """Host must not treat unconverged as failed or drop the flag."""
+    p = AgrimateParams(plan_maxiter=1)
+    H = np.linspace(0.05, 1.2, 24)
+    sol = solve_supplier_plan(H, 0.3, np.ones(24) * 2.0, 2.0, 0.4, 3.2, 2.0, p)
+    assert sol["success"] is True
+    assert sol["fallback"] is False
+    assert sol["converged"] is False
+    assert sol["residual"] < 1e-8
+    assert sol["status"] == 1
+
+
+def test_default_plan_maxiter_is_forty():
+    assert AgrimateParams().plan_maxiter == 40

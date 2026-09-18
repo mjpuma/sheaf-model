@@ -31,5 +31,6 @@ bit-reproduction. Data 10688435 not unpacked.
 | Step accounting | D.6 / D.3 / consumer clip | n/a | `accounting.py` | `test_2006_harvest_amis_path_identities` |
 | International delivery | E.1 T* to importers, Ndel lag | own-XI echo (bug) | `international_destination_shares` | `test_international_sales_are_not_echoed_to_the_exporter` |
 | Local price β, τ_P | author `AgrimateParams`; `determine_target_price_adjustment_factor` | n/a | unused fields on `AgrimateParams` | P3: wheat `two_markets` pins P_loc=1; `test_beta_loc_does_not_enter_supplier_plan` |
+| Unconverged L-BFGS-B | scipy `success=False` on feasible fraction plans | n/a | counted; `plan_maxiter=40` | P5 `solver.md`; not dropped |
 
-Unresolved (labelled, not guessed): FAOSTAT FB vs USDA; paper 28 vs code 27; D.8 αI=3.5 vs code 3.2. β/τ_P unused on wheat path (S3). D.30a formula wired; author x1=demand not copied (S4).
+Unresolved (labelled, not guessed): FAOSTAT FB vs USDA; paper 28 vs code 27; D.8 αI=3.5 vs code 3.2. β/τ_P unused on wheat path (S3). D.30a formula wired; author x1=demand not copied (S4). Unconverged plans labelled N5.
