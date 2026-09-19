@@ -11,12 +11,13 @@ Otto, *Ecological Economics* 231 (2025) 108546; ODD supplement §D; wheat §E).
 - Solver smoke: `PYTHONPATH=. python scripts/run_agrimate_wheat.py`
 - Spec map: `diagnostics/GATE0_SPEC_MATRIX.md`
 - Validation protocol: `diagnostics/GATE0_VALIDATION.md`
-- Prompt list (one per session): `diagnostics/GATE0_PROMPTS.md`
+- Prompt list (one per session): `diagnostics/GATE0_PROMPTS.md` (P0–P12 done)
+- Reproduction prompts (adaptive): `diagnostics/GATE0_REPRO_PROMPTS.md`
+- Next paste: `diagnostics/GATE0_REPRO_DISPATCH.md`
 - Validation scores: `diagnostics/gate0_agrimate/validation.md`
 - G0-P methods note: `diagnostics/gate0_agrimate/methods.md` (written; **not accepted**)
 - Red team (post-P12): `diagnostics/GATE0_REDTEAM.md`
 - Data cookbook: `diagnostics/GATE0_DATA.md`
-- Reproduction prompts: `diagnostics/GATE0_REPRO_PROMPTS.md``
 - Legacy: `sheaf.legacy`, `python scripts/score_legacy_crop.py --crop wheat`
 
 1. Every baseline mechanism cites paper / supplement section, equation, or table.

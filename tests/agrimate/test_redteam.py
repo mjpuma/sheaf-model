@@ -73,6 +73,7 @@ def test_provenance_and_cookbook_exist():
         "diagnostics/GATE0_DATA.md",
         "diagnostics/GATE0_REDTEAM.md",
         "diagnostics/GATE0_REPRO_PROMPTS.md",
+        "diagnostics/GATE0_REPRO_DISPATCH.md",
         "archive/README.md",
     ):
         assert (ROOT / rel).is_file(), rel
@@ -96,5 +97,7 @@ def test_redteam_note_does_not_claim_replication():
     assert "Do not start G1" in text
     assert "L1–L8" in text
     assert "α_foreign=10" in text or "Bai" in text
-    assert "fetch_external_data.py" in text
-    assert "A7" in text
+    assert "adaptive" in (ROOT / "diagnostics" / "GATE0_REPRO_PROMPTS.md").read_text().lower()
+    dispatch = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
+    assert "Next paste: R2" in dispatch
+    assert "R11" in dispatch

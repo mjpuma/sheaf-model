@@ -1,19 +1,53 @@
 # Gate 0 reproduction prompt list (post-P12)
 
-Paste **exactly one** prompt per session. Do not skip. Do not open G1/G2.
-This queue is the red-team follow-up (`GATE0_REDTEAM.md`): close the
-**Agrimate Fig. 4 experiment gap**, not a Pink-Sheet fit.
+**Where:** this file. Living next-paste: [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md).
+Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
+[`GATE0_DATA.md`](GATE0_DATA.md).
 
-Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
-[`GATE0_CONTRACT.md`](GATE0_CONTRACT.md). Protocol:
-[`GATE0_VALIDATION.md`](GATE0_VALIDATION.md). Data:
-[`GATE0_DATA.md`](GATE0_DATA.md). Red team:
-[`GATE0_REDTEAM.md`](GATE0_REDTEAM.md).
+P0–P12 were a **fixed** queue (identities, then drift, then … methods).
+This follow-up is **adaptive**. Paste **one** prompt per session. After
+the run, rewrite the dispatch from the **numbers you just got**. The
+next session pastes `Next paste`, not `R{n+1}`. Skip IDs that the
+dispatch has already ruled out. Do not open G1/G2.
 
-**Now:** paste **R2**. R1 is done. Everything below R2 is later.
-P0–P12 stay done. G0-P is **not accepted**.
+**Now:** paste **R2** (first evidence run). R1 is done. G0-P is **not
+accepted**. `wheat_params()` stay 14022004 defaults.
+
+## Adaptive rule (read before picking an ID after R2)
+
+Write `GATE0_REPRO_DISPATCH.md` in ≤20 lines:
+
+```
+Last completed: R?
+Window / scenario: …
+hike_2008 (default → comparison → author): …
+moy max/min (default → comparison → author): …
+undisturbed last/first (host → author): …
+unconverged / failed: …
+What you could set / could not set: …
+Next paste: R?
+Why (one sentence): …
+Skip: …
+```
+
+Choose **Next paste** from this table, in order, first match wins:
+
+| If the last run showed… | Next paste | Skip |
+|---|---|---|
+| Comparison object does not exist yet | **R2** | do not score Fig. 4 |
+| Knobs moved hike toward ×1.62 **or** moy max/min down by ≥2 toward 1.45 | **R10** then later R9 | R7 unless asked |
+| Knobs ran and amplitude/hike **barely moved** (still ~18× / ×4+) | **R4** (item 3 / XI split); **R3** if price object still undocumented | do not treat R10 as a win |
+| FAO/EU28 still missing but knobs ran | continue R3/R4/R10 on what you *could* set | **R6** is obtain-or-leave, not a gate |
+| Undisturbed last/first still >1.1 after R2/R4 | **R4** if not done; else **R5** | do not pin |
+| Defaults unchanged (`wheat_params` still 3.2/0.1/0.2/ζ=0/N_for=3) | **never R11** | R11 |
+| Items 1–5 evidence actually changed | **R12** methods v2 | G1 |
+| Tests still would pass a *non*-match | **R8** may piggyback any session | do not weaken identities |
+
+Hard stops do not adapt. L1–L8, 2006 pin, Bai αI=10, maize/rice
+acceptance, and G1/G2 stay off even if a knob improves Pink corr.
 
 ## Shared preamble (prepend to every prompt)
+
 
 ```
 You are continuing SHEAF Gate 0 wheat: an independent Agrimate copy
@@ -40,6 +74,8 @@ Hard stops:
 Exit: pytest tests/agrimate; if you touch the runner, re-run
 PYTHONPATH=. python scripts/run_agrimate_validation.py and update
 diagnostics/gate0_agrimate/. One prompt, one PR-sized change.
+Rewrite diagnostics/GATE0_REPRO_DISPATCH.md from this run (≤20 lines).
+Next session pastes that file's **Next paste**, not the next integer.
 ```
 
 ## Status
@@ -48,17 +84,17 @@ diagnostics/gate0_agrimate/. One prompt, one PR-sized change.
 |---|---|---|
 | P0–P12 | Original Gate 0 queue | **done** (G0-P note written, **not accepted**) |
 | **R1** | Red team + data cookbook | **done** |
-| **R2** | Labelled Fig. 4-config comparison run | **next** |
-| R3 | World-price recipe vs author plot | queued |
-| R4 | Undisturbed XI-split characterisation | queued |
-| R5 | S4 x1=demand labelled experiment | queued |
-| R6 | FAOSTAT FB obtain-or-leave | queued / maybe stop |
-| R7 | A8 mean-vs-sum sensitivity (do not rewrite host) | queued |
-| R8 | Expand Fig. 4 *score* tests (honest FAIL until match) | queued |
-| R9 | N5 on the Fig. 4 config | queued |
-| R10 | Score Fig. 4 config vs author hike/drift/amplitude | queued |
-| R11 | Re-run default three-scenario only if defaults changed (they must not) | queued |
-| R12 | Methods note v2 | after R10 |
+| **R2** | Labelled Fig. 4-config comparison run | **next** (first evidence; then dispatch) |
+| R3 | World-price recipe vs author plot | adaptive |
+| R4 | Undisturbed XI-split characterisation | adaptive |
+| R5 | S4 x1=demand labelled experiment | adaptive |
+| R6 | FAOSTAT FB obtain-or-leave | adaptive / maybe stop |
+| R7 | A8 mean-vs-sum sensitivity (do not rewrite host) | adaptive |
+| R8 | Expand Fig. 4 *score* tests (honest FAIL until match) | piggyback |
+| R9 | N5 on the Fig. 4 config | after a real comparison run |
+| R10 | Score Fig. 4 config vs author hike/drift/amplitude | if knobs moved Fig. 4 metrics |
+| R11 | Re-run default three-scenario | **skip** unless defaults changed (forbidden) |
+| R12 | Methods note v2 | when items 1–5 evidence changed |
 | — | G1 / G2 | **blocked until G0-P accepted** |
 
 ---
@@ -92,6 +128,9 @@ Do not adopt the comparison knobs as defaults. Do not restore L1–L8.
 
 Read first: diagnostics/GATE0_REDTEAM.md Step 7, GATE0_DEPARTURES.md A7,
 diagnostics/gate0_agrimate/fig4.md, sheaf/agrimate/params.py.
+End: rewrite GATE0_REPRO_DISPATCH.md from the 2006–08 scores (hike,
+moy max/min if you have it, unconverged). Next session pastes **Next
+paste**, not R3 automatically.
 ```
 
 ## R3 — World-price recipe

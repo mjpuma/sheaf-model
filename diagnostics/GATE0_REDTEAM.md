@@ -343,27 +343,18 @@ opening G1.
 
 ## Step 12 — What to paste next
 
-Pasteable queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md).
+**Adaptive**, not a skip-nothing ladder. Menu:
+[`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md). Living next-paste:
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (right now **R2**).
 Data cookbook: [`GATE0_DATA.md`](GATE0_DATA.md).
 
-| ID | Work | Why it is next |
-|---|---|---|
-| **R1** | This red team + data cookbook | **done** |
-| R2 | Labelled Fig. 4-config comparison run | A7; ζ/N_for/region/FAO |
-| R3 | World-price recipe vs author plot | Step 6 open G |
-| R4 | Undisturbed XI-split characterisation | item 3 |
-| R5 | S4 x1=demand labelled experiment | purchaser vs T* |
-| R6 | FAOSTAT FB obtain-or-leave (again) | A1 |
-| R7 | A8 mean-vs-sum sensitivity (do not rewrite host) | coverage |
-| R8 | Expand reproduction *score* tests (not a fake pass) | Step 2 |
-| R9 | N5 on the Fig. 4 config | item 2 |
-| R10 | Score Fig. 4 config vs author hike/drift/amplitude | item 5 on the *right* experiment |
-| R11 | Re-run three-scenario host only if R2–R10 change defaults (they must not) | G0-U |
-| R12 | Methods note v2 | G0-P retry |
+R2 is the only forced first evidence run (A7). After that, the dispatch
+picks R10 if knobs moved Fig. 4 metrics, R4/R3 if they did not, skips
+R11 while defaults are unchanged, and holds R12 until items 1–5 actually
+moved. Hard stops do not adapt.
 
-R2–R12 keep the **same shared preamble** as P1–P12. `wheat_params()`
-stay the 14022004 defaults. Fig. 4 knobs live on a **named comparison
-object**, not in `wheat_params()`.
+`wheat_params()` stay the 14022004 defaults. Fig. 4 knobs live on a
+**named comparison object**, not in `wheat_params()`.
 
 ---
 

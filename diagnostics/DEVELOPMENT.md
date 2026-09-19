@@ -167,9 +167,10 @@ approval.
     Host does **not** reproduce Agrimate Fig. 4. `tests/agrimate` pass because
     they lock honesty (including host hike > author hike), not a match.
     Data cookbook: `GATE0_DATA.md`. Next queue:
-    `GATE0_REPRO_PROMPTS.md` (R2 labelled Fig. 4-config, not a default
-    change). `wheat_params()` unchanged. G1/G2 stay blocked.
-   **Next session:** paste **R2** from `GATE0_REPRO_PROMPTS.md`.
+    `GATE0_REPRO_PROMPTS.md` (adaptive; first paste R2, then
+    `GATE0_REPRO_DISPATCH.md`). `wheat_params()` unchanged. G1/G2 stay blocked.
+   **Next session:** paste **Next paste** from `GATE0_REPRO_DISPATCH.md`
+   (currently **R2**).
 
 Reference command:
 
