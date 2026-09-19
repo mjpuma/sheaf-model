@@ -11,7 +11,11 @@ repeat it.
 
 Canonical contract: [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md).
 Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
-Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md).
+Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
+(P0–P12 done). Post-P12: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md);
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md).
+Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
+[`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
 
 ## What “publishable Gate 0” means
@@ -163,7 +167,14 @@ approval.
     Agrimate ×1.62 vs Pink ×1.88). `wheat_params()` unchanged. G1/G2
     stay blocked until a later G0-P acceptance. Do not start G1 from
     this note.
-   **Next:** G0-P is a human accept/reject. Do not paste G1.
+17. **R1 (done).** Full-mode red team + data cookbook:
+    `diagnostics/GATE0_REDTEAM.md`, `diagnostics/GATE0_DATA.md`.
+    Items 3 and 5 still fail; tests lock honesty not Fig. 4 match;
+    fetch does not download Zenodo or FAO FB. Adaptive queue:
+    `GATE0_REPRO_PROMPTS.md`. Living next-paste:
+    `GATE0_REPRO_DISPATCH.md` (**R2**: labelled Fig. 4 knobs, not
+    `wheat_params()`).
+   **Next:** paste **R2**. G0-P is still not accepted. Do not paste G1.
 
 Reference command:
 

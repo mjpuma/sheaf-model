@@ -4,7 +4,17 @@ Wheat harvest calendars for SHEAF nodes (Gate 0 prototype)
 Purpose
 -------
 Spread annual USDA PSD wheat production into the Agrimate-aligned 24-step
-year (2 equal half-months per calendar month). Used by sheaf.seasonal.
+year (2 equal half-months per calendar month). The CSV stores start/end
+(and peak) months.
+
+Live Gate 0 wheat (`sheaf/agrimate/`)
+------------------------------------
+`sheaf.agrimate.wheat_data` loads the start/end months via
+`sheaf.seasonal.load_harvest_calendar`, then allocates with **Eq. E.27
+raised-cosine** (`sheaf.agrimate.harvest.step_profile_from_months`,
+`duration_in_s=1.2`). That is the live host. The triangular weights and
+twin-pin / liquid-free-stock paragraphs below describe the **legacy**
+`sheaf.seasonal` / `sheaf.dynamic_wheat` spine, not this copy.
 
 Source / method
 ---------------

@@ -5,8 +5,10 @@ Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
 [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md). Protocol:
 [`GATE0_VALIDATION.md`](GATE0_VALIDATION.md).
 
-**Now:** G0-P methods note is written (`diagnostics/gate0_agrimate/methods.md`).
-**Not accepted.** Do not paste G1/G2. Everything above P12 is done.
+**Now:** P0–P12 done. G0-P **not accepted.** Post-P12 queue is
+[`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md); paste
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) **Next paste**
+(currently **R2**). Do not paste G1/G2.
 
 ## Shared preamble (prepend to every prompt)
 
