@@ -110,6 +110,17 @@ two-market `x1` is *fixed* to those requests; host supplier plan still
 sets current sales (labelled, not a guessed CES-rationing rule).
 Classification **H** for the formula (95–100%); remaining x1 gap is **D**.
 
+## Documentation G-fix (not an economic departure)
+
+G-R3 **World-price methods shorthand.** Code was already the
+XI-weighted mix of lagged D.7 offers × p0
+(`model.py` `np.dot(xi_lag, p_lag)/vol`). methods.md said “D.7 × p0”.
+R3 names `volume_weighted_offer_index`, stores `AgrimateResult.offer`,
+and tests that reported `p_w` equals that mix and is not D.7 of world
+XI*. Economics unchanged. Zenodo 14022004 `plot_wm_price_timeseries`
+still not in the repo (`world_price.md`). Not a 2006 pin. Not a
+`wheat_params()` change.
+
 ## Coding fix (not an economic departure)
 
 B1 **International delivery (P2).** Pre-fix, lagged XI was credited to the

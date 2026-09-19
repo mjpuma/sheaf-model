@@ -50,7 +50,7 @@ are not this note.
 | consumer | D.35 | εc=0.1 |
 | harvest shape | E.27 | author raised-cosine |
 | restrictions | Tbl. E.4 / AMIS OECD | prescribed Δ; not a game |
-| world price | §5.2 international tx | D.7 × p0; not a calm pin |
+| world price | §5.2 international tx | XI-weighted lagged D.7 offers × p0; not a 2006 pin |
 | Nash init | §D.5 | not the dynamic baseline |
 
 Units: quantities million tonnes (MMT); prices a $/t index on D.7.
@@ -109,9 +109,10 @@ Same design as Agrimate’s published wheat experiments.
 | `harvest_amis` | on | AMIS / Tbl. E.4 |
 
 Command: `PYTHONPATH=. python scripts/run_agrimate_validation.py`.
-World price is the international transaction price already in
-`model.py` (D.7 × p0). Not a calm pin. Harvest vs harvest+AMIS
-differ when AMIS binds (they were identical before the OECD column
+World price is the XI-weighted mix of lagged D.7 offers × p0
+(`volume_weighted_offer_index`). Not D.7 of world XI*. Not a
+2006 pin (`world_price.md`). Harvest vs harvest+AMIS differ
+when AMIS binds (they were identical before the OECD column
 fix).
 
 ## 5. Numerical representation

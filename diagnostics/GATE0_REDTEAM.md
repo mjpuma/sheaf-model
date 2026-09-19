@@ -200,6 +200,13 @@ that honesty*, not because the price path matches Agrimate. G0-P remains
    `plot_wm_price_timeseries` is diffed in-tree (40–60% as a
    reproduction blocker). Do not change `wheat_params()`. Do not pin.
 
+**R3 follow-up (this checkout).** 14022004 Julia is still absent, so
+the bit-diff was not run. Host identity is now executable:
+`volume_weighted_offer_index` / `lagged_offer_index` replay
+`price_index` on 2006 harvest+AMIS; a single D.7 of lagged world XI /
+XI* disagrees. methods.md G-shorthand fixed. Writeup:
+`diagnostics/gate0_agrimate/world_price.md`. Economics unchanged.
+
 ---
 
 ## Step 7 — Experiment mismatch (A7) — you cannot reproduce Fig. 4 on the default host

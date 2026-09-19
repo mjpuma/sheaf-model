@@ -20,7 +20,7 @@ replication.
 | Purchaser CES | D.30 + D.30a; wheat `determine_demands` | Armington | `purchaser_demand` nested | `test_d30a_*`; A_d=1 recovers D.30 |
 | Consumer CES | D.35; εc=0.1 | isoelastic food | `consumption_ces` | `test_consumption_capped_and_price_response` |
 | Nash init | §D.5; α=3 | none / twin pin | `nash_ibr` | not a price pin |
-| World price | §5.2 international tx; XI-weighted lagged D.7 offers × p0 | blend + pin | `model.py` `np.dot(xi_lag, p_lag)/vol` | not a 2006 pin; methods “D.7 × p0” is shorthand (G) |
+| World price | §5.2 international tx; XI-weighted lagged D.7 offers × p0 | blend + pin | `model.py` `volume_weighted_offer_index` | R3 host identity; not D.7 of world XI*; 14022004 `plot_wm_price_timeseries` still not in-tree; not a 2006 pin |
 | Harvest shape | E.27 author raised-cosine | triangular | `harvest.py` | `test_harvest_profile_normalised` |
 | Restrictions | E.4 / AMIS OECD columns PolicyMeasure_Name, CommodityClass_Name | extra AMIS types | `restrictions.py` | wheat Δ nonempty 2007/08 |
 | Baseline quantities | FAOSTAT FB E.1 | USDA+E0 | USDA PSD + E0 rescale | A1; P10 `faostat_fb.md` — FB absent, USDA default |
@@ -39,6 +39,7 @@ replication.
 | G0-P methods note | Agrimate wheat market section | n/a | `methods.py` / `score_agrimate_methods.py` | P12 `methods.md`; written; **not accepted** |
 | Post-P12 red team | DEVELOPMENT items 1–6 vs live host | n/a | `GATE0_REDTEAM.md` / `GATE0_DATA.md` | R1 inventory; not a retune |
 | Fig. 4-config comparison | NetCDF αI=3.5, ζ=1, N_for=6 | n/a | `fig4_experiment_params` / `fig4_config.py` | R2 labelled; not `wheat_params()`; next R10 |
+| World-price recipe | §5.2; host mix vs author `plot_wm_price_timeseries` | n/a | `volume_weighted_offer_index` / `world_price.md` | R3 host identity; Julia absent |
 
 Unresolved (labelled, not guessed): paper 28 vs code 27;
 D.8 αI=3.5 vs code 3.2. FAOSTAT FB vs USDA is A1 (P10: arrays not in

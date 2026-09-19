@@ -26,6 +26,72 @@ from .optimize import nash_ibr, solve_supplier_plan
 from .params import AgrimateParams, wheat_params
 from .wheat_data import WheatData, prepare_wheat, international_destination_shares
 
+# Delivery-queue empty-volume floor. Matches the run-loop mix.
+_VOL_FLOOR = 1e-12
+
+
+def volume_weighted_offer_index(
+    xi: np.ndarray,
+    offer: np.ndarray,
+    *,
+    empty: float | None = None,
+    vol_floor: float = _VOL_FLOOR,
+) -> float:
+    """World-price index as an XI-weighted mix of regional D.7 offers.
+
+    This is **not** Eq. D.7 of world XI / XI*_world. Each region's offer
+    is already D.7 of ``(XI_r + Q_{-r}) / XI*_world``; ``p_w`` is the
+    volume-weighted mean of those offers. Empty volume returns ``empty``.
+    """
+    xi = np.asarray(xi, float).reshape(-1)
+    offer = np.asarray(offer, float).reshape(-1)
+    if xi.shape != offer.shape:
+        raise ValueError("xi and offer must have the same length")
+    vol = float(np.sum(xi))
+    if vol > vol_floor:
+        return float(np.dot(xi, offer) / vol)
+    if empty is None:
+        raise ValueError("empty international volume and no fallback price")
+    return float(empty)
+
+
+def lagged_offer_index(
+    xi_path: np.ndarray,
+    offer_path: np.ndarray,
+    n_del: int,
+    *,
+    empty0: float = 1.0,
+    vol_floor: float = _VOL_FLOOR,
+) -> np.ndarray:
+    """Replay the Ndel delivery queue used for ``price_index``.
+
+    Initial frames are zeros (XI) and ones (offers), matching
+    ``AgrimateSim.run``. Step ``t`` reports the mix of the XI and
+    offers enqueued ``n_del`` steps earlier.
+    """
+    xi = np.asarray(xi_path, float)
+    offer = np.asarray(offer_path, float)
+    if xi.ndim != 2 or xi.shape != offer.shape:
+        raise ValueError("xi_path and offer_path must be (R, T) and aligned")
+    n_r, T = xi.shape
+    n_del = int(n_del)
+    if n_del < 0:
+        raise ValueError("n_del must be nonnegative")
+    q_i = [np.zeros(n_r) for _ in range(n_del)]
+    q_p = [np.ones(n_r) for _ in range(n_del)]
+    out = np.empty(T, dtype=float)
+    prev = float(empty0)
+    for t in range(T):
+        q_i.append(xi[:, t].copy())
+        q_p.append(offer[:, t].copy())
+        xi_lag = q_i.pop(0)
+        p_lag = q_p.pop(0)
+        out[t] = volume_weighted_offer_index(
+            xi_lag, p_lag, empty=(prev if t else float(empty0)),
+            vol_floor=vol_floor)
+        prev = out[t]
+    return out
+
 
 @dataclass
 class AgrimateResult:
@@ -52,6 +118,7 @@ class AgrimateResult:
     runtime_s: float = 0.0
     use_anomalies: bool = True
     use_restrictions: bool = True
+    offer: np.ndarray | None = None
 
     def to_monthly_price(self) -> np.ndarray:
         p = np.asarray(self.price_usd, float)
@@ -166,6 +233,7 @@ class AgrimateSim:
         sold_d_path = np.zeros((n_r, T))
         p_c_path = np.zeros((n_r, T))
         inflow_path = np.zeros((n_r, T))
+        offer_path = np.zeros((n_r, T))
         failed = 0
         fallback = 0
         unconverged = 0
@@ -245,6 +313,7 @@ class AgrimateSim:
                                                 p.demand_arg_floor))
                 if abs(offer[r] - 1.0) < p.iota:
                     offer[r] = 1.0
+            offer_path[:, t] = offer
             sold_d = np.zeros(n_r)
             sold_i = np.zeros(n_r)
             avail = S_p + H
@@ -263,11 +332,10 @@ class AgrimateSim:
             q_p.append(offer.copy())
             xi_lag = q_i.pop(0)
             p_lag = q_p.pop(0)
-            world_vol = float(np.sum(xi_lag))
-            if world_vol > 1e-12:
-                p_w = float(np.dot(xi_lag, p_lag) / world_vol)
-            else:
-                p_w = float(price_index[t - 1] if t else 1.0)
+            p_w = volume_weighted_offer_index(
+                xi_lag, p_lag,
+                empty=(float(price_index[t - 1]) if t else 1.0),
+            )
             price_index[t] = p_w
             arrive = dest.T @ xi_lag
             for s in range(n_r):
@@ -318,6 +386,7 @@ class AgrimateSim:
             plan_residual=plan_residual, runtime_s=runtime_s,
             use_anomalies=self.use_anomalies,
             use_restrictions=self.use_restrictions,
+            offer=offer_path,
         )
 
 

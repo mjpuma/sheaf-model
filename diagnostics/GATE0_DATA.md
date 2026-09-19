@@ -97,6 +97,10 @@ forced scenarios, git `old-demand-dynamics`. Those knobs belong on a
   into this package (`/agrimate/` at repo root is gitignored PDF extracts
   only).
 - Needed to diff `plot_wm_price_timeseries`, `two_markets`, ζ, D.30a x1.
+- R3 searched this checkout: Julia is still **not** present. Host
+  identity (`volume_weighted_offer_index`, `world_price.md`,
+  `tests/agrimate/test_world_price.py`) locks the XI-weighted lagged
+  D.7 mix. Do not treat that as a bit-diff of author `plot.jl`.
 - Do not vendor it. Do not “tune” host knobs from a local checkout
   except as a labelled comparison object (R2).
 
