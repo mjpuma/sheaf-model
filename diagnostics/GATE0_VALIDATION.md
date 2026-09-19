@@ -62,6 +62,12 @@ G0-P methods note (does **not** re-run the host; P12):
 PYTHONPATH=. python scripts/score_agrimate_methods.py
 ```
 
+Labelled Fig. 4-config comparison (does **not** change `wheat_params()`; R2):
+
+```bash
+PYTHONPATH=. python scripts/score_agrimate_fig4_config.py
+```
+
 Single-scenario solver smoke (harvest+AMIS only):
 
 ```bash

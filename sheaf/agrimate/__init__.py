@@ -9,7 +9,7 @@ package.
 Legacy SHEAF Gate 0 remains in ``sheaf.legacy`` and must not be imported
 from this package.
 """
-from .params import AgrimateParams, wheat_params
+from .params import AgrimateParams, fig4_experiment_params, wheat_params
 from .model import AgrimateResult, AgrimateSim, run_agrimate
 from .wheat_data import prepare_wheat
 from .validation import SCENARIOS, run_three_scenarios
@@ -21,6 +21,7 @@ __all__ = [
     "AgrimateSim",
     "SCENARIOS",
     "check_result",
+    "fig4_experiment_params",
     "prepare_wheat",
     "run_agrimate",
     "run_three_scenarios",
