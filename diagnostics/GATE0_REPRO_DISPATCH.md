@@ -5,16 +5,15 @@ numbers**. Do not walk R3…R12 in order. Template:
 `GATE0_REPRO_PROMPTS.md` (Adaptive rule).
 
 ```
-Last completed: R3
-Window / scenario: 2006 harvest+AMIS host p_w identity (runner not re-run)
-hike_2008 (default → comparison → author): ×2.31 → ×2.22 → ×1.62
-moy max/min (default → comparison → author): 26.8× → 13.3× → 1.51×
-undisturbed last/first (host default → knobs → author 2006–08): 0.618 → 0.409 → 1.006
-unconverged / failed: default 611/1944 failed=0; knobs 553/1944 failed=0
-What you could set / could not set: host p_w = XI-weighted lagged D.7 mix
-  tested; 14022004 plot_wm_price_timeseries still not in repo
-Next paste: R10
-Why: R3 locked the host recipe (not a 2006 pin). Julia still absent.
-  moy 26.8×→13.3× (drop ≥2) still says score Fig. 4 knobs vs author series.
-Skip: R11; G1/G2; R7 unless asked; R6 as a gate
+Last completed: R10
+Window / scenario: 2006–2008 fig4_knobs vs author_fig4
+hike_2008 (default → knobs → author): ×2.31 → ×2.22 → ×1.62
+moy max/min: 26.8× → 13.3× → 1.51×
+2006 index: 1.267 → 1.677 → 1.183 (knobs moved away)
+undisturbed last/first: 0.618 → 0.409 → 1.006
+unconverged / failed: knobs 553/1944 failed=0
+What you could set / could not set: αI=3.5, ζ=1, N_for=6 scored; remaining A7
+Next paste: R9
+Why: not a Fig. 4 match; do not adopt; N5 on this object next
+Skip: R11; G1/G2; R6 as a gate; do not adopt knobs for Pink
 ```
