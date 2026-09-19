@@ -38,8 +38,9 @@ replication.
 | Unconverged L-BFGS-B | scipy `success=False` on feasible fraction plans | n/a | counted; `plan_maxiter=40` | P5 `solver.md`; not dropped |
 | G0-P methods note | Agrimate wheat market section | n/a | `methods.py` / `score_agrimate_methods.py` | P12 `methods.md`; written; **not accepted** |
 | Post-P12 red team | DEVELOPMENT items 1–6 vs live host | n/a | `GATE0_REDTEAM.md` / `GATE0_DATA.md` | R1 inventory; not a retune |
-| Fig. 4-config comparison | NetCDF αI=3.5, ζ=1, N_for=6 | n/a | `fig4_experiment_params` / `fig4_config.py` | R2 labelled; not `wheat_params()`; next R10 |
+| Fig. 4-config comparison | NetCDF αI=3.5, ζ=1, N_for=6 | n/a | `fig4_experiment_params` / `fig4_config.py` | R2 labelled; not `wheat_params()` |
 | World-price recipe | §5.2; host mix vs author `plot_wm_price_timeseries` | n/a | `volume_weighted_offer_index` / `world_price.md` | R3 host identity; Julia absent |
+| Fig. 4 knobs vs author | R2 2006–08 run vs `author_fig4/` | n/a | `fig4_author_score.py` / `fig4_config_score.md` | R10 not a match; remaining A7; next R9 |
 
 Unresolved (labelled, not guessed): paper 28 vs code 27;
 D.8 αI=3.5 vs code 3.2. FAOSTAT FB vs USDA is A1 (P10: arrays not in

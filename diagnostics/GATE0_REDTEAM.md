@@ -242,7 +242,12 @@ XI* disagrees. methods.md G-shorthand fixed. Writeup:
 R2 (this queue) added `fig4_experiment_params()` and scored 2006–08
 harvest+AMIS on USDA/EU-27: moy **26.8× → 13.3×**, hike **×2.31 → ×2.22**
 (author ×1.62, moy 1.51× on this window). Knobs are **not** adopted as
-`wheat_params()`. FAO/EU28 still cannot-set. Next paste **R10**.
+`wheat_params()`. FAO/EU28 still cannot-set.
+
+**R10.** Same R2 run scored against `author_fig4/` (`fig4_config_score.md`).
+Harvest+AMIS 2006 index **1.677 vs author 1.183** (knobs moved away);
+hike ×2.22 vs ×1.62; moy 13.3× vs 1.51×; undisturbed last/first 0.409
+vs 1.006. Remaining A7 unchanged. Not a match. Not adopted. Next **R9**.
 
 ---
 

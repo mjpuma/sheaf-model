@@ -33,6 +33,10 @@ A7 **Fig. 4 experiment ≠ 14022004 wheat defaults (P7).** Author
 R2 adds `fig4_experiment_params()` (αI=3.5, ζ=1, N_for=6) as a **labelled
 comparison object**, not a `wheat_params()` replacement. FAO FB / EU28+Egypt
 / start-2000 / FAO anomalies remain cannot-set (`fig4_config.md`).
+R10 scores that 2006–08 run against `author_fig4/`: hike ×2.22 vs ×1.62,
+moy 13.3× vs 1.51×, 2006 index 1.677 vs 1.183 (knobs moved *away*),
+undisturbed last/first 0.409 vs 1.006. **Not adopted.** Remaining A7
+unchanged (`fig4_config_score.md`).
 A8 **Multi-country PSD baseline uses `groupby.mean()` not sum (P9).**
 `prepare_wheat` averages country-year rows; `psd_regional_annual()` sums
 members. Counterexample 2007–09 production: China (China+Hong Kong)

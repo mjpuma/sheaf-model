@@ -129,11 +129,9 @@ def test_fig4_config_note_labels_cannot_set_and_does_not_adopt():
     assert d["failed"] == 0
     assert c["failed"] == 0
     assert wheat_params().alpha_i == 3.2
-    # R2 numbers stay in the living dispatch until a later session
-    # replaces them. Do not freeze "Last completed: R2".
-    dispatch = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
-    assert "Next paste: R10" in dispatch
-    assert "26.8" in dispatch and "13.3" in dispatch
+    # Living dispatch moves after R10. R2 numbers stay in fig4_config.md.
+    text = note.read_text()
+    assert "26.8" in text and "13.3" in text
 
 
 def test_r2_did_not_overwrite_three_scenario_csvs():
