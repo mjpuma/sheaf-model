@@ -121,3 +121,6 @@ def test_author_plot_wm_price_timeseries_not_in_tree():
     assert "not in" in note.lower() or "absent" in note.lower()
     assert "Do not pin" in note or "not pinned" in note.lower()
     assert "wheat_params()" in note
+    dispatch = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
+    assert "Last completed: R3" in dispatch
+    assert "Next paste: R10" in dispatch
