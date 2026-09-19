@@ -84,7 +84,7 @@ Next session pastes that file's **Next paste**, not the next integer.
 |---|---|---|
 | P0–P12 | Original Gate 0 queue | **done** (G0-P note written, **not accepted**) |
 | **R1** | Red team + data cookbook | **done** |
-| **R2** | Labelled Fig. 4-config comparison run | **next** (first evidence; then dispatch) |
+| **R2** | Labelled Fig. 4-config comparison run | **this session** (then dispatch) |
 | R3 | World-price recipe vs author plot | adaptive |
 | R4 | Undisturbed XI-split characterisation | adaptive |
 | R5 | S4 x1=demand labelled experiment | adaptive |

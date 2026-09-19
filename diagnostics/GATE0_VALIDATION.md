@@ -58,6 +58,13 @@ G0-P methods note (does **not** re-run the host; P12):
 PYTHONPATH=. python scripts/score_agrimate_methods.py
 ```
 
+Labelled Fig. 4 knobs vs `wheat_params()` (R2; 2006–08 only; does **not**
+overwrite 2003–11 CSVs or change defaults):
+
+```bash
+PYTHONPATH=. python scripts/score_agrimate_fig4_config.py
+```
+
 Single-scenario solver smoke (harvest+AMIS only):
 
 ```bash

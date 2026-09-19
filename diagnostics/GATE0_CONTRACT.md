@@ -18,6 +18,7 @@ Otto, *Ecological Economics* 231 (2025) 108546; ODD supplement §D; wheat §E).
 - G0-P methods note: `diagnostics/gate0_agrimate/methods.md` (written; **not accepted**)
 - Red team (post-P12): `diagnostics/GATE0_REDTEAM.md`
 - Data cookbook: `diagnostics/GATE0_DATA.md`
+- Fig. 4-config comparison (R2): `diagnostics/gate0_agrimate/fig4_config.md` (labelled; `wheat_params()` unchanged)
 - Legacy: `sheaf.legacy`, `python scripts/score_legacy_crop.py --crop wheat`
 
 1. Every baseline mechanism cites paper / supplement section, equation, or table.

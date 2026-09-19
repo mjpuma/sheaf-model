@@ -136,6 +136,12 @@ PYTHONPATH=. python scripts/score_agrimate_hindcast.py
 PYTHONPATH=. python scripts/score_agrimate_methods.py
 ```
 
+Labelled Fig. 4 knobs (does **not** change `wheat_params()`; 2006–08 only):
+
+```bash
+PYTHONPATH=. python scripts/score_agrimate_fig4_config.py
+```
+
 ## Folders that are *not* Gate 0 wheat inputs
 
 | Path | Why ignore for this host |

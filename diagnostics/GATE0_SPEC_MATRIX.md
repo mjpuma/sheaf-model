@@ -37,7 +37,8 @@ replication.
 | Local price β, τ_P | author `AgrimateParams`; `determine_target_price_adjustment_factor` | n/a | unused fields on `AgrimateParams` | P3: wheat `two_markets` pins P_loc=1; `test_beta_loc_does_not_enter_supplier_plan` |
 | Unconverged L-BFGS-B | scipy `success=False` on feasible fraction plans | n/a | counted; `plan_maxiter=40` | P5 `solver.md`; not dropped |
 | G0-P methods note | Agrimate wheat market section | n/a | `methods.py` / `score_agrimate_methods.py` | P12 `methods.md`; written; **not accepted** |
-| Post-P12 red team | Fig. 4 reproduction bar | n/a | `GATE0_REDTEAM.md` / `GATE0_DATA.md` | R1; not a match; next R2 labelled Fig. 4-config |
+| Post-P12 red team | Fig. 4 reproduction bar | n/a | `GATE0_REDTEAM.md` / `GATE0_DATA.md` | R1; not a match |
+| Fig. 4-config comparison | 10688435 knobs αI=3.5, ζ=1, N_for=6 on USDA/EU-27 host | n/a | `fig4_config.py` / `score_agrimate_fig4_config.py` | R2 `fig4_config.md`; labelled; `wheat_params()` unchanged |
 
 Unresolved (labelled, not guessed): paper 28 vs code 27;
 D.8 αI=3.5 vs code 3.2. FAOSTAT FB vs USDA is A1 (P10: arrays not in
