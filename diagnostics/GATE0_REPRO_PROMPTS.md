@@ -10,8 +10,9 @@ the run, rewrite the dispatch from the **numbers you just got**. The
 next session pastes `Next paste`, not `R{n+1}`. Skip IDs that the
 dispatch has already ruled out. Do not open G1/G2.
 
-**Now:** paste **R2** (first evidence run). R1 is done. G0-P is **not
-accepted**. `wheat_params()` stay 14022004 defaults.
+**Now:** paste **R10**. R2 is done (moy max/min 26.8×→13.3× on the
+labelled knobs; hike barely moved). G0-P is **not accepted**.
+`wheat_params()` stay 14022004 defaults.
 
 ## Adaptive rule (read before picking an ID after R2)
 
@@ -84,7 +85,7 @@ Next session pastes that file's **Next paste**, not the next integer.
 |---|---|---|
 | P0–P12 | Original Gate 0 queue | **done** (G0-P note written, **not accepted**) |
 | **R1** | Red team + data cookbook | **done** |
-| **R2** | Labelled Fig. 4-config comparison run | **this session** (then dispatch) |
+| **R2** | Labelled Fig. 4-config comparison run | **done** (moy 26.8×→13.3×; hike ×2.31→×2.22) |
 | R3 | World-price recipe vs author plot | adaptive |
 | R4 | Undisturbed XI-split characterisation | adaptive |
 | R5 | S4 x1=demand labelled experiment | adaptive |
@@ -92,7 +93,7 @@ Next session pastes that file's **Next paste**, not the next integer.
 | R7 | A8 mean-vs-sum sensitivity (do not rewrite host) | adaptive |
 | R8 | Expand Fig. 4 *score* tests (honest FAIL until match) | piggyback |
 | R9 | N5 on the Fig. 4 config | after a real comparison run |
-| R10 | Score Fig. 4 config vs author hike/drift/amplitude | if knobs moved Fig. 4 metrics |
+| **R10** | Score Fig. 4 config vs author hike/drift/amplitude | **next** |
 | R11 | Re-run default three-scenario | **skip** unless defaults changed (forbidden) |
 | R12 | Methods note v2 | when items 1–5 evidence changed |
 | — | G1 / G2 | **blocked until G0-P accepted** |
@@ -109,7 +110,7 @@ reproduction. 12 steps. Check tests, archive, and automated downloads.
 Write GATE0_REDTEAM.md and GATE0_DATA.md. Do not retune. Do not start G1.
 ```
 
-## R2 — Labelled Fig. 4 configuration (next)
+## R2 — Labelled Fig. 4 configuration (done)
 
 ```
 [SHARED PREAMBLE]

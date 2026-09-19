@@ -236,9 +236,20 @@ def choose_next_paste(summary: pd.DataFrame) -> tuple[str, str]:
                   & (summary["label"] == "fig4_knobs")]
     last_first = float(und.iloc[0]["last_first"]) if not und.empty else float("nan")
     if moved["moved"]:
+        bits = []
+        if moved["moy_drop_ge2"]:
+            bits.append(
+                f"moy max/min {_fmt(moved['moy_default'], 1)}×→"
+                f"{_fmt(moved['moy_comparison'], 1)}×"
+            )
+        if moved["toward_hike"]:
+            bits.append(
+                f"hike ×{_fmt(moved['hike_default'])}→"
+                f"×{_fmt(moved['hike_comparison'])}"
+            )
+        detail = "; ".join(bits) if bits else "Fig. 4 knobs moved a Fig. 4 metric"
         return "R10", (
-            "Fig. 4 knobs moved hike toward ×1.62 or cut moy max/min by ≥2; "
-            "score vs author series before treating it as a win."
+            f"{detail}; score vs author series before treating it as a win."
         )
     why = (
         "Knobs ran on USDA/EU-27; hike/amplitude did not close Fig. 4. "
