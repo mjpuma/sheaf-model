@@ -5,8 +5,11 @@ Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
 [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md). Protocol:
 [`GATE0_VALIDATION.md`](GATE0_VALIDATION.md).
 
-**Now:** G0-P methods note is written (`diagnostics/gate0_agrimate/methods.md`).
-**Not accepted.** Do not paste G1/G2. Everything above P12 is done.
+**Now:** G0-P is **not accepted**. Red team R1 is done.
+New prompts (adaptive, not a skip-nothing queue):
+[`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md).
+Paste whatever [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md)
+lists as **Next paste** (right now **R2**). Do not paste G1/G2.
 
 ## Shared preamble (prepend to every prompt)
 

@@ -1,6 +1,12 @@
 Wheat harvest calendars for SHEAF nodes (Gate 0 prototype)
 ==========================================================
 
+Gate 0 live host (`sheaf/agrimate/`): uses **start_month** and
+**end_month** only, allocated with Agrimate Eq. E.27 raised-cosine
+(`sheaf.agrimate.harvest.step_profile_from_months`). Ignore the
+triangular / twin-pin / `sheaf.dynamic_wheat` paragraphs below — those
+describe the **legacy** ask/scarcity spine, not Gate 0.
+
 Purpose
 -------
 Spread annual USDA PSD wheat production into the Agrimate-aligned 24-step

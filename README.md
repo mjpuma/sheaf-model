@@ -81,11 +81,15 @@ quantities). See [`sheaf/annual/README.md`](sheaf/annual/README.md).
 ### 8. Gate 0 (Agrimate baseline)
 
 **Default host:** `sheaf/agrimate/` — independent implementation of Kuhla et al.
-(2025) supplement §D, wheat application. Contract:
+(2025) supplement §D, wheat application. **Not a Fig. 4 replication**
+(see [`diagnostics/GATE0_REDTEAM.md`](diagnostics/GATE0_REDTEAM.md)).
+Contract:
 [`diagnostics/GATE0_CONTRACT.md`](diagnostics/GATE0_CONTRACT.md). Spec map:
 [`diagnostics/GATE0_SPEC_MATRIX.md`](diagnostics/GATE0_SPEC_MATRIX.md).
 Validation protocol:
 [`diagnostics/GATE0_VALIDATION.md`](diagnostics/GATE0_VALIDATION.md).
+Data refresh:
+[`diagnostics/GATE0_DATA.md`](diagnostics/GATE0_DATA.md).
 
 ```bash
 PYTHONPATH=. python scripts/run_agrimate_validation.py

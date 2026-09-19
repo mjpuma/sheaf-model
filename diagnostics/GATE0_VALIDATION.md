@@ -123,6 +123,9 @@ P11: `diagnostics/gate0_agrimate/pulse.md` — 8-run 2008 prescribed-Δ,
 clean; not Bai's 36; not G2.
 P12: `diagnostics/gate0_agrimate/methods.md` — G0-P market-section
 offer; **not accepted** (items 3 and 5 fail). G1/G2 stay blocked.
+R1: `diagnostics/GATE0_REDTEAM.md` — host does not reproduce Fig. 4;
+data cookbook `GATE0_DATA.md`. Next paste: `GATE0_REPRO_DISPATCH.md`
+(currently R2). Menu: `GATE0_REPRO_PROMPTS.md` (adaptive).
 
 ## Sensitivity (diagnostic)
 

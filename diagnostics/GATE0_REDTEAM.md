@@ -1,0 +1,374 @@
+# Gate 0 red team (post-P12) — 12 steps
+
+Full-mode assessment of the live wheat host (`sheaf/agrimate/`) against
+**Agrimate reproduction** (Kuhla et al. 2025, *Ecol. Econ.* 231:108546;
+ODD §D; wheat §E; Fig. 4). Not a Pink-Sheet fit. Not the legacy
+ask/scarcity host. G1/G2 stay blocked.
+
+Verification protocol: `CLAUDE.md` (locate claim, locate code,
+counterexample, correctness argument). Classification letters follow
+`CLAUDE.md`. This file is an **inventory**, not a retune and not G0-P
+acceptance.
+
+Date: 2026-09-19. Branch base: P12 methods note
+(`diagnostics/gate0_agrimate/methods.md`). `pytest tests/agrimate` at
+write time: passing. `wheat_params()` stay αI=3.2, p_sto=0.1, xmin=0.2,
+ζ=0, N_for=3. L1–L8 rejected. Bai α_foreign=10 not adopted. Unforced
+price not pinned to the 2006 mean.
+
+**Headline.** The host is a source-faithful *independent implementation*
+of retrieved Zenodo 14022004 wheat code, with labelled gaps. It does
+**not** reproduce Agrimate Fig. 4. Most tests pass *because they lock
+that honesty*, not because the price path matches Agrimate. G0-P remains
+**not accepted**. Do not start G1.
+
+---
+
+## Step 1 — What “reproduce Agrimate” means here
+
+**Claim.** DEVELOPMENT items 1–6. Pass rule: 1–3 before judging 5.
+Item 5 is Agrimate’s published wheat results, not legacy SHEAF, not a
+Bai 2017–25 fit.
+
+**Code.** `diagnostics/DEVELOPMENT.md`; `GATE0_CONTRACT.md`;
+`GATE0_SPEC_MATRIX.md`.
+
+**Match.** The P0–P12 queue executed that protocol. G0-N feasible;
+G0-S met for retrieved code; G0-U workflow exists; G0-H scored a
+sourced shortfall; G0-P note recommends reject.
+
+**Counterexample to “we have reproduced Agrimate”.** Host harvest+AMIS
+2008 hike ×4.54 vs Agrimate Fig. 4d ×1.62 vs Pink ×1.88; undisturbed
+last/first 1.63 vs author 1.004; 2006 mean $65 vs Pink $213
+(`hindcast.md`, `fig4.md`).
+
+**Correctness.** Calling the host “Agrimate-faithful” means *equation
+family and author-code defaults*, not *Fig. 4 bit-reproduction*. That
+distinction is already in P7/P8/P12. Classification **H** for the
+claim-as-stated in those notes (95–100%, reproduced scores).
+Classification **F** if anyone reads README “Agrimate baseline” as
+Fig. 4 replication (40–60% reader risk; **G** on README tone).
+
+---
+
+## Step 2 — Test battery: almost all tests pass, reproduction still fails
+
+**Claim.** `pytest tests/agrimate` is the Gate 0 exit.
+
+**Code.** 12 modules under `tests/agrimate/` (83 at P12; R1 adds
+inventory tests in `test_redteam.py`).
+
+| File | What it actually locks |
+|---|---|
+| `test_equations.py` | D.1 weights, E.27 profile sum, D.2, D.3 (1−Δ), D.30a algebra, D.35 clip |
+| `test_optimize.py` | feasible fraction plans, xmin soft, grad, N5 counted, maxiter=40 |
+| `test_accounting.py` | 2006 harvest+AMIS identities; B1 T* delivery |
+| `test_params.py` | β/τ_P unused on wheat path |
+| `test_wheat_data.py` | 27 C.1 names; AMIS Δ nonempty 2008 |
+| `test_validation.py` | three-scenario flags; OAT lists Bai 10, does not adopt |
+| `test_fig4.py` | author CSVs present; author baseline does **not** drift; host hike **>** author |
+| `test_hindcast.py` | negative Pink corr; stocks 1.58× not 3×; AMIS adds 2008 not 2007 |
+| `test_regional.py` | A8 China 0.50× / EA 0.10× labelled |
+| `test_faostat_fb.py` | A1 left; USDA default |
+| `test_pulse.py` | 8-run not 36; not G2; Δ=1 zeros XI |
+| `test_methods.py` | G0-P **not accepted**; no G1/G2 import |
+
+**Counterexample to “tests imply Fig. 4 match”.**
+`test_fig4_report_is_independent_not_replication` **requires**
+`hike_2008_host > hike_2008_author`. A future “reproduction” would have
+to *change that assertion*, not merely keep 83 green.
+
+**What is not tested.** Zenodo 14022004 Julia is not in-repo (cannot
+diff). FAOSTAT FB pipeline does not exist. 2003–11 three-scenario path
+is not a pytest (runtime). `fetch_external_data.py` is not called in CI.
+Archive/legacy is not imported (now locked by `test_redteam.py`).
+Author `plot_wm_price_timeseries` vs host `np.dot(xi_lag, p_lag)/vol`
+is not a bit-test.
+
+**Correctness.** Tests are doing the right job for an *honest copy*.
+They are the wrong job if the bar is *numeric Fig. 4 reproduction*.
+Classification **H** for identity/params tests (80–95%). Classification
+**F** relative to a reproduction bar (95–100% that current tests do not
+require Fig. 4 match).
+
+---
+
+## Step 3 — Source fidelity (item 1)
+
+**Claim.** Supplier, purchaser, consumer, storage, restrictions, timing,
+world-price definition match paper/supplement or an approved departure.
+
+**Code.** `GATE0_SPEC_MATRIX.md`; `sheaf/agrimate/{equations,optimize,model,harvest,restrictions,params}.py`.
+
+**Match (retrieved 14022004).** 27 `AgrimateRegionsWheat`; D.1 logistic
+weights N_for=3; E.27 `duration_in_s=1.2`; D.8 p_sto=0.1/Nyear and xmin
+penalty with ζ=0 on; αI=3.2 not Tbl. D.8 3.5; E.4 AMIS OECD column
+names; D.30a formula wired; β/τ_P unused matching wheat `two_markets`
+(S3).
+
+**Labelled gaps, not silent bugs.** A1 USDA not FAOSTAT FB. A2 E0
+rescale. A3 A_d not E.30. A7 Fig. 4 executable ≠ 14022004 wheat. A8
+`groupby.mean()`. S4 inflow still T*; author x1=demand labelled. N1–N5
+numerical representation.
+
+**Counterexample to “paper text = host”.** Paper C.1 said 28; code is 27
+(S1). Tbl. D.8 αI=3.5; executable 3.2 (S2). Host follows code. **H**
+(95–100%).
+
+**Correctness.** Item 1 is met *for retrieved wheat code* with those
+labels. It is **not** met for the Fig. 4 NetCDF experiment (Step 7).
+
+---
+
+## Step 4 — Numerical reliability (item 2)
+
+**Claim.** Plans converge; residuals small; failed solves rare enough
+that they do not set the price path. No L1–L8 to pass a test.
+
+**Code.** `optimize.solve_supplier_plan`; `solver.md`; N5 in
+`GATE0_DEPARTURES.md`.
+
+**Match.** harvest+AMIS 2003–11: failed=0, fallback=0, residual=0,
+offer-floor 0. **Unconverged 1743/5832** (~30%): scipy `success=False`
+(maxiter 1033 + ABNORMAL 710). `plan_maxiter=40` kept: 200 vs 400 iters
+disagree as much as 40 vs 400 (`solver.md`).
+
+**Counterexample to “failed solves do not set the path”.** Unconverged
+points *are* the accepted path. Raising maxiter *moves* pidx (RMSE
+~0.17–0.22). Item 2’s “converge” clause fails; the “failed/rare” clause
+holds if “failed” means infeasible.
+
+**Correctness.** Classification **C** (N5), 95–100% on counts. Not a
+reason to restore L1–L8 or to pick an arbitrary maxiter. Reproduction
+of a unique Agrimate path is not demonstrated.
+
+---
+
+## Step 5 — Undisturbed dynamics (item 3) — fail
+
+**Claim.** After spin-up, seasonal repeating behaviour as Agrimate
+describes. Not a flat pinned world price.
+
+**Code.** `undisturbed.md`; author Fig. 4 baseline last/first=1.004,
+seasonal corr 0.991 (`test_author_baseline_does_not_drift`).
+
+**Match.** Host seasonal *shape* repeats (corr ≈ 0.98). Annual-mean
+ratio 2011/2006 = **1.63**. Inverse-demand floor binds 0. H*=C*=542 MMT.
+B1 (T* delivery) fixed exporter-stock echo; **p_w unchanged** (price is
+on XI, not on who receives it). Remaining candidate: non-periodic xd/xi
+split (annual XI 164–254 MMT).
+
+**Counterexample.** Author 1.004 vs host 1.63 on the same 2006–11 window.
+
+**Correctness.** Item 3 **fails**. Classification **open C/D** on the
+split (60–80% that Jacobi + rolling year + xmin penalty can wander XI;
+not proven). **H** that pinning 2006 is forbidden and would not be
+Agrimate. Do not pin.
+
+---
+
+## Step 6 — World-price object
+
+**Claim (README §8).** “reported world price is the volume-weighted
+international transaction-price *index* scaled by the 2006 real Pink
+Sheet wheat mean.”
+
+**Claim (methods.md).** “D.7 × p0; not a calm pin.”
+
+**Claim (fig4.md).** Author Fig. 4d is volume-weighted international
+transaction price, “not D.7 on world XI*.” Host scores “D.7 × p0 / p0.”
+
+**Code.** `sheaf/agrimate/model.py`: each region’s offer is D.7 of
+`(XI_r + Q_{-r}) / XI*_world`; then
+`p_w = dot(xi_lag, p_lag) / sum(xi_lag)`; `price_usd = price_index * p0`
+with `p0` = 2006 Pink mean (`wheat_data.py`). `p0` is a **unit scale**,
+not a path pin (`test_host_index_is_usd_over_p0`: 2006 index mean ≠ 1).
+
+**Match.** README’s “volume-weighted … scaled by 2006 Pink” matches the
+code. methods.md’s “D.7 × p0” omits the volume-weight step. fig4.md’s
+contrast is real *if* author `plot_wm_price_timeseries` weights a
+different price than D.7 offers; that Julia is **not vendored**, so the
+bit-diff is not re-run here.
+
+**Counterexample to “host reports a single D.7 of world XI*”.** Offers
+are per-region D.7; world price is their XI-weighted mean. Classification
+**G** for methods shorthand (80–95%). Classification **H** for “not a
+2006 pin” (95–100%). Open **G/H** on author vs host weight recipe until
+14022004 `plot_wm_price_timeseries` is diffed in-tree (40–60% as a
+reproduction blocker).
+
+---
+
+## Step 7 — Experiment mismatch (A7) — you cannot reproduce Fig. 4 on the default host
+
+**Claim.** P7 scored host vs Zenodo 10688435 Fig. 4 series.
+
+**Code.** `author_fig4/PROVENANCE.txt`; `fig4.md`; A7 in
+`GATE0_DEPARTURES.md`.
+
+| knob | Fig. 4 NetCDF | Host `wheat_params()` |
+|---|---|---|
+| region list | AgrimateEU28 + Egypt extra | AgrimateRegionsWheat (Brazil named; Egypt in Northern Africa; EU-27) |
+| anomalies | FAO since 2005 | USDA PSD LOWESS |
+| α_foreign | 3.5 | 3.2 |
+| ζ | 1 (xmin penalty **off**) | 0 (penalty **on**) |
+| N_for | 6 months | 3 months |
+| start | 2000-01-01 | 2003 spin-up |
+| git | `old-demand-dynamics` | 14022004 equal-sales-penalty tree |
+
+**Counterexample.** Even a perfect 14022004 copy would not match Fig. 4
+output. ζ=1 vs 0 alone changes the xmin quadratic; Fig. 4 amplitude
+1.45× vs host ~18× is the first place to look **on a labelled Fig. 4
+configuration**, not by retuning αI to Pink or to Bai 10.
+
+**Correctness.** Classification **F** (95–100%) for “default host
+reproduces Fig. 4.” Allowed next work: a **labelled comparison run**
+that copies the Fig. 4 *experiment* without changing `wheat_params()`
+defaults (see `GATE0_REPRO_PROMPTS.md` R2). Forbidden: adopt Bai 10,
+restore L1–L8, pin 2006.
+
+---
+
+## Step 8 — Data vintage, downloads, missing Agrimate inputs
+
+Cookbook: [`GATE0_DATA.md`](GATE0_DATA.md). Summary:
+
+| Input | Agrimate E.1 / Fig. 4 | Host | Fetch |
+|---|---|---|---|
+| Baseline P/C/S | FAOSTAT Food Balances | USDA PSD 2007–09 mean (A1) | `fetch_external_data.py --psd-only` |
+| Trade structure | FAOSTAT E0 | E0 2006–07 rescaled to USDA XI (A2) | **vendored**; no fetch |
+| Anomalies | FAO (Fig. 4) | USDA LOWESS | PSD path above |
+| Restrictions | AMIS/E.4 | OECD XLSX → CSV | **browser** then `--amis-only` (Cloudflare) |
+| Calendars | SAGE / author | hand-curated start/end months; **E.27 raised-cosine** | none (CSV vendored) |
+| Pink Sheet | scoring | scoring only | `--prices-only` |
+| Fig. 4 series | 10688435 NetCDF | extracted CSVs in `author_fig4/` | **manual** Zenodo; zip not vendored |
+| Author Julia | 14022004 | not copied | **not in repo** |
+| FAOSTAT FB arrays | E.1.1 | **absent** (P10) | **no script** |
+
+`data/crop_calendars/PROVENANCE.txt` still describes triangular
+allocation and `sheaf.dynamic_wheat` twin-pin — the **legacy** host.
+Live Gate 0 uses `sheaf.agrimate.harvest.step_profile_from_months` (E.27).
+Classification **G** (80–95%).
+
+There is **no** automated download for Zenodo 14022004, 10688435, or
+FAOSTAT Food Balances. Reproduction of the *author experiment* is not
+one-command.
+
+---
+
+## Step 9 — Archive, leftover G1/G2, silent tuning
+
+**Claim.** Dead-end artifacts stay in `archive/`; leftover
+`dynamic_coupled` / `dynamic_policy` are not approval
+(`DEVELOPMENT.md`, `GATE0_EXTENSION_PLAN.md`).
+
+**Code.** `archive/legacy-gate0/scratch/` — dozens of r0–r5 / ask_rival /
+calm-pin prototypes on the **old** sequential map.
+`diagnostics/redteam/` — same cycle’s scores. `diagnostics/gate0_wheat_report.md`
+and maize/rice reports — **legacy**. `sheaf/legacy/`, `sheaf/dynamic_crop.py`,
+`sheaf/dynamic_coupled.py`, `sheaf/dynamic_policy.py` still importable.
+
+**Counterexample to “archive is a tuner for Gate 0”.** Nothing under
+`sheaf/agrimate/` imports `sheaf.legacy` or `archive/`
+(`test_redteam.py`). `scripts/fetch_external_data.py` has no αI / p_sto /
+xmin fit. P6 OAT lists Bai 10 and does not write it into
+`wheat_params()`.
+
+**Correctness.** Classification **H** (95–100%) that live Gate 0 is not
+silently tuned from archive. Classification **E** that leftover G1/G2
+files exist. **Do not run archive scratch as a calibrator.**
+
+---
+
+## Step 10 — Historical performance vs Agrimate (item 5) — fail
+
+From `hindcast.md` / `fig4.md` / `methods.md` (2006–11, harvest+AMIS):
+
+| metric | Host | Agrimate Fig. 4 | Pink Sheet |
+|---|---:|---:|---:|
+| 2006 mean | $65.3 (index ~0.31) | index 1.183 | $213.5 |
+| 2008 hike | ×4.54 | ×1.62 | ×1.88 |
+| crisis peak | 2007-06 | 2008-05 | 2008-03 |
+| moy max/min | ~17.8× | 1.45× | 1.07× |
+| moy corr vs author | 0.91 | 1 | — |
+| production corr vs USDA | 0.795 | — | — |
+| production corr vs author | 0.986 | 1 | — |
+| stocks vs USDA | 1.58× | (author 325 vs host 248 MMT) | — |
+| undisturbed last/first | 1.63 | 1.004 | — |
+
+Calendar matches Agrimate; **amplitude, level, hike, and peak month do
+not**. AMIS does move Ukraine (2007 XI 15→6 MMT; consumption 1.93→10.3).
+P11 prescribed Δ=1/12m zeros Ukraine/Russia XI (D.3 binds) without
+moving 2008 mean price (~1.00× harvest-only).
+
+**Correctness.** Item 5 **fails** vs Agrimate. Classification **F**
+(95–100%). Not a reason to restore L1–L8 or adopt Bai 10 (P6: αI=10
+raises the spike).
+
+---
+
+## Step 11 — Ranked blockers (allowed vs forbidden)
+
+Allowed under hard stops (labelled, `wheat_params()` defaults unchanged):
+
+1. **A7 labelled Fig. 4 configuration** (EU28+Egypt, FAO if present, αI=3.5,
+   ζ=1, N_for=6) as a comparison run — the actual published experiment.
+2. **Item 3:** characterise the undisturbed XI split (Jacobi, rolling year,
+   xmin). Diagnose, do not pin.
+3. **S4:** author x1=demand as a labelled experiment, not a guessed
+   rationing rule.
+4. **A1:** add FAOSTAT FB *only* with PROVENANCE and a parallel WheatData;
+   USDA stays default until G0-P says otherwise.
+5. **World-price recipe test** vs author `plot_wm_price_timeseries` if
+   14022004 is available locally.
+6. **Tests** that fail if identities regress, and tests that *score*
+   Fig. 4 gaps with explicit numbers (already started in P7/P8).
+
+Forbidden (hard stops still on):
+
+- G1 / G2 / `dynamic_policy.py` / `dynamic_coupled.py`
+- L1–L8 restore
+- Pin unforced p_w to 2006 Pink mean
+- Retune αI, p_sto, xmin, λ to Pink or to Bai α_foreign=10
+- Maize/rice as acceptance
+- Treat P11 pulse grid as Gate 2
+- Rewrite A8 (China ×2 / EA ×10) without an approved departure — it
+  rescales the 2003–11 host
+
+Complexity-budget: a Fig. 4-config *comparison* is closer to Agrimate’s
+published wheat than any Pink-Sheet fit, and closer to the lineage than
+opening G1.
+
+---
+
+## Step 12 — What to paste next
+
+**Adaptive**, not a skip-nothing ladder. Menu:
+[`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md). Living next-paste:
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (right now **R2**).
+Data cookbook: [`GATE0_DATA.md`](GATE0_DATA.md).
+
+R2 is the only forced first evidence run (A7). After that, the dispatch
+picks R10 if knobs moved Fig. 4 metrics, R4/R3 if they did not, skips
+R11 while defaults are unchanged, and holds R12 until items 1–5 actually
+moved. Hard stops do not adapt.
+
+`wheat_params()` stay the 14022004 defaults. Fig. 4 knobs live on a
+**named comparison object**, not in `wheat_params()`.
+
+---
+
+## Verdict
+
+| DEVELOPMENT item | Red-team result | Class |
+|---|---|---|
+| 1. Source fidelity | Met for 14022004 wheat code, labelled gaps | H / labelled F |
+| 2. Numerical reliability | Feasible; not first-order stationary (N5) | C |
+| 3. Undisturbed | **Fail** 1.63 vs 1.004 | open C; not a pin |
+| 4. Reference reproduction | Independent; Fig. 4 is a **different experiment** (A7) | F |
+| 5. Historical performance | **Fail** vs Fig. 4 and Pink | F |
+| 6. Controlled experiments | Three scenarios + P11; AMIS/D.3 bind | H |
+
+**Do not accept G0-P. Do not start G1.** The shortest honest path toward
+Agrimate reproduction is R2 (run the Fig. 4 *experiment*), not a
+parameter search on Pink Sheet.
