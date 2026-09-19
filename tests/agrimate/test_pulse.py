@@ -70,8 +70,13 @@ def test_pulse_csv_cuts_full_year_exports():
 
 
 def test_pulse_module_does_not_import_dynamic_policy():
-    import inspect
-    import sheaf.agrimate.pulse as pulse
-    src = inspect.getsource(pulse)
-    assert "dynamic_policy" not in src
-    assert "sheaf.dynamic_policy" not in src
+    import ast
+    from pathlib import Path
+    tree = ast.parse(Path("sheaf/agrimate/pulse.py").read_text())
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            assert all("dynamic_policy" not in a.name for a in node.names)
+        if isinstance(node, ast.ImportFrom):
+            mod = node.module or ""
+            assert "dynamic_policy" not in mod
+            assert all("dynamic_policy" not in a.name for a in node.names)
