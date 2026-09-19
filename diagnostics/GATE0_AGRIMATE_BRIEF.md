@@ -21,14 +21,13 @@ Closed from the executable model (not guessed):
 7. **D.30a:** wheat uses it. `ε_d_adjust=false` so `determine_demands`
    (single ε_d=1/α=1/3, A_d, B) not the two-market ε_d split. Host formula
    matches; A_d not refit. Inflow still T* (author x1=demand labelled).
+8. **FAOSTAT Food Balances vs USDA (P10):** not in
+   `data/faostat_network/` (E0 trade only). FoodTradeNetwork P0/R0 are
+   2015–21 averages, not 2006–11 annual FB. A1 left; USDA default.
 9. **Fig. 4 executable (P7):** published series used `AgrimateEU28` + Egypt
    extra, FAO anomalies since 2005, start 2000, `α_foreign=3.5`, `ζ=1.0`,
    `N_for=6`, gitcommit `old-demand-dynamics-150-gbfc02cb-dirty`. Host
    stays on 14022004 wheat defaults. Comparison labelled; not a retune.
-
-Still open:
-
-8. FAOSTAT Food Balance arrays vs USDA PSD.
 
 Recorded, not a question for Agrimate: Bai/Wada/Puma copy uses α_foreign=10
 as a 2017–25 fit. Host keeps author 3.2. Their finding that one parameter

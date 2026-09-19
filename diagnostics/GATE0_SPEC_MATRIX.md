@@ -23,7 +23,7 @@ replication.
 | World price | §5.2 international tx | blend + pin | `model.py` | index O(1) |
 | Harvest shape | E.27 author raised-cosine | triangular | `harvest.py` | `test_harvest_profile_normalised` |
 | Restrictions | E.4 / AMIS OECD columns PolicyMeasure_Name, CommodityClass_Name | extra AMIS types | `restrictions.py` | wheat Δ nonempty 2007/08 |
-| Baseline quantities | FAOSTAT FB E.1 | USDA+E0 | USDA PSD + E0 rescale | labelled A1 |
+| Baseline quantities | FAOSTAT FB E.1 | USDA+E0 | USDA PSD + E0 rescale | A1; P10 `faostat_fb.md` — FB absent, USDA default |
 | Storage cost | Tbl. D.8 p_sto=0.1 / Nyear | cover rule | `optimize.py` unit costs | G0-S |
 | x_min | Tbl. D.8 0.2 even spread | n/a | quadratic penalty, ζ=0 | G0-S |
 | Three-scenario validation | Agrimate Fig. 4 design; Bai/Wada/Puma copy workflow | Pink-Sheet only | `validation.py` / `run_agrimate_validation.py` | prices **and** USDA supply/stocks |
@@ -37,8 +37,9 @@ replication.
 | Local price β, τ_P | author `AgrimateParams`; `determine_target_price_adjustment_factor` | n/a | unused fields on `AgrimateParams` | P3: wheat `two_markets` pins P_loc=1; `test_beta_loc_does_not_enter_supplier_plan` |
 | Unconverged L-BFGS-B | scipy `success=False` on feasible fraction plans | n/a | counted; `plan_maxiter=40` | P5 `solver.md`; not dropped |
 
-Unresolved (labelled, not guessed): FAOSTAT FB vs USDA; paper 28 vs code 27;
-D.8 αI=3.5 vs code 3.2. Fig. 4 used the D.8 αI=3.5 / EU28+Egypt / FAO
+Unresolved (labelled, not guessed): paper 28 vs code 27;
+D.8 αI=3.5 vs code 3.2. FAOSTAT FB vs USDA is A1 (P10: arrays not in
+`data/faostat_network/`; USDA default). Fig. 4 used the D.8 αI=3.5 / EU28+Egypt / FAO
 executable (P7), not the 14022004 wheat defaults. β/τ_P unused on wheat
 path (S3). D.30a formula wired; author x1=demand not copied (S4).
 Unconverged plans labelled N5.
