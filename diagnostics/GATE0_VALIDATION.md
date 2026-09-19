@@ -113,6 +113,8 @@ Regional USDA (P9): `diagnostics/gate0_agrimate/regional.md` — coverage
 labelled (A8 China 0.50× / Eastern Africa 0.10×); no stock-level fit.
 P10: `diagnostics/gate0_agrimate/faostat_fb.md` — `data/faostat_network/`
 is E0 only; A1 left; USDA default.
+P11: `diagnostics/gate0_agrimate/pulse.md` — 8-run 2008 prescribed-Δ,
+clean; not Bai's 36; not G2.
 
 ## Sensitivity (diagnostic)
 
@@ -124,12 +126,16 @@ open G0-H question, not a retune of this wheat run.
 `--sensitivity` runs a short 2006–08 harvest+AMIS OAT. It must not change
 `wheat_params()`.
 
-## Exporter-at-a-time grid (later, not G2)
+## Exporter-at-a-time grid (P11, not G2)
 
-Bai’s 9 exporters × 2 intensities × 2 durations = 36 prescribed-Δ runs.
-Helper: `sheaf.agrimate.restrictions.restriction_pulse`. Not in the default
-command. That grid is a **G0-H/P experiment** on AMIS-style Δ. Gate 2 is a
-different mechanism (governments choose Δ).
+P11 ran the **8-run** 2008 wheat slice: Ukraine and Russia × {0.5, 1.0} ×
+{6, 12} months on harvest-anomaly data vs harvest-only. Helper:
+`sheaf.agrimate.restrictions.restriction_pulse`. Scorer:
+`PYTHONPATH=. python scripts/score_agrimate_pulse.py` (not the default
+three-scenario command). Writeup: `diagnostics/gate0_agrimate/pulse.md`.
+The slice is **clean** (failed=0, production identical, Δ on one exporter,
+Δ=1.0/12m zeros XI). Bai’s 9×2×2=36 2020 grid is **not** run. Gate 2 is a
+different mechanism (governments choose Δ). This grid **prescribes** Δ.
 
 ## Figures
 

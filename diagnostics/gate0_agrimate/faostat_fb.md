@@ -73,5 +73,5 @@ network only.
 - this note
 - `data/faostat_network/PROVENANCE.txt` (E0 only)
 
-Next: P11 exporter pulse grid (optional, not G2).
+Next: P12 G0-P methods note. P11 pulse grid: `pulse.md` (8-run 2008 clean; not 36; not G2).
 
