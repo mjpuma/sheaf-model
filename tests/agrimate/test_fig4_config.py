@@ -61,7 +61,7 @@ def test_cannot_set_is_labelled_and_region_path_is_none():
     assert "2000" in joined
     assert "old-demand-dynamics" in joined
     assert "14022004" in joined
-    assert avail["food_balance_files"] == []
+    assert avail["faostat_fb_files"] == []
     assert avail["usda_is_default"] is True
     assert avail["host_has_egypt_node"] is False
     assert avail["host_has_eu28"] is False
@@ -129,6 +129,10 @@ def test_fig4_config_note_labels_cannot_set_and_does_not_adopt():
     assert d["failed"] == 0
     assert c["failed"] == 0
     assert wheat_params().alpha_i == 3.2
+    dispatch = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
+    assert "Last completed: R2" in dispatch
+    assert "Next paste: R10" in dispatch
+    assert "26.8" in dispatch and "13.3" in dispatch
 
 
 def test_r2_did_not_overwrite_three_scenario_csvs():

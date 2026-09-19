@@ -8,7 +8,7 @@ Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
 **Now:** P0–P12 done. G0-P **not accepted.** Post-P12 queue is
 [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md); paste
 [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) **Next paste**
-(currently **R2**). Do not paste G1/G2.
+(currently **R10**). Do not paste G1/G2.
 
 ## Shared preamble (prepend to every prompt)
 
