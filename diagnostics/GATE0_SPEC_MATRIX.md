@@ -36,6 +36,7 @@ replication.
 | International delivery | E.1 T* to importers, Ndel lag | own-XI echo (bug) | `international_destination_shares` | `test_international_sales_are_not_echoed_to_the_exporter` |
 | Local price β, τ_P | author `AgrimateParams`; `determine_target_price_adjustment_factor` | n/a | unused fields on `AgrimateParams` | P3: wheat `two_markets` pins P_loc=1; `test_beta_loc_does_not_enter_supplier_plan` |
 | Unconverged L-BFGS-B | scipy `success=False` on feasible fraction plans | n/a | counted; `plan_maxiter=40` | P5 `solver.md`; not dropped |
+| G0-P methods note | Agrimate wheat market section | n/a | `methods.py` / `score_agrimate_methods.py` | P12 `methods.md`; written; **not accepted** |
 
 Unresolved (labelled, not guessed): paper 28 vs code 27;
 D.8 αI=3.5 vs code 3.2. FAOSTAT FB vs USDA is A1 (P10: arrays not in

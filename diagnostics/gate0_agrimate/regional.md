@@ -113,5 +113,5 @@ restore L1–L8 or retune αI.
 - `score_regional_summary.csv` — 2006–11 corr / level
 - `score_regional_construction.csv` — 2007–09 mean vs sum
 
-Next: P12 G0-P methods note. P11: `pulse.md`. P10 left A1 (`faostat_fb.md`).
+Next: P12 methods note is `methods.md` (not accepted). P11: `pulse.md`. P10 left A1 (`faostat_fb.md`).
 

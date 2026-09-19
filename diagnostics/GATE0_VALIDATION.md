@@ -14,8 +14,8 @@ The only SHEAF differentiator versus an Agrimate copy is **later**:
 | Layer | Status on this host | Recovery |
 |---|---|---|
 | **G0** | Single-crop wheat, AMIS/E.4 prescribed | This protocol |
-| **G1** | Cross-crop substitution — **blocked** until G0-P | Disabled G1 recovers G0 |
-| **G2** | Government restriction game — **blocked** until G0-P | Disabled G2 recovers E.4 |
+| **G1** | Cross-crop substitution — **blocked** until G0-P accepted | Disabled G1 recovers G0 |
+| **G2** | Government restriction game — **blocked** until G0-P accepted | Disabled G2 recovers E.4 |
 
 Do not implement G1/G2 here. Do not restore L1–L8 to chase Pink Sheet.
 
@@ -50,6 +50,12 @@ FAOSTAT FB inventory (P10; does **not** re-run the host or switch USDA):
 
 ```bash
 PYTHONPATH=. python scripts/score_agrimate_faostat_fb.py
+```
+
+G0-P methods note (does **not** re-run the host; P12):
+
+```bash
+PYTHONPATH=. python scripts/score_agrimate_methods.py
 ```
 
 Single-scenario solver smoke (harvest+AMIS only):
@@ -115,6 +121,8 @@ P10: `diagnostics/gate0_agrimate/faostat_fb.md` — `data/faostat_network/`
 is E0 only; A1 left; USDA default.
 P11: `diagnostics/gate0_agrimate/pulse.md` — 8-run 2008 prescribed-Δ,
 clean; not Bai's 36; not G2.
+P12: `diagnostics/gate0_agrimate/methods.md` — G0-P market-section
+offer; **not accepted** (items 3 and 5 fail). G1/G2 stay blocked.
 
 ## Sensitivity (diagnostic)
 
@@ -148,7 +156,7 @@ different mechanism (governments choose Δ). This grid **prescribes** Δ.
 | `fig5_eastern_africa_purchaser.png` | Does the shock reach a dependent importer? |
 
 Figures wait on the three-scenario baseline. They are diagnostics, not a
-publication deck, until G0-P.
+publication deck. G0-P (`methods.md`) is written and **not accepted**.
 
 ## What we explicitly will not do in G0
 
@@ -156,4 +164,4 @@ publication deck, until G0-P.
 - Use one-parameter-set failure on 2008 **and** 2022 as a reason to
   split-calibrate the 2006–11 Agrimate case.
 - Treat the 36-run exporter grid as Gate 2.
-- Open G1 substitution or G2 games before G0-P (`DEVELOPMENT.md`).
+- Open G1 substitution or G2 games before G0-P is accepted (`DEVELOPMENT.md`).

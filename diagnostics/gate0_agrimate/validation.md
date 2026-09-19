@@ -95,6 +95,7 @@ not the P11 8-run prescribed-Δ grid (`pulse.md`; not Bai's 36; not G2).
 - `regional.md` — P9 named-node vs `psd_regional_annual()`. Coverage labelled (A8); no xmin/p_sto fit.
 - `faostat_fb.md` — P10: `data/faostat_network/` is E0, not Food Balances. A1 left.
 - `pulse.md` — P11: 8-run 2008 Ukraine/Russia prescribed-Δ vs harvest-only. Clean; not 36; not G2.
+- `methods.md` — P12: G0-P market-section offer. **Not accepted.** No G1/G2.
 
 ## What this does not do
 
