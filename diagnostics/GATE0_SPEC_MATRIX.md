@@ -31,7 +31,7 @@ replication.
 | G0-H hindcast note | Agrimate Fig. 4 + Pink Sheet levels and paths | price corr only | `hindcast.py` / `score_agrimate_hindcast.py` | P8 `hindcast.md`; sourced shortfall, no retune |
 | Regional USDA | `psd_regional_annual()` vs named nodes | world PSD only | `regional.py` / `score_agrimate_regional.py` | P9 `regional.md`; A8 mean-of-members labelled, no xmin fit |
 | OAT sensitivity | diagnostic around author params | n/a | `oat_settings()` | P6 2006–08: αI/p_sto/xmin move hike; εc/σ silent; Bai 10 listed, not adopted |
-| Exporter pulse grid | prescribed Δ, G0-H/P | n/a | `restriction_pulse` | not G2 |
+| Exporter pulse grid | prescribed Δ, G0-H/P | n/a | `restriction_pulse` / `pulse.py` | P11 `pulse.md`; 8-run 2008 clean; not 36; not G2 |
 | Step accounting | D.6 / D.3 / consumer clip | n/a | `accounting.py` | `test_2006_harvest_amis_path_identities` |
 | International delivery | E.1 T* to importers, Ndel lag | own-XI echo (bug) | `international_destination_shares` | `test_international_sales_are_not_echoed_to_the_exporter` |
 | Local price β, τ_P | author `AgrimateParams`; `determine_target_price_adjustment_factor` | n/a | unused fields on `AgrimateParams` | P3: wheat `two_markets` pins P_loc=1; `test_beta_loc_does_not_enter_supplier_plan` |

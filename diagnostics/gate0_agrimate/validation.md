@@ -79,8 +79,7 @@ Repeating seasonal harvest, no AMIS. Not a world-price pin.
 - Fig. 4 `Ukraine` supplier: harvest, producer stocks, exports, consumption.
 - Fig. 5 `Eastern Africa` purchaser: consumer price, inflow, consumption, stocks.
 These compare harvest-only vs harvest+AMIS on the 2006–11 AMIS diary,
-not a synthetic 36-run exporter grid (that grid is G0-H/P; see
-`restriction_pulse` in `restrictions.py`).
+not the P11 8-run prescribed-Δ grid (`pulse.md`; not Bai's 36; not G2).
 
 ## Figures
 
@@ -95,6 +94,7 @@ not a synthetic 36-run exporter grid (that grid is G0-H/P; see
 - `hindcast.md` — G0-H 2006–11 score. Explicit sourced shortfall, not a retune.
 - `regional.md` — P9 named-node vs `psd_regional_annual()`. Coverage labelled (A8); no xmin/p_sto fit.
 - `faostat_fb.md` — P10: `data/faostat_network/` is E0, not Food Balances. A1 left.
+- `pulse.md` — P11: 8-run 2008 Ukraine/Russia prescribed-Δ vs harvest-only. Clean; not 36; not G2.
 
 ## What this does not do
 
