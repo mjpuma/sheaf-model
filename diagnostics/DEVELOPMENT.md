@@ -163,7 +163,13 @@ approval.
     Agrimate ×1.62 vs Pink ×1.88). `wheat_params()` unchanged. G1/G2
     stay blocked until a later G0-P acceptance. Do not start G1 from
     this note.
-   **Next:** G0-P is a human accept/reject. Do not paste G1.
+17. **R1 (done).** Post-P12 red team: `diagnostics/GATE0_REDTEAM.md`.
+    Host does **not** reproduce Agrimate Fig. 4. `tests/agrimate` pass because
+    they lock honesty (including host hike > author hike), not a match.
+    Data cookbook: `GATE0_DATA.md`. Next queue:
+    `GATE0_REPRO_PROMPTS.md` (R2 labelled Fig. 4-config, not a default
+    change). `wheat_params()` unchanged. G1/G2 stay blocked.
+   **Next session:** paste **R2** from `GATE0_REPRO_PROMPTS.md`.
 
 Reference command:
 

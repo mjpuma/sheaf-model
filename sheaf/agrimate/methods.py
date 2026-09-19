@@ -397,6 +397,7 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "- `hindcast.md`, `fig4.md`, `regional.md`, `faostat_fb.md`, `pulse.md`,",
         "  `undisturbed.md`, `solver.md`, `validation.md`",
         "- `GATE0_DEPARTURES.md`, `GATE0_SPEC_MATRIX.md`, `GATE0_CONTRACT.md`",
+        "- `GATE0_REDTEAM.md`, `GATE0_DATA.md` — post-P12 inventory; not a retune",
         "",
         "G1/G2 remain the blocked pair in `GATE0_EXTENSION_PLAN.md`.",
         "",
