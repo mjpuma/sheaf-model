@@ -232,6 +232,11 @@ that honesty*, not because the price path matches Agrimate. G0-P remains
    `wheat_params()` defaults (see `GATE0_REPRO_PROMPTS.md` R2).
    Forbidden: adopt Bai 10, restore L1–L8, pin 2006.
 
+R2 (this queue) added `fig4_experiment_params()` and scored 2006–08
+harvest+AMIS on USDA/EU-27: moy **26.8× → 13.3×**, hike **×2.31 → ×2.22**
+(author ×1.62, moy 1.51× on this window). Knobs are **not** adopted as
+`wheat_params()`. FAO/EU28 still cannot-set. Next paste **R10**.
+
 ---
 
 ## Step 8 — Data vintage, downloads, missing Agrimate inputs
@@ -369,8 +374,10 @@ dispatch picks R10 if knobs moved Fig. 4 metrics, R4/R3 if they did
 not, skips R11 while defaults are unchanged, and holds R12 until
 items 1–5 actually moved. Hard stops do not adapt.
 
-`wheat_params()` stay the 14022004 defaults. Fig. 4 knobs live on a
-**named comparison object**, not in `wheat_params()`.
+**R2 done (2026-09-19).** moy 26.8×→13.3× triggered R10; hike barely
+moved. Living next-paste is **R10**. `wheat_params()` stay the 14022004
+defaults. Fig. 4 knobs live on `fig4_experiment_params()`, not in
+`wheat_params()`.
 
 ---
 

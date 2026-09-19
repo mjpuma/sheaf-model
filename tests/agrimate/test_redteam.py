@@ -109,7 +109,8 @@ def test_redteam_note_does_not_claim_replication():
     assert "α_foreign=10" in text or "Bai" in text
     assert "adaptive" in (ROOT / "diagnostics" / "GATE0_REPRO_PROMPTS.md").read_text().lower()
     dispatch = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
-    assert "Next paste: R2" in dispatch
+    assert "Last completed:" in dispatch
+    assert "Next paste:" in dispatch
     assert "R11" in dispatch
     data = (ROOT / "diagnostics" / "GATE0_DATA.md").read_text()
     assert "--psd-only" in data

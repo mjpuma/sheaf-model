@@ -172,9 +172,13 @@ approval.
     Items 3 and 5 still fail; tests lock honesty not Fig. 4 match;
     fetch does not download Zenodo or FAO FB. Adaptive queue:
     `GATE0_REPRO_PROMPTS.md`. Living next-paste:
-    `GATE0_REPRO_DISPATCH.md` (**R2**: labelled Fig. 4 knobs, not
-    `wheat_params()`).
-   **Next:** paste **R2**. G0-P is still not accepted. Do not paste G1.
+    `GATE0_REPRO_DISPATCH.md` (**R10**: score Fig. 4 knobs vs author).
+18. **R2 (done).** `fig4_experiment_params()` is αI=3.5, ζ=1, N_for=6.
+    FAO/EU28/start-2000 cannot-set. Short 2006–08 harvest+AMIS: moy
+    26.8×→13.3× (drop ≥2); hike ×2.31→×2.22 (barely). Unconverged
+    611→553 / 1944, failed=0. `wheat_params()` unchanged.
+    Writeup: `diagnostics/gate0_agrimate/fig4_config.md`.
+   **Next:** paste **R10**. G0-P is still not accepted. Do not paste G1.
 
 Reference command:
 
