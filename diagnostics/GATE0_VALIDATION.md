@@ -19,6 +19,10 @@ The only SHEAF differentiator versus an Agrimate copy is **later**:
 
 Do not implement G1/G2 here. Do not restore L1–L8 to chase Pink Sheet.
 
+Post-P12 inventory: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md),
+[`GATE0_DATA.md`](GATE0_DATA.md). Next paste:
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md).
+
 ## Command
 
 ```bash
