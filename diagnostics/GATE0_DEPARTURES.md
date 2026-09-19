@@ -16,7 +16,14 @@ to restore them.
 
 ## Data adaptations (not economic departures)
 
-A1 USDA PSD not FAOSTAT Food Balances; A2 E0 shares rescaled; A3 A_d not E.30 (F.1 Egypt 0.17 unused: Egypt is inside Northern Africa);
+A1 **USDA PSD not FAOSTAT Food Balances (P10 confirmed).**
+`data/faostat_network/` (the path named in the prompt) is E0 trade
+only. FoodTradeNetwork P0/R0 are 2015–21 averages, not 2006–11 annual
+FB. Zenodo 10688435 is FAO-forced model *output*, not FB inputs. Author
+AgriculturalData expects cleaned `wheat_food_balance_fao.csv`, which is
+not shipped. USDA remains the 2006–11 default. Writeup:
+`diagnostics/gate0_agrimate/faostat_fb.md`.
+A2 E0 shares rescaled; A3 A_d not E.30 (F.1 Egypt 0.17 unused: Egypt is inside Northern Africa);
 A4 A_c income-group proxies; A5 restriction weights inside multi-country
 regions; A6 inverse-demand floor 0.05 (numerical).
 A7 **Fig. 4 experiment ≠ 14022004 wheat defaults (P7).** Author

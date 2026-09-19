@@ -113,5 +113,5 @@ restore L1–L8 or retune αI.
 - `score_regional_summary.csv` — 2006–11 corr / level
 - `score_regional_construction.csv` — 2007–09 mean vs sum
 
-Next: P10 FAOSTAT FB vs USDA (A1) only if those arrays exist.
+Next: P11 exporter pulse (optional, not G2). P10 left A1 (`faostat_fb.md`).
 

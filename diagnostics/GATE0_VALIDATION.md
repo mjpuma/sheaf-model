@@ -46,6 +46,12 @@ price CSVs:
 PYTHONPATH=. python scripts/score_agrimate_regional.py
 ```
 
+FAOSTAT FB inventory (P10; does **not** re-run the host or switch USDA):
+
+```bash
+PYTHONPATH=. python scripts/score_agrimate_faostat_fb.py
+```
+
 Single-scenario solver smoke (harvest+AMIS only):
 
 ```bash
@@ -96,7 +102,8 @@ stage. Gate 0 scores both from the start.
    Comparison is harvest-only vs harvest+AMIS on the historical diary.
 
 FAOSTAT Food Balances remain labelled A1. Bai found FAO anomalies closer to
-prices in 2020–24; we stay on USDA because FAOSTAT FB is not in the repo.
+prices in 2020–24. P10 checked `data/faostat_network/` (E0 only; no 2006–11
+FB arrays) and left A1. USDA stays the default. See `faostat_fb.md`.
 
 Agrimate Fig. 4 author series: Zenodo 10688435 unpacked (P7). Score in
 `diagnostics/gate0_agrimate/fig4.md`. Independent implementation, not a
@@ -104,6 +111,8 @@ replication. PDF digitisation was not used. G0-H writeup (P8):
 `diagnostics/gate0_agrimate/hindcast.md` — sourced shortfall, not a retune.
 Regional USDA (P9): `diagnostics/gate0_agrimate/regional.md` — coverage
 labelled (A8 China 0.50× / Eastern Africa 0.10×); no stock-level fit.
+P10: `diagnostics/gate0_agrimate/faostat_fb.md` — `data/faostat_network/`
+is E0 only; A1 left; USDA default.
 
 ## Sensitivity (diagnostic)
 

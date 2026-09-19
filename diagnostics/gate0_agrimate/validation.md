@@ -94,6 +94,7 @@ not a synthetic 36-run exporter grid (that grid is G0-H/P; see
 - `fig4.md` — author series score. Independent implementation, not a replication.
 - `hindcast.md` — G0-H 2006–11 score. Explicit sourced shortfall, not a retune.
 - `regional.md` — P9 named-node vs `psd_regional_annual()`. Coverage labelled (A8); no xmin/p_sto fit.
+- `faostat_fb.md` — P10: `data/faostat_network/` is E0, not Food Balances. A1 left.
 
 ## What this does not do
 
