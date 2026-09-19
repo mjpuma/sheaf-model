@@ -167,10 +167,15 @@ approval.
     Host does **not** reproduce Agrimate Fig. 4. `tests/agrimate` pass because
     they lock honesty (including host hike > author hike), not a match.
     Data cookbook: `GATE0_DATA.md`. Next queue:
-    `GATE0_REPRO_PROMPTS.md` (adaptive; first paste R2, then
-    `GATE0_REPRO_DISPATCH.md`). `wheat_params()` unchanged. G1/G2 stay blocked.
+    `GATE0_REPRO_PROMPTS.md` (adaptive). `wheat_params()` unchanged. G1/G2 stay blocked.
+18. **R2 (done).** Labelled `fig4_experiment_params()` copies
+    Fig. 4 knobs (αI=3.5, ζ=1, N_for=6) without replacing `wheat_params()`.
+    2006–08 harvest+AMIS: hike ×2.31→×2.22 vs author ×1.62; moy max/min
+    26.8×→13.3× vs 1.51×; unconverged 611→553 / 1944, failed=0.
+    Undisturbed last/first 0.618→0.409 vs author 1.006 (wander not fixed).
+    FAO/EU28/start-2000 still cannot be set. Note: `fig4_config.md`.
    **Next session:** paste **Next paste** from `GATE0_REPRO_DISPATCH.md`
-   (currently **R2**).
+   (currently **R10**).
 
 Reference command:
 

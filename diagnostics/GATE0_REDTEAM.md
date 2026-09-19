@@ -345,13 +345,13 @@ opening G1.
 
 **Adaptive**, not a skip-nothing ladder. Menu:
 [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md). Living next-paste:
-[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (right now **R2**).
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (right now **R10**).
 Data cookbook: [`GATE0_DATA.md`](GATE0_DATA.md).
 
-R2 is the only forced first evidence run (A7). After that, the dispatch
-picks R10 if knobs moved Fig. 4 metrics, R4/R3 if they did not, skips
-R11 while defaults are unchanged, and holds R12 until items 1–5 actually
-moved. Hard stops do not adapt.
+R2 ran the labelled Fig. 4 knobs on USDA/EU-27, 2006–08: moy max/min
+26.8×→13.3× (trigger), hike ×2.31→×2.22 (barely). FAO/EU28 still
+cannot be set. Dispatch picks R10. R11 skipped (`wheat_params`
+unchanged). Hard stops do not adapt.
 
 `wheat_params()` stay the 14022004 defaults. Fig. 4 knobs live on a
 **named comparison object**, not in `wheat_params()`.

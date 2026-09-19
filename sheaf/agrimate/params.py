@@ -63,3 +63,20 @@ def wheat_table_d8_defaults() -> AgrimateParams:
 def wheat_published_sensitivity_defaults() -> AgrimateParams:
     """Tbl. F.1 / author code: αI=3.2, τ=0.1 Nyear."""
     return AgrimateParams(alpha_i=3.2, alpha_nash=3.2, tau_storage=0.1)
+
+
+def fig4_experiment_params() -> AgrimateParams:
+    """Labelled Fig. 4 NetCDF knobs. Not a wheat_params() replacement.
+
+    Zenodo 10688435 main_output: α_foreign=3.5, α=3.0, ζ=1 (xmin
+    penalty off), N_for=6. p_sto, σ, εc already match this host's
+    14022004 defaults and are left as AgrimateParams fields. Region
+    list, FAO anomalies, start-2000, and old-demand-dynamics are
+    **not** set here — see ``fig4_config.CANNOT_SET``.
+    """
+    return AgrimateParams(
+        alpha_i=3.5,
+        alpha_nash=3.0,
+        zeta_penalty=1.0,
+        n_for_months=6,
+    )
