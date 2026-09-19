@@ -71,5 +71,5 @@ in this PR.
 
 - `score_pulse.csv` — harvest-only + 8 pulses
 
-Next: P12 G0-P methods note.
+Next: P12 methods note is `methods.md` (written; not accepted; G1 blocked).
 

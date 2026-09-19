@@ -1,8 +1,9 @@
 # SHEAF extensions after Agrimate Gate 0
 
-**Blocked** until wheat Gate 0 passes the publishable bar in
-`diagnostics/DEVELOPMENT.md` (stage G0-P). Do not implement these in
-`sheaf/agrimate/`.
+**Blocked** until wheat Gate 0 is **accepted** at the publishable bar in
+`diagnostics/DEVELOPMENT.md` (stage G0-P). P12 wrote
+`diagnostics/gate0_agrimate/methods.md`; that note recommends **reject**.
+Do not implement these in `sheaf/agrimate/`.
 
 Gate 0 is an Agrimate copy. A parallel copy (Bai/Wada/Puma) is being
 validated on the same three-scenario workflow. **The only planned SHEAF

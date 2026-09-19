@@ -177,9 +177,8 @@ on historical performance (DEVELOPMENT item 5) and still fails
 item 3 (undisturbed). Do not restore L1–L8. Do not adopt Bai
 α_foreign=10. Do not pin 2006. Regional USDA (P9): `regional.md`
 (coverage labelled; no xmin/p_sto fit). P11 prescribed-Δ: `pulse.md`
-(8-run 2008 clean; not 36; not G2). P12 methods note waits on
-an accepted G0-H picture; this note plus `regional.md` are that
-picture.
+(8-run 2008 clean; not 36; not G2). P12 methods note: `methods.md`
+(written; **not accepted** as the SHEAF market section).
 
 ## Files
 

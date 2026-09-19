@@ -5,8 +5,8 @@ Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
 [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md). Protocol:
 [`GATE0_VALIDATION.md`](GATE0_VALIDATION.md).
 
-**Now:** paste **P12**. Everything above P12 is done. Everything below P12
-is later.
+**Now:** G0-P methods note is written (`diagnostics/gate0_agrimate/methods.md`).
+**Not accepted.** Do not paste G1/G2. Everything above P12 is done.
 
 ## Shared preamble (prepend to every prompt)
 
@@ -53,8 +53,8 @@ diagnostics/gate0_agrimate/. One prompt, one PR-sized change.
 | **P9** | Regional USDA supply/stocks (not only world) | **done** (coverage labelled; no stock fit) |
 | **P10** | FAOSTAT FB vs USDA (A1) — only if data exist | **done** (arrays absent; A1 left; USDA default) |
 | P11 | Exporter-at-a-time pulse grid (not G2) | **done** (8-run 2008 clean; not 36; not G2) |
-| P12 | G0-P methods note | **next** |
-| — | G1 substitution / G2 restriction game | **blocked until G0-P** |
+| P12 | G0-P methods note | **done** (written; recommend reject; G1 blocked) |
+| — | G1 substitution / G2 restriction game | **blocked until G0-P accepted** |
 
 ---
 

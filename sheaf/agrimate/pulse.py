@@ -292,7 +292,7 @@ def write_pulse_note(summary: pd.DataFrame, out_dir: Path) -> Path:
         "",
         "- `score_pulse.csv` — harvest-only + 8 pulses",
         "",
-        "Next: P12 G0-P methods note.",
+        "Next: P12 methods note is `methods.md` (written; not accepted; G1 blocked).",
         "",
     ]
     path = Path(out_dir) / "pulse.md"

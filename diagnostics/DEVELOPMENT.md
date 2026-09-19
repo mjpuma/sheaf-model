@@ -64,7 +64,7 @@ government games will be added **after** G0-P.
 | **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | **Met for retrieved code.** 27-region C.1 wheat list, author params, p_sto, x_min penalty, E.27, D.1 weights. β/τ_P labelled unused on wheat path (P3). D.30a formula wired (P4); author x1=demand labelled. FAOSTAT FB absent (P10, A1 left). Fig. 4 zip unpacked (P7); not a replication. |
 | **G0-U** | Undisturbed / harvest-only / harvest+AMIS. Accounting identities. Score prices **and** USDA supply/stocks. Ukraine / Eastern Africa mechanism panels. OAT diagnostic without retuning. Protocol: `GATE0_VALIDATION.md`. | Three-scenario report in `diagnostics/gate0_agrimate/`; documented seasonal baseline; material balance. |
 | **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | **P8–P11 done:** `hindcast.md` sourced shortfall; `regional.md` named-node vs PSD; `faostat_fb.md` — FB arrays not in repo, A1 left, USDA default. `pulse.md` 8-run 2008 prescribed-Δ (Ukraine/Russia × {0.5,1.0} × {6,12}m) is clean; not Bai's 36; not G2. |
-| **G0-P** | Gate 0 note at publication standard (methods, data, hindcast, limits). No substitution, no government game. | You accept wheat Gate 0 as the SHEAF market paper / section. **This is the only gate that unlocks G1.** |
+| **G0-P** | Gate 0 note at publication standard (methods, data, hindcast, limits). No substitution, no government game. | **Note written, not accepted.** `diagnostics/gate0_agrimate/methods.md` is the market-section offer. Items 3 and 5 fail. G1 stays blocked. |
 | **G1** | Cross-crop substitution (wheat/rice/maize), distinct from Agrimate origin CES. Disabled G1 recovers G0. | Identity test + spillover experiments. No σ* fit to 2008. |
 | **G2** | Government restriction game, distinct from supplier oligopoly and from AMIS/E.4. Disabled G2 recovers E.4 Agrimate. | Mechanism tests on the *accepted* G0 host. Train/hold-out if estimated. |
 
@@ -156,7 +156,14 @@ approval.
     harvest-only. Not expanded to Bai's 36-run 2020 grid. Not G2.
     `wheat_params()` unchanged. Writeup:
     `diagnostics/gate0_agrimate/pulse.md`.
-   **Next session:** paste **P12** (G0-P methods note).
+16. **P12 (done).** G0-P methods note: `diagnostics/gate0_agrimate/methods.md`.
+    Independent Agrimate copy; not a Fig. 4 replication; no substitution;
+    no government game. **Recommend reject** as the SHEAF market section
+    (item 3 undisturbed 1.63 vs author 1.004; item 5 hike ×4.54 vs
+    Agrimate ×1.62 vs Pink ×1.88). `wheat_params()` unchanged. G1/G2
+    stay blocked until a later G0-P acceptance. Do not start G1 from
+    this note.
+   **Next:** G0-P is a human accept/reject. Do not paste G1.
 
 Reference command:
 

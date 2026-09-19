@@ -13,6 +13,7 @@ Otto, *Ecological Economics* 231 (2025) 108546; ODD supplement §D; wheat §E).
 - Validation protocol: `diagnostics/GATE0_VALIDATION.md`
 - Prompt list (one per session): `diagnostics/GATE0_PROMPTS.md`
 - Validation scores: `diagnostics/gate0_agrimate/validation.md`
+- G0-P methods note: `diagnostics/gate0_agrimate/methods.md` (written; **not accepted**)`
 - Legacy: `sheaf.legacy`, `python scripts/score_legacy_crop.py --crop wheat`
 
 1. Every baseline mechanism cites paper / supplement section, equation, or table.
