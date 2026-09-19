@@ -1,0 +1,163 @@
+{
+  "window": [
+    2006,
+    2008
+  ],
+  "scenario": "harvest_amis",
+  "n_regions": 27,
+  "default_plan_maxiter": 40,
+  "fig4_plan_maxiter": 40,
+  "wheat_params_alpha_i": 3.2,
+  "runs": {
+    "default_40": {
+      "failed": 0,
+      "fallback": 0,
+      "unconverged": 611,
+      "n_solves": 1944,
+      "residual": 0.0,
+      "runtime_s": 7.841828530999919,
+      "pidx_min": 0.030713360744084175,
+      "pidx_max": 3.768823001634713,
+      "pidx_mean": 0.9215412183719839,
+      "n_snaps": 611,
+      "messages": {
+        "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT": 353,
+        "ABNORMAL: ": 258
+      },
+      "status": {
+        "1": 353,
+        "2": 258
+      },
+      "buckets": {
+        "maxiter": 353,
+        "abnormal": 258,
+        "other": 0
+      },
+      "nit_median": 40.0,
+      "nit_max": 40,
+      "pgnorm_median": 1676.183685906298,
+      "pgnorm_p90": 84882.55149997395,
+      "plan_maxiter": 40,
+      "alpha_i": 3.2,
+      "zeta_penalty": 0.0,
+      "n_for_months": 3
+    },
+    "knobs_40": {
+      "failed": 0,
+      "fallback": 0,
+      "unconverged": 553,
+      "n_solves": 1944,
+      "residual": 0.0,
+      "runtime_s": 6.133119242000248,
+      "pidx_min": 0.15278552412225194,
+      "pidx_max": 4.882584998325028,
+      "pidx_mean": 1.4792180314114265,
+      "n_snaps": 553,
+      "messages": {
+        "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT": 455,
+        "ABNORMAL: ": 98
+      },
+      "status": {
+        "1": 455,
+        "2": 98
+      },
+      "buckets": {
+        "maxiter": 455,
+        "abnormal": 98,
+        "other": 0
+      },
+      "nit_median": 40.0,
+      "nit_max": 40,
+      "pgnorm_median": 0.2556807873429437,
+      "pgnorm_p90": 44463.20282441693,
+      "plan_maxiter": 40,
+      "alpha_i": 3.5,
+      "zeta_penalty": 1.0,
+      "n_for_months": 6
+    },
+    "knobs_200": {
+      "failed": 0,
+      "fallback": 0,
+      "unconverged": 115,
+      "n_solves": 1944,
+      "residual": 0.0,
+      "runtime_s": 6.760877160999371,
+      "pidx_min": 0.013207113687717471,
+      "pidx_max": 6.498483585580231,
+      "pidx_mean": 1.1128349046147517,
+      "n_snaps": 115,
+      "messages": {
+        "ABNORMAL: ": 97,
+        "STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT": 18
+      },
+      "status": {
+        "2": 97,
+        "1": 18
+      },
+      "buckets": {
+        "maxiter": 18,
+        "abnormal": 97,
+        "other": 0
+      },
+      "nit_median": 0.0,
+      "nit_max": 200,
+      "pgnorm_median": 9476.457064838909,
+      "pgnorm_p90": 209724.6709785375,
+      "plan_maxiter": 200,
+      "alpha_i": 3.5,
+      "zeta_penalty": 1.0,
+      "n_for_months": 6
+    },
+    "knobs_400": {
+      "failed": 0,
+      "fallback": 0,
+      "unconverged": 117,
+      "n_solves": 1944,
+      "residual": 0.0,
+      "runtime_s": 6.502952384998935,
+      "pidx_min": 0.011566715470172791,
+      "pidx_max": 6.498483585580231,
+      "pidx_mean": 1.0073387063859203,
+      "n_snaps": 117,
+      "messages": {
+        "ABNORMAL: ": 117
+      },
+      "status": {
+        "2": 117
+      },
+      "buckets": {
+        "maxiter": 0,
+        "abnormal": 117,
+        "other": 0
+      },
+      "nit_median": 0.0,
+      "nit_max": 0,
+      "pgnorm_median": 54325.29733508035,
+      "pgnorm_p90": 232643.46518069156,
+      "plan_maxiter": 400,
+      "alpha_i": 3.5,
+      "zeta_penalty": 1.0,
+      "n_for_months": 6
+    }
+  },
+  "knobs_40_vs_200": {
+    "max_abs_pidx": 4.0132866054953,
+    "rmse_pidx": 0.8790480530514747,
+    "corr_pidx": 0.8273306066589068,
+    "max_abs_xi": 22.853584543311
+  },
+  "knobs_40_vs_400": {
+    "max_abs_pidx": 4.0132866054953,
+    "rmse_pidx": 0.9971619520242616,
+    "corr_pidx": 0.7746486077397247,
+    "max_abs_xi": 33.54637870267442
+  },
+  "knobs_200_vs_400": {
+    "max_abs_pidx": 1.0045835849369196,
+    "rmse_pidx": 0.24273923457547916,
+    "corr_pidx": 0.988310344340801,
+    "max_abs_xi": 18.94405267743564
+  },
+  "decision": "leave plan_maxiter=40",
+  "adopted_fig4_knobs": false
+}

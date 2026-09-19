@@ -143,6 +143,11 @@ that honesty*, not because the price path matches Agrimate. G0-P remains
    restore L1–L8 or to pick an arbitrary maxiter. Reproduction of a
    unique Agrimate path is not demonstrated.
 
+**R9 follow-up.** Same split on `fig4_experiment_params()` harvest+AMIS
+2006–08 (`solver_fig4.md`). Failed still 0. Unconverged still counted.
+Labelled maxiter=200/400 probes move p_w; default cap stays 40.
+Fig. 4 knobs not adopted.
+
 ---
 
 ## Step 5 — Undisturbed dynamics (item 3) — fail
