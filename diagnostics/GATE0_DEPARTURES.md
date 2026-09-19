@@ -74,6 +74,9 @@ N5 **Unconverged L-BFGS-B (P5).** Feasible fraction plans with scipy
 kept: more iters move the price path, but 200 vs 400 disagree by a similar
 RMSE, so there is no demonstrated unique stationary point to adopt.
 Writeup: `diagnostics/gate0_agrimate/solver.md`. Not a pin and not L1–L8.
+R9 repeats the count on `fig4_experiment_params()` harvest+AMIS 2006–08
+(`solver_fig4.md`): failed still 0; unconverged still counted; labelled
+maxiter=200/400 probes do **not** raise the default cap and are not adopted.
 
 Agrimate Tbl. D.8 `x_min = 0.2` (quadratic penalty, ζ=0) and linear
 `p_sto = 0.1 / Nyear` are **implemented** (G0-S, from Zenodo 14022004).

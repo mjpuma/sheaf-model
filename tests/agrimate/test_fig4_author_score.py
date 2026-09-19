@@ -14,8 +14,6 @@ from sheaf.agrimate.fig4_config import CANNOT_SET, PROTECTED_THREE_SCENARIO
 from sheaf.agrimate.params import wheat_params
 from sheaf.agrimate.validation import OUT_DEFAULT
 
-ROOT = Path(__file__).resolve().parents[2]
-
 
 def test_wheat_params_not_adopted_after_r10():
     p = wheat_params()
@@ -86,9 +84,6 @@ def test_r10_did_not_overwrite_three_scenario_or_adopt():
     for name in PROTECTED_THREE_SCENARIO:
         assert (OUT_DEFAULT / name).is_file(), name
     assert wheat_params().alpha_i == 3.2
-    dispatch = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
-    assert "Last completed: R10" in dispatch
-    assert "Next paste: R9" in dispatch
 
 
 def test_score_r2_against_author_is_pure_csv():

@@ -10,9 +10,9 @@ the run, rewrite the dispatch from the **numbers you just got**. The
 next session pastes `Next paste`, not `R{n+1}`. Skip IDs that the
 dispatch has already ruled out. Do not open G1/G2.
 
-**Now:** paste **R9**. R10 scored the R2 knobs vs `author_fig4/`
-(not a match; not adopted). G0-P is **not accepted**.
-`wheat_params()` stay 14022004 defaults.
+**Now:** paste **R4**. R9 repeated N5 on Fig. 4 knobs (`plan_maxiter`
+stays 40). G0-P is **not accepted**. `wheat_params()` stay 14022004
+defaults.
 
 ## Adaptive rule (read before picking an ID after R2)
 
@@ -86,13 +86,13 @@ Next session pastes that file's **Next paste**, not the next integer.
 | **R1** | Red team + data cookbook | **done** |
 | **R2** | Labelled Fig. 4-config comparison run | **done** (moy 26.8×→13.3×; next R10) |
 | **R3** | World-price recipe vs author plot | **done** (host identity; 14022004 Julia absent; next still R10) |
-| R4 | Undisturbed XI-split characterisation | adaptive |
+| R4 | Undisturbed XI-split characterisation | **next** |
 | R5 | S4 x1=demand labelled experiment | adaptive |
 | R6 | FAOSTAT FB obtain-or-leave | adaptive / maybe stop |
 | R7 | A8 mean-vs-sum sensitivity (do not rewrite host) | adaptive |
 | R8 | Expand Fig. 4 *score* tests (honest FAIL until match) | piggyback |
-| **R9** | N5 on the Fig. 4 config | **next** |
-| **R10** | Score Fig. 4 config vs author hike/drift/amplitude | **done** (not a match; knobs not adopted; next R9) |
+| **R9** | N5 on the Fig. 4 config | **done** (`plan_maxiter` stays 40; next R4) |
+| **R10** | Score Fig. 4 config vs author hike/drift/amplitude | **done** (not a match; knobs not adopted) |
 | R11 | Re-run default three-scenario | **skip** unless defaults changed (forbidden) |
 | R12 | Methods note v2 | when items 1–5 evidence changed |
 | — | G1 / G2 | **blocked until G0-P accepted** |
