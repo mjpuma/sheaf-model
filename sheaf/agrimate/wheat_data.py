@@ -2,6 +2,11 @@
 
 Data adaptation (not an economic departure): FAOSTAT Food Balances E.1 are
 not in this repository. A_d is not E.30 (merchandise exports absent).
+
+A8 (S1): the 2007–09 baseline is member-sum within year, then mean over
+those years — the same construction as ``psd_regional_annual()``. Stocks
+are USDA ``ending_stocks`` only. Never FAOSTAT FBSH Stock Variation
+(element 5074) as a stock level.
 """
 from __future__ import annotations
 
@@ -21,6 +26,10 @@ from .regions import D9_ALPHA, D9_NU, REGION_NAMES, iso3_to_region
 from .restrictions import restriction_matrix
 
 _CONV = None
+
+# USDA PSD quantity columns. ending_stocks is S; never FAO ΔS (element 5074).
+PSD_QTY_COLS = ("production", "consumption", "exports", "imports", "ending_stocks")
+BASELINE_YEARS = (2007, 2009)
 
 
 def _iso2_to_iso3() -> dict[str, str]:
@@ -93,6 +102,26 @@ def _income_ac(region: str) -> float:
     return 0.40
 
 
+def psd_member_sum_then_mean(
+    psd: pd.DataFrame,
+    year0: int = BASELINE_YEARS[0],
+    year1: int = BASELINE_YEARS[1],
+) -> pd.DataFrame:
+    """Sum PSD members within each year, then mean over ``[year0, year1]``.
+
+    Same construction as ``psd_regional_annual()`` followed by a year-mean.
+    ``psd`` must already carry a ``region`` column. Stocks are USDA
+    ``ending_stocks`` only.
+    """
+    cols = list(PSD_QTY_COLS)
+    window = psd[(psd["year"] >= year0) & (psd["year"] <= year1)]
+    return (
+        window.groupby(["region", "year"])[cols].sum()
+        .groupby("region")
+        .mean()
+    )
+
+
 def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
                   params: AgrimateParams | None = None) -> WheatData:
     params = params or AgrimateParams()
@@ -100,17 +129,22 @@ def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
     n_r = len(regions)
     n_y = params.n_year
     notes = [
-        "Baseline quantities: USDA PSD 2007–09 mean, not FAOSTAT Food Balances (E.1.1).",
+        "Baseline quantities: USDA PSD 2007–09 member-sum then mean, not FAOSTAT Food Balances (E.1.1).",
+        "A8 (S1): multi-country nodes sum PSD members within year (same as psd_regional_annual()), then mean 2007–09.",
+        "Stocks are USDA ending_stocks, never FAOSTAT FBSH Stock Variation (element 5074 / ΔS).",
         "Trade pattern: FAOSTAT E0 2006–07, rescaled to USDA exports.",
         "C.1 wheat nodes: Zenodo 14022004 AgrimateRegionsWheat (27 names).",
         "A_d is not E.30. F.1 Egypt 0.17 unused (Egypt is in Northern Africa).",
         "Starred XI*, XD*, C* used in inverse demand are per-step averages.",
+        "Anomalies use the already-summed member series (groupby region+year production.sum).",
     ]
     psd = load_psd_country("wheat")
-    base = psd[(psd["year"] >= 2007) & (psd["year"] <= 2009)].copy()
-    base["region"] = [_psd_to_region(c, n) for c, n in zip(base["country_code"], base["country_psd"])]
-    base = base.dropna(subset=["region"])
-    g = base.groupby("region")[["production", "consumption", "exports", "imports", "ending_stocks"]].mean()
+    mapped = psd.copy()
+    mapped["region"] = [
+        _psd_to_region(c, n) for c, n in zip(mapped["country_code"], mapped["country_psd"])
+    ]
+    mapped = mapped.dropna(subset=["region"])
+    g = psd_member_sum_then_mean(mapped)
     H_ann = np.array([float(g["production"].get(r, 0.0)) for r in regions])
     C_ann = np.array([float(g["consumption"].get(r, 0.0)) for r in regions])
     X_ann = np.array([float(g["exports"].get(r, 0.0)) for r in regions])
@@ -201,10 +235,8 @@ def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
 
     years = list(range(start_year, end_year + 1))
     anomaly = np.zeros((n_r, len(years)))
-    full = psd.copy()
-    full["region"] = [_psd_to_region(c, n) for c, n in zip(full["country_code"], full["country_psd"])]
-    full = full.dropna(subset=["region"])
-    prod = full.groupby(["region", "year"])["production"].sum().unstack("year")
+    # Already-summed member series (A8). Do not re-mean country-year rows here.
+    prod = mapped.groupby(["region", "year"])["production"].sum().unstack("year")
     for i, r in enumerate(regions):
         if r not in prod.index:
             continue
@@ -266,6 +298,5 @@ def psd_regional_annual(regions: list[str] | None = None) -> pd.DataFrame:
     psd["region"] = [_psd_to_region(c, n) for c, n in zip(psd["country_code"], psd["country_psd"])]
     psd = psd.dropna(subset=["region"])
     psd = psd[psd["region"].isin(regions)]
-    cols = ["production", "consumption", "exports", "imports", "ending_stocks"]
-    g = psd.groupby(["region", "year"])[cols].sum().reset_index()
+    g = psd.groupby(["region", "year"])[list(PSD_QTY_COLS)].sum().reset_index()
     return g

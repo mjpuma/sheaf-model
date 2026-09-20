@@ -22,7 +22,7 @@ Checked 2026-09-20 (R6 obtain): FAOSTAT JSON API FBSH **521**; bulk zip
 
 | Need | Vendored? | Command | Notes |
 |---|---|---|---|
-| USDA PSD country P/C/S | zip + grain extracts | `PYTHONPATH=. python scripts/fetch_external_data.py --psd-only` | No API key. Full `psd_alldata.csv` is gitignored; rebuild from zip. Units 1000 MT → ×1e-3 MMT. |
+| USDA PSD country P/C/S | zip + grain extracts | `PYTHONPATH=. python scripts/fetch_external_data.py --psd-only` | No API key. Units 1000 MT → ×1e-3 MMT. S1: 2007–09 baseline is member-sum then mean (`ending_stocks` is S; never FAO ΔS). |
 | USDA world aggregates | yes | none | `data/usda_world/` (scoring 27-node sum vs world) |
 | FAOSTAT E0 trade shares | yes | none | `data/faostat_network/` — **E0 only**, not Food Balances (A1) |
 | FAOSTAT Food Balances | **raw FBSH yes** / author cleaned **no** | `--faostat-fb` (opt-in) | `data/faostat_fb/` wheat 2006–11 item 2511. Not `wheat_food_balance_fao.csv`. USDA stays `prepare_wheat` default. |

@@ -53,9 +53,9 @@ def psd_construction_table(
 ) -> pd.DataFrame:
     """2007–09 PSD member mean vs sum vs host ``H_annual``.
 
-    ``prepare_wheat`` takes ``groupby(region).mean()`` of country-year rows.
-    ``psd_regional_annual`` sums members within a year. They match iff the
-    node is a single PSD row.
+    S1: ``prepare_wheat`` uses member-sum within year, then mean over
+    2007–09 (same construction as ``psd_regional_annual()``). The pooled
+    country-year mean is reported for the A8 counterexample only.
     """
     data = prepare_wheat(start_year=year0, end_year=year1)
     regions = list(regions or NAMED_REGIONS)
@@ -95,7 +95,7 @@ def psd_construction_table(
             "host_over_psd_sum": (h / sum_p) if sum_p else float("nan"),
             "construction": (
                 "single_psd_row" if n_cty == 1 else
-                "groupby_mean_of_members" if n_cty > 1 else
+                "member_sum" if n_cty > 1 else
                 "unmapped"
             ),
         })
@@ -239,14 +239,16 @@ def write_regional_note(
         )
     lines += [
         "",
-        "## Construction gap (A8, labelled, not fixed)",
+        "## Construction (A8, S1 implemented)",
         "",
-        "`prepare_wheat` baseline (2007–09) uses `groupby(region).mean()` on",
-        "country-year PSD rows. `psd_regional_annual()` **sums** members",
-        "within a year. They match if and only if the node is one PSD row.",
-        "Counterexample, 2007–09 production:",
+        "`prepare_wheat` 2007–09 baseline **sums** PSD members within each",
+        "year, then means over 2007–09 — the same construction as",
+        "`psd_regional_annual()`. Stocks are USDA `ending_stocks`, never",
+        "FAOSTAT FBSH Stock Variation (element 5074). Pooled country-year",
+        "`groupby.mean()` is the rejected A8 construction (R7 labelled).",
+        "2007–09 production:",
         "",
-        "| region | PSD members | host H (mean of rows) | PSD sum | host/sum |",
+        "| region | PSD members | host H (member-sum) | PSD sum | host/sum |",
         "|---|---|---:|---:|---:|",
         f"| USA | {usa['n_psd_members']} ({usa['psd_members']}) | "
         f"{_fmt(usa['model_H_annual'], 1)} | {_fmt(usa['psd_sum_production'], 1)} | "
@@ -258,18 +260,17 @@ def write_regional_note(
         f"{_fmt(ea['model_H_annual'], 2)} | {_fmt(ea['psd_sum_production'], 2)} | "
         f"{_fmt(ea['host_over_psd_sum'], 2)} |",
         "",
-        "China is China+Hong Kong; HK production is ~0, so the mean is",
-        f"~½ of China ({_fmt(ch['model_H_annual'], 1)} vs "
-        f"{_fmt(ch['psd_sum_production'], 1)} MMT). Eastern Africa is the",
-        f"mean of {int(ea['n_psd_members'])} mapped countries "
-        f"({_fmt(ea['model_H_annual'], 2)} vs {_fmt(ea['psd_sum_production'], 2)}).",
+        "China is China+Hong Kong; HK production is ~0, so the *old* mean",
+        f"was ~½ of mainland ({_fmt(ch['psd_mean_production'], 1)} vs "
+        f"{_fmt(ch['psd_sum_production'], 1)} MMT). Eastern Africa's *old*",
+        f"mean of {int(ea['n_psd_members'])} mapped countries was "
+        f"{_fmt(ea['psd_mean_production'], 2)} vs "
+        f"{_fmt(ea['psd_sum_production'], 2)}. Host H now matches the sum.",
         "EU-27 is USDA's single `European Union` aggregate, not 27 ISO3",
         "sums (United Kingdom is Rest of Europe). Verification protocol:",
-        "the claim is A1 node-level USDA; the implementation averages",
-        "members. Mean is not a regional total. **Not fixed in P9** —",
-        "summing would rescale China harvest ×2 and Eastern Africa ×10",
-        "and rewrite the 2003–11 host. That is a data-adapter change,",
-        "not a parameter fit, and not this prompt.",
+        "the claim is A8 member-sum; the implementation matches",
+        "`psd_regional_annual()`. **S1 implemented.** Not a parameter fit.",
+        "Do not retune αI / p_sto / xmin. Do not treat FAO ΔS as stocks.",
         "",
         "Other labelled coverage: calendar-year model stocks vs USDA",
         "marketing year; 27-node sum vs world PSD at the global score;",
@@ -317,21 +318,20 @@ def write_regional_note(
         "2007–09 mean times a LOWESS residual, while PSD is a rising",
         "level. That is Agrimate-style anomaly forcing, not a missing",
         f"knob. China production is {_fmt(_ratio('China'), 2)}× mapped PSD",
-        f"(A8). Eastern Africa production is {_fmt(_ratio('Eastern Africa'), 2)}×",
-        "(A8). Do not fit xmin or p_sto to the stock column: Ukraine",
+        f"(A8 member-sum). Eastern Africa production is {_fmt(_ratio('Eastern Africa'), 2)}×",
+        "(A8 member-sum). Do not fit xmin or p_sto to the stock column: Ukraine",
         f"stocks are {_fmt(_ratio('Ukraine', 'ending_stocks'), 2)}× mapped",
         "PSD; Eastern Africa stocks are "
-        f"{_fmt(_ratio('Eastern Africa', 'ending_stocks'), 2)}× on a tiny",
-        "denominator after the mean-of-members harvest. The world 1.58×",
+        f"{_fmt(_ratio('Eastern Africa', 'ending_stocks'), 2)}×. The world 1.58×",
         "gap in `hindcast.md` is a different comparison (27-node sum vs",
-        "world PSD).",
+        "world PSD; stale until S5 re-score).",
         "",
-        "Eastern Africa *consumption* is not 0.1× PSD: inflows come from",
-        "T* (A2), so the purchaser can eat imported grain even when local",
-        "H is the 10-country mean (ratio "
+        "Eastern Africa *consumption* is not the old 0.1× PSD: inflows come from",
+        "T* (A2), so the purchaser can eat imported grain. Host H is now the",
+        "10-country sum (ratio "
         f"{_fmt(_ratio('Eastern Africa', 'consumption'), 2)}). USA",
         f"consumption is {_fmt(_ratio('USA', 'consumption'), 2)}× mapped",
-        "PSD (2007–08 host ~6 MMT vs PSD ~30) — who-eats / export drain,",
+        "PSD (2007–08 host vs PSD ~30) — who-eats / export drain,",
         "not xmin. Argentina ending stocks are "
         f"{_fmt(_ratio('Argentina', 'ending_stocks'), 2)}×. Those are",
         "labelled regional gaps. Do not fit a storage-cost knob to them.",

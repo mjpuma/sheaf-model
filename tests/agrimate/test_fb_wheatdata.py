@@ -47,7 +47,7 @@ def test_map_drops_china_total_and_aggregates():
     assert inventory()["fbsh_wheat_files"]
 
 
-def test_fbsh_parallel_china_is_sum_not_a8_mean():
+def test_fbsh_parallel_china_is_sum_matching_s1_usda():
     usda = prepare_wheat(start_year=2006, end_year=2008, params=wheat_params())
     fbsh = prepare_wheat_fbsh(start_year=2006, end_year=2008, params=wheat_params())
     assert usda.regions == fbsh.regions
@@ -55,13 +55,17 @@ def test_fbsh_parallel_china_is_sum_not_a8_mean():
     i_us = usda.regions.index("USA")
     i_ea = usda.regions.index("Eastern Africa")
     assert abs(usda.H_annual[i_us] - fbsh.H_annual[i_us]) < 0.5
-    assert fbsh.H_annual[i_cn] / usda.H_annual[i_cn] > 1.5
-    assert fbsh.H_annual[i_ea] / max(usda.H_annual[i_ea], 1e-9) > 5.0
+    # S1: USDA China/EA are member-sum, so they sit next to FBSH H (not 0.50× / 0.10×).
+    assert abs(usda.H_annual[i_cn] / fbsh.H_annual[i_cn] - 1.0) < 0.15
+    assert usda.H_annual[i_cn] > 100.0
+    assert usda.H_annual[i_ea] > 2.0
     assert np.allclose(usda.Psi, fbsh.Psi)
     assert any("PARALLEL" in n for n in fbsh.notes)
     assert wheat_params().alpha_i == 3.2
     tab = quantity_table(usda, fbsh)
     assert set(tab["region"]) == set(usda.regions)
+    # USDA stays default. FBSH is not adopted.
+    assert any("USDA PSD" in n and "not FAOSTAT Food Balances" in n for n in usda.notes)
 
 
 def test_fbsh_module_does_not_import_g1g2():

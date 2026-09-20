@@ -22,7 +22,7 @@ Do not implement G1/G2 here. Do not restore L1–L8 to chase Pink Sheet.
 Post-P12 inventory: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md),
 [`GATE0_DATA.md`](GATE0_DATA.md). R-queue exhausted. Post-R development:
 [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md). Next paste:
-[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S1**).
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S2**).
 
 ## Command
 
@@ -63,7 +63,7 @@ FBSH parallel WheatData vs USDA (R6; does **not** switch `prepare_wheat`):
 PYTHONPATH=. python scripts/score_agrimate_fb_wheatdata.py
 ```
 
-A8 mean-vs-sum sensitivity (R7; does **not** rewrite the host; USDA stocks):
+A8 mean-vs-sum table (R7 labelled; S1 implemented the sum; USDA stocks):
 
 ```bash
 PYTHONPATH=. python scripts/score_agrimate_a8_sum.py
@@ -141,9 +141,9 @@ Agrimate Fig. 4 author series: Zenodo 10688435 unpacked (P7). Score in
 replication. PDF digitisation was not used. G0-H writeup (P8):
 `diagnostics/gate0_agrimate/hindcast.md` — sourced shortfall, not a retune.
 P9: `diagnostics/gate0_agrimate/regional.md` — coverage labelled
-(A8 China 0.50× / Eastern Africa 0.10×); no stock-level fit.
-R7: `diagnostics/gate0_agrimate/a8_sum.md` — 2007–09 H/C/S if members
-summed (USDA ending stocks, not FAO ΔS); host unchanged.
+(A8 member-sum, S1); no stock-level fit.
+R7: `diagnostics/gate0_agrimate/a8_sum.md` — 2007–09 H/C/S mean vs
+sum (USDA ending stocks, not FAO ΔS); S1 implements the sum.
 P10: `diagnostics/gate0_agrimate/faostat_fb.md` — `data/faostat_network/`
 is E0 only; A1 left; USDA default. R6 obtain: raw FBSH at
 `data/faostat_fb/`; author cleaned still absent.
