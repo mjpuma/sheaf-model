@@ -9,7 +9,7 @@ Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
 [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md) is **exhausted.**
 Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
 paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) **Next paste**
-(currently **stay not-accepted**; S5 done; G0-P **not accepted**). Do not paste G1/G2.
+(currently **T1**; S6 done; G0-P **not accepted**). Do not paste G1/G2.
 
 ## Shared preamble (prepend to every prompt)
 

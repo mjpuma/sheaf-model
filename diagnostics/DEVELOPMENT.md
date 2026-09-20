@@ -14,7 +14,7 @@ Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
 Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
 (P0–P12 done). Post-P12 R-queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md)
 (**exhausted**). Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
-next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S5 done**; G0-P **not accepted**; do not start G1).
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S6 done**; G0-P **not accepted**; next **T1** in [`GATE0_CONTINUE.md`](GATE0_CONTINUE.md)).
 Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
 [`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
@@ -236,6 +236,10 @@ approval.
     unconverged 2304/5832. Items 1–3 did **not** newly pass. G0-P
     stays **not accepted**. `wheat_params()` unchanged. Do not start
     G1. Next paste **stay not-accepted** (not S6).
+27. **S6 (done).** G0-P methods v2 from S1–S5 CSVs. Still **not
+    accepted** (last/first 1.444; hike ×3.71; unconverged 2304/5832).
+    `wheat_params()` unchanged. Do not start G1. Continuation:
+    `GATE0_CONTINUE.md` **T1** (obtain-or-leave 14022004 Julia).
 
 Reference command:
 

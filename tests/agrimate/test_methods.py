@@ -30,6 +30,7 @@ def test_g0_p_is_not_accepted():
     assert bar["unconverged_harvest_amis"] == 2304
     assert bar["hike_2008_host"] > 3.0
     assert 1.5 < bar["hike_2008_author"] < 1.9
+    assert abs(float(bar["drift_undisturbed"]) - 1.444) < 0.01
 
 
 def test_methods_note_is_the_market_section_offer():
@@ -47,13 +48,14 @@ def test_methods_note_is_the_market_section_offer():
     assert "USDA" in text and "FAOSTAT" in text
     assert "undisturbed" in text.lower()
     assert "harvest_amis" in text or "harvest+AMIS" in text
-    assert "1743/5832" in text
-    assert "1.63" in text
+    assert "2304/5832" in text
+    assert "1.444" in text or "1.443" in text
     assert "1.004" in text
     assert "G1" in text and "blocked" in text.lower()
     assert "dynamic_policy" in text  # named as not implemented
     assert "A1" in text and "A8" in text
     assert "P11" in text or "restriction_pulse" in text
+    assert "member-sum" in text or "S1" in text
 
 
 def test_methods_module_does_not_import_g1_g2():

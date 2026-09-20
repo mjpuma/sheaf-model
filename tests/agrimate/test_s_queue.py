@@ -1,4 +1,4 @@
-"""Post-R S-queue: S5 re-score done; Next paste stay not-accepted."""
+"""Post-R S-queue: S6 methods v2 done; Next paste T1."""
 from __future__ import annotations
 
 from dataclasses import fields
@@ -8,6 +8,7 @@ import pandas as pd
 
 from sheaf.agrimate.a8_sum import write_r7_dispatch
 from sheaf.agrimate.fb_wheatdata import write_r6_dispatch, write_s3_dispatch
+from sheaf.agrimate.methods import write_s6_dispatch
 from sheaf.agrimate.s4_a7 import write_s4_dispatch
 from sheaf.agrimate.s5_score import write_s5_dispatch
 from sheaf.agrimate.fig4_config import PROTECTED_THREE_SCENARIO
@@ -55,19 +56,17 @@ def test_s1_implements_member_sum():
     assert any("5074" in n for n in d.notes)
 
 
-def test_dispatch_next_paste_is_stay_not_accepted():
+def test_dispatch_next_paste_is_t1():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: S5" in text
-    assert "Next paste: stay not-accepted" in text
-    assert "Next paste: S6" not in text
-    assert "R11" in text
+    assert "Last completed: S6" in text
+    assert "Next paste: T1" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
-    assert "FAO ΔS" in text
-    assert "2006 pin" in text or "pin" in text
-    assert "Bai 10" in text
+    assert "R11" in text
     assert "not accepted" in text.lower()
+    assert "Bai 10" in text
+    assert "freeze_q_oth" in text
 
 
 def test_s2_prompt_forbids_pin_and_l1l8():
@@ -111,7 +110,12 @@ def test_pointers_name_s_queue():
     ):
         body = (ROOT / rel).read_text()
         assert "GATE0_NEXT_PROMPTS.md" in body, rel
-        assert "S5" in body, rel
+        assert "S6" in body or "S5" in body, rel
+    cont = (ROOT / "diagnostics" / "GATE0_CONTINUE.md").read_text()
+    assert "Task T1 only" in cont
+    assert "Do not copy Julia" in cont
+    assert "Do not start G1" in cont
+    assert "freeze_q_oth" in cont
     repro = (ROOT / "diagnostics" / "GATE0_REPRO_PROMPTS.md").read_text()
     assert "exhausted" in repro.lower()
     dep = (ROOT / "diagnostics" / "GATE0_DEPARTURES.md").read_text()
@@ -127,7 +131,7 @@ def test_r7_dispatch_writer_does_not_clobber_s5(tmp_path):
     living = tmp_path / "GATE0_REPRO_DISPATCH.md"
     living.write_text(DISPATCH.read_text())
     before = living.read_text()
-    assert "Last completed: S5" in before
+    assert "Last completed: S6" in before
     from sheaf.agrimate.a8_sum import a8_mean_vs_sum_table
 
     tab = a8_mean_vs_sum_table()
@@ -378,9 +382,40 @@ def test_s5_rescored_from_csvs_not_r11():
 
 def test_s5_dispatch_writer_does_not_clobber_later(tmp_path):
     living = tmp_path / "GATE0_REPRO_DISPATCH.md"
-    living.write_text("Last completed: S6\nNext paste: G1\n")
+    living.write_text("Last completed: S6\nNext paste: T1\n")
     from sheaf.agrimate.s5_score import live_s5_metrics
     metrics = live_s5_metrics()
     write_s5_dispatch(metrics, path=living)
-    assert living.read_text() == "Last completed: S6\nNext paste: G1\n"
+    assert living.read_text() == "Last completed: S6\nNext paste: T1\n"
+
+
+def test_s6_methods_v2_still_rejects():
+    from sheaf.agrimate.methods import publication_bar
+
+    note = (OUT_DEFAULT / "methods.md").read_text()
+    assert "S6" in note or "methods note (G0-P / S6)" in note
+    assert "not accepted" in note.lower()
+    assert "Recommend reject" in note
+    assert "2304/5832" in note
+    assert "1.444" in note or "1.443" in note
+    assert "×3.71" in note or "×3.7" in note
+    assert "L1–L8" in note
+    assert "Do not start G1" in note
+    assert "member-sum" in note
+    bar = publication_bar()
+    assert bar["accepted"] is False
+    assert abs(float(bar["drift_undisturbed"]) - 1.444) < 0.01
+    assert bar["unconverged_harvest_amis"] == 2304
+    assert wheat_params().alpha_i == 3.2
+    for name in PROTECTED_THREE_SCENARIO:
+        assert (OUT_DEFAULT / name).is_file(), name
+
+
+def test_s6_dispatch_writer_does_not_clobber_later(tmp_path):
+    living = tmp_path / "GATE0_REPRO_DISPATCH.md"
+    living.write_text("Last completed: T1\nNext paste: T2\n")
+    from sheaf.agrimate.methods import publication_bar
+    write_s6_dispatch(publication_bar(), path=living)
+    assert living.read_text() == "Last completed: T1\nNext paste: T2\n"
+
 
