@@ -1,33 +1,42 @@
 ## undisturbed
-Baseline quantities: USDA PSD 2007–09 mean, not FAOSTAT Food Balances (E.1.1).
+Baseline quantities: USDA PSD 2007–09 member-sum then mean, not FAOSTAT Food Balances (E.1.1).
+A8 (S1): multi-country nodes sum PSD members within year (same as psd_regional_annual()), then mean 2007–09.
+Stocks are USDA ending_stocks, never FAOSTAT FBSH Stock Variation (element 5074 / ΔS).
 Trade pattern: FAOSTAT E0 2006–07, rescaled to USDA exports.
 C.1 wheat nodes: Zenodo 14022004 AgrimateRegionsWheat (27 names).
 A_d is not E.30. F.1 Egypt 0.17 unused (Egypt is in Northern Africa).
 Starred XI*, XD*, C* used in inverse demand are per-step averages.
+Anomalies use the already-summed member series (groupby region+year production.sum).
 AMIS wheat Δ: 491 region-steps, max=0.95, regions=['Argentina', 'China', 'India', 'Kazakhstan', 'Russia', 'Ukraine', 'Northern Africa'].
 Nash IBR: 0 iters, err=2.100e-16, success=True.
-Supplier solves: failed=0, fallback=0, unconverged=1583 of 5832.
-Inverse-demand floor binds: offer=0, plan-path=74110; max plan residual=0.000e+00; runtime=14.5s.
+Supplier solves: failed=0, fallback=0, unconverged=1990 of 5832.
+Inverse-demand floor binds: offer=0, plan-path=60373; max plan residual=0.000e+00; runtime=17.7s.
 
 ## harvest
-Baseline quantities: USDA PSD 2007–09 mean, not FAOSTAT Food Balances (E.1.1).
+Baseline quantities: USDA PSD 2007–09 member-sum then mean, not FAOSTAT Food Balances (E.1.1).
+A8 (S1): multi-country nodes sum PSD members within year (same as psd_regional_annual()), then mean 2007–09.
+Stocks are USDA ending_stocks, never FAOSTAT FBSH Stock Variation (element 5074 / ΔS).
 Trade pattern: FAOSTAT E0 2006–07, rescaled to USDA exports.
 C.1 wheat nodes: Zenodo 14022004 AgrimateRegionsWheat (27 names).
 A_d is not E.30. F.1 Egypt 0.17 unused (Egypt is in Northern Africa).
 Starred XI*, XD*, C* used in inverse demand are per-step averages.
+Anomalies use the already-summed member series (groupby region+year production.sum).
 AMIS wheat Δ: 491 region-steps, max=0.95, regions=['Argentina', 'China', 'India', 'Kazakhstan', 'Russia', 'Ukraine', 'Northern Africa'].
 Nash IBR: 0 iters, err=2.100e-16, success=True.
-Supplier solves: failed=0, fallback=0, unconverged=1628 of 5832.
-Inverse-demand floor binds: offer=0, plan-path=68519; max plan residual=0.000e+00; runtime=19.5s.
+Supplier solves: failed=0, fallback=0, unconverged=2161 of 5832.
+Inverse-demand floor binds: offer=0, plan-path=54754; max plan residual=0.000e+00; runtime=22.1s.
 
 ## harvest_amis
-Baseline quantities: USDA PSD 2007–09 mean, not FAOSTAT Food Balances (E.1.1).
+Baseline quantities: USDA PSD 2007–09 member-sum then mean, not FAOSTAT Food Balances (E.1.1).
+A8 (S1): multi-country nodes sum PSD members within year (same as psd_regional_annual()), then mean 2007–09.
+Stocks are USDA ending_stocks, never FAOSTAT FBSH Stock Variation (element 5074 / ΔS).
 Trade pattern: FAOSTAT E0 2006–07, rescaled to USDA exports.
 C.1 wheat nodes: Zenodo 14022004 AgrimateRegionsWheat (27 names).
 A_d is not E.30. F.1 Egypt 0.17 unused (Egypt is in Northern Africa).
 Starred XI*, XD*, C* used in inverse demand are per-step averages.
+Anomalies use the already-summed member series (groupby region+year production.sum).
 AMIS wheat Δ: 491 region-steps, max=0.95, regions=['Argentina', 'China', 'India', 'Kazakhstan', 'Russia', 'Ukraine', 'Northern Africa'].
 Nash IBR: 0 iters, err=2.100e-16, success=True.
-Supplier solves: failed=0, fallback=0, unconverged=1743 of 5832.
-Inverse-demand floor binds: offer=0, plan-path=68018; max plan residual=0.000e+00; runtime=19.9s.
+Supplier solves: failed=0, fallback=0, unconverged=2304 of 5832.
+Inverse-demand floor binds: offer=0, plan-path=54475; max plan residual=0.000e+00; runtime=22.9s.
 
