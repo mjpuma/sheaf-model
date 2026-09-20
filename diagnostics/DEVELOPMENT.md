@@ -14,7 +14,7 @@ Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
 Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
 (P0–P12 done). Post-P12 R-queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md)
 (**exhausted**). Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
-next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S2**).
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S3**).
 Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
 [`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
@@ -107,7 +107,8 @@ approval.
    That is a G0-H score, not a reason to restore L1–L8. G0-U exit is the
    **workflow**, not publication-quality hindcast. **R-science is exhausted.**
    Remaining gaps are labelled (item-3 wander, A7 cannot-set, A1 USDA).
-   **S1 implemented** A8 member-sum. Next paste **S2**
+   **S1 implemented** A8 member-sum. **S2 labelled** item 3 at 1.444
+   (no sourced D.22; freeze not adopted). Next paste **S3**
    (`GATE0_NEXT_PROMPTS.md`), not R8.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
 5. **P1 (done).** Step identities on 2006 harvest+AMIS.
@@ -177,7 +178,7 @@ approval.
     Items 3 and 5 still fail; tests lock honesty not Fig. 4 match;
     fetch does not download Zenodo or FAO FB. Adaptive queue:
     `GATE0_REPRO_PROMPTS.md` (exhausted). Living next-paste:
-    `GATE0_REPRO_DISPATCH.md` (**S1**; `GATE0_NEXT_PROMPTS.md`).
+    `GATE0_REPRO_DISPATCH.md` (**S3**; `GATE0_NEXT_PROMPTS.md`).
 18. **R2 (done).** `fig4_experiment_params()` is αI=3.5, ζ=1, N_for=6.
     FAO/EU28/start-2000 cannot-set. Short 2006–08 harvest+AMIS: moy
     26.8×→13.3× (drop ≥2); hike ×2.31→×2.22 (barely). Unconverged
@@ -191,11 +192,17 @@ approval.
 20. **R-science exhausted.** First-match table has nowhere to go without
     breaking hard stops (R11 forbidden; freeze not sourced; FAO/EU28
     cannot-set; labelled-off experiments did not move live items 1–3).
-    Remaining gaps after S1: live item-3 wander, A7 cannot-set, A1 USDA.
+    Remaining gaps after S2: A7 cannot-set, A1 USDA (item 3 labelled
+    1.444 vs author 1.004; freeze not sourced).
 21. **S1 (done).** `prepare_wheat` 2007–09 baseline is member-sum then
     mean (same as `psd_regional_annual()`). USDA `ending_stocks` only.
     Never FAO ΔS. China H 56.4→112.7, Eastern Africa 0.33→3.31, USA
     1.00. `wheat_params()` stay 14022004. Next paste **S2**.
+22. **S2 (done).** Member-sum host undisturbed last/first **1.444** vs
+    author **1.004** (pre-S1 1.630). Still >1.1. No sourced D.22
+    variant (0 `*.jl` in tree). `freeze_q_oth` stays diagnostic,
+    default off, not a `wheat_params()` field. Not adopted. Not a pin.
+    Writeup: `diagnostics/gate0_agrimate/item3.md`. Next paste **S3**.
 
 Reference command:
 

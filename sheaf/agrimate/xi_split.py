@@ -4,10 +4,14 @@ Item 3: host 2011/2006 last/first ≈ 1.63 vs author 1.004. B1 delivery did
 not move p_w. Candidates (labelled probes, defaults unchanged): xmin
 penalty (ζ=1 off), Jacobi D.22 q_oth EMA (frozen), rolling-year replan
 (calendar stride=24). No decay knob. No L1–L8.
+
+S2: re-measure last/first on the S1 member-sum host from the existing
+three-scenario prices. Still >1.1; no sourced D.22 variant. Label and
+stop. freeze_q_oth stays diagnostic, default off, not wheat_params().
 """
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import fields, replace
 from pathlib import Path
 
 import numpy as np
@@ -16,7 +20,7 @@ import pandas as pd
 from .fig4 import AUTHOR_DIR, author_undisturbed_drift, load_author_fig4
 from .fig4_config import PROTECTED_THREE_SCENARIO, _last_first
 from .model import AgrimateResult, run_agrimate
-from .params import wheat_params
+from .params import AgrimateParams, wheat_params
 from .validation import OUT_DEFAULT, monthly_price, step_years
 from .wheat_data import prepare_wheat
 
@@ -322,7 +326,10 @@ def write_xi_split_note(annual: pd.DataFrame, summary: pd.DataFrame,
 
 
 def write_r4_dispatch(summary: pd.DataFrame, path: Path | None = None) -> Path:
+    """Historical R4 writer. Does not clobber a moved living dispatch."""
     path = Path(path) if path else DISPATCH
+    if path.is_file() and "Last completed: R4" not in path.read_text():
+        return path
     d = summary[summary["label"] == "default"].iloc[0]
     closest = _closest_probe(summary)
     c = summary[summary["label"] == closest].iloc[0]
@@ -376,3 +383,179 @@ def run_xi_split_score(out_dir: Path | None = None) -> dict[str, Path]:
         "note": note, "annual": annual_path, "csv": summary_path,
         "dispatch": dispatch,
     }
+
+
+def n_julia_sources(root: Path | None = None) -> int:
+    """Count in-tree author Julia. 14022004 is not vendored."""
+    root = Path(root) if root else ROOT
+    return sum(1 for p in root.rglob("*.jl") if ".git" not in p.parts)
+
+
+def live_host_last_first(prices_path: Path | None = None) -> dict:
+    """Undisturbed 2011/2006 last/first from the living three-scenario CSV.
+
+    Does not re-run NLP. Does not freeze q_oth. Does not pin.
+    """
+    path = Path(prices_path) if prices_path else OUT_DEFAULT / "prices_three_scenarios.csv"
+    df = pd.read_csv(path, index_col=0)
+    idx = pd.PeriodIndex(df.index, freq="M")
+    s = pd.Series(df["undisturbed"].to_numpy(float), index=idx)
+    window = s[(s.index.year >= SCORE_START) & (s.index.year <= SCORE_END)]
+    first = float(window[window.index.year == SCORE_START].mean())
+    last = float(window[window.index.year == SCORE_END].mean())
+    author = author_undisturbed_drift(
+        load_author_fig4(AUTHOR_DIR)["monthly"], SCORE_START, SCORE_END)
+    p = wheat_params()
+    param_names = {f.name for f in fields(AgrimateParams)}
+    return {
+        "last_first": _last_first(window),
+        "mean_first_usd": first,
+        "mean_last_usd": last,
+        "last_first_author": float(author["last_over_first"]),
+        "author_first": float(author["annual_mean_first"]),
+        "author_last": float(author["annual_mean_last"]),
+        "n_julia": n_julia_sources(),
+        "freeze_q_oth_on_params": "freeze_q_oth" in param_names,
+        "alpha_i": p.alpha_i,
+        "zeta_penalty": p.zeta_penalty,
+        "n_for_months": p.n_for_months,
+        "p_sto_annual": p.p_sto_annual,
+        "xmin_share": p.xmin_share,
+        "pre_s1_last_first": 1.630,
+        "r4_freeze_last_first": 1.019,
+    }
+
+
+def write_s2_item3_note(metrics: dict, out_dir: Path) -> Path:
+    """Label item 3 on the member-sum host. Does not adopt freeze."""
+    p = wheat_params()
+    lf = float(metrics["last_first"])
+    author = float(metrics["last_first_author"])
+    lines = [
+        "# S2 — Item 3 re-measure on the A8 member-sum host",
+        "",
+        "Not a pin. Not a freeze. Not a decay knob. Not L1–L8. Not an αI",
+        f"retune. `wheat_params()` stay αI={p.alpha_i:g}, ζ={p.zeta_penalty:g},",
+        f"N_for={p.n_for_months:g}, p_sto={p.p_sto_annual:g}, xmin={p.xmin_share:g}.",
+        "Fig. 4 knobs stay on the comparison object. G1/G2 stay blocked.",
+        "",
+        "## Verification protocol (CLAUDE.md)",
+        "",
+        "1. **Claim.** DEVELOPMENT item 3 / Agrimate undisturbed: after",
+        "spin-up, repeating seasonal behaviour. Author Fig. 4 baseline",
+        "last/first of the annual-mean world-price index 2011/2006 =",
+        f"**{_fmt(author, 3)}**.",
+        "",
+        "2. **Implementation.** D.22 `q_oth` EMA in `sheaf/agrimate/model.py`",
+        "(`AgrimateSim.__init__` `freeze_q_oth=False`; init",
+        "`q_oth = max(XI*_world − XI*_r, 1e-9)`; each step",
+        "`q_oth = (1−w_exp)·q_oth + w_exp·realized_oth` unless freeze).",
+        "`freeze_q_oth` is an `AgrimateSim` / `run_agrimate` kwarg, **not**",
+        "an `AgrimateParams` field and **not** in `wheat_params()`.",
+        "",
+        "3. **Match.** Live host still updates `q_oth` (D.22). N2 rolling",
+        "year (`replan_stride=1`) and N3 Jacobi IBR unchanged. Author D.22",
+        "still updates `q_oth` (R4 / `GATE0_DEPARTURES.md`).",
+        "",
+        "4. **Counterexample.** On the S1 member-sum host, undisturbed",
+        f"`prices_three_scenarios.csv` 2006–11 last/first = **{_fmt(lf, 3)}**",
+        f"(USD annual mean ${_fmt(metrics['mean_first_usd'], 2)} → "
+        f"${_fmt(metrics['mean_last_usd'], 2)}). Author **{_fmt(author, 3)}**",
+        f"(index {_fmt(metrics['author_first'], 3)} → "
+        f"{_fmt(metrics['author_last'], 3)}). Pre-S1 pooled-mean host was",
+        f"**{_fmt(metrics['pre_s1_last_first'], 3)}**. Member-sum moved the",
+        "ratio; it did not recover Agrimate. Threshold 1.1 still failed.",
+        "",
+        "5. **Correctness argument (do not adopt freeze).** R4",
+        f"`qoth_freeze` last/first **{_fmt(metrics['r4_freeze_last_first'], 3)}**",
+        "on the *pre-S1* host was a diagnostic isolation. Author still",
+        "updates `q_oth` and still has last/first ≈ 1. There is **no**",
+        "sourced D.22 variant in retrieved 14022004 wheat: this tree has",
+        f"**{int(metrics['n_julia'])}** `*.jl` files.",
+        "`scripts/fetch_external_data.py` does not mention 14022004.",
+        "`freeze_q_oth` is not an `AgrimateParams` field (absent, as",
+        "required). Without a sourced freeze (or other D.22 variant) from",
+        "author wheat code, adopting it would be a new economic law, not a",
+        "copy. Label and stop.",
+        "",
+        "6. **Change.** None to economics. This note labels item 3 on the",
+        "member-sum host. `freeze_q_oth` stays default False. Do not pin",
+        "the unforced world price to the 2006 mean. Do not restore L1–L8.",
+        "",
+        "## Live score (USD, 2006–11, from prices_three_scenarios.csv)",
+        "",
+        "| object | last/first | 2006 mean | 2011 mean |",
+        "|---|---:|---:|---:|",
+        f"| Host undisturbed | {_fmt(lf, 3)} | "
+        f"{_fmt(metrics['mean_first_usd'], 2)} | "
+        f"{_fmt(metrics['mean_last_usd'], 2)} |",
+        f"| Author Fig. 4 baseline | {_fmt(author, 3)} | "
+        f"{_fmt(metrics['author_first'], 3)} (index) | "
+        f"{_fmt(metrics['author_last'], 3)} (index) |",
+        f"| Pre-S1 host (R4 default) | {_fmt(metrics['pre_s1_last_first'], 3)} | — | — |",
+        f"| R4 qoth_freeze (pre-S1, not adopted) | "
+        f"{_fmt(metrics['r4_freeze_last_first'], 3)} | — | — |",
+        "",
+        "G0-P item 3 remains **fail**. Historical R4 probes stay in",
+        "`xi_split.md` (including that note's **Next paste: R5**).",
+        "**Next paste: S3.** A1 after A8 (USDA `ending_stocks` only;",
+        "never FAO ΔS as stocks). Do not start G1/G2.",
+        "",
+    ]
+    path = Path(out_dir) / "item3.md"
+    path.write_text("\n".join(lines))
+    return path
+
+
+def write_s2_dispatch(metrics: dict, path: Path | None = None) -> Path:
+    """Living S2 writer. Does not clobber a later S-session dispatch."""
+    path = Path(path) if path else DISPATCH
+    if path.is_file():
+        text = path.read_text()
+        if "Last completed: S1" not in text and "Last completed: S2" not in text:
+            return path
+    lf = _fmt(metrics["last_first"], 3)
+    author = _fmt(metrics["last_first_author"], 3)
+    body = "\n".join([
+        "# Gate 0 reproduction dispatch",
+        "",
+        "Living next-paste. R-science queue exhausted. Template:",
+        "`GATE0_NEXT_PROMPTS.md` (S1–S6). Do not walk R8…R12 as science.",
+        "",
+        "```",
+        "Last completed: S2",
+        "Window / scenario: 2003–11 undisturbed last/first on USDA member-sum host",
+        "hike_2008 harvest+AMIS 2006–08: ×3.71 (S1; author ×1.62)",
+        "moy max/min harvest+AMIS: 16.8× (author 1.45×)",
+        f"undisturbed last/first: {lf} vs author {author} (was 1.630 pre-S1)",
+        "unconverged / failed: harvest+AMIS 2304 / 0 (S1; not re-run)",
+        "What you could set / could not set: item 3 labelled; no sourced D.22; freeze not adopted; USDA S; A7 cannot-set",
+        "Next paste: S3",
+        f"Why: last/first {lf} > 1.1; 0 Julia; freeze stays diagnostic default off; do not pin",
+        "Skip: R8-as-science; R11; G1/G2; 2006 pin; Bai 10; L1–L8; FAO ΔS as stocks",
+        "```",
+    ])
+    path.write_text(body + "\n")
+    return path
+
+
+def run_s2_item3_score(out_dir: Path | None = None) -> dict[str, Path]:
+    """Label item 3 from living prices. Does not re-run NLP or freeze probes."""
+    out_dir = Path(out_dir) if out_dir else OUT_DEFAULT
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for name in PROTECTED_THREE_SCENARIO:
+        assert (out_dir / name).is_file(), name
+    before = {name: (out_dir / name).read_bytes() for name in PROTECTED_THREE_SCENARIO}
+    metrics = live_host_last_first(out_dir / "prices_three_scenarios.csv")
+    assert metrics["last_first"] > 1.1
+    assert metrics["n_julia"] == 0
+    assert metrics["freeze_q_oth_on_params"] is False
+    assert wheat_params().alpha_i == 3.2
+    assert wheat_params().zeta_penalty == 0.0
+    csv_path = out_dir / "score_item3.csv"
+    pd.DataFrame([metrics]).to_csv(csv_path, index=False)
+    note = write_s2_item3_note(metrics, out_dir)
+    dispatch = write_s2_dispatch(metrics)
+    after = {name: (out_dir / name).read_bytes() for name in PROTECTED_THREE_SCENARIO}
+    assert before == after, "S2 must not overwrite 2003–11 three-scenario CSVs"
+    return {"note": note, "csv": csv_path, "dispatch": dispatch}

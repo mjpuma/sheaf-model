@@ -50,9 +50,13 @@ Because p_w is inverse demand on **international** volume, the annual mean
 moves when the **xd/xi split** is not periodic under constant H. Undisturbed
 annual XI still wanders 164–254 MMT (2004 vs 2005) after the delivery fix.
 **R4** (`xi_split.md`): live D.22 `q_oth` EMA is the last/first channel on
-this host (freeze → 1.019 vs author 1.004 vs live 1.630). xmin_off 0.548
-and calendar_replan 0.523 overshoot. Freeze is a diagnostic isolation, not
-adopted — author still updates q_oth. Do not pin. Do not add a decay knob.
+this host (freeze → 1.019 vs author 1.004 vs live 1.630 on the pre-S1
+pooled-mean host). xmin_off 0.548 and calendar_replan 0.523 overshoot.
+Freeze is a diagnostic isolation, not adopted — author still updates
+q_oth. **S2** (`item3.md`): after A8 member-sum, last/first is **1.444**
+($45.82 → $66.15) vs author 1.004. Still >1.1. No sourced D.22 variant
+(0 `*.jl` in tree). `freeze_q_oth` stays default off, not a
+`wheat_params()` field. Do not pin. Do not add a decay knob.
 
 | Candidate | Price mean | Stock balloon |
 |---|---|---|
@@ -62,7 +66,7 @@ adopted — author still updates q_oth. Do not pin. Do not add a decay knob.
 | Harvest vs C* | Seasonality | No (H*=C*) |
 | Own-XI echo | **No** (p_w on XI) | **Yes — fixed** |
 | Non-periodic XI split | volume still wanders | No |
-| Live D.22 q_oth EMA | **Yes, last/first 1.630** (R4 freeze 1.019, not adopted) | No |
+| Live D.22 q_oth EMA | **Yes, last/first 1.444** after S1 (pre-S1 1.630; R4 freeze 1.019, not adopted) | No |
 
 ## What this is not
 
