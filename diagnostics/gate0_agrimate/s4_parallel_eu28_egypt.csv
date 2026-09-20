@@ -1,0 +1,255 @@
+region,iso3,source
+USA,USA,parallel_eu28_egypt
+Ukraine,UKR,parallel_eu28_egypt
+Argentina,ARG,parallel_eu28_egypt
+Eastern Africa,ATF,parallel_eu28_egypt
+Eastern Africa,BDI,parallel_eu28_egypt
+Eastern Africa,COM,parallel_eu28_egypt
+Eastern Africa,DJI,parallel_eu28_egypt
+Eastern Africa,ERI,parallel_eu28_egypt
+Eastern Africa,ETH,parallel_eu28_egypt
+Eastern Africa,IOT,parallel_eu28_egypt
+Eastern Africa,KEN,parallel_eu28_egypt
+Eastern Africa,MDG,parallel_eu28_egypt
+Eastern Africa,MOZ,parallel_eu28_egypt
+Eastern Africa,MUS,parallel_eu28_egypt
+Eastern Africa,MWI,parallel_eu28_egypt
+Eastern Africa,MYT,parallel_eu28_egypt
+Eastern Africa,REU,parallel_eu28_egypt
+Eastern Africa,RWA,parallel_eu28_egypt
+Eastern Africa,SOM,parallel_eu28_egypt
+Eastern Africa,SSD,parallel_eu28_egypt
+Eastern Africa,SYC,parallel_eu28_egypt
+Eastern Africa,TZA,parallel_eu28_egypt
+Eastern Africa,UGA,parallel_eu28_egypt
+Eastern Africa,ZMB,parallel_eu28_egypt
+Eastern Africa,ZWE,parallel_eu28_egypt
+Central America,ABW,parallel_eu28_egypt
+Central America,AIA,parallel_eu28_egypt
+Central America,ANT,parallel_eu28_egypt
+Central America,ATG,parallel_eu28_egypt
+Central America,BES,parallel_eu28_egypt
+Central America,BHS,parallel_eu28_egypt
+Central America,BLM,parallel_eu28_egypt
+Central America,BLZ,parallel_eu28_egypt
+Central America,BMU,parallel_eu28_egypt
+Central America,BRB,parallel_eu28_egypt
+Central America,CRI,parallel_eu28_egypt
+Central America,CUB,parallel_eu28_egypt
+Central America,CUW,parallel_eu28_egypt
+Central America,CYM,parallel_eu28_egypt
+Central America,DMA,parallel_eu28_egypt
+Central America,DOM,parallel_eu28_egypt
+Central America,GLP,parallel_eu28_egypt
+Central America,GRD,parallel_eu28_egypt
+Central America,GTM,parallel_eu28_egypt
+Central America,HND,parallel_eu28_egypt
+Central America,HTI,parallel_eu28_egypt
+Central America,JAM,parallel_eu28_egypt
+Central America,KNA,parallel_eu28_egypt
+Central America,LCA,parallel_eu28_egypt
+Central America,MAF,parallel_eu28_egypt
+Central America,MEX,parallel_eu28_egypt
+Central America,MSR,parallel_eu28_egypt
+Central America,MTQ,parallel_eu28_egypt
+Central America,NIC,parallel_eu28_egypt
+Central America,PAN,parallel_eu28_egypt
+Central America,PRI,parallel_eu28_egypt
+Central America,SLV,parallel_eu28_egypt
+Central America,SXM,parallel_eu28_egypt
+Central America,TCA,parallel_eu28_egypt
+Central America,TTO,parallel_eu28_egypt
+Central America,VCT,parallel_eu28_egypt
+Central America,VGB,parallel_eu28_egypt
+Central America,VIR,parallel_eu28_egypt
+Middle Africa,AGO,parallel_eu28_egypt
+Middle Africa,CAF,parallel_eu28_egypt
+Middle Africa,CMR,parallel_eu28_egypt
+Middle Africa,COD,parallel_eu28_egypt
+Middle Africa,COG,parallel_eu28_egypt
+Middle Africa,GAB,parallel_eu28_egypt
+Middle Africa,GNQ,parallel_eu28_egypt
+Middle Africa,STP,parallel_eu28_egypt
+Middle Africa,TCD,parallel_eu28_egypt
+Rest of Eastern Asia,JPN,parallel_eu28_egypt
+Rest of Eastern Asia,KOR,parallel_eu28_egypt
+Rest of Eastern Asia,MNG,parallel_eu28_egypt
+Rest of Eastern Asia,PRK,parallel_eu28_egypt
+Rest of South America,BOL,parallel_eu28_egypt
+Rest of South America,BVT,parallel_eu28_egypt
+Rest of South America,CHL,parallel_eu28_egypt
+Rest of South America,COL,parallel_eu28_egypt
+Rest of South America,ECU,parallel_eu28_egypt
+Rest of South America,FLK,parallel_eu28_egypt
+Rest of South America,GUF,parallel_eu28_egypt
+Rest of South America,GUY,parallel_eu28_egypt
+Rest of South America,PER,parallel_eu28_egypt
+Rest of South America,PRY,parallel_eu28_egypt
+Rest of South America,SGS,parallel_eu28_egypt
+Rest of South America,SUR,parallel_eu28_egypt
+Rest of South America,URY,parallel_eu28_egypt
+Rest of South America,VEN,parallel_eu28_egypt
+Rest of South America,BRA,parallel_eu28_egypt
+Northern Africa,DZA,parallel_eu28_egypt
+Northern Africa,ESH,parallel_eu28_egypt
+Northern Africa,LBY,parallel_eu28_egypt
+Northern Africa,MAR,parallel_eu28_egypt
+Northern Africa,SDN,parallel_eu28_egypt
+Northern Africa,TUN,parallel_eu28_egypt
+Rest of Southern Asia,AFG,parallel_eu28_egypt
+Rest of Southern Asia,BGD,parallel_eu28_egypt
+Rest of Southern Asia,BTN,parallel_eu28_egypt
+Rest of Southern Asia,IRN,parallel_eu28_egypt
+Rest of Southern Asia,LKA,parallel_eu28_egypt
+Rest of Southern Asia,MDV,parallel_eu28_egypt
+Rest of Southern Asia,NPL,parallel_eu28_egypt
+Kazakhstan,KAZ,parallel_eu28_egypt
+South-Eastern Asia,BRN,parallel_eu28_egypt
+South-Eastern Asia,IDN,parallel_eu28_egypt
+South-Eastern Asia,KHM,parallel_eu28_egypt
+South-Eastern Asia,LAO,parallel_eu28_egypt
+South-Eastern Asia,MMR,parallel_eu28_egypt
+South-Eastern Asia,MYS,parallel_eu28_egypt
+South-Eastern Asia,PHL,parallel_eu28_egypt
+South-Eastern Asia,SGP,parallel_eu28_egypt
+South-Eastern Asia,THA,parallel_eu28_egypt
+South-Eastern Asia,TLS,parallel_eu28_egypt
+South-Eastern Asia,VNM,parallel_eu28_egypt
+India,IND,parallel_eu28_egypt
+EU-28,AUT,parallel_eu28_egypt
+EU-28,BEL,parallel_eu28_egypt
+EU-28,BGR,parallel_eu28_egypt
+EU-28,CYP,parallel_eu28_egypt
+EU-28,CZE,parallel_eu28_egypt
+EU-28,DEU,parallel_eu28_egypt
+EU-28,DNK,parallel_eu28_egypt
+EU-28,ESP,parallel_eu28_egypt
+EU-28,EST,parallel_eu28_egypt
+EU-28,FIN,parallel_eu28_egypt
+EU-28,FRA,parallel_eu28_egypt
+EU-28,GRC,parallel_eu28_egypt
+EU-28,HRV,parallel_eu28_egypt
+EU-28,HUN,parallel_eu28_egypt
+EU-28,IRL,parallel_eu28_egypt
+EU-28,ITA,parallel_eu28_egypt
+EU-28,LTU,parallel_eu28_egypt
+EU-28,LUX,parallel_eu28_egypt
+EU-28,LVA,parallel_eu28_egypt
+EU-28,MLT,parallel_eu28_egypt
+EU-28,NLD,parallel_eu28_egypt
+EU-28,POL,parallel_eu28_egypt
+EU-28,PRT,parallel_eu28_egypt
+EU-28,ROU,parallel_eu28_egypt
+EU-28,SVK,parallel_eu28_egypt
+EU-28,SVN,parallel_eu28_egypt
+EU-28,SWE,parallel_eu28_egypt
+EU-28,GBR,parallel_eu28_egypt
+Canada,CAN,parallel_eu28_egypt
+Rest of Europe,ALA,parallel_eu28_egypt
+Rest of Europe,ALB,parallel_eu28_egypt
+Rest of Europe,AND,parallel_eu28_egypt
+Rest of Europe,BIH,parallel_eu28_egypt
+Rest of Europe,BLR,parallel_eu28_egypt
+Rest of Europe,CHE,parallel_eu28_egypt
+Rest of Europe,FRO,parallel_eu28_egypt
+Rest of Europe,GGY,parallel_eu28_egypt
+Rest of Europe,GIB,parallel_eu28_egypt
+Rest of Europe,IMN,parallel_eu28_egypt
+Rest of Europe,ISL,parallel_eu28_egypt
+Rest of Europe,JEY,parallel_eu28_egypt
+Rest of Europe,LIE,parallel_eu28_egypt
+Rest of Europe,MCO,parallel_eu28_egypt
+Rest of Europe,MDA,parallel_eu28_egypt
+Rest of Europe,MKD,parallel_eu28_egypt
+Rest of Europe,MNE,parallel_eu28_egypt
+Rest of Europe,NOR,parallel_eu28_egypt
+Rest of Europe,SCG,parallel_eu28_egypt
+Rest of Europe,SJM,parallel_eu28_egypt
+Rest of Europe,SMR,parallel_eu28_egypt
+Rest of Europe,SRB,parallel_eu28_egypt
+Rest of Europe,VAT,parallel_eu28_egypt
+Rest of Europe,YUG,parallel_eu28_egypt
+Rest of Europe,XKX,parallel_eu28_egypt
+Rest of Western Asia,ARE,parallel_eu28_egypt
+Rest of Western Asia,ARM,parallel_eu28_egypt
+Rest of Western Asia,AZE,parallel_eu28_egypt
+Rest of Western Asia,BHR,parallel_eu28_egypt
+Rest of Western Asia,GEO,parallel_eu28_egypt
+Rest of Western Asia,IRQ,parallel_eu28_egypt
+Rest of Western Asia,ISR,parallel_eu28_egypt
+Rest of Western Asia,JOR,parallel_eu28_egypt
+Rest of Western Asia,KWT,parallel_eu28_egypt
+Rest of Western Asia,LBN,parallel_eu28_egypt
+Rest of Western Asia,OMN,parallel_eu28_egypt
+Rest of Western Asia,PSE,parallel_eu28_egypt
+Rest of Western Asia,QAT,parallel_eu28_egypt
+Rest of Western Asia,SAU,parallel_eu28_egypt
+Rest of Western Asia,SYR,parallel_eu28_egypt
+Rest of Western Asia,YEM,parallel_eu28_egypt
+Rest of Western Asia,YMD,parallel_eu28_egypt
+Pakistan,PAK,parallel_eu28_egypt
+Russia,RUS,parallel_eu28_egypt
+Western Africa,BEN,parallel_eu28_egypt
+Western Africa,BFA,parallel_eu28_egypt
+Western Africa,CIV,parallel_eu28_egypt
+Western Africa,CPV,parallel_eu28_egypt
+Western Africa,GHA,parallel_eu28_egypt
+Western Africa,GIN,parallel_eu28_egypt
+Western Africa,GMB,parallel_eu28_egypt
+Western Africa,GNB,parallel_eu28_egypt
+Western Africa,LBR,parallel_eu28_egypt
+Western Africa,MLI,parallel_eu28_egypt
+Western Africa,MRT,parallel_eu28_egypt
+Western Africa,NER,parallel_eu28_egypt
+Western Africa,NGA,parallel_eu28_egypt
+Western Africa,SEN,parallel_eu28_egypt
+Western Africa,SHN,parallel_eu28_egypt
+Western Africa,SLE,parallel_eu28_egypt
+Western Africa,TGO,parallel_eu28_egypt
+Rest of Central Asia,KGZ,parallel_eu28_egypt
+Rest of Central Asia,TJK,parallel_eu28_egypt
+Rest of Central Asia,TKM,parallel_eu28_egypt
+Rest of Central Asia,UZB,parallel_eu28_egypt
+Egypt,EGY,parallel_eu28_egypt
+Southern Africa,BWA,parallel_eu28_egypt
+Southern Africa,LSO,parallel_eu28_egypt
+Southern Africa,NAM,parallel_eu28_egypt
+Southern Africa,SWZ,parallel_eu28_egypt
+Southern Africa,ZAF,parallel_eu28_egypt
+China,CHN,parallel_eu28_egypt
+China,HKG,parallel_eu28_egypt
+China,MAC,parallel_eu28_egypt
+China,TWN,parallel_eu28_egypt
+Australia,AUS,parallel_eu28_egypt
+Turkey,TUR,parallel_eu28_egypt
+Rest of Oceania,ASM,parallel_eu28_egypt
+Rest of Oceania,CCK,parallel_eu28_egypt
+Rest of Oceania,COK,parallel_eu28_egypt
+Rest of Oceania,CXR,parallel_eu28_egypt
+Rest of Oceania,FJI,parallel_eu28_egypt
+Rest of Oceania,FSM,parallel_eu28_egypt
+Rest of Oceania,GUM,parallel_eu28_egypt
+Rest of Oceania,HMD,parallel_eu28_egypt
+Rest of Oceania,JTN,parallel_eu28_egypt
+Rest of Oceania,KIR,parallel_eu28_egypt
+Rest of Oceania,MHL,parallel_eu28_egypt
+Rest of Oceania,MID,parallel_eu28_egypt
+Rest of Oceania,MNP,parallel_eu28_egypt
+Rest of Oceania,NCL,parallel_eu28_egypt
+Rest of Oceania,NFK,parallel_eu28_egypt
+Rest of Oceania,NIU,parallel_eu28_egypt
+Rest of Oceania,NRU,parallel_eu28_egypt
+Rest of Oceania,NZL,parallel_eu28_egypt
+Rest of Oceania,PCN,parallel_eu28_egypt
+Rest of Oceania,PLW,parallel_eu28_egypt
+Rest of Oceania,PNG,parallel_eu28_egypt
+Rest of Oceania,PYF,parallel_eu28_egypt
+Rest of Oceania,SLB,parallel_eu28_egypt
+Rest of Oceania,TKL,parallel_eu28_egypt
+Rest of Oceania,TON,parallel_eu28_egypt
+Rest of Oceania,TUV,parallel_eu28_egypt
+Rest of Oceania,UMI,parallel_eu28_egypt
+Rest of Oceania,VUT,parallel_eu28_egypt
+Rest of Oceania,WAK,parallel_eu28_egypt
+Rest of Oceania,WLF,parallel_eu28_egypt
+Rest of Oceania,WSM,parallel_eu28_egypt

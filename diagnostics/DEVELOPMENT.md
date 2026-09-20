@@ -14,7 +14,7 @@ Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
 Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
 (P0–P12 done). Post-P12 R-queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md)
 (**exhausted**). Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
-next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S4**).
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S5**).
 Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
 [`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
@@ -110,7 +110,7 @@ approval.
    **S1 implemented** A8 member-sum. **S2 labelled** item 3 at 1.444
    (no sourced D.22; freeze not adopted). **S3** re-scored FBSH vs
    member-sum USDA (China H 1.00; moy 20.1×→33.0×; not adopted).
-   Next paste **S4**
+   Next paste **S5**
    (`GATE0_NEXT_PROMPTS.md`), not R8.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
 5. **P1 (done).** Step identities on 2006 harvest+AMIS.
@@ -218,6 +218,13 @@ approval.
     **Not adopted** as `prepare_wheat`. Egypt remains a FAOSTAT area
     row, not a C.1 node. Writeup: `diagnostics/gate0_agrimate/author_fb.md`.
     Next paste still **S4** (EU28+Egypt / start-2000 still cannot-set).
+25. **S4 (done).** A7 cannot-set inventory. Fig. 4 knobs already on
+    `fig4_experiment_params()`. Host reconstruction of
+    `wheat_food_balance_fao.csv` labelled, **not adopted**. Parallel
+    AgrimateEU28+Egypt name list labelled from NetCDF `region_list`
+    (`s4_a7.md`); **not** C.1. Egypt not invented. `wheat_params()`
+    stay αI=3.2. Still cannot-set: start 2000, FAO-since-2005 inputs,
+    Julia, bit-identical author FB. Next paste **S5**.
 
 Reference command:
 
