@@ -172,6 +172,30 @@ Fig. 4 knobs not adopted.
    wander XI; not proven this run). **H** that pinning 2006 is
    forbidden and would not be Agrimate. Do not pin.
 
+**R4 follow-up (this checkout).** Labelled 2003–11 undisturbed probes
+(`xi_split.md`; `wheat_params()` unchanged):
+
+| label | last/first | XI span MMT | note |
+|---|---:|---:|---|
+| default (live D.22, N2, ζ=0) | **1.630** | 89.9 | item 3 still fails |
+| xmin_off (ζ=1) | 0.548 | 78.0 | moves the wrong way |
+| qoth_freeze (D.22 EMA off) | **1.019** | 97.8 | ≈ author 1.004 |
+| calendar_replan (stride=24) | 0.523 | 71.3 | moves the wrong way; S_p≈0 |
+| author Fig. 4 baseline | 1.004 | — | live D.22 on their path |
+
+1. Claim: last/first wander is non-periodic xd/xi (Jacobi / rolling /
+   xmin). 2. Code: `model.py` D.22 `q_oth` EMA; N2 every-step replan;
+   ζ=0 xmin penalty. 3. Match: D.22 is implemented. 4. Counterexample:
+   freeze `q_oth` at XI*_world−XI*_r recovers 1.019; xmin_off and
+   calendar_replan overshoot to ~0.53. XI still spans 137–235 MMT
+   under the freeze — last/first is the offer-mix mean, not XI
+   volume. 5. Correctness: **C** (80–95%) that live D.22 `q_oth` is
+   the host last/first channel on this window. **H** (95–100%) that
+   freezing it is not Agrimate (author updates q_oth and still has
+   last/first ≈ 1) and must not be adopted or pinned. Not B: the EMA
+   matches D.22; the wander is the realised XI path feeding it.
+   Not a decay knob. Not L1–L8. Next paste **R5**.
+
 ---
 
 ## Step 6 — World-price object
@@ -352,7 +376,9 @@ Allowed under hard stops (labelled, `wheat_params()` defaults unchanged):
    αI=3.5, ζ=1, N_for=6) as a comparison run — the actual published
    experiment.
 2. **Item 3:** characterise the undisturbed XI split (Jacobi, rolling
-   year, xmin). Diagnose, do not pin.
+   year, xmin). Diagnose, do not pin. **R4 done:** live D.22 `q_oth`
+   is the last/first channel (freeze 1.019 vs author 1.004); xmin and
+   calendar replan overshoot. Not adopted.
 3. **S4:** author x1=demand as a labelled experiment, not a guessed
    rationing rule.
 4. **A1:** add FAOSTAT FB *only* with PROVENANCE and a parallel
@@ -383,7 +409,7 @@ the lineage than opening G1.
 
 **Adaptive**, not a skip-nothing ladder. Menu:
 [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md). Living next-paste:
-[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (right now **R2**).
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (right now **R5**).
 Data cookbook: [`GATE0_DATA.md`](GATE0_DATA.md).
 
 R2 is the only forced first evidence run (A7). After that, the
@@ -391,10 +417,11 @@ dispatch picks R10 if knobs moved Fig. 4 metrics, R4/R3 if they did
 not, skips R11 while defaults are unchanged, and holds R12 until
 items 1–5 actually moved. Hard stops do not adapt.
 
-**R2 done (2026-09-19).** moy 26.8×→13.3× triggered R10; hike barely
-moved. Living next-paste is **R10**. `wheat_params()` stay the 14022004
-defaults. Fig. 4 knobs live on `fig4_experiment_params()`, not in
-`wheat_params()`.
+**R4 done (2026-09-19).** Undisturbed last/first: live host **1.630**,
+qoth_freeze probe **1.019** vs author **1.004**. xmin_off 0.548 and
+calendar_replan 0.523 overshoot. Freeze is a diagnostic isolation,
+not adopted. `wheat_params()` stay 14022004. Living next-paste is
+**R5**. Item 3 still fails on the live host.
 
 ---
 
@@ -404,7 +431,7 @@ defaults. Fig. 4 knobs live on `fig4_experiment_params()`, not in
 |---|---|---|
 | 1. Source fidelity | Met for 14022004 wheat code, labelled gaps | H / labelled F |
 | 2. Numerical reliability | Feasible; not first-order stationary (N5) | C |
-| 3. Undisturbed | **Fail** 1.630 vs 1.004 | open C; not a pin |
+| 3. Undisturbed | **Fail** 1.630 vs 1.004; R4: D.22 q_oth is the last/first channel (freeze 1.019, not adopted) | C; not a pin |
 | 4. Reference reproduction | Independent; Fig. 4 is a **different experiment** (A7) | F |
 | 5. Historical performance | **Fail** vs Fig. 4 and Pink | F |
 | 6. Controlled experiments | Three scenarios + P11; AMIS/D.3 bind | H |

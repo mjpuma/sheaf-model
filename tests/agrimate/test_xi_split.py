@@ -40,6 +40,8 @@ def test_r4_note_does_not_pin_or_adopt():
     assert "wheat_params" in text
     assert "Next paste: R5" in text
     assert "xmin_off" in text and "qoth_freeze" in text and "calendar_replan" in text
+    assert "not a sourced Agrimate freeze" in text
+    assert "wheat_params()" in text or "wheat_params" in text
     tab = pd.read_csv(csv)
     assert set(tab["label"]) >= {"default", "xmin_off", "qoth_freeze", "calendar_replan"}
     d = tab[tab["label"] == "default"].iloc[0]

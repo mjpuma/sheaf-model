@@ -49,9 +49,10 @@ as B1 in `GATE0_DEPARTURES.md`. Not L1–L8. Not a pin.
 Because p_w is inverse demand on **international** volume, the annual mean
 moves when the **xd/xi split** is not periodic under constant H. Undisturbed
 annual XI still wanders 164–254 MMT (2004 vs 2005) after the delivery fix.
-Candidates for that remaining wander, not assumed: q_oth EMA (D.22), S_p
-transients, Jacobi IBR. That is a later characterisation (adjacent to P5),
-not a reason to add a decay knob in this prompt.
+**R4** (`xi_split.md`): live D.22 `q_oth` EMA is the last/first channel on
+this host (freeze → 1.019 vs author 1.004 vs live 1.630). xmin_off 0.548
+and calendar_replan 0.523 overshoot. Freeze is a diagnostic isolation, not
+adopted — author still updates q_oth. Do not pin. Do not add a decay knob.
 
 | Candidate | Price mean | Stock balloon |
 |---|---|---|
@@ -60,7 +61,8 @@ not a reason to add a decay knob in this prompt.
 | Floor | 0 binds | No |
 | Harvest vs C* | Seasonality | No (H*=C*) |
 | Own-XI echo | **No** (p_w on XI) | **Yes — fixed** |
-| Non-periodic XI split | **Yes, still open** | No |
+| Non-periodic XI split | volume still wanders | No |
+| Live D.22 q_oth EMA | **Yes, last/first 1.630** (R4 freeze 1.019, not adopted) | No |
 
 ## What this is not
 

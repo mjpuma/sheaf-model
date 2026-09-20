@@ -174,26 +174,36 @@ def _wander_verdict(summary: pd.DataFrame) -> tuple[str, str]:
     author = float(d["last_first_author"])
     host = float(d["last_first"])
     recoverers, movers, inert = [], [], []
+    rec_why = []
     for _, r in summary.iterrows():
         if r["label"] == "default":
             continue
         lf = float(r["last_first"])
         name = str(r["label"])
+        bit = f"{name} {_fmt(lf, 3)}"
         if abs(lf - author) < 0.05:
-            recoverers.append(name)
+            recoverers.append(bit)
+            rec_why.append(bit)
         elif abs(lf - host) > 0.05:
-            movers.append(f"{name} {_fmt(lf, 3)}")
+            movers.append(bit)
         else:
             inert.append(name)
     if recoverers:
-        who = ", ".join(recoverers)
+        who = "; ".join(recoverers)
+        extra = ""
+        if movers:
+            extra = f" Other probes move the wrong way ({'; '.join(movers)})."
+        if inert:
+            extra += f" Inert: {', '.join(inert)}."
         verdict = (
-            f"{who} alone brings last/first to ≈ author 1.004 on this "
-            "window. That is the wander *on this labelled probe*. "
-            "Not adopted. Do not pin. Do not write it into wheat_params()."
+            f"{who} is within 0.05 of author {_fmt(author, 3)} on this "
+            f"window.{extra} That is the last/first wander *on this labelled "
+            "probe*, not a sourced Agrimate freeze: author D.22 still updates "
+            "q_oth and still has last/first ≈ 1. Not adopted. Do not pin. "
+            "Do not write freeze_q_oth into wheat_params()."
         )
         why = (
-            f"{who} recovers last/first on the probe; host default still "
+            f"{'; '.join(rec_why)} ≈ author {_fmt(author, 3)}; host still "
             f"{_fmt(host, 3)}; do not pin"
         )
     elif movers:
@@ -288,8 +298,16 @@ def write_xi_split_note(annual: pd.DataFrame, summary: pd.DataFrame,
         "",
         f"Reading: {verdict}",
         "",
-        "Rolling year under constant H only changes how often S_p / q_oth",
-        "are fed into a new programme; harvest itself is already periodic.",
+        "XI volume is not the last/first object: qoth_freeze still spans",
+        f"{_fmt(summary.loc[summary['label']=='qoth_freeze', 'xi_min'].iloc[0], 1)}"
+        f"–{_fmt(summary.loc[summary['label']=='qoth_freeze', 'xi_max'].iloc[0], 1)} "
+        "MMT. The 2006–11 mean-price ratio is the D.7 offer mix under",
+        "live vs frozen D.22. Author Agrimate updates q_oth; freezing it",
+        "here is a diagnostic isolation, not a copy of the paper.",
+        "xmin_off and calendar_replan each move last/first *below* 1",
+        "(not a pin to 1). Calendar replan also zeros year-end S_p",
+        "(N2's original reason for rolling year).",
+        "",
         "Do not add a decay knob to force last/first = 1. Do not restore",
         "L1–L8. Do not pin.",
         "",
