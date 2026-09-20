@@ -179,6 +179,21 @@ def extra_storage_demand(S: float, S_star: float, tau_steps: float) -> float:
     return (S_star - S) / tau_steps
 
 
+def foreign_request_quantity(q: np.ndarray, self_index: int) -> float:
+    """International part of a D.30/D.30a request vector (drop own origin).
+
+    Author two-market ``x1`` is the request, not a min(supply, demand)
+    ration. Domestic origin stays on the supplier ``sold_d`` path.
+    """
+    q = np.asarray(q, float).reshape(-1)
+    i = int(self_index)
+    if q.size == 0:
+        return 0.0
+    if i < 0 or i >= q.size:
+        return float(np.maximum(q, 0.0).sum())
+    return float(max(q.sum() - q[i], 0.0))
+
+
 def preference_update(pref: np.ndarray, fill: np.ndarray, rho: float) -> np.ndarray:
     p = np.asarray(pref, float)
     f = np.asarray(fill, float)

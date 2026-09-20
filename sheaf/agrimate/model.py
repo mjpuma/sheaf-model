@@ -16,6 +16,7 @@ from .equations import (
     expected_harvest,
     expected_restriction,
     extra_storage_demand,
+    foreign_request_quantity,
     fulfill_sales,
     inverse_demand,
     inverse_of_inverse_demand,
@@ -119,6 +120,7 @@ class AgrimateResult:
     use_anomalies: bool = True
     use_restrictions: bool = True
     offer: np.ndarray | None = None
+    x1_from_demand: bool = False
 
     def to_monthly_price(self) -> np.ndarray:
         p = np.asarray(self.price_usd, float)
@@ -172,7 +174,8 @@ def _purchaser_baseline(H_star, p_wld, C_star, Psi, A_c, params: AgrimateParams)
 class AgrimateSim:
     def __init__(self, data: WheatData, params: AgrimateParams | None = None,
                  use_restrictions: bool = True, use_anomalies: bool = True,
-                 replan_stride: int = 1, freeze_q_oth: bool = False):
+                 replan_stride: int = 1, freeze_q_oth: bool = False,
+                 x1_from_demand: bool = False):
         self.data = data
         self.params = params or wheat_params()
         self.use_restrictions = use_restrictions
@@ -182,6 +185,10 @@ class AgrimateSim:
         # freeze_q_oth: hold D.22 rivals at XI*_world − XI*_r (no EMA).
         self.replan_stride = max(int(replan_stride), 1)
         self.freeze_q_oth = bool(freeze_q_oth)
+        # R5: S4 labelled experiment. Default off recovers T*+domestic.
+        # True: Ndel-lagged international D.30/D.30a requests replace
+        # dest.T @ XI_lag as arrive. Not a min(supply, demand) ration.
+        self.x1_from_demand = bool(x1_from_demand)
         self.n_r = len(data.regions)
         self.n_y = self.params.n_year
         self.n_years = data.end_year - data.start_year + 1
@@ -228,6 +235,8 @@ class AgrimateSim:
         # not the exporter's own lagged shipments.
         q_i = [np.zeros(n_r) for _ in range(p.n_del)]
         q_p = [np.ones(n_r) for _ in range(p.n_del)]
+        # R5: Ndel queue of international D.30/D.30a requests (x1=demand).
+        q_req = [np.zeros(n_r) for _ in range(p.n_del)]
         dest = international_destination_shares(d.T_star)
 
         price_index = np.ones(T)
@@ -349,20 +358,25 @@ class AgrimateSim:
                 empty=(float(price_index[t - 1]) if t else 1.0),
             )
             price_index[t] = p_w
-            arrive = dest.T @ xi_lag
+            arrive_tstar = dest.T @ xi_lag
+            req_lag = q_req[0]
+            arrive = req_lag if self.x1_from_demand else arrive_tstar
+            req_now = np.zeros(n_r)
             for s in range(n_r):
                 prices = np.maximum(offer * (1.0 + 0.0 * d.nu[s]), 1e-8)
                 S_star = d.Psi[s] * n_y * d.C_star[s]
                 extra = extra_storage_demand(S_c[s], S_star, p.tau_steps)
-                # D.30a: B = C*/A_d at p*=1 (author mean(p* D*)/A_d*). Inflow
-                # remains T*+domestic; requests do not yet fix x1 (author does).
+                # D.30a: B = C*/A_d at p*=1 (author mean(p* D*)/A_d*).
+                # Default inflow is T*+domestic. x1_from_demand (R5, default
+                # off) replaces international T* with lagged foreign requests.
                 B = d.C_star[s] / max(float(d.A_d[s]), 1e-8)
                 P_idx = ces_price_index(prices, shares[:, s], p.sigma_ces)
                 A_t = crop_budget_share(d.A_d[s], P_idx, extra, B)
-                _ = purchaser_demand(
+                q_ask = purchaser_demand(
                     prices, B, p.sigma_ces, shares[:, s],
                     A_d=A_t, eps_d=p.eps_d,
                 )
+                req_now[s] = foreign_request_quantity(q_ask, s)
                 inflow = float(arrive[s]) + float(sold_d[s])
                 p_c[s] = consumer_price_mix(p_w, inflow, p_c[s], S_c[s])
                 cons = consumption_ces(p_c[s], d.A_c[s], p.eps_c, d.C_star[s])
@@ -371,6 +385,8 @@ class AgrimateSim:
                 C_path[s, t] = cons
                 inflow_path[s, t] = inflow
                 p_c_path[s, t] = p_c[s]
+            q_req.append(req_now)
+            q_req.pop(0)
             S_p_path[:, t] = S_p
             S_c_path[:, t] = S_c
 
@@ -399,20 +415,22 @@ class AgrimateSim:
             use_anomalies=self.use_anomalies,
             use_restrictions=self.use_restrictions,
             offer=offer_path,
+            x1_from_demand=self.x1_from_demand,
         )
 
 
 def run_agrimate(data: WheatData | None = None, use_restrictions: bool = True,
                  use_anomalies: bool = True, start_year: int = 2003,
                  end_year: int = 2011, params: AgrimateParams | None = None,
-                 replan_stride: int = 1, freeze_q_oth: bool = False
+                 replan_stride: int = 1, freeze_q_oth: bool = False,
+                 x1_from_demand: bool = False
                  ) -> AgrimateResult:
     if data is None:
         data = prepare_wheat(start_year=start_year, end_year=end_year, params=params)
     return AgrimateSim(
         data, params=params, use_restrictions=use_restrictions,
         use_anomalies=use_anomalies, replan_stride=replan_stride,
-        freeze_q_oth=freeze_q_oth,
+        freeze_q_oth=freeze_q_oth, x1_from_demand=x1_from_demand,
     ).run()
 
 

@@ -12,8 +12,6 @@ from sheaf.agrimate.params import wheat_params
 from sheaf.agrimate.validation import OUT_DEFAULT
 from sheaf.agrimate.wheat_data import prepare_wheat
 
-ROOT = Path(__file__).resolve().parents[2]
-
 
 def test_diagnostic_hooks_default_off():
     data = prepare_wheat(start_year=2006, end_year=2006, params=wheat_params())
@@ -75,7 +73,7 @@ def test_r4_module_does_not_import_g1g2():
 def test_r4_did_not_overwrite_three_scenario():
     for name in PROTECTED_THREE_SCENARIO:
         assert (OUT_DEFAULT / name).is_file(), name
-    dispatch = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
-    assert "Last completed: R4" in dispatch
-    assert "Next paste: R5" in dispatch
-    assert "do not pin" in dispatch.lower() or "do not add a decay" in dispatch.lower()
+    # Living dispatch moves after R5. R4 numbers stay in xi_split.md.
+    text = (OUT_DEFAULT / "xi_split.md").read_text()
+    assert "Next paste: R5" in text
+    assert "Not a pin" in text or "not a pin" in text.lower()
