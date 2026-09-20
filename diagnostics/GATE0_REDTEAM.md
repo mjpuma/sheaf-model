@@ -70,7 +70,7 @@ that honesty*, not because the price path matches Agrimate. G0-P remains
 | `test_fig4.py` | author CSVs present; author baseline does **not** drift; host hike **>** author |
 | `test_hindcast.py` | negative Pink corr; stocks 1.58× not 3×; AMIS adds 2008 not 2007 |
 | `test_regional.py` | A8 China 0.50× / EA 0.10× labelled |
-| `test_faostat_fb.py` | A1 left; USDA default |
+| `test_faostat_fb.py` | A1 left; USDA default; raw FBSH vendored |
 | `test_pulse.py` | 8-run not 36; not G2; Δ=1 zeros XI |
 | `test_methods.py` | G0-P **not accepted**; no G1/G2 import |
 
@@ -296,13 +296,15 @@ HTTP HEAD/GET (2026-09-19):
 | Pink Sheet | scoring | scoring only | `--prices-only` (WB page HEAD 200) |
 | Fig. 4 series | 10688435 NetCDF | extracted CSVs in `author_fig4/` | **manual** Zenodo (record HEAD 200); zip not vendored |
 | Author Julia | 14022004 | not copied | record HEAD 200; **not in fetch script**; **not in repo** |
-| FAOSTAT FB arrays | E.1.1 | **absent** (P10) | **no script**; no `*food_balance*` under `data/` |
+| FAOSTAT FB arrays | E.1.1 | USDA default (A1); **raw FBSH** in `data/faostat_fb/` (R6 obtain); author cleaned still absent | `--faostat-fb` (opt-in; bulk zip 200 this run; JSON API 521) |
 
 `scripts/fetch_external_data.py` contains none of: `zenodo`,
-`14022004`, `10688435`, `alpha_i`, `p_sto`, `xmin`, `food_balance`,
-`faostat`. There is **no** automated download for Zenodo or FAOSTAT
-Food Balances. Reproduction of the *author experiment* is not
-one-command.
+`14022004`, `10688435`, `alpha_i`, `p_sto`, `xmin`. There is **no**
+automated download for Zenodo. FAOSTAT Food Balances are opt-in
+`--faostat-fb` (raw FBSH wheat 2006–11, not a silent fit; USDA stays
+`prepare_wheat` default). Reproduction of the *author experiment* is
+not one-command. Laptop `/Users/mjp38/GitHub/sheaf-model/data` is not
+mounted on this VM.
 
 `data/crop_calendars/PROVENANCE.txt` described triangular allocation
 and `sheaf.dynamic_wheat` twin-pin — the **legacy** host. Live Gate 0

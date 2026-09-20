@@ -14,6 +14,10 @@ HEAD/GET. USDA FAS zip **200**; World Bank commodity page **200**;
 oecd.org **403** (Cloudflare); Zenodo 10688435 and 14022004 records
 **200** but **not** wired into `fetch_external_data.py`.
 
+Checked 2026-09-20 (R6 obtain): FAOSTAT JSON API FBSH **521**; bulk zip
+`bulks-faostat.fao.org` **200**. `--faostat-fb` is opt-in. Laptop
+`/Users/mjp38/GitHub/sheaf-model/data` is **not** mounted here.
+
 ## One-screen map
 
 | Need | Vendored? | Command | Notes |
@@ -21,7 +25,7 @@ oecd.org **403** (Cloudflare); Zenodo 10688435 and 14022004 records
 | USDA PSD country P/C/S | zip + grain extracts | `PYTHONPATH=. python scripts/fetch_external_data.py --psd-only` | No API key. Full `psd_alldata.csv` is gitignored; rebuild from zip. Units 1000 MT → ×1e-3 MMT. |
 | USDA world aggregates | yes | none | `data/usda_world/` (scoring 27-node sum vs world) |
 | FAOSTAT E0 trade shares | yes | none | `data/faostat_network/` — **E0 only**, not Food Balances (A1) |
-| FAOSTAT Food Balances | **no** | **none** | P10 left A1. Do not invent a vintage. No `*food_balance*` under `data/`. |
+| FAOSTAT Food Balances | **raw FBSH yes** / author cleaned **no** | `--faostat-fb` (opt-in) | `data/faostat_fb/` wheat 2006–11 item 2511. Not `wheat_food_balance_fao.csv`. USDA stays `prepare_wheat` default. |
 | AMIS / E.4 restrictions | yes (XLSX+CSV) | Browser download, then `--amis-only` | oecd.org is Cloudflare-blocked unattended (HEAD 403 this run) |
 | Pink Sheet monthly/annual | yes | `--prices-only` | URL hash changes; script scrapes the WB page |
 | Wheat harvest months | yes | none | Start/end months. Host uses **E.27 raised-cosine** (`sheaf.agrimate.harvest`), not the triangular/twin-pin paragraph that described the legacy host. |
@@ -29,9 +33,10 @@ oecd.org **403** (Cloudflare); Zenodo 10688435 and 14022004 records
 | Author Julia 14022004 | **not in repo** | not copied | Executable spec retrieved 2026-09-16; do not vendor copyrighted code |
 
 Default three-scenario run needs only the vendored trees (PSD extracts,
-E0, AMIS CSV, calendars, Pink Sheet). You do **not** need Zenodo to run
-the host. You **do** need `author_fig4/*.csv` to score Fig. 4 (already
-committed).
+E0, AMIS CSV, calendars, Pink Sheet). You do **not** need Zenodo, and
+you do **not** need FAOSTAT FB, to run the host. You **do** need
+`author_fig4/*.csv` to score Fig. 4 (already committed). FBSH is for a
+labelled parallel WheatData (next R6), not the default path.
 
 ## Automated refresh (no keys)
 
@@ -41,15 +46,22 @@ PYTHONPATH=. python scripts/fetch_external_data.py --psd-only
 
 # World Bank Pink Sheet annual + monthly
 PYTHONPATH=. python scripts/fetch_external_data.py --prices-only
+
+# FAOSTAT FBSH wheat 2006–11 (opt-in; not in the default fetch)
+PYTHONPATH=. python scripts/fetch_external_data.py --faostat-fb
 ```
+
+Default (no flags) refreshes PSD + AMIS + Pink Sheet only — **not** FB.
 
 Script: `scripts/fetch_external_data.py`. Metadata:
 `data/usda_psd/DOWNLOAD_META.json`,
-`data/world_prices/DOWNLOAD_META.json`. Provenance files sit next to
+`data/world_prices/DOWNLOAD_META.json`,
+`data/faostat_fb/DOWNLOAD_META.json`. Provenance files sit next to
 the CSVs.
 
 The script does **not** mention zenodo / 14022004 / 10688435 / αI /
-p_sto / xmin / food_balance / faostat. Do not add a silent fit.
+p_sto / xmin. `--faostat-fb` does **not** change `wheat_params` or
+`prepare_wheat`. Do not add a silent fit.
 
 ## Semi-automated (browser once)
 
@@ -104,17 +116,52 @@ forced scenarios, git `old-demand-dynamics`. Those knobs belong on a
 - Do not vendor it. Do not “tune” host knobs from a local checkout
   except as a labelled comparison object (R2).
 
-### FAOSTAT Food Balances (A1)
+### FAOSTAT Food Balances (A1) — how to get them
 
 Author AgriculturalData expects cleaned `wheat_food_balance_fao.csv`.
-That file is **not** in `data/faostat_network/` (E0 trade only: nine
-`*E0.csv` plus `country_conversion_table.csv`). FoodTradeNetwork
-`inputs_processed/` P0/R0 are 2015–21 *averages*, not 2006–11 annual
-FB. P10 left A1. USDA remains the default.
+That file is **still not** in the repo (not in `data/faostat_network/`,
+which is E0 trade only: nine `*E0.csv` plus
+`country_conversion_table.csv`). FoodTradeNetwork `inputs_processed/`
+P0/R0 are 2015–21 *averages*, not 2006–11 annual FB. Do not copy those.
 
-If you add FB later: ship PROVENANCE.txt, build a **parallel** WheatData,
-keep USDA as `prepare_wheat` default until G0-P says otherwise. Do not
-copy 2015–21 averages as fake 2006–11 FB.
+**Raw FAOSTAT FBSH** (old methodology through 2013) wheat 2006–11 **is**
+vendored:
+
+```bash
+PYTHONPATH=. python scripts/fetch_external_data.py --faostat-fb
+```
+
+Writes `data/faostat_fb/wheat_fbsh_2006_2011.csv` (+ `_long.csv`,
+`DOWNLOAD_META.json`). Bulk zip is gitignored. Domain FBSH, item 2511
+Wheat and products, unit 1000 t, Stock Variation element **5074**.
+Do **not** mix FBS 2010+ (new methodology) into this extract.
+
+USDA remains `prepare_wheat` default. Next R6 builds a **parallel**
+WheatData and compares one harvest+AMIS window; this obtain does not
+switch the host. Do not retune αI / p_sto / xmin to FBSH numbers.
+
+Laptop path `/Users/mjp38/GitHub/sheaf-model/data` is a local checkout.
+This cloud VM does not mount it. On the laptop, run the same
+`--faostat-fb` command (or copy `data/faostat_fb/`). `inventory()`
+reports `laptop_data.exists` so you can see whether that tree is
+visible.
+
+### How a user gets every Gate 0 dataset
+
+| Already in git | Refresh command |
+|---|---|
+| USDA PSD grain extracts, world aggregates | `--psd-only` if you want a newer FAS dump |
+| FAOSTAT E0 | none (vendored) |
+| FAOSTAT FBSH wheat 2006–11 | `--faostat-fb` (opt-in; zip gitignored) |
+| AMIS/OECD restrictions | browser XLSX, then `--amis-only` |
+| Pink Sheet | `--prices-only` |
+| Harvest calendars | none (vendored) |
+| Fig. 4 author CSVs | none (`author_fig4/` committed); NetCDF zip is manual Zenodo |
+| Author Julia 14022004 | **not** fetched; retrieve yourself, do not vendor |
+
+`pip install -r requirements.txt` then the commands above. No API keys
+except the OECD browser step. Zenodo is only for Fig. 4 NetCDF / author
+code, never for a silent fit.
 
 ## What “tuning” exists (diagnostic only)
 
@@ -170,6 +217,7 @@ PYTHONPATH=. python scripts/score_agrimate_methods.py
 - `data/usda_psd/PROVENANCE.txt`
 - `data/usda_world/PROVENANCE.txt`
 - `data/faostat_network/PROVENANCE.txt`
+- `data/faostat_fb/PROVENANCE.txt` (raw FBSH wheat 2006–11; USDA still default)
 - `data/amis_policies/PROVENANCE.txt`
 - `data/world_prices/PROVENANCE.txt`
 - `data/crop_calendars/PROVENANCE.txt` (live host is E.27; legacy

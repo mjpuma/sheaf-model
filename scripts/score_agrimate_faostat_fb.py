@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""P10: FAOSTAT Food Balance inventory. Does not switch the USDA host.
+"""P10/R6 obtain: FAOSTAT Food Balance inventory. Does not switch the USDA host.
 
     PYTHONPATH=. python scripts/score_agrimate_faostat_fb.py
 """

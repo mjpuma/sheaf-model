@@ -1,0 +1,42 @@
+FAOSTAT Food Balance Sheets, historic domain FBSH
+(Food Balances (-2013, old methodology and population)).
+
+What is here
+  wheat_fbsh_2006_2011.csv       wheat item 2511, years 2006–2011, wide
+  wheat_fbsh_2006_2011_long.csv  same rows, one element per line
+  DOWNLOAD_META.json             fetch timestamp and source URL
+
+What is not here
+  The bulk zip is gitignored (regenerate with --faostat-fb).
+  Agrimate's cleaned wheat_food_balance_fao.csv (QCL+TCL impute/rebalance)
+    is still not shipped; this extract is the official FAOSTAT dump, not
+    that pipeline.
+  FoodTradeNetwork 2015–21 P0/R0 averages are not copied.
+  FBS 2010+ (new methodology) is not mixed into this extract.
+
+Source
+  https://www.fao.org/faostat/en/#data/FBSH
+  Bulk: https://bulks-faostat.fao.org/production/FoodBalanceSheetsHistoric_E_All_Data_(Normalized).zip
+  Item: 2511 Wheat and products. Unit: 1000 t.
+  Elements kept: production, food, feed, seed, losses, imports, exports,
+  domestic_supply, stock_variation.
+  Stock Variation is FBSH element 5074 (FBS new methodology uses 5072).
+  It is a food-balance residual, not USDA ending stocks.
+
+This extract (2026-09-20)
+  9936 long rows, 1259 area-years, 210 areas.
+  2007 production (1000 t): United States of America 55820; World 608672;
+  China, mainland 109298; European Union (27) 107883.
+  JSON API fenixservices.fao.org/.../data/FBSH returned HTTP 521; bulk zip 200.
+
+Refresh
+  PYTHONPATH=. python scripts/fetch_external_data.py --faostat-fb
+
+Laptop
+  /Users/mjp38/GitHub/sheaf-model/data is a local checkout, not mounted
+  on the cloud agent. Re-run --faostat-fb there, or copy data/faostat_fb/.
+
+Use
+  USDA PSD remains prepare_wheat default (A1 labelled). This tree is a
+  parallel input for a later WheatData comparison. Do not retune αI /
+  p_sto / xmin to these numbers. Do not treat this as G0-P acceptance.
