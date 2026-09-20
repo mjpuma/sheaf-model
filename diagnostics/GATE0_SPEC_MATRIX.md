@@ -23,7 +23,7 @@ replication.
 | World price | §5.2 international tx; XI-weighted lagged D.7 offers × p0 | blend + pin | `model.py` `volume_weighted_offer_index` | R3 host identity; not D.7 of world XI*; 14022004 `plot_wm_price_timeseries` still not in-tree; not a 2006 pin |
 | Harvest shape | E.27 author raised-cosine | triangular | `harvest.py` | `test_harvest_profile_normalised` |
 | Restrictions | E.4 / AMIS OECD columns PolicyMeasure_Name, CommodityClass_Name | extra AMIS types | `restrictions.py` | wheat Δ nonempty 2007/08 |
-| Baseline quantities | FAOSTAT FB E.1 | USDA+E0 | USDA PSD + E0 rescale | A1; raw FBSH vendored `data/faostat_fb/` (R6 obtain); author cleaned absent; USDA default |
+| Baseline quantities | FAOSTAT FB E.1 | USDA+E0 | USDA PSD + E0 rescale | A1; raw FBSH vendored; labelled `prepare_wheat_fbsh` not adopted (`fb_wheatdata.md`); USDA default |
 | Storage cost | Tbl. D.8 p_sto=0.1 / Nyear | cover rule | `optimize.py` unit costs | G0-S |
 | x_min | Tbl. D.8 0.2 even spread | n/a | quadratic penalty, ζ=0 | G0-S |
 | Three-scenario validation | Agrimate Fig. 4 design; Bai/Wada/Puma copy workflow | Pink-Sheet only | `validation.py` / `run_agrimate_validation.py` | prices **and** USDA supply/stocks |

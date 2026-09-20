@@ -56,6 +56,12 @@ FAOSTAT FB inventory (P10; does **not** re-run the host or switch USDA):
 PYTHONPATH=. python scripts/score_agrimate_faostat_fb.py
 ```
 
+FBSH parallel WheatData vs USDA (R6; does **not** switch `prepare_wheat`):
+
+```bash
+PYTHONPATH=. python scripts/score_agrimate_fb_wheatdata.py
+```
+
 G0-P methods note (does **not** re-run the host; P12):
 
 ```bash
@@ -119,10 +125,9 @@ stage. Gate 0 scores both from the start.
 
 FAOSTAT Food Balances remain labelled A1. Bai found FAO anomalies closer to
 prices in 2020–24. P10 checked `data/faostat_network/` (E0 only). R6 obtain
-vendored raw FBSH wheat 2006–11 under `data/faostat_fb/`; author cleaned
-`wheat_food_balance_fao.csv` is still absent. USDA stays the default. See
-`faostat_fb.md`. Next R6: labelled parallel WheatData vs USDA, one
-harvest+AMIS window.
+vendored raw FBSH wheat 2006–11; R6 ran a labelled `prepare_wheat_fbsh`
+parallel vs USDA on 2006–08 harvest+AMIS (**not adopted**; Psi stayed USDA).
+USDA stays the default. See `faostat_fb.md`, `fb_wheatdata.md`.
 
 Agrimate Fig. 4 author series: Zenodo 10688435 unpacked (P7). Score in
 `diagnostics/gate0_agrimate/fig4.md`. Independent implementation, not a
