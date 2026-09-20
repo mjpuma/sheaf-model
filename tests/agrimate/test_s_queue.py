@@ -1,4 +1,4 @@
-"""Post-R S-queue: S3 FBSH not adopted; Next paste S4."""
+"""Post-R S-queue: S4 A7 inventory done; Next paste S5."""
 from __future__ import annotations
 
 from dataclasses import fields
@@ -8,6 +8,7 @@ import pandas as pd
 
 from sheaf.agrimate.a8_sum import write_r7_dispatch
 from sheaf.agrimate.fb_wheatdata import write_r6_dispatch, write_s3_dispatch
+from sheaf.agrimate.s4_a7 import write_s4_dispatch
 from sheaf.agrimate.fig4_config import PROTECTED_THREE_SCENARIO
 from sheaf.agrimate.methods import publication_bar
 from sheaf.agrimate.model import AgrimateSim
@@ -53,12 +54,12 @@ def test_s1_implements_member_sum():
     assert any("5074" in n for n in d.notes)
 
 
-def test_dispatch_next_paste_is_s4():
+def test_dispatch_next_paste_is_s5():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: S3" in text
-    assert "Next paste: S4" in text
-    assert "Next paste: S3" not in text.split("Next paste: S4")[0][-80:]
+    assert "Last completed: S4" in text
+    assert "Next paste: S5" in text
+    assert "Next paste: S4" not in text.split("Next paste: S5")[0][-80:]
     assert "R11" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
@@ -66,6 +67,7 @@ def test_dispatch_next_paste_is_s4():
     assert "2006 pin" in text or "pin" in text
     assert "Bai 10" in text
     assert "USDA stays default" in text or "USDA stays" in text
+    assert "invent Egypt" in text or "Egypt not invented" in text
 
 
 def test_s2_prompt_forbids_pin_and_l1l8():
@@ -117,14 +119,15 @@ def test_pointers_name_s_queue():
     assert "Never FAO ΔS" in dep or "not FAOSTAT FBSH ΔS" in dep
     assert "1.444" in dep
     assert "s3_fbsh.md" in dep
+    assert "s4_a7.md" in dep
     assert "approved, not implemented" not in dep
 
 
-def test_r7_dispatch_writer_does_not_clobber_s4(tmp_path):
+def test_r7_dispatch_writer_does_not_clobber_s5(tmp_path):
     living = tmp_path / "GATE0_REPRO_DISPATCH.md"
     living.write_text(DISPATCH.read_text())
     before = living.read_text()
-    assert "Next paste: S4" in before
+    assert "Next paste: S5" in before
     from sheaf.agrimate.a8_sum import a8_mean_vs_sum_table
 
     tab = a8_mean_vs_sum_table()
@@ -253,3 +256,64 @@ def test_s3_dispatch_writer_does_not_clobber_later(tmp_path):
     verdict = s3_adoption_verdict(score)
     write_s3_dispatch(score, verdict, path=living)
     assert living.read_text() == "Last completed: S4\nNext paste: S5\n"
+
+
+def test_s5_prompt_exists_and_is_not_r11():
+    text = NEXT.read_text()
+    assert "Task S5 only" in text
+    assert "not R11" in text.lower() or "This is not R11" in text
+    assert "Do not pin 2006" in text or "Do not pin" in text
+    assert "Next paste S6" in text
+
+
+def test_s4_inventory_does_not_invent_egypt_or_retune():
+    from sheaf.agrimate.regions import REGION_NAMES, REGION_ISO3
+    from sheaf.agrimate.s4_a7 import (
+        FIG4_EU28_EGYPT_NAMES,
+        parallel_eu28_egypt_iso3,
+    )
+    from sheaf.agrimate.params import fig4_experiment_params
+
+    assert "Egypt" not in REGION_NAMES
+    assert "EU-28" not in REGION_NAMES
+    assert "Brazil" in REGION_NAMES
+    assert "EU-27" in REGION_NAMES
+    assert "EGY" in REGION_ISO3["Northern Africa"]
+    p = wheat_params()
+    assert p.alpha_i == 3.2
+    assert p.zeta_penalty == 0.0
+    assert p.n_for_months == 3
+    fig4 = fig4_experiment_params()
+    assert fig4.alpha_i == 3.5
+    assert fig4.zeta_penalty == 1.0
+    assert fig4.n_for_months == 6
+    par = parallel_eu28_egypt_iso3()
+    assert list(par) == list(FIG4_EU28_EGYPT_NAMES)
+    assert par["Egypt"] == ["EGY"]
+    assert "GBR" in par["EU-28"]
+    assert "BRA" in par["Rest of South America"]
+    assert "Brazil" not in par
+    note = (OUT_DEFAULT / "s4_a7.md").read_text()
+    assert "Do not invent an Egypt node" in note
+    assert "wheat_params()" in note
+    assert "Next paste: S5" in note
+    assert "not C.1" in note or "not** replaced" in note
+    assert "L1–L8" in note
+    tab = pd.read_csv(OUT_DEFAULT / "score_s4_a7.csv").iloc[0]
+    assert bool(tab["host_has_egypt_node"]) is False
+    assert bool(tab["reconstruction_adopted"]) is False
+    assert bool(tab["usda_is_default"]) is True
+    assert float(tab["wheat_params_alpha_i"]) == 3.2
+    assert int(tab["n_julia"]) == 0
+    d = prepare_wheat(start_year=2006, end_year=2006, params=wheat_params())
+    assert any("USDA PSD" in n and "not FAOSTAT Food Balances" in n for n in d.notes)
+    for name in PROTECTED_THREE_SCENARIO:
+        assert (OUT_DEFAULT / name).is_file(), name
+
+
+def test_s4_dispatch_writer_does_not_clobber_later(tmp_path):
+    living = tmp_path / "GATE0_REPRO_DISPATCH.md"
+    living.write_text("Last completed: S5\nNext paste: S6\n")
+    inv = pd.read_csv(OUT_DEFAULT / "score_s4_a7.csv").iloc[0].to_dict()
+    write_s4_dispatch(inv, path=living)
+    assert living.read_text() == "Last completed: S5\nNext paste: S6\n"
