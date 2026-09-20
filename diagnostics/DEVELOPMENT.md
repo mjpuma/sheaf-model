@@ -65,9 +65,9 @@ government games will be added **after** G0-P.
 | Stage | Work | Exit |
 |---|---|---|
 | **G0-N** | Make the supplier programme numerically solvent on the 24-step wheat year. Record residual, runtime, and when the inverse-demand floor binds. | **Feasible** on 2003–11 (failed/fallback 0; residual 0; offer-floor 0). Unconverged scipy **1743/5832** on harvest+AMIS is labelled N5 (`solver.md`); not first-order stationary. Pink-Sheet scoring is G0-H. |
-| **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | **Met for retrieved code.** 27-region C.1 wheat list, author params, p_sto, x_min penalty, E.27, D.1 weights. β/τ_P labelled unused on wheat path (P3). D.30a formula wired (P4); author x1=demand labelled. FAOSTAT FB absent (P10, A1 left). Fig. 4 zip unpacked (P7); not a replication. |
+| **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | **Met for retrieved code.** 27-region C.1 wheat list, author params, p_sto, x_min penalty, E.27, D.1 weights. β/τ_P labelled unused on wheat path (P3). D.30a formula wired (P4); author x1=demand labelled. Raw FAOSTAT FBSH vendored (R6 obtain); author cleaned FB absent; A1 USDA default. Fig. 4 zip unpacked (P7); not a replication. |
 | **G0-U** | Undisturbed / harvest-only / harvest+AMIS. Accounting identities. Score prices **and** USDA supply/stocks. Ukraine / Eastern Africa mechanism panels. OAT diagnostic without retuning. Protocol: `GATE0_VALIDATION.md`. | Three-scenario report in `diagnostics/gate0_agrimate/`; documented seasonal baseline; material balance. |
-| **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | **P8–P11 done:** `hindcast.md` sourced shortfall; `regional.md` named-node vs PSD; `faostat_fb.md` — FB arrays not in repo, A1 left, USDA default. `pulse.md` 8-run 2008 prescribed-Δ (Ukraine/Russia × {0.5,1.0} × {6,12}m) is clean; not Bai's 36; not G2. |
+| **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | **P8–P11 done:** `hindcast.md` sourced shortfall; `regional.md` named-node vs PSD; `faostat_fb.md` — raw FBSH vendored, author cleaned absent, A1 left, USDA default. `pulse.md` 8-run 2008 prescribed-Δ (Ukraine/Russia × {0.5,1.0} × {6,12}m) is clean; not Bai's 36; not G2. |
 | **G0-P** | Gate 0 note at publication standard (methods, data, hindcast, limits). No substitution, no government game. | **Note written, not accepted.** `diagnostics/gate0_agrimate/methods.md` is the market-section offer. Items 3 and 5 fail. G1 stays blocked. |
 | **G1** | Cross-crop substitution (wheat/rice/maize), distinct from Agrimate origin CES. Disabled G1 recovers G0. | Identity test + spillover experiments. No σ* fit to 2008. |
 | **G2** | Government restriction game, distinct from supplier oligopoly and from AMIS/E.4. Disabled G2 recovers E.4 Agrimate. | Mechanism tests on the *accepted* G0 host. Train/hold-out if estimated. |
@@ -149,8 +149,9 @@ approval.
 14. **P10 (done).** FAOSTAT Food Balance arrays are **not** in
     `data/faostat_network/` (the path named in the prompt: E0 trade only).
     FoodTradeNetwork P0/R0 are 2015–21 averages, not 2006–11 FB. A1 left.
-    USDA stays default. No parallel `WheatData`. Writeup:
-    `diagnostics/gate0_agrimate/faostat_fb.md`.
+    USDA stays default. R6 obtain later vendored raw FBSH under
+    `data/faostat_fb/`; author cleaned still absent; still no parallel
+    `WheatData`. Writeup: `diagnostics/gate0_agrimate/faostat_fb.md`.
 15. **P11 (done).** Prescribed-Δ 8-run on harvest-anomaly wheat, 2008:
     Ukraine and Russia × {0.5, 1.0} × {6, 12} months vs harvest-only.
     `restriction_pulse` (AMIS-style Δ, not a government best-response).

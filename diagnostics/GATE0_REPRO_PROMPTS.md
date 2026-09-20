@@ -191,14 +191,18 @@ sheaf/agrimate/model.py purchaser_demand call.
 ```
 [SHARED PREAMBLE]
 
-Task R6 only. A1: USDA PSD not FAOSTAT Food Balances. P10 found no FB
-arrays in data/faostat_network/. Follow GATE0_DATA.md. If you can add
-2006–11 FB with PROVENANCE.txt, build a parallel WheatData and compare
-one harvest+AMIS window to USDA; keep USDA as prepare_wheat default.
-If you cannot, leave A1 and stop. Do not copy 2015–21 FoodTradeNetwork
-averages as fake 2006–11 FB.
+Task R6 only. A1: USDA PSD not FAOSTAT Food Balances. R6 obtain vendored
+raw FAOSTAT FBSH wheat 2006–11 at data/faostat_fb/ (PROVENANCE.txt;
+--faostat-fb). Author cleaned wheat_food_balance_fao.csv is still
+absent. Follow GATE0_DATA.md. Build a parallel WheatData from that FBSH
+extract and compare one harvest+AMIS window to USDA; keep USDA as
+prepare_wheat default. If you cannot map FBSH areas onto the 27-node
+host faithfully, leave A1 and stop. Do not copy 2015–21
+FoodTradeNetwork averages as fake 2006–11 FB. Do not retune αI / p_sto
+/ xmin. Do not mix FBS 2010+ into FBSH.
 
-Read first: GATE0_DATA.md, faostat_fb.md, GATE0_DEPARTURES.md A1.
+Read first: GATE0_DATA.md, faostat_fb.md, GATE0_DEPARTURES.md A1,
+data/faostat_fb/PROVENANCE.txt.
 ```
 
 ## R7 — A8 mean-vs-sum sensitivity

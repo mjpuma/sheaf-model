@@ -99,7 +99,7 @@ def test_r5_module_does_not_import_g1g2():
 def test_r5_did_not_overwrite_three_scenario():
     for name in PROTECTED_THREE_SCENARIO:
         assert (OUT_DEFAULT / name).is_file(), name
-    dispatch = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
-    assert "Last completed: R5" in dispatch
-    assert "Next paste: R6" in dispatch
-    assert "not adopted" in dispatch.lower() or "do not adopt" in dispatch.lower()
+    # Living dispatch moves after R6 obtain. R5 numbers stay in x1_demand.md.
+    text = (OUT_DEFAULT / "x1_demand.md").read_text()
+    assert "Next paste: R6" in text
+    assert "not adopted" in text.lower() or "Not adopted" in text

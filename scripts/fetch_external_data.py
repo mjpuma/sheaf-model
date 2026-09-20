@@ -6,10 +6,14 @@ AMIS/OECD export-restrictions: converts a browser-downloaded XLSX into CSVs
 (oecd.org blocks unattended bots via Cloudflare).
 World Bank Pink Sheet annual prices: discovered from the Commodity Markets page
 (download URL hash changes monthly).
+FAOSTAT Food Balances (optional, --faostat-fb): FBSH bulk zip, wheat 2006–11
+extract only. Not a silent fit; USDA stays prepare_wheat default.
 """
 from __future__ import annotations
 
 import argparse
+import csv
+import io
 import json
 import re
 import zipfile
@@ -24,8 +28,28 @@ ROOT = Path(__file__).resolve().parents[1]
 PSD_DIR = ROOT / "data" / "usda_psd"
 AMIS_DIR = ROOT / "data" / "amis_policies"
 PRICE_DIR = ROOT / "data" / "world_prices"
+FB_DIR = ROOT / "data" / "faostat_fb"
 PSD_URL = "https://apps.fas.usda.gov/psdonline/downloads/psd_alldata_csv.zip"
 WB_COMMODITY_PAGE = "https://www.worldbank.org/en/research/commodity-markets"
+# FAOSTAT Food Balances (-2013, old methodology). One vintage for 2006–11.
+FBSH_URL = (
+    "https://bulks-faostat.fao.org/production/"
+    "FoodBalanceSheetsHistoric_E_All_Data_(Normalized).zip"
+)
+FBSH_WHEAT_ITEM = 2511  # Wheat and products
+FBSH_YEARS = tuple(range(2006, 2012))
+# FBSH (old methodology) uses 5074 for Stock Variation; FBS 2010+ uses 5072.
+FBSH_ELEMENTS = {
+    5511: "production",
+    5611: "imports",
+    5911: "exports",
+    5301: "domestic_supply",
+    5142: "food",
+    5521: "feed",
+    5527: "seed",
+    5123: "losses",
+    5074: "stock_variation",
+}
 
 # Pink Sheet commodity column → SHEAF grain
 _PINK_SERIES = {
@@ -291,15 +315,143 @@ def fetch_prices() -> None:
     print("Pink Sheet price refresh complete (annual + monthly).")
 
 
+def fetch_faostat_fb() -> None:
+    """Download FAOSTAT FBSH bulk and extract wheat 2006–11 quantities.
+
+    This is the official FAO Food Balance Sheet (old methodology, domain
+    FBSH), not Agrimate's cleaned ``wheat_food_balance_fao.csv`` and not
+    FoodTradeNetwork 2015–21 P0/R0 averages. USDA remains prepare_wheat
+    default until a later labelled parallel WheatData uses this extract.
+    """
+    FB_DIR.mkdir(parents=True, exist_ok=True)
+    zip_path = FB_DIR / "FoodBalanceSheetsHistoric_E_All_Data_(Normalized).zip"
+    if zip_path.exists() and zip_path.stat().st_size > 1_000_000:
+        print(f"Reusing {zip_path.name} ({zip_path.stat().st_size / 1e6:.1f} MB)")
+    else:
+        print(f"Downloading {FBSH_URL} ...")
+        urllib.request.urlretrieve(FBSH_URL, zip_path)
+        print(f"  wrote {zip_path} ({zip_path.stat().st_size / 1e6:.1f} MB)")
+    member = None
+    with zipfile.ZipFile(zip_path) as zf:
+        names = zf.namelist()
+        for n in names:
+            if n.lower().endswith(".csv") and "normalized" in n.lower():
+                member = n
+                break
+        if member is None:
+            csvs = [n for n in names if n.lower().endswith(".csv")]
+            member = csvs[0] if csvs else None
+        if member is None:
+            raise RuntimeError(f"No CSV in {zip_path.name}: {names[:8]}")
+        print(f"  reading {member}")
+        years = {str(y) for y in FBSH_YEARS}
+        item = str(FBSH_WHEAT_ITEM)
+        keep_el = {str(k) for k in FBSH_ELEMENTS}
+        rows = []
+        with zf.open(member) as raw:
+            text = io.TextIOWrapper(raw, encoding="utf-8-sig", errors="replace", newline="")
+            reader = csv.reader(text)
+            header = next(reader)
+            header = [h.strip() for h in header]
+            low = {h.lower(): i for i, h in enumerate(header)}
+
+            def _col(*cands):
+                for c in cands:
+                    if c.lower() in low:
+                        return low[c.lower()]
+                return None
+
+            idx = {
+                "area_code": _col("Area Code", "Area Code (M49)"),
+                "area": _col("Area"),
+                "item_code": _col("Item Code"),
+                "item": _col("Item"),
+                "element_code": _col("Element Code"),
+                "element": _col("Element"),
+                "year": _col("Year"),
+                "unit": _col("Unit"),
+                "value": _col("Value"),
+                "flag": _col("Flag"),
+            }
+            need = ("item_code", "year", "element_code", "value", "area")
+            if any(idx[k] is None for k in need):
+                raise RuntimeError(f"Unexpected FBSH columns: {header}")
+            for i, parts in enumerate(reader, start=1):
+                if len(parts) <= max(v for v in idx.values() if v is not None):
+                    continue
+                if parts[idx["item_code"]] != item:
+                    continue
+                if parts[idx["year"]] not in years:
+                    continue
+                if parts[idx["element_code"]] not in keep_el:
+                    continue
+                rows.append({
+                    "area_code": parts[idx["area_code"]] if idx["area_code"] is not None else "",
+                    "area": parts[idx["area"]],
+                    "item_code": int(parts[idx["item_code"]]),
+                    "item": parts[idx["item"]] if idx["item"] is not None else "",
+                    "element_code": int(parts[idx["element_code"]]),
+                    "element": parts[idx["element"]] if idx["element"] is not None else "",
+                    "year": int(parts[idx["year"]]),
+                    "unit": parts[idx["unit"]] if idx["unit"] is not None else "",
+                    "value": parts[idx["value"]],
+                    "flag": parts[idx["flag"]] if idx["flag"] is not None else "",
+                    "field": FBSH_ELEMENTS[int(parts[idx["element_code"]])],
+                })
+                if i % 1_000_000 == 0:
+                    print(f"    scanned {i:,} rows, kept {len(rows):,}")
+    long = pd.DataFrame(rows)
+    long["value"] = pd.to_numeric(long["value"], errors="coerce")
+    long_path = FB_DIR / "wheat_fbsh_2006_2011_long.csv"
+    long.to_csv(long_path, index=False)
+    wide = (long.pivot_table(
+        index=["area_code", "area", "year", "unit"],
+        columns="field", values="value", aggfunc="sum")
+        .reset_index())
+    wide.columns.name = None
+    for col in FBSH_ELEMENTS.values():
+        if col not in wide.columns:
+            wide[col] = float("nan")
+    wide_path = FB_DIR / "wheat_fbsh_2006_2011.csv"
+    wide.to_csv(wide_path, index=False)
+    meta = {
+        "downloaded_at_utc": datetime.now(timezone.utc).isoformat(),
+        "source_url": FBSH_URL,
+        "domain": "FBSH",
+        "domain_name": "Food Balances (-2013, old methodology and population)",
+        "item_code": FBSH_WHEAT_ITEM,
+        "item": "Wheat and products",
+        "years": list(FBSH_YEARS),
+        "n_long_rows": int(len(long)),
+        "n_area_year": int(len(wide)),
+        "zip_member": member,
+        "stock_variation_element_code": 5074,
+        "note": (
+            "Raw FAOSTAT FBSH extract. Stock Variation is FBSH 5074 "
+            "(not FBS 5072). Not Agrimate wheat_food_balance_fao.csv "
+            "(impute/QCL+TCL/rebalance). Not FoodTradeNetwork 2015-21 averages."
+        ),
+    }
+    (FB_DIR / "DOWNLOAD_META.json").write_text(json.dumps(meta, indent=2))
+    print(f"  wheat extract: {len(long)} long rows, {len(wide)} area-years → {wide_path.name}")
+    print("FAOSTAT FBSH wheat 2006–11 extract complete.")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--psd-only", action="store_true")
     ap.add_argument("--amis-only", action="store_true")
     ap.add_argument("--prices-only", action="store_true")
+    ap.add_argument("--faostat-fb", action="store_true",
+                    help="Download FAOSTAT FBSH and extract wheat 2006–11. "
+                         "Opt-in; not part of the default PSD/AMIS/Pink fetch. "
+                         "Does not change wheat_params or prepare_wheat.")
     ap.add_argument("--amis-xlsx", type=Path, default=None,
                     help="Path to a browser-downloaded OECD/AMIS XLSX")
     args = ap.parse_args()
-    if args.amis_only:
+    if args.faostat_fb:
+        fetch_faostat_fb()
+    elif args.amis_only:
         refresh_amis_csvs(args.amis_xlsx)
     elif args.psd_only:
         fetch_psd()

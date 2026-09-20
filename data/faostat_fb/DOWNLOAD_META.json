@@ -1,0 +1,21 @@
+{
+  "downloaded_at_utc": "2026-09-20T08:32:21.353986+00:00",
+  "source_url": "https://bulks-faostat.fao.org/production/FoodBalanceSheetsHistoric_E_All_Data_(Normalized).zip",
+  "domain": "FBSH",
+  "domain_name": "Food Balances (-2013, old methodology and population)",
+  "item_code": 2511,
+  "item": "Wheat and products",
+  "years": [
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011
+  ],
+  "n_long_rows": 9936,
+  "n_area_year": 1259,
+  "zip_member": "FoodBalanceSheetsHistoric_E_All_Data_(Normalized).csv",
+  "stock_variation_element_code": 5074,
+  "note": "Raw FAOSTAT FBSH extract. Stock Variation is FBSH 5074 (not FBS 5072). Not Agrimate wheat_food_balance_fao.csv (impute/QCL+TCL/rebalance). Not FoodTradeNetwork 2015-21 averages."
+}

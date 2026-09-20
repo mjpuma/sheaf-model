@@ -1,12 +1,14 @@
-"""P10: FAOSTAT Food Balances are not in the repo. Leave A1. USDA stays default."""
+"""R6 obtain: raw FAOSTAT FBSH is vendored; author cleaned FB absent; USDA default."""
 from __future__ import annotations
 
 from pathlib import Path
 
-from sheaf.agrimate.faostat_fb import FAOSTAT_NETWORK, inventory
+from sheaf.agrimate.faostat_fb import FAOSTAT_FB, FAOSTAT_NETWORK, inventory
 from sheaf.agrimate.params import wheat_params
 from sheaf.agrimate.validation import OUT_DEFAULT
 from sheaf.agrimate.wheat_data import prepare_wheat
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_usda_remains_prepare_wheat_default():
@@ -25,14 +27,17 @@ def test_faostat_network_is_e0_not_food_balances():
     assert not any("food_balance" in n.lower() for n in names)
 
 
-def test_inventory_finds_no_food_balance_arrays():
+def test_inventory_separates_raw_fbsh_from_author_cleaned():
     inv = inventory()
     assert inv["e0_files"]
     assert inv["food_balance_files"] == []
     assert inv["author_fb_present"] == []
+    assert inv["fbsh_wheat_files"]
+    assert "wheat_fbsh_2006_2011.csv" in inv["fbsh_wheat_files"]
     assert inv["usda_is_default"] is True
     assert inv["alpha_i"] == 3.2
     assert inv["p0_r0_files"] == []
+    assert inv["laptop_data"]["exists"] is False
 
 
 def test_wheat_2006_e0_is_square_trade_not_a_food_balance():
@@ -44,9 +49,23 @@ def test_wheat_2006_e0_is_square_trade_not_a_food_balance():
     assert "production" not in cols
     assert "consumption" not in cols
     assert "ending_stocks" not in cols
-    # FAO area codes or ISO3, not FB element names
     sample = cols[0]
     assert sample in {"arm", "1"} or sample.isupper() or sample.isdigit()
+
+
+def test_fbsh_wheat_extract_is_2006_2011_thousand_tonnes():
+    import pandas as pd
+    path = FAOSTAT_FB / "wheat_fbsh_2006_2011.csv"
+    assert path.is_file()
+    df = pd.read_csv(path)
+    assert set(df["year"].unique()) == {2006, 2007, 2008, 2009, 2010, 2011}
+    assert set(df["unit"].unique()) == {"1000 t"}
+    usa = df[(df["area"] == "United States of America") & (df["year"] == 2007)]
+    assert abs(float(usa["production"].iloc[0]) - 55820.0) < 1.0
+    world = df[(df["area"] == "World") & (df["year"] == 2007)]
+    assert abs(float(world["production"].iloc[0]) - 608672.0) < 1.0
+    assert "stock_variation" in df.columns
+    assert usa["stock_variation"].notna().iloc[0]
 
 
 def test_p10_note_leaves_a1():
@@ -59,9 +78,31 @@ def test_p10_note_leaves_a1():
     assert "10688435" in text
     assert "faostat_network" in text
     assert "FoodTradeNetwork" in text or "P0" in text
+    assert "FBSH" in text
+    assert "--faostat-fb" in text
+    assert "wheat_food_balance_fao.csv" in text
 
 
-def test_no_faostat_fb_data_dir_was_added():
-    root = Path(__file__).resolve().parents[2]
-    assert not (root / "data" / "faostat_fb").exists()
-    assert not (root / "data" / "food_balances").exists()
+def test_bulk_zip_is_gitignored():
+    gi = (ROOT / ".gitignore").read_text()
+    assert "data/faostat_fb/*.zip" in gi
+    assert "data/faostat_fb/*_All_Data*" in gi
+
+
+def test_dispatch_obtain_then_parallel_wheatdata():
+    text = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
+    assert "Last completed: R6 obtain" in text
+    assert "Next paste: R6" in text
+    assert "do not switch prepare_wheat" in text.lower() or "USDA still" in text
+
+
+def test_faostat_fb_dir_has_provenance_and_not_author_cleaned():
+    assert FAOSTAT_FB.is_dir()
+    assert (FAOSTAT_FB / "PROVENANCE.txt").is_file()
+    assert (FAOSTAT_FB / "wheat_fbsh_2006_2011.csv").is_file()
+    assert not (FAOSTAT_FB / "wheat_food_balance_fao.csv").exists()
+    assert not (ROOT / "data" / "food_balances").exists()
+    prov = (FAOSTAT_FB / "PROVENANCE.txt").read_text()
+    assert "5074" in prov
+    assert "prepare_wheat" in prov or "USDA" in prov
+    assert "14022004" not in (ROOT / "scripts" / "fetch_external_data.py").read_text()
