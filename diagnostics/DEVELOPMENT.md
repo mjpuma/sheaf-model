@@ -14,7 +14,7 @@ Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
 Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
 (P0–P12 done). Post-P12 R-queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md)
 (**exhausted**). Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
-next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S5**).
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S5 done**; G0-P **not accepted**; do not start G1).
 Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
 [`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
@@ -110,8 +110,11 @@ approval.
    **S1 implemented** A8 member-sum. **S2 labelled** item 3 at 1.444
    (no sourced D.22; freeze not adopted). **S3** re-scored FBSH vs
    member-sum USDA (China H 1.00; moy 20.1×→33.0×; not adopted).
-   Next paste **S5**
-   (`GATE0_NEXT_PROMPTS.md`), not R8.
+   **S4** A7 inventory (Egypt not invented). **S5** re-scored Fig. 4 /
+   hindcast on the S1 CSVs (hike ×3.71, last/first 1.444, unconverged
+   2304/5832). Items 1–3 still fail. G0-P **not accepted**. Do not
+   start G1. Next paste **stay not-accepted**
+   (`GATE0_NEXT_PROMPTS.md`), not S6, not R8.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
 5. **P1 (done).** Step identities on 2006 harvest+AMIS.
 6. **P2 (done).** Delivery bug: lagged XI was credited to the *exporter*
@@ -225,6 +228,14 @@ approval.
     (`s4_a7.md`); **not** C.1. Egypt not invented. `wheat_params()`
     stay αI=3.2. Still cannot-set: start 2000, FAO-since-2005 inputs,
     Julia, bit-identical author FB. Next paste **S5**.
+26. **S5 (done).** Re-scored hike, quiet-year, moy max/min, and
+    undisturbed last/first from the S1 three-scenario CSVs against
+    `author_fig4/` and Pink Sheet. Not R11 (NLP not re-run).
+    harvest+AMIS hike ×3.71 vs author ×1.62 vs Pink ×1.88; 2006 mean
+    $81.5 vs Pink $213.5; last/first 1.444 vs author 1.004;
+    unconverged 2304/5832. Items 1–3 did **not** newly pass. G0-P
+    stays **not accepted**. `wheat_params()` unchanged. Do not start
+    G1. Next paste **stay not-accepted** (not S6).
 
 Reference command:
 

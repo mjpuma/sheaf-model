@@ -22,7 +22,7 @@ Do not implement G1/G2 here. Do not restore L1–L8 to chase Pink Sheet.
 Post-P12 inventory: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md),
 [`GATE0_DATA.md`](GATE0_DATA.md). R-queue exhausted. Post-R development:
 [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md). Next paste:
-[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S5**; S4 done).
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S5 done**; G0-P **not accepted**).
 
 ## Command
 
@@ -37,10 +37,17 @@ Fig. 4 author-series score (does **not** re-run the host; P7):
 PYTHONPATH=. python scripts/score_agrimate_fig4.py
 ```
 
-G0-H hindcast note (does **not** re-run the host; P8):
+G0-H hindcast note (does **not** re-run the host; P8 / S5):
 
 ```bash
 PYTHONPATH=. python scripts/score_agrimate_hindcast.py
+```
+
+S5 re-score of Fig. 4 + hindcast + regional notes from existing CSVs
+(does **not** re-run the NLP runner; not R11):
+
+```bash
+PYTHONPATH=. python scripts/score_agrimate_s5.py
 ```
 
 Regional USDA table (P9). Harvest is reconstructed from `H_annual`;

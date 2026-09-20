@@ -12,11 +12,12 @@ The R-science first-match table is **exhausted** on this host. G0-P stays
 | **A8** mean-of-members | **S1 implemented** (China H 112.7 / EA 3.31) | live host is member-sum |
 | **Item 3** wander | last/first **1.444** vs author 1.004; labelled; no sourced D.22 | **S2 done**; freeze not adopted |
 | **A1** USDA quantities | **S3 done** (FBSH H/C vs member-sum; China 1.00; moy worsened; not adopted) | USDA stays default; never FAO ΔS as S |
-| **A7** cannot-set | **S4 done** (parallel EU28+Egypt list labelled, not C.1; start-2000 / FAO-since-2005 / Julia still absent) | **S5** re-score Fig. 4 / hindcast |
+| **A7** cannot-set | **S4 done** (parallel EU28+Egypt list labelled, not C.1; start-2000 / FAO-since-2005 / Julia still absent) | **S5 done** (CSV re-score; items 1–3 still fail) |
 
 Do not walk R8…R12 as science. R8 may piggyback tests. R11 stays skipped
 while `wheat_params()` are unchanged. R12 / S6 only after items 1–3 move.
-Do not open G1/G2.
+Do not open G1/G2. S5 re-scored the S1 CSVs; items 1–3 still fail.
+G0-P stays **not accepted**.
 
 ## Why S1 before item 3
 
@@ -94,8 +95,8 @@ Next session pastes that file's **Next paste**, not the next integer.
 | **S2** | Item 3 re-measure on S1 host | **done** (1.444 labelled; freeze not adopted) |
 | **S3** | A1 after A8 (USDA S only) | **done** (FBSH not adopted; China H 1.00; moy 20.1×→33.0×) |
 | **S4** | A7 cannot-set inventory | **done** (Egypt not invented; parallel list labelled; knobs stay on comparison object) |
-| **S5** | Re-score Fig. 4 / hindcast on new host | **next** |
-| S6 | G0-P methods v2 | only if live items 1–3 changed |
+| **S5** | Re-score Fig. 4 / hindcast on new host | **done** (hike ×3.71; last/first 1.444; unconverged 2304; items 1–3 still fail) |
+| S6 | G0-P methods v2 | **not next** — items 1–3 did not newly pass |
 | — | G1 / G2 | **blocked until G0-P accepted** |
 
 ---

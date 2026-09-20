@@ -5,7 +5,9 @@ This table compares named AgrimateRegionsWheat nodes to
 `psd_regional_annual()` (mapped PSD members, marketing year).
 Coverage gaps stay labelled. `wheat_params()` stay αI=3.2,
 p_sto=0.1, xmin=0.2. No fit to close the stock-level gap.
-L1–L8 stay rejected. Bai α_foreign=10 not adopted.
+L1–L8 stay rejected. Bai α_foreign=10 not adopted. S5 re-scored
+world hike / quiet-year / moy / last/first from the S1 CSVs;
+not R11; `wheat_params()` unchanged.
 
 Harvest is reconstructed from `H_annual × (1+anomaly)` (no NLP);
 it matches the saved Ukraine mechanism CSVs year-for-year.
@@ -86,9 +88,9 @@ knob. China production is 1.00× mapped PSD
 (A8 member-sum). Eastern Africa production is 0.95×
 (A8 member-sum). Do not fit xmin or p_sto to the stock column: Ukraine
 stocks are 2.41× mapped
-PSD; Eastern Africa stocks are 3.45×. The world 1.58×
+PSD; Eastern Africa stocks are 3.45×. The world 1.65×
 gap in `hindcast.md` is a different comparison (27-node sum vs
-world PSD; stale until S5 re-score).
+world PSD; S5 re-scored).
 
 Eastern Africa *consumption* is not the old 0.1× PSD: inflows come from
 T* (A2), so the purchaser can eat imported grain. Host H is now the
@@ -102,9 +104,11 @@ labelled regional gaps. Do not fit a storage-cost knob to them.
 
 Production is identical by construction (same anomalies). AMIS
 moves consumption on restricting exporters: Ukraine 2007 is
-1.93 MMT harvest-only vs 10.34 MMT harvest+AMIS (grain stays
-home under E.4). See `ukraine_*.csv`. This table does not
-restore L1–L8 or retune αI.
+10.09 MMT harvest-only vs 2.83 MMT harvest+AMIS
+(sign flipped vs the pre-S1 pooled-mean host; grain does **not**
+stay home under E.4 on this member-sum path). See `ukraine_*.csv`.
+This table does not restore L1–L8 or retune αI. S5 re-scored
+hike / quiet-year / moy / last/first; it did not re-run NLP.
 
 ## Files
 

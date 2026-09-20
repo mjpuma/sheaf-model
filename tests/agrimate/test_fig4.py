@@ -92,8 +92,8 @@ def test_fig4_report_is_independent_not_replication():
     text = (OUT_DEFAULT / "fig4.md").read_text()
     assert "Do **not** claim replication" in text
     assert "G0-U items 1–3" in text
-    assert "1.63" in text
-    assert "1743/5832" in text
+    assert "1.444" in text or "1.443" in text
+    assert "2304/5832" in text
     assert "α_foreign" in text
     assert "not a replication" in text.lower()
     assert "L1–L8" in text
