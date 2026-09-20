@@ -11,6 +11,9 @@ data/usda_psd/psd_alldata.csv
 # FAOSTAT bulk Food Balance zips (regenerable via --faostat-fb)
 data/faostat_fb/*.zip
 data/faostat_fb/*_All_Data*
+# FAOSTAT QCL/TCL bulk zips (regenerable via --faostat-qcl-tcl)
+data/faostat_qcl_tcl/*.zip
+data/faostat_qcl_tcl/*_All_Data*
 # Local copies of Kuhla et al. 2025 (copyrighted; do not commit).
 # Anchored at repo root so sheaf/agrimate/ and tests/agrimate/ stay trackable.
 /agrimate/

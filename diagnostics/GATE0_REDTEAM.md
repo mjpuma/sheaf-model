@@ -308,7 +308,7 @@ HTTP HEAD/GET (2026-09-19):
 | Pink Sheet | scoring | scoring only | `--prices-only` (WB page HEAD 200) |
 | Fig. 4 series | 10688435 NetCDF | extracted CSVs in `author_fig4/` | **manual** Zenodo (record HEAD 200); zip not vendored |
 | Author Julia | 14022004 | not copied | record HEAD 200; **not in fetch script**; **not in repo** |
-| FAOSTAT FB arrays | E.1.1 | USDA default (A1); **raw FBSH** in `data/faostat_fb/` (R6 obtain); author cleaned still absent | `--faostat-fb` (opt-in; bulk zip 200 this run; JSON API 521) |
+| FAOSTAT FB arrays | E.1.1 | USDA default (A1); **raw FBSH** in `data/faostat_fb/` (R6 obtain); labelled host reconstruction in `data/food_balances/` (not bit-identical; **not adopted**) | `--faostat-fb` / `--faostat-qcl-tcl` (opt-in; bulk zip 200 this run; JSON API 521) |
 
 `scripts/fetch_external_data.py` contains none of: `zenodo`,
 `14022004`, `10688435`, `alpha_i`, `p_sto`, `xmin`. There is **no**

@@ -148,7 +148,9 @@ R7: `diagnostics/gate0_agrimate/a8_sum.md` — 2007–09 H/C/S mean vs
 sum (USDA ending stocks, not FAO ΔS); S1 implements the sum.
 P10: `diagnostics/gate0_agrimate/faostat_fb.md` — `data/faostat_network/`
 is E0 only; A1 left; USDA default. R6 obtain: raw FBSH at
-`data/faostat_fb/`; author cleaned still absent.
+`data/faostat_fb/`; labelled host reconstruction at
+`data/food_balances/wheat_food_balance_fao.csv` (not bit-identical;
+not adopted).
 P11: `diagnostics/gate0_agrimate/pulse.md` — 8-run 2008 prescribed-Δ,
 clean; not Bai's 36; not G2.
 P12: `diagnostics/gate0_agrimate/methods.md` — G0-P market-section

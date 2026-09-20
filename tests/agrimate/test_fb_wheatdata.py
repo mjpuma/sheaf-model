@@ -43,7 +43,7 @@ def test_map_drops_china_total_and_aggregates():
     assert iso == "USA" and region == "USA"
     assert 351 in DROP_AREA_CODES
     assert inventory()["usda_is_default"] is True
-    assert inventory()["food_balance_files"] == []
+    assert "wheat_food_balance_fao.csv" in inventory()["author_fb_present"]
     assert inventory()["fbsh_wheat_files"]
 
 

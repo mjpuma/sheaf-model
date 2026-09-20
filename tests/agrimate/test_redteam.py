@@ -72,6 +72,8 @@ def test_provenance_and_cookbook_exist():
         "data/usda_world/PROVENANCE.txt",
         "data/faostat_network/PROVENANCE.txt",
         "data/faostat_fb/PROVENANCE.txt",
+        "data/faostat_qcl_tcl/PROVENANCE.txt",
+        "data/food_balances/PROVENANCE.txt",
         "data/amis_policies/PROVENANCE.txt",
         "data/world_prices/PROVENANCE.txt",
         "data/crop_calendars/PROVENANCE.txt",
@@ -120,5 +122,6 @@ def test_redteam_note_does_not_claim_replication():
     data = (ROOT / "diagnostics" / "GATE0_DATA.md").read_text()
     assert "--psd-only" in data
     assert "--faostat-fb" in data
+    assert "--faostat-qcl-tcl" in data
     assert "Food Balances" in data
     assert OUT_DEFAULT.exists()

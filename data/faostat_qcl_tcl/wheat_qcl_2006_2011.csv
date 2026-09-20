@@ -1,0 +1,943 @@
+Area Code,Area,Item Code,Item,Element,Year,Unit,Value,Flag
+2,Afghanistan,15,Wheat,Production,2006,t,3363000.000000,A
+2,Afghanistan,15,Wheat,Production,2007,t,4484000.000000,A
+2,Afghanistan,15,Wheat,Production,2008,t,2623000.000000,A
+2,Afghanistan,15,Wheat,Production,2009,t,5064000.000000,A
+2,Afghanistan,15,Wheat,Production,2010,t,4532000.000000,A
+2,Afghanistan,15,Wheat,Production,2011,t,3388000.000000,A
+3,Albania,15,Wheat,Production,2006,t,230900.000000,A
+3,Albania,15,Wheat,Production,2007,t,249500.000000,A
+3,Albania,15,Wheat,Production,2008,t,335000.000000,A
+3,Albania,15,Wheat,Production,2009,t,333100.000000,A
+3,Albania,15,Wheat,Production,2010,t,294900.000000,A
+3,Albania,15,Wheat,Production,2011,t,292800.000000,A
+4,Algeria,15,Wheat,Production,2006,t,2687930.000000,A
+4,Algeria,15,Wheat,Production,2007,t,2318963.000000,A
+4,Algeria,15,Wheat,Production,2008,t,1111033.000000,A
+4,Algeria,15,Wheat,Production,2009,t,2953117.000000,A
+4,Algeria,15,Wheat,Production,2010,t,2605178.000000,A
+4,Algeria,15,Wheat,Production,2011,t,2910890.000000,A
+7,Angola,15,Wheat,Production,2006,t,4000.000000,X
+7,Angola,15,Wheat,Production,2007,t,4000.000000,X
+7,Angola,15,Wheat,Production,2008,t,4000.000000,X
+7,Angola,15,Wheat,Production,2009,t,4000.000000,X
+7,Angola,15,Wheat,Production,2010,t,4000.000000,X
+7,Angola,15,Wheat,Production,2011,t,4000.000000,X
+9,Argentina,15,Wheat,Production,2006,t,14547960.000000,A
+9,Argentina,15,Wheat,Production,2007,t,16354091.000000,A
+9,Argentina,15,Wheat,Production,2008,t,8376452.000000,A
+9,Argentina,15,Wheat,Production,2009,t,9023139.000000,A
+9,Argentina,15,Wheat,Production,2010,t,15875653.000000,A
+9,Argentina,15,Wheat,Production,2011,t,14500519.000000,A
+1,Armenia,15,Wheat,Production,2006,t,146544.000000,A
+1,Armenia,15,Wheat,Production,2007,t,254233.000000,A
+1,Armenia,15,Wheat,Production,2008,t,225734.000000,A
+1,Armenia,15,Wheat,Production,2009,t,198080.000000,A
+1,Armenia,15,Wheat,Production,2010,t,183464.000000,A
+1,Armenia,15,Wheat,Production,2011,t,224082.000000,A
+10,Australia,15,Wheat,Production,2006,t,10821628.000000,A
+10,Australia,15,Wheat,Production,2007,t,13569378.000000,A
+10,Australia,15,Wheat,Production,2008,t,21420177.000000,A
+10,Australia,15,Wheat,Production,2009,t,21834010.000000,A
+10,Australia,15,Wheat,Production,2010,t,27410076.000000,A
+10,Australia,15,Wheat,Production,2011,t,29905009.000000,A
+11,Austria,15,Wheat,Production,2006,t,1396300.000000,A
+11,Austria,15,Wheat,Production,2007,t,1399341.000000,A
+11,Austria,15,Wheat,Production,2008,t,1689688.000000,A
+11,Austria,15,Wheat,Production,2009,t,1523368.000000,A
+11,Austria,15,Wheat,Production,2010,t,1517805.000000,A
+11,Austria,15,Wheat,Production,2011,t,1781837.000000,A
+52,Azerbaijan,15,Wheat,Production,2006,t,1460303.000000,A
+52,Azerbaijan,15,Wheat,Production,2007,t,1305458.000000,A
+52,Azerbaijan,15,Wheat,Production,2008,t,1645792.000000,A
+52,Azerbaijan,15,Wheat,Production,2009,t,2096203.000000,A
+52,Azerbaijan,15,Wheat,Production,2010,t,1272340.000000,A
+52,Azerbaijan,15,Wheat,Production,2011,t,1594394.000000,A
+16,Bangladesh,15,Wheat,Production,2006,t,735000.000000,A
+16,Bangladesh,15,Wheat,Production,2007,t,737000.000000,A
+16,Bangladesh,15,Wheat,Production,2008,t,844000.000000,A
+16,Bangladesh,15,Wheat,Production,2009,t,849046.000000,A
+16,Bangladesh,15,Wheat,Production,2010,t,901490.000000,A
+16,Bangladesh,15,Wheat,Production,2011,t,972085.000000,A
+57,Belarus,15,Wheat,Production,2006,t,1075238.000000,A
+57,Belarus,15,Wheat,Production,2007,t,1396553.000000,A
+57,Belarus,15,Wheat,Production,2008,t,2045237.000000,A
+57,Belarus,15,Wheat,Production,2009,t,1979000.000000,A
+57,Belarus,15,Wheat,Production,2010,t,1739110.000000,A
+57,Belarus,15,Wheat,Production,2011,t,2132369.000000,A
+255,Belgium,15,Wheat,Production,2006,t,1661958.000000,A
+255,Belgium,15,Wheat,Production,2007,t,1577342.000000,A
+255,Belgium,15,Wheat,Production,2008,t,1850406.000000,A
+255,Belgium,15,Wheat,Production,2009,t,1909768.000000,A
+255,Belgium,15,Wheat,Production,2010,t,1849584.000000,A
+255,Belgium,15,Wheat,Production,2011,t,1687749.000000,A
+18,Bhutan,15,Wheat,Production,2006,t,9100.000000,A
+18,Bhutan,15,Wheat,Production,2007,t,8879.000000,A
+18,Bhutan,15,Wheat,Production,2008,t,5828.000000,A
+18,Bhutan,15,Wheat,Production,2009,t,4481.000000,A
+18,Bhutan,15,Wheat,Production,2010,t,4873.000000,A
+18,Bhutan,15,Wheat,Production,2011,t,6266.000000,A
+19,Bolivia (Plurinational State of),15,Wheat,Production,2006,t,143677.000000,A
+19,Bolivia (Plurinational State of),15,Wheat,Production,2007,t,167095.000000,A
+19,Bolivia (Plurinational State of),15,Wheat,Production,2008,t,199990.000000,A
+19,Bolivia (Plurinational State of),15,Wheat,Production,2009,t,201508.000000,A
+19,Bolivia (Plurinational State of),15,Wheat,Production,2010,t,241397.000000,A
+19,Bolivia (Plurinational State of),15,Wheat,Production,2011,t,182927.000000,A
+80,Bosnia and Herzegovina,15,Wheat,Production,2006,t,232496.000000,A
+80,Bosnia and Herzegovina,15,Wheat,Production,2007,t,257112.000000,A
+80,Bosnia and Herzegovina,15,Wheat,Production,2008,t,240533.000000,A
+80,Bosnia and Herzegovina,15,Wheat,Production,2009,t,255848.000000,A
+80,Bosnia and Herzegovina,15,Wheat,Production,2010,t,145412.000000,A
+80,Bosnia and Herzegovina,15,Wheat,Production,2011,t,210004.000000,A
+20,Botswana,15,Wheat,Production,2006,t,187.210000,I
+20,Botswana,15,Wheat,Production,2007,t,72.000000,A
+20,Botswana,15,Wheat,Production,2008,t,104.000000,A
+20,Botswana,15,Wheat,Production,2009,t,0.000000,A
+20,Botswana,15,Wheat,Production,2010,t,0.000000,I
+20,Botswana,15,Wheat,Production,2011,t,0.000000,I
+21,Brazil,15,Wheat,Production,2006,t,2484848.000000,A
+21,Brazil,15,Wheat,Production,2007,t,4114057.000000,A
+21,Brazil,15,Wheat,Production,2008,t,6027131.000000,A
+21,Brazil,15,Wheat,Production,2009,t,5055525.000000,A
+21,Brazil,15,Wheat,Production,2010,t,6171250.000000,A
+21,Brazil,15,Wheat,Production,2011,t,5690043.000000,A
+27,Bulgaria,15,Wheat,Production,2006,t,3301882.000000,A
+27,Bulgaria,15,Wheat,Production,2007,t,2390610.000000,A
+27,Bulgaria,15,Wheat,Production,2008,t,4632210.000000,A
+27,Bulgaria,15,Wheat,Production,2009,t,3976852.000000,A
+27,Bulgaria,15,Wheat,Production,2010,t,4094597.000000,A
+27,Bulgaria,15,Wheat,Production,2011,t,4458492.000000,A
+29,Burundi,15,Wheat,Production,2006,t,8007.000000,A
+29,Burundi,15,Wheat,Production,2007,t,7987.000000,A
+29,Burundi,15,Wheat,Production,2008,t,8094.000000,A
+29,Burundi,15,Wheat,Production,2009,t,8583.000000,A
+29,Burundi,15,Wheat,Production,2010,t,9034.000000,A
+29,Burundi,15,Wheat,Production,2011,t,9787.000000,A
+32,Cameroon,15,Wheat,Production,2006,t,730.110000,I
+32,Cameroon,15,Wheat,Production,2007,t,752.650000,I
+32,Cameroon,15,Wheat,Production,2008,t,776.430000,I
+32,Cameroon,15,Wheat,Production,2009,t,801.570000,I
+32,Cameroon,15,Wheat,Production,2010,t,900.000000,E
+32,Cameroon,15,Wheat,Production,2011,t,950.000000,E
+33,Canada,15,Wheat,Production,2006,t,25265400.000000,A
+33,Canada,15,Wheat,Production,2007,t,20090400.000000,A
+33,Canada,15,Wheat,Production,2008,t,28619200.000000,A
+33,Canada,15,Wheat,Production,2009,t,26949900.000000,A
+33,Canada,15,Wheat,Production,2010,t,23299600.000000,A
+33,Canada,15,Wheat,Production,2011,t,25288000.000000,A
+39,Chad,15,Wheat,Production,2006,t,1865.000000,A
+39,Chad,15,Wheat,Production,2007,t,8393.000000,A
+39,Chad,15,Wheat,Production,2008,t,8100.000000,A
+39,Chad,15,Wheat,Production,2009,t,5000.000000,A
+39,Chad,15,Wheat,Production,2010,t,1698.000000,A
+39,Chad,15,Wheat,Production,2011,t,1723.000000,A
+40,Chile,15,Wheat,Production,2006,t,1403689.000000,A
+40,Chile,15,Wheat,Production,2007,t,1095872.000000,A
+40,Chile,15,Wheat,Production,2008,t,1237691.000000,A
+40,Chile,15,Wheat,Production,2009,t,1145290.000000,A
+40,Chile,15,Wheat,Production,2010,t,1523921.200000,A
+40,Chile,15,Wheat,Production,2011,t,1575822.000000,A
+351,China,15,Wheat,Production,2006,t,108466271.000000,A
+351,China,15,Wheat,Production,2007,t,109298296.000000,A
+351,China,15,Wheat,Production,2008,t,112464292.000000,A
+351,China,15,Wheat,Production,2009,t,115115364.000000,A
+351,China,15,Wheat,Production,2010,t,115186178.000000,A
+351,China,15,Wheat,Production,2011,t,117414034.000000,A
+41,"China, mainland",15,Wheat,Production,2006,t,108466000.000000,A
+41,"China, mainland",15,Wheat,Production,2007,t,109298000.000000,A
+41,"China, mainland",15,Wheat,Production,2008,t,112464000.000000,A
+41,"China, mainland",15,Wheat,Production,2009,t,115115000.000000,A
+41,"China, mainland",15,Wheat,Production,2010,t,115181000.000000,A
+41,"China, mainland",15,Wheat,Production,2011,t,117410000.000000,A
+214,"China, Taiwan Province of",15,Wheat,Production,2006,t,271.000000,A
+214,"China, Taiwan Province of",15,Wheat,Production,2007,t,296.000000,A
+214,"China, Taiwan Province of",15,Wheat,Production,2008,t,292.000000,A
+214,"China, Taiwan Province of",15,Wheat,Production,2009,t,364.000000,A
+214,"China, Taiwan Province of",15,Wheat,Production,2010,t,5178.000000,A
+214,"China, Taiwan Province of",15,Wheat,Production,2011,t,4034.000000,A
+44,Colombia,15,Wheat,Production,2006,t,26399.000000,A
+44,Colombia,15,Wheat,Production,2007,t,36778.000000,A
+44,Colombia,15,Wheat,Production,2008,t,39191.000000,A
+44,Colombia,15,Wheat,Production,2009,t,24349.000000,A
+44,Colombia,15,Wheat,Production,2010,t,15147.000000,A
+44,Colombia,15,Wheat,Production,2011,t,12754.000000,A
+98,Croatia,15,Wheat,Production,2006,t,804601.000000,A
+98,Croatia,15,Wheat,Production,2007,t,812347.000000,A
+98,Croatia,15,Wheat,Production,2008,t,858333.000000,A
+98,Croatia,15,Wheat,Production,2009,t,936076.000000,A
+98,Croatia,15,Wheat,Production,2010,t,681017.000000,A
+98,Croatia,15,Wheat,Production,2011,t,782499.000000,A
+50,Cyprus,15,Wheat,Production,2006,t,7518.000000,A
+50,Cyprus,15,Wheat,Production,2007,t,10712.000000,A
+50,Cyprus,15,Wheat,Production,2008,t,2472.000000,A
+50,Cyprus,15,Wheat,Production,2009,t,14690.000000,A
+50,Cyprus,15,Wheat,Production,2010,t,18889.000000,A
+50,Cyprus,15,Wheat,Production,2011,t,23740.000000,A
+167,Czechia,15,Wheat,Production,2006,t,3506252.000000,A
+167,Czechia,15,Wheat,Production,2007,t,3938924.000000,A
+167,Czechia,15,Wheat,Production,2008,t,4631502.000000,A
+167,Czechia,15,Wheat,Production,2009,t,4358073.000000,A
+167,Czechia,15,Wheat,Production,2010,t,4161553.000000,A
+167,Czechia,15,Wheat,Production,2011,t,4913048.000000,A
+116,Democratic People's Republic of Korea,15,Wheat,Production,2006,t,199000.000000,X
+116,Democratic People's Republic of Korea,15,Wheat,Production,2007,t,195000.000000,X
+116,Democratic People's Republic of Korea,15,Wheat,Production,2008,t,175000.000000,X
+116,Democratic People's Republic of Korea,15,Wheat,Production,2009,t,169000.000000,X
+116,Democratic People's Republic of Korea,15,Wheat,Production,2010,t,160000.000000,X
+116,Democratic People's Republic of Korea,15,Wheat,Production,2011,t,127000.000000,X
+250,Democratic Republic of the Congo,15,Wheat,Production,2006,t,8640.000000,A
+250,Democratic Republic of the Congo,15,Wheat,Production,2007,t,8690.000000,A
+250,Democratic Republic of the Congo,15,Wheat,Production,2008,t,8740.000000,A
+250,Democratic Republic of the Congo,15,Wheat,Production,2009,t,8790.000000,A
+250,Democratic Republic of the Congo,15,Wheat,Production,2010,t,8841.000000,A
+250,Democratic Republic of the Congo,15,Wheat,Production,2011,t,8841.000000,A
+54,Denmark,15,Wheat,Production,2006,t,4801600.000000,A
+54,Denmark,15,Wheat,Production,2007,t,4519200.000000,A
+54,Denmark,15,Wheat,Production,2008,t,5018700.000000,A
+54,Denmark,15,Wheat,Production,2009,t,5940400.000000,A
+54,Denmark,15,Wheat,Production,2010,t,5059900.000000,A
+54,Denmark,15,Wheat,Production,2011,t,4831000.000000,A
+58,Ecuador,15,Wheat,Production,2006,t,7577.000000,A
+58,Ecuador,15,Wheat,Production,2007,t,9243.000000,A
+58,Ecuador,15,Wheat,Production,2008,t,8144.000000,A
+58,Ecuador,15,Wheat,Production,2009,t,11314.000000,A
+58,Ecuador,15,Wheat,Production,2010,t,7605.000000,A
+58,Ecuador,15,Wheat,Production,2011,t,5938.000000,A
+59,Egypt,15,Wheat,Production,2006,t,8274230.000000,A
+59,Egypt,15,Wheat,Production,2007,t,7379000.000000,A
+59,Egypt,15,Wheat,Production,2008,t,7977051.000000,A
+59,Egypt,15,Wheat,Production,2009,t,8522995.000000,A
+59,Egypt,15,Wheat,Production,2010,t,7177399.000000,A
+59,Egypt,15,Wheat,Production,2011,t,8407126.000000,A
+178,Eritrea,15,Wheat,Production,2006,t,21570.000000,A
+178,Eritrea,15,Wheat,Production,2007,t,27274.000000,A
+178,Eritrea,15,Wheat,Production,2008,t,5391.000000,A
+178,Eritrea,15,Wheat,Production,2009,t,26142.000000,A
+178,Eritrea,15,Wheat,Production,2010,t,33000.000000,X
+178,Eritrea,15,Wheat,Production,2011,t,29000.000000,X
+63,Estonia,15,Wheat,Production,2006,t,219590.000000,A
+63,Estonia,15,Wheat,Production,2007,t,345726.000000,A
+63,Estonia,15,Wheat,Production,2008,t,342500.000000,A
+63,Estonia,15,Wheat,Production,2009,t,342520.000000,A
+63,Estonia,15,Wheat,Production,2010,t,327600.000000,A
+63,Estonia,15,Wheat,Production,2011,t,360400.000000,A
+209,Eswatini,15,Wheat,Production,2006,t,334.950000,I
+209,Eswatini,15,Wheat,Production,2007,t,325.000000,E
+209,Eswatini,15,Wheat,Production,2008,t,388.800000,I
+209,Eswatini,15,Wheat,Production,2009,t,420.000000,E
+209,Eswatini,15,Wheat,Production,2010,t,450.000000,E
+209,Eswatini,15,Wheat,Production,2011,t,556.400000,I
+238,Ethiopia,15,Wheat,Production,2006,t,2219075.000000,A
+238,Ethiopia,15,Wheat,Production,2007,t,2536955.920000,E
+238,Ethiopia,15,Wheat,Production,2008,t,2383923.670000,E
+238,Ethiopia,15,Wheat,Production,2009,t,3167913.320000,E
+238,Ethiopia,15,Wheat,Production,2010,t,3325620.000000,E
+238,Ethiopia,15,Wheat,Production,2011,t,3091540.000000,E
+67,Finland,15,Wheat,Production,2006,t,684100.000000,A
+67,Finland,15,Wheat,Production,2007,t,796800.000000,A
+67,Finland,15,Wheat,Production,2008,t,787500.000000,A
+67,Finland,15,Wheat,Production,2009,t,887000.000000,A
+67,Finland,15,Wheat,Production,2010,t,724400.000000,A
+67,Finland,15,Wheat,Production,2011,t,974800.000000,A
+68,France,15,Wheat,Production,2006,t,35363563.400000,A
+68,France,15,Wheat,Production,2007,t,32763445.900000,A
+68,France,15,Wheat,Production,2008,t,39006372.000000,A
+68,France,15,Wheat,Production,2009,t,38336864.700000,A
+68,France,15,Wheat,Production,2010,t,38207431.000000,A
+68,France,15,Wheat,Production,2011,t,35992794.300000,A
+73,Georgia,15,Wheat,Production,2006,t,69700.000000,A
+73,Georgia,15,Wheat,Production,2007,t,74900.000000,A
+73,Georgia,15,Wheat,Production,2008,t,80300.000000,A
+73,Georgia,15,Wheat,Production,2009,t,53900.000000,A
+73,Georgia,15,Wheat,Production,2010,t,48400.000000,A
+73,Georgia,15,Wheat,Production,2011,t,96800.000000,A
+79,Germany,15,Wheat,Production,2006,t,22427900.000000,A
+79,Germany,15,Wheat,Production,2007,t,20828077.000000,A
+79,Germany,15,Wheat,Production,2008,t,25988564.000000,A
+79,Germany,15,Wheat,Production,2009,t,25192350.000000,A
+79,Germany,15,Wheat,Production,2010,t,23782955.000000,A
+79,Germany,15,Wheat,Production,2011,t,22782700.000000,A
+84,Greece,15,Wheat,Production,2006,t,1778170.000000,A
+84,Greece,15,Wheat,Production,2007,t,1629072.000000,A
+84,Greece,15,Wheat,Production,2008,t,2074607.570000,A
+84,Greece,15,Wheat,Production,2009,t,2139472.150000,A
+84,Greece,15,Wheat,Production,2010,t,1920669.750000,A
+84,Greece,15,Wheat,Production,2011,t,1857428.800000,A
+89,Guatemala,15,Wheat,Production,2006,t,1587.570000,A
+89,Guatemala,15,Wheat,Production,2007,t,1864.260000,A
+89,Guatemala,15,Wheat,Production,2008,t,1846.120000,A
+89,Guatemala,15,Wheat,Production,2009,t,1546.750000,A
+89,Guatemala,15,Wheat,Production,2010,t,1437.890000,A
+89,Guatemala,15,Wheat,Production,2011,t,1433.350000,A
+95,Honduras,15,Wheat,Production,2006,t,1085.460000,I
+95,Honduras,15,Wheat,Production,2007,t,1099.490000,I
+95,Honduras,15,Wheat,Production,2008,t,1113.300000,I
+95,Honduras,15,Wheat,Production,2009,t,1127.000000,A
+95,Honduras,15,Wheat,Production,2010,t,1139.610000,I
+95,Honduras,15,Wheat,Production,2011,t,1170.080000,I
+97,Hungary,15,Wheat,Production,2006,t,4376235.000000,A
+97,Hungary,15,Wheat,Production,2007,t,3986708.000000,A
+97,Hungary,15,Wheat,Production,2008,t,5630833.000000,A
+97,Hungary,15,Wheat,Production,2009,t,4419163.000000,A
+97,Hungary,15,Wheat,Production,2010,t,3745190.000000,A
+97,Hungary,15,Wheat,Production,2011,t,4107000.000000,A
+100,India,15,Wheat,Production,2006,t,69354496.000000,A
+100,India,15,Wheat,Production,2007,t,75806704.000000,A
+100,India,15,Wheat,Production,2008,t,78570200.000000,A
+100,India,15,Wheat,Production,2009,t,80679400.000000,A
+100,India,15,Wheat,Production,2010,t,80803600.000000,A
+100,India,15,Wheat,Production,2011,t,86874000.000000,A
+102,Iran (Islamic Republic of),15,Wheat,Production,2006,t,14663745.000000,A
+102,Iran (Islamic Republic of),15,Wheat,Production,2007,t,15886608.500000,A
+102,Iran (Islamic Republic of),15,Wheat,Production,2008,t,6999977.400000,A
+102,Iran (Islamic Republic of),15,Wheat,Production,2009,t,12093027.500000,A
+102,Iran (Islamic Republic of),15,Wheat,Production,2010,t,12142987.900000,A
+102,Iran (Islamic Republic of),15,Wheat,Production,2011,t,8677966.000000,A
+103,Iraq,15,Wheat,Production,2006,t,2086000.000000,A
+103,Iraq,15,Wheat,Production,2007,t,2202800.000000,A
+103,Iraq,15,Wheat,Production,2008,t,1255000.000000,A
+103,Iraq,15,Wheat,Production,2009,t,1700390.000000,A
+103,Iraq,15,Wheat,Production,2010,t,2748840.000000,A
+103,Iraq,15,Wheat,Production,2011,t,2808900.000000,A
+104,Ireland,15,Wheat,Production,2006,t,801000.000000,A
+104,Ireland,15,Wheat,Production,2007,t,713400.000000,A
+104,Ireland,15,Wheat,Production,2008,t,992800.000000,A
+104,Ireland,15,Wheat,Production,2009,t,690100.000000,A
+104,Ireland,15,Wheat,Production,2010,t,669200.000000,A
+104,Ireland,15,Wheat,Production,2011,t,929200.000000,A
+105,Israel,15,Wheat,Production,2006,t,131200.000000,A
+105,Israel,15,Wheat,Production,2007,t,158921.000000,A
+105,Israel,15,Wheat,Production,2008,t,75734.000000,A
+105,Israel,15,Wheat,Production,2009,t,132963.000000,A
+105,Israel,15,Wheat,Production,2010,t,112324.320000,A
+105,Israel,15,Wheat,Production,2011,t,141866.000000,A
+106,Italy,15,Wheat,Production,2006,t,7181720.000000,A
+106,Italy,15,Wheat,Production,2007,t,7170181.000000,A
+106,Italy,15,Wheat,Production,2008,t,8855440.000000,A
+106,Italy,15,Wheat,Production,2009,t,6534746.000000,A
+106,Italy,15,Wheat,Production,2010,t,6849858.000000,A
+106,Italy,15,Wheat,Production,2011,t,6641806.500000,A
+110,Japan,15,Wheat,Production,2006,t,837200.000000,A
+110,Japan,15,Wheat,Production,2007,t,910100.000000,A
+110,Japan,15,Wheat,Production,2008,t,881200.000000,A
+110,Japan,15,Wheat,Production,2009,t,674200.000000,A
+110,Japan,15,Wheat,Production,2010,t,571300.000000,A
+110,Japan,15,Wheat,Production,2011,t,746300.000000,A
+112,Jordan,15,Wheat,Production,2006,t,22928.000000,A
+112,Jordan,15,Wheat,Production,2007,t,20997.000000,A
+112,Jordan,15,Wheat,Production,2008,t,7835.000000,A
+112,Jordan,15,Wheat,Production,2009,t,12484.000000,A
+112,Jordan,15,Wheat,Production,2010,t,22125.000000,A
+112,Jordan,15,Wheat,Production,2011,t,19801.000000,A
+108,Kazakhstan,15,Wheat,Production,2006,t,13460480.000000,A
+108,Kazakhstan,15,Wheat,Production,2007,t,16466870.000000,A
+108,Kazakhstan,15,Wheat,Production,2008,t,12538190.000000,A
+108,Kazakhstan,15,Wheat,Production,2009,t,17052020.000000,A
+108,Kazakhstan,15,Wheat,Production,2010,t,9638400.000000,A
+108,Kazakhstan,15,Wheat,Production,2011,t,22732066.510000,A
+114,Kenya,15,Wheat,Production,2006,t,329193.000000,A
+114,Kenya,15,Wheat,Production,2007,t,322320.000000,A
+114,Kenya,15,Wheat,Production,2008,t,336688.000000,A
+114,Kenya,15,Wheat,Production,2009,t,219301.000000,A
+114,Kenya,15,Wheat,Production,2010,t,511994.000000,A
+114,Kenya,15,Wheat,Production,2011,t,268482.000000,A
+118,Kuwait,15,Wheat,Production,2006,t,510.000000,A
+118,Kuwait,15,Wheat,Production,2007,t,478.000000,A
+118,Kuwait,15,Wheat,Production,2008,t,398.000000,A
+118,Kuwait,15,Wheat,Production,2009,t,84.000000,A
+118,Kuwait,15,Wheat,Production,2010,t,162.000000,A
+118,Kuwait,15,Wheat,Production,2011,t,62.000000,A
+113,Kyrgyzstan,15,Wheat,Production,2006,t,840299.000000,A
+113,Kyrgyzstan,15,Wheat,Production,2007,t,708877.000000,A
+113,Kyrgyzstan,15,Wheat,Production,2008,t,746200.000000,A
+113,Kyrgyzstan,15,Wheat,Production,2009,t,1056656.000000,A
+113,Kyrgyzstan,15,Wheat,Production,2010,t,813300.000000,A
+113,Kyrgyzstan,15,Wheat,Production,2011,t,799841.000000,A
+119,Latvia,15,Wheat,Production,2006,t,598300.000000,A
+119,Latvia,15,Wheat,Production,2007,t,807300.000000,A
+119,Latvia,15,Wheat,Production,2008,t,989600.000000,A
+119,Latvia,15,Wheat,Production,2009,t,1036400.000000,A
+119,Latvia,15,Wheat,Production,2010,t,989400.000000,A
+119,Latvia,15,Wheat,Production,2011,t,939500.000000,A
+121,Lebanon,15,Wheat,Production,2006,t,153400.000000,A
+121,Lebanon,15,Wheat,Production,2007,t,116200.000000,A
+121,Lebanon,15,Wheat,Production,2008,t,143700.000000,A
+121,Lebanon,15,Wheat,Production,2009,t,111400.000000,A
+121,Lebanon,15,Wheat,Production,2010,t,83000.000000,X
+121,Lebanon,15,Wheat,Production,2011,t,125000.000000,X
+122,Lesotho,15,Wheat,Production,2006,t,6607.000000,A
+122,Lesotho,15,Wheat,Production,2007,t,3158.000000,A
+122,Lesotho,15,Wheat,Production,2008,t,2697.000000,A
+122,Lesotho,15,Wheat,Production,2009,t,6099.000000,A
+122,Lesotho,15,Wheat,Production,2010,t,20119.000000,A
+122,Lesotho,15,Wheat,Production,2011,t,20065.000000,A
+124,Libya,15,Wheat,Production,2006,t,104000.000000,A
+124,Libya,15,Wheat,Production,2007,t,104000.000000,A
+124,Libya,15,Wheat,Production,2008,t,104000.000000,A
+124,Libya,15,Wheat,Production,2009,t,105000.000000,E
+124,Libya,15,Wheat,Production,2010,t,132239.070000,I
+124,Libya,15,Wheat,Production,2011,t,166000.000000,X
+126,Lithuania,15,Wheat,Production,2006,t,809800.000000,A
+126,Lithuania,15,Wheat,Production,2007,t,1390700.000000,A
+126,Lithuania,15,Wheat,Production,2008,t,1722500.000000,A
+126,Lithuania,15,Wheat,Production,2009,t,2100200.000000,A
+126,Lithuania,15,Wheat,Production,2010,t,1710400.000000,A
+126,Lithuania,15,Wheat,Production,2011,t,1869300.000000,A
+256,Luxembourg,15,Wheat,Production,2006,t,75603.000000,A
+256,Luxembourg,15,Wheat,Production,2007,t,70469.000000,A
+256,Luxembourg,15,Wheat,Production,2008,t,97760.000000,A
+256,Luxembourg,15,Wheat,Production,2009,t,90903.000000,A
+256,Luxembourg,15,Wheat,Production,2010,t,83474.000000,A
+256,Luxembourg,15,Wheat,Production,2011,t,76839.000000,A
+129,Madagascar,15,Wheat,Production,2006,t,10000.000000,X
+129,Madagascar,15,Wheat,Production,2007,t,11000.000000,E
+129,Madagascar,15,Wheat,Production,2008,t,10000.000000,X
+129,Madagascar,15,Wheat,Production,2009,t,8812.940000,I
+129,Madagascar,15,Wheat,Production,2010,t,8694.390000,I
+129,Madagascar,15,Wheat,Production,2011,t,10000.000000,X
+130,Malawi,15,Wheat,Production,2006,t,1999.000000,A
+130,Malawi,15,Wheat,Production,2007,t,4605.000000,A
+130,Malawi,15,Wheat,Production,2008,t,2386.000000,A
+130,Malawi,15,Wheat,Production,2009,t,2590.000000,A
+130,Malawi,15,Wheat,Production,2010,t,2341.000000,A
+130,Malawi,15,Wheat,Production,2011,t,1850.000000,A
+133,Mali,15,Wheat,Production,2006,t,8565.000000,A
+133,Mali,15,Wheat,Production,2007,t,8585.000000,A
+133,Mali,15,Wheat,Production,2008,t,13166.000000,A
+133,Mali,15,Wheat,Production,2009,t,15132.000000,A
+133,Mali,15,Wheat,Production,2010,t,10051.000000,A
+133,Mali,15,Wheat,Production,2011,t,33842.000000,A
+134,Malta,15,Wheat,Production,2006,t,10500.000000,E
+134,Malta,15,Wheat,Production,2007,t,12000.000000,E
+134,Malta,15,Wheat,Production,2008,t,14500.000000,E
+134,Malta,15,Wheat,Production,2009,t,13800.000000,E
+134,Malta,15,Wheat,Production,2010,t,13038.070000,I
+134,Malta,15,Wheat,Production,2011,t,12468.120000,I
+136,Mauritania,15,Wheat,Production,2006,t,574.000000,A
+136,Mauritania,15,Wheat,Production,2007,t,2000.000000,E
+136,Mauritania,15,Wheat,Production,2008,t,4000.000000,A
+136,Mauritania,15,Wheat,Production,2009,t,3414.000000,A
+136,Mauritania,15,Wheat,Production,2010,t,2413.000000,A
+136,Mauritania,15,Wheat,Production,2011,t,2888.000000,A
+138,Mexico,15,Wheat,Production,2006,t,3378116.000000,A
+138,Mexico,15,Wheat,Production,2007,t,3515392.000000,A
+138,Mexico,15,Wheat,Production,2008,t,4019400.000000,A
+138,Mexico,15,Wheat,Production,2009,t,4116161.000000,A
+138,Mexico,15,Wheat,Production,2010,t,3676707.000000,A
+138,Mexico,15,Wheat,Production,2011,t,3627511.000000,A
+141,Mongolia,15,Wheat,Production,2006,t,127757.000000,A
+141,Mongolia,15,Wheat,Production,2007,t,109560.000000,A
+141,Mongolia,15,Wheat,Production,2008,t,209830.000000,A
+141,Mongolia,15,Wheat,Production,2009,t,388122.000000,A
+141,Mongolia,15,Wheat,Production,2010,t,345458.000000,A
+141,Mongolia,15,Wheat,Production,2011,t,435889.000000,A
+273,Montenegro,15,Wheat,Production,2006,t,2497.000000,A
+273,Montenegro,15,Wheat,Production,2007,t,752.000000,A
+273,Montenegro,15,Wheat,Production,2008,t,1096.000000,A
+273,Montenegro,15,Wheat,Production,2009,t,1155.000000,A
+273,Montenegro,15,Wheat,Production,2010,t,946.000000,A
+273,Montenegro,15,Wheat,Production,2011,t,1614.000000,A
+143,Morocco,15,Wheat,Production,2006,t,6326760.000000,A
+143,Morocco,15,Wheat,Production,2007,t,1582630.000000,A
+143,Morocco,15,Wheat,Production,2008,t,3769450.000000,A
+143,Morocco,15,Wheat,Production,2009,t,6371430.000000,A
+143,Morocco,15,Wheat,Production,2010,t,4876140.000000,A
+143,Morocco,15,Wheat,Production,2011,t,6017821.000000,A
+144,Mozambique,15,Wheat,Production,2006,t,8400.000000,E
+144,Mozambique,15,Wheat,Production,2007,t,10000.000000,E
+144,Mozambique,15,Wheat,Production,2008,t,12500.000000,E
+144,Mozambique,15,Wheat,Production,2009,t,15000.000000,E
+144,Mozambique,15,Wheat,Production,2010,t,17870.000000,A
+144,Mozambique,15,Wheat,Production,2011,t,20350.000000,A
+28,Myanmar,15,Wheat,Production,2006,t,140200.000000,A
+28,Myanmar,15,Wheat,Production,2007,t,155300.000000,A
+28,Myanmar,15,Wheat,Production,2008,t,170400.000000,A
+28,Myanmar,15,Wheat,Production,2009,t,179200.000000,A
+28,Myanmar,15,Wheat,Production,2010,t,181000.000000,A
+28,Myanmar,15,Wheat,Production,2011,t,169800.000000,A
+147,Namibia,15,Wheat,Production,2006,t,12858.000000,A
+147,Namibia,15,Wheat,Production,2007,t,12163.000000,A
+147,Namibia,15,Wheat,Production,2008,t,14581.000000,A
+147,Namibia,15,Wheat,Production,2009,t,12448.000000,A
+147,Namibia,15,Wheat,Production,2010,t,13397.330000,I
+147,Namibia,15,Wheat,Production,2011,t,16300.000000,X
+149,Nepal,15,Wheat,Production,2006,t,1394126.000000,A
+149,Nepal,15,Wheat,Production,2007,t,1515139.000000,A
+149,Nepal,15,Wheat,Production,2008,t,1572065.000000,A
+149,Nepal,15,Wheat,Production,2009,t,1343862.000000,A
+149,Nepal,15,Wheat,Production,2010,t,1556539.000000,A
+149,Nepal,15,Wheat,Production,2011,t,1745811.000000,A
+150,Netherlands (Kingdom of the),15,Wheat,Production,2006,t,1184400.000000,A
+150,Netherlands (Kingdom of the),15,Wheat,Production,2007,t,1018000.000000,A
+150,Netherlands (Kingdom of the),15,Wheat,Production,2008,t,1366162.000000,A
+150,Netherlands (Kingdom of the),15,Wheat,Production,2009,t,1402040.000000,A
+150,Netherlands (Kingdom of the),15,Wheat,Production,2010,t,1369553.000000,A
+150,Netherlands (Kingdom of the),15,Wheat,Production,2011,t,1175275.000000,A
+153,New Caledonia,15,Wheat,Production,2006,t,0.000000,A
+153,New Caledonia,15,Wheat,Production,2007,t,0.000000,A
+153,New Caledonia,15,Wheat,Production,2008,t,0.000000,A
+153,New Caledonia,15,Wheat,Production,2009,t,0.000000,A
+153,New Caledonia,15,Wheat,Production,2010,t,0.000000,A
+153,New Caledonia,15,Wheat,Production,2011,t,0.000000,A
+156,New Zealand,15,Wheat,Production,2006,t,261798.000000,A
+156,New Zealand,15,Wheat,Production,2007,t,344434.000000,A
+156,New Zealand,15,Wheat,Production,2008,t,343350.000000,A
+156,New Zealand,15,Wheat,Production,2009,t,403463.000000,A
+156,New Zealand,15,Wheat,Production,2010,t,444890.000000,A
+156,New Zealand,15,Wheat,Production,2011,t,383262.000000,A
+158,Niger,15,Wheat,Production,2006,t,7796.000000,A
+158,Niger,15,Wheat,Production,2007,t,7000.000000,A
+158,Niger,15,Wheat,Production,2008,t,8775.000000,A
+158,Niger,15,Wheat,Production,2009,t,6179.580000,I
+158,Niger,15,Wheat,Production,2010,t,5165.270000,I
+158,Niger,15,Wheat,Production,2011,t,1291.000000,A
+159,Nigeria,15,Wheat,Production,2006,t,71000.000000,A
+159,Nigeria,15,Wheat,Production,2007,t,44000.000000,A
+159,Nigeria,15,Wheat,Production,2008,t,53000.000000,A
+159,Nigeria,15,Wheat,Production,2009,t,80000.000000,E
+159,Nigeria,15,Wheat,Production,2010,t,110440.620000,I
+159,Nigeria,15,Wheat,Production,2011,t,165000.000000,X
+154,North Macedonia,15,Wheat,Production,2006,t,293326.000000,A
+154,North Macedonia,15,Wheat,Production,2007,t,218100.000000,A
+154,North Macedonia,15,Wheat,Production,2008,t,291719.000000,A
+154,North Macedonia,15,Wheat,Production,2009,t,271117.000000,A
+154,North Macedonia,15,Wheat,Production,2010,t,243137.000000,A
+154,North Macedonia,15,Wheat,Production,2011,t,256103.000000,A
+162,Norway,15,Wheat,Production,2006,t,357000.000000,A
+162,Norway,15,Wheat,Production,2007,t,401100.000000,A
+162,Norway,15,Wheat,Production,2008,t,453300.000000,A
+162,Norway,15,Wheat,Production,2009,t,278000.000000,A
+162,Norway,15,Wheat,Production,2010,t,331400.000000,A
+162,Norway,15,Wheat,Production,2011,t,284600.000000,A
+221,Oman,15,Wheat,Production,2006,t,775.000000,A
+221,Oman,15,Wheat,Production,2007,t,947.000000,A
+221,Oman,15,Wheat,Production,2008,t,1070.000000,A
+221,Oman,15,Wheat,Production,2009,t,1874.000000,A
+221,Oman,15,Wheat,Production,2010,t,2286.000000,A
+221,Oman,15,Wheat,Production,2011,t,2126.000000,A
+165,Pakistan,15,Wheat,Production,2006,t,21276900.000000,A
+165,Pakistan,15,Wheat,Production,2007,t,23294600.000000,A
+165,Pakistan,15,Wheat,Production,2008,t,20958800.000000,A
+165,Pakistan,15,Wheat,Production,2009,t,24033000.000000,A
+165,Pakistan,15,Wheat,Production,2010,t,23310800.000000,A
+165,Pakistan,15,Wheat,Production,2011,t,25213800.000000,A
+299,Palestine,15,Wheat,Production,2006,t,39430.000000,A
+299,Palestine,15,Wheat,Production,2007,t,39799.000000,A
+299,Palestine,15,Wheat,Production,2008,t,31826.000000,A
+299,Palestine,15,Wheat,Production,2009,t,30000.000000,E
+299,Palestine,15,Wheat,Production,2010,t,17380.000000,A
+299,Palestine,15,Wheat,Production,2011,t,17840.000000,A
+169,Paraguay,15,Wheat,Production,2006,t,620000.000000,A
+169,Paraguay,15,Wheat,Production,2007,t,800000.000000,A
+169,Paraguay,15,Wheat,Production,2008,t,799632.000000,A
+169,Paraguay,15,Wheat,Production,2009,t,1066800.000000,A
+169,Paraguay,15,Wheat,Production,2010,t,1401987.000000,A
+169,Paraguay,15,Wheat,Production,2011,t,1463881.000000,A
+170,Peru,15,Wheat,Production,2006,t,191082.000000,A
+170,Peru,15,Wheat,Production,2007,t,181552.000000,A
+170,Peru,15,Wheat,Production,2008,t,206936.000000,A
+170,Peru,15,Wheat,Production,2009,t,226265.000000,A
+170,Peru,15,Wheat,Production,2010,t,219454.000000,A
+170,Peru,15,Wheat,Production,2011,t,214140.000000,A
+173,Poland,15,Wheat,Production,2006,t,7059671.000000,A
+173,Poland,15,Wheat,Production,2007,t,8317265.000000,A
+173,Poland,15,Wheat,Production,2008,t,9274920.000000,A
+173,Poland,15,Wheat,Production,2009,t,9789586.000000,A
+173,Poland,15,Wheat,Production,2010,t,9408110.000000,A
+173,Poland,15,Wheat,Production,2011,t,9339200.000000,A
+174,Portugal,15,Wheat,Production,2006,t,249580.000000,A
+174,Portugal,15,Wheat,Production,2007,t,102258.000000,A
+174,Portugal,15,Wheat,Production,2008,t,203289.000000,A
+174,Portugal,15,Wheat,Production,2009,t,124146.000000,A
+174,Portugal,15,Wheat,Production,2010,t,82577.000000,A
+174,Portugal,15,Wheat,Production,2011,t,51003.000000,A
+179,Qatar,15,Wheat,Production,2006,t,20.000000,A
+179,Qatar,15,Wheat,Production,2007,t,32.000000,A
+179,Qatar,15,Wheat,Production,2008,t,30.000000,A
+179,Qatar,15,Wheat,Production,2009,t,49.000000,A
+179,Qatar,15,Wheat,Production,2010,t,36.000000,A
+179,Qatar,15,Wheat,Production,2011,t,26.000000,A
+117,Republic of Korea,15,Wheat,Production,2006,t,5810.000000,A
+117,Republic of Korea,15,Wheat,Production,2007,t,7351.000000,A
+117,Republic of Korea,15,Wheat,Production,2008,t,10359.000000,A
+117,Republic of Korea,15,Wheat,Production,2009,t,18782.000000,A
+117,Republic of Korea,15,Wheat,Production,2010,t,39116.000000,A
+117,Republic of Korea,15,Wheat,Production,2011,t,43677.000000,A
+146,Republic of Moldova,15,Wheat,Production,2006,t,691417.000000,A
+146,Republic of Moldova,15,Wheat,Production,2007,t,406484.000000,A
+146,Republic of Moldova,15,Wheat,Production,2008,t,1286332.000000,A
+146,Republic of Moldova,15,Wheat,Production,2009,t,736660.000000,A
+146,Republic of Moldova,15,Wheat,Production,2010,t,744160.000000,A
+146,Republic of Moldova,15,Wheat,Production,2011,t,794783.000000,A
+183,Romania,15,Wheat,Production,2006,t,5526190.000000,A
+183,Romania,15,Wheat,Production,2007,t,3044465.000000,A
+183,Romania,15,Wheat,Production,2008,t,7180984.000000,A
+183,Romania,15,Wheat,Production,2009,t,5202526.000000,A
+183,Romania,15,Wheat,Production,2010,t,5811810.000000,A
+183,Romania,15,Wheat,Production,2011,t,7131590.000000,A
+185,Russian Federation,15,Wheat,Production,2006,t,44926880.000000,A
+185,Russian Federation,15,Wheat,Production,2007,t,49367973.000000,A
+185,Russian Federation,15,Wheat,Production,2008,t,63765140.000000,A
+185,Russian Federation,15,Wheat,Production,2009,t,61739751.000000,A
+185,Russian Federation,15,Wheat,Production,2010,t,41507581.000000,A
+185,Russian Federation,15,Wheat,Production,2011,t,56239994.000000,A
+184,Rwanda,15,Wheat,Production,2006,t,19549.000000,A
+184,Rwanda,15,Wheat,Production,2007,t,24633.000000,A
+184,Rwanda,15,Wheat,Production,2008,t,8247.000000,A
+184,Rwanda,15,Wheat,Production,2009,t,7988.470000,I
+184,Rwanda,15,Wheat,Production,2010,t,7661.900000,I
+184,Rwanda,15,Wheat,Production,2011,t,8464.560000,I
+194,Saudi Arabia,15,Wheat,Production,2006,t,2630394.000000,A
+194,Saudi Arabia,15,Wheat,Production,2007,t,2558000.000000,A
+194,Saudi Arabia,15,Wheat,Production,2008,t,1985556.000000,A
+194,Saudi Arabia,15,Wheat,Production,2009,t,1152447.000000,A
+194,Saudi Arabia,15,Wheat,Production,2010,t,1349389.000000,A
+194,Saudi Arabia,15,Wheat,Production,2011,t,1184454.000000,A
+272,Serbia,15,Wheat,Production,2006,t,1875335.000000,A
+272,Serbia,15,Wheat,Production,2007,t,1863811.000000,A
+272,Serbia,15,Wheat,Production,2008,t,2095400.000000,A
+272,Serbia,15,Wheat,Production,2009,t,2067555.000000,A
+272,Serbia,15,Wheat,Production,2010,t,1630404.000000,A
+272,Serbia,15,Wheat,Production,2011,t,2076237.000000,A
+199,Slovakia,15,Wheat,Production,2006,t,1342693.000000,A
+199,Slovakia,15,Wheat,Production,2007,t,1379643.000000,A
+199,Slovakia,15,Wheat,Production,2008,t,1819479.000000,A
+199,Slovakia,15,Wheat,Production,2009,t,1537905.000000,A
+199,Slovakia,15,Wheat,Production,2010,t,1185286.000000,A
+199,Slovakia,15,Wheat,Production,2011,t,1631112.000000,A
+198,Slovenia,15,Wheat,Production,2006,t,134449.000000,A
+198,Slovenia,15,Wheat,Production,2007,t,133339.000000,A
+198,Slovenia,15,Wheat,Production,2008,t,160297.000000,A
+198,Slovenia,15,Wheat,Production,2009,t,136904.000000,A
+198,Slovenia,15,Wheat,Production,2010,t,153481.000000,A
+198,Slovenia,15,Wheat,Production,2011,t,153575.000000,A
+201,Somalia,15,Wheat,Production,2006,t,960.000000,E
+201,Somalia,15,Wheat,Production,2007,t,970.000000,E
+201,Somalia,15,Wheat,Production,2008,t,1000.000000,E
+201,Somalia,15,Wheat,Production,2009,t,950.000000,E
+201,Somalia,15,Wheat,Production,2010,t,997.890000,I
+201,Somalia,15,Wheat,Production,2011,t,1005.500000,I
+202,South Africa,15,Wheat,Production,2006,t,2105000.000000,A
+202,South Africa,15,Wheat,Production,2007,t,1905000.000000,A
+202,South Africa,15,Wheat,Production,2008,t,2130000.000000,A
+202,South Africa,15,Wheat,Production,2009,t,1958000.000000,A
+202,South Africa,15,Wheat,Production,2010,t,1430000.000000,A
+202,South Africa,15,Wheat,Production,2011,t,2005000.000000,A
+203,Spain,15,Wheat,Production,2006,t,5521582.000000,A
+203,Spain,15,Wheat,Production,2007,t,6436359.000000,A
+203,Spain,15,Wheat,Production,2008,t,6714300.000000,A
+203,Spain,15,Wheat,Production,2009,t,4804772.000000,A
+203,Spain,15,Wheat,Production,2010,t,5941197.000000,A
+203,Spain,15,Wheat,Production,2011,t,6876657.000000,A
+206,Sudan (former),15,Wheat,Production,2006,t,669000.000000,A
+206,Sudan (former),15,Wheat,Production,2007,t,803000.000000,A
+206,Sudan (former),15,Wheat,Production,2008,t,587000.000000,A
+206,Sudan (former),15,Wheat,Production,2009,t,641695.000000,A
+206,Sudan (former),15,Wheat,Production,2010,t,403000.000000,A
+206,Sudan (former),15,Wheat,Production,2011,t,292000.000000,A
+210,Sweden,15,Wheat,Production,2006,t,1967400.000000,A
+210,Sweden,15,Wheat,Production,2007,t,2255700.000000,A
+210,Sweden,15,Wheat,Production,2008,t,2202200.000000,A
+210,Sweden,15,Wheat,Production,2009,t,2277900.000000,A
+210,Sweden,15,Wheat,Production,2010,t,2143000.000000,A
+210,Sweden,15,Wheat,Production,2011,t,2253100.000000,A
+211,Switzerland,15,Wheat,Production,2006,t,543800.000000,A
+211,Switzerland,15,Wheat,Production,2007,t,543900.000000,A
+211,Switzerland,15,Wheat,Production,2008,t,549084.000000,A
+211,Switzerland,15,Wheat,Production,2009,t,549919.000000,A
+211,Switzerland,15,Wheat,Production,2010,t,524017.000000,A
+211,Switzerland,15,Wheat,Production,2011,t,553150.000000,A
+212,Syrian Arab Republic,15,Wheat,Production,2006,t,4932000.000000,A
+212,Syrian Arab Republic,15,Wheat,Production,2007,t,4041100.000000,A
+212,Syrian Arab Republic,15,Wheat,Production,2008,t,2139300.000000,A
+212,Syrian Arab Republic,15,Wheat,Production,2009,t,3701784.000000,A
+212,Syrian Arab Republic,15,Wheat,Production,2010,t,3083100.000000,A
+212,Syrian Arab Republic,15,Wheat,Production,2011,t,3858331.000000,A
+208,Tajikistan,15,Wheat,Production,2006,t,640339.000000,A
+208,Tajikistan,15,Wheat,Production,2007,t,649300.000000,A
+208,Tajikistan,15,Wheat,Production,2008,t,659096.000000,A
+208,Tajikistan,15,Wheat,Production,2009,t,1088591.000000,A
+208,Tajikistan,15,Wheat,Production,2010,t,1033144.000000,A
+208,Tajikistan,15,Wheat,Production,2011,t,726880.000000,A
+216,Thailand,15,Wheat,Production,2006,t,1000.000000,E
+216,Thailand,15,Wheat,Production,2007,t,1013.610000,I
+216,Thailand,15,Wheat,Production,2008,t,1045.220000,I
+216,Thailand,15,Wheat,Production,2009,t,1063.010000,I
+216,Thailand,15,Wheat,Production,2010,t,1107.410000,I
+216,Thailand,15,Wheat,Production,2011,t,1115.480000,I
+222,Tunisia,15,Wheat,Production,2006,t,1250600.000000,A
+222,Tunisia,15,Wheat,Production,2007,t,1442800.000000,A
+222,Tunisia,15,Wheat,Production,2008,t,919000.000000,A
+222,Tunisia,15,Wheat,Production,2009,t,1653600.000000,A
+222,Tunisia,15,Wheat,Production,2010,t,822000.000000,A
+222,Tunisia,15,Wheat,Production,2011,t,1605500.000000,A
+223,Türkiye,15,Wheat,Production,2006,t,20010000.000000,A
+223,Türkiye,15,Wheat,Production,2007,t,17234000.000000,A
+223,Türkiye,15,Wheat,Production,2008,t,17782000.000000,A
+223,Türkiye,15,Wheat,Production,2009,t,20600000.000000,A
+223,Türkiye,15,Wheat,Production,2010,t,19674000.000000,A
+223,Türkiye,15,Wheat,Production,2011,t,21800000.000000,A
+213,Turkmenistan,15,Wheat,Production,2006,t,3260000.000000,X
+213,Turkmenistan,15,Wheat,Production,2007,t,1082770.000000,A
+213,Turkmenistan,15,Wheat,Production,2008,t,996160.000000,A
+213,Turkmenistan,15,Wheat,Production,2009,t,1405600.000000,A
+213,Turkmenistan,15,Wheat,Production,2010,t,1476620.000000,A
+213,Turkmenistan,15,Wheat,Production,2011,t,1168220.000000,A
+226,Uganda,15,Wheat,Production,2006,t,18000.000000,A
+226,Uganda,15,Wheat,Production,2007,t,19000.000000,A
+226,Uganda,15,Wheat,Production,2008,t,19000.000000,A
+226,Uganda,15,Wheat,Production,2009,t,20000.000000,A
+226,Uganda,15,Wheat,Production,2010,t,20000.000000,A
+226,Uganda,15,Wheat,Production,2011,t,23000.000000,A
+230,Ukraine,15,Wheat,Production,2006,t,13947300.000000,A
+230,Ukraine,15,Wheat,Production,2007,t,13937700.000000,A
+230,Ukraine,15,Wheat,Production,2008,t,25885400.000000,A
+230,Ukraine,15,Wheat,Production,2009,t,20886400.000000,A
+230,Ukraine,15,Wheat,Production,2010,t,16851300.000000,A
+230,Ukraine,15,Wheat,Production,2011,t,22323600.000000,A
+225,United Arab Emirates,15,Wheat,Production,2006,t,26.000000,A
+225,United Arab Emirates,15,Wheat,Production,2007,t,30.000000,A
+225,United Arab Emirates,15,Wheat,Production,2008,t,30.000000,A
+225,United Arab Emirates,15,Wheat,Production,2009,t,,M
+225,United Arab Emirates,15,Wheat,Production,2010,t,,M
+225,United Arab Emirates,15,Wheat,Production,2011,t,,M
+229,United Kingdom of Great Britain and Northern Ireland,15,Wheat,Production,2006,t,14755222.000000,A
+229,United Kingdom of Great Britain and Northern Ireland,15,Wheat,Production,2007,t,13220620.000000,A
+229,United Kingdom of Great Britain and Northern Ireland,15,Wheat,Production,2008,t,17227051.000000,A
+229,United Kingdom of Great Britain and Northern Ireland,15,Wheat,Production,2009,t,14075596.000000,A
+229,United Kingdom of Great Britain and Northern Ireland,15,Wheat,Production,2010,t,14877835.000000,A
+229,United Kingdom of Great Britain and Northern Ireland,15,Wheat,Production,2011,t,15257083.000000,A
+215,United Republic of Tanzania,15,Wheat,Production,2006,t,110000.000000,A
+215,United Republic of Tanzania,15,Wheat,Production,2007,t,82800.000000,A
+215,United Republic of Tanzania,15,Wheat,Production,2008,t,43360.000000,A
+215,United Republic of Tanzania,15,Wheat,Production,2009,t,82370.000000,A
+215,United Republic of Tanzania,15,Wheat,Production,2010,t,62370.000000,A
+215,United Republic of Tanzania,15,Wheat,Production,2011,t,112658.000000,A
+231,United States of America,15,Wheat,Production,2006,t,49216040.000000,A
+231,United States of America,15,Wheat,Production,2007,t,55820360.000000,A
+231,United States of America,15,Wheat,Production,2008,t,68016096.000000,A
+231,United States of America,15,Wheat,Production,2009,t,60365728.000000,A
+231,United States of America,15,Wheat,Production,2010,t,60062408.000000,A
+231,United States of America,15,Wheat,Production,2011,t,54418808.000000,A
+234,Uruguay,15,Wheat,Production,2006,t,454100.000000,A
+234,Uruguay,15,Wheat,Production,2007,t,611200.000000,A
+234,Uruguay,15,Wheat,Production,2008,t,697143.000000,A
+234,Uruguay,15,Wheat,Production,2009,t,1356600.000000,A
+234,Uruguay,15,Wheat,Production,2010,t,1844416.000000,A
+234,Uruguay,15,Wheat,Production,2011,t,1300700.000000,A
+235,Uzbekistan,15,Wheat,Production,2006,t,6099300.000000,A
+235,Uzbekistan,15,Wheat,Production,2007,t,6190300.000000,A
+235,Uzbekistan,15,Wheat,Production,2008,t,6147100.000000,A
+235,Uzbekistan,15,Wheat,Production,2009,t,6639800.000000,A
+235,Uzbekistan,15,Wheat,Production,2010,t,6745000.000000,A
+235,Uzbekistan,15,Wheat,Production,2011,t,6526955.000000,A
+236,Venezuela (Bolivarian Republic of),15,Wheat,Production,2006,t,220.000000,A
+236,Venezuela (Bolivarian Republic of),15,Wheat,Production,2007,t,213.000000,A
+236,Venezuela (Bolivarian Republic of),15,Wheat,Production,2008,t,230.000000,A
+236,Venezuela (Bolivarian Republic of),15,Wheat,Production,2009,t,143.000000,A
+236,Venezuela (Bolivarian Republic of),15,Wheat,Production,2010,t,183.000000,A
+236,Venezuela (Bolivarian Republic of),15,Wheat,Production,2011,t,204.000000,A
+249,Yemen,15,Wheat,Production,2006,t,149173.000000,A
+249,Yemen,15,Wheat,Production,2007,t,218520.000000,A
+249,Yemen,15,Wheat,Production,2008,t,170446.000000,A
+249,Yemen,15,Wheat,Production,2009,t,222129.000000,A
+249,Yemen,15,Wheat,Production,2010,t,265432.000000,A
+249,Yemen,15,Wheat,Production,2011,t,232339.000000,A
+251,Zambia,15,Wheat,Production,2006,t,93958.000000,A
+251,Zambia,15,Wheat,Production,2007,t,115843.000000,A
+251,Zambia,15,Wheat,Production,2008,t,113242.000000,A
+251,Zambia,15,Wheat,Production,2009,t,195456.000000,A
+251,Zambia,15,Wheat,Production,2010,t,172256.000000,A
+251,Zambia,15,Wheat,Production,2011,t,237332.000000,A
+181,Zimbabwe,15,Wheat,Production,2006,t,241924.000000,A
+181,Zimbabwe,15,Wheat,Production,2007,t,149110.000000,A
+181,Zimbabwe,15,Wheat,Production,2008,t,31000.000000,A
+181,Zimbabwe,15,Wheat,Production,2009,t,12000.000000,X
+181,Zimbabwe,15,Wheat,Production,2010,t,18000.000000,X
+181,Zimbabwe,15,Wheat,Production,2011,t,23000.000000,X
+5000,World,15,Wheat,Production,2006,t,601878913.710000,A
+5000,World,15,Wheat,Production,2007,t,611107130.340000,A
+5000,World,15,Wheat,Production,2008,t,680105120.510000,A
+5000,World,15,Wheat,Production,2009,t,684659723.980000,A
+5000,World,15,Wheat,Production,2010,t,653707910.630000,A
+5000,World,15,Wheat,Production,2011,t,698000561.610000,A
+5100,Africa,15,Wheat,Production,2006,t,24623312.270000,A
+5100,Africa,15,Wheat,Production,2007,t,18947029.570000,A
+5100,Africa,15,Wheat,Production,2008,t,19690693.900000,A
+5100,Africa,15,Wheat,Production,2009,t,26115227.870000,A
+5100,Africa,15,Wheat,Production,2010,t,21813270.480000,A
+5100,Africa,15,Wheat,Production,2011,t,25496262.460000,A
+5101,Eastern Africa,15,Wheat,Production,2006,t,3082635.000000,A
+5101,Eastern Africa,15,Wheat,Production,2007,t,3312497.920000,E
+5101,Eastern Africa,15,Wheat,Production,2008,t,2974831.670000,E
+5101,Eastern Africa,15,Wheat,Production,2009,t,3767106.720000,E
+5101,Eastern Africa,15,Wheat,Production,2010,t,4189839.190000,E
+5101,Eastern Africa,15,Wheat,Production,2011,t,3836469.070000,E
+5102,Middle Africa,15,Wheat,Production,2006,t,15235.110000,A
+5102,Middle Africa,15,Wheat,Production,2007,t,21835.650000,A
+5102,Middle Africa,15,Wheat,Production,2008,t,21616.430000,A
+5102,Middle Africa,15,Wheat,Production,2009,t,18591.570000,A
+5102,Middle Africa,15,Wheat,Production,2010,t,15439.000000,A
+5102,Middle Africa,15,Wheat,Production,2011,t,15514.000000,A
+5103,Northern Africa,15,Wheat,Production,2006,t,19312520.000000,A
+5103,Northern Africa,15,Wheat,Production,2007,t,13630393.000000,A
+5103,Northern Africa,15,Wheat,Production,2008,t,14467534.000000,A
+5103,Northern Africa,15,Wheat,Production,2009,t,20247837.000000,A
+5103,Northern Africa,15,Wheat,Production,2010,t,16015956.070000,A
+5103,Northern Africa,15,Wheat,Production,2011,t,19399337.000000,A
+5104,Southern Africa,15,Wheat,Production,2006,t,2124987.160000,A
+5104,Southern Africa,15,Wheat,Production,2007,t,1920718.000000,A
+5104,Southern Africa,15,Wheat,Production,2008,t,2147770.800000,A
+5104,Southern Africa,15,Wheat,Production,2009,t,1976967.000000,A
+5104,Southern Africa,15,Wheat,Production,2010,t,1463966.330000,A
+5104,Southern Africa,15,Wheat,Production,2011,t,2041921.400000,A
+5105,Western Africa,15,Wheat,Production,2006,t,87935.000000,A
+5105,Western Africa,15,Wheat,Production,2007,t,61585.000000,A
+5105,Western Africa,15,Wheat,Production,2008,t,78941.000000,A
+5105,Western Africa,15,Wheat,Production,2009,t,104725.580000,E
+5105,Western Africa,15,Wheat,Production,2010,t,128069.890000,E
+5105,Western Africa,15,Wheat,Production,2011,t,203021.000000,E
+5200,Americas,15,Wheat,Production,2006,t,97741781.040000,A
+5200,Americas,15,Wheat,Production,2007,t,102799216.760000,A
+5200,Americas,15,Wheat,Production,2008,t,118250195.420000,A
+5200,Americas,15,Wheat,Production,2009,t,109545395.750000,A
+5200,Americas,15,Wheat,Production,2010,t,114342305.700000,A
+5200,Americas,15,Wheat,Production,2011,t,108283850.430000,A
+5203,Northern America,15,Wheat,Production,2006,t,74481440.000000,A
+5203,Northern America,15,Wheat,Production,2007,t,75910760.000000,A
+5203,Northern America,15,Wheat,Production,2008,t,96635296.000000,A
+5203,Northern America,15,Wheat,Production,2009,t,87315628.000000,A
+5203,Northern America,15,Wheat,Production,2010,t,83362008.000000,A
+5203,Northern America,15,Wheat,Production,2011,t,79706808.000000,A
+5204,Central America,15,Wheat,Production,2006,t,3380789.040000,A
+5204,Central America,15,Wheat,Production,2007,t,3518355.760000,A
+5204,Central America,15,Wheat,Production,2008,t,4022359.420000,A
+5204,Central America,15,Wheat,Production,2009,t,4118834.750000,A
+5204,Central America,15,Wheat,Production,2010,t,3679284.500000,A
+5204,Central America,15,Wheat,Production,2011,t,3630114.430000,A
+5207,South America,15,Wheat,Production,2006,t,19879552.000000,A
+5207,South America,15,Wheat,Production,2007,t,23370101.000000,A
+5207,South America,15,Wheat,Production,2008,t,17592540.000000,A
+5207,South America,15,Wheat,Production,2009,t,18110933.000000,A
+5207,South America,15,Wheat,Production,2010,t,27301013.200000,A
+5207,South America,15,Wheat,Production,2011,t,24946928.000000,A
+5300,Asia,15,Wheat,Production,2006,t,276713944.000000,A
+5300,Asia,15,Wheat,Production,2007,t,285744795.110000,A
+5300,Asia,15,Wheat,Production,2008,t,272119965.620000,A
+5300,Asia,15,Wheat,Production,2009,t,297883691.510000,A
+5300,Asia,15,Wheat,Production,2010,t,288324080.630000,A
+5300,Asia,15,Wheat,Production,2011,t,309899466.990000,A
+5301,Central Asia,15,Wheat,Production,2006,t,24300418.000000,A
+5301,Central Asia,15,Wheat,Production,2007,t,25098117.000000,A
+5301,Central Asia,15,Wheat,Production,2008,t,21086746.000000,A
+5301,Central Asia,15,Wheat,Production,2009,t,27242667.000000,A
+5301,Central Asia,15,Wheat,Production,2010,t,19706464.000000,A
+5301,Central Asia,15,Wheat,Production,2011,t,31953962.510000,A
+5302,Eastern Asia,15,Wheat,Production,2006,t,109636038.000000,A
+5302,Eastern Asia,15,Wheat,Production,2007,t,110520307.000000,A
+5302,Eastern Asia,15,Wheat,Production,2008,t,113740681.000000,A
+5302,Eastern Asia,15,Wheat,Production,2009,t,116365468.000000,A
+5302,Eastern Asia,15,Wheat,Production,2010,t,116302052.000000,A
+5302,Eastern Asia,15,Wheat,Production,2011,t,118766900.000000,A
+5303,Southern Asia,15,Wheat,Production,2006,t,110796367.000000,A
+5303,Southern Asia,15,Wheat,Production,2007,t,121732930.500000,A
+5303,Southern Asia,15,Wheat,Production,2008,t,111573870.400000,A
+5303,Southern Asia,15,Wheat,Production,2009,t,124066816.500000,A
+5303,Southern Asia,15,Wheat,Production,2010,t,123252289.900000,A
+5303,Southern Asia,15,Wheat,Production,2011,t,126877928.000000,A
+5304,South-eastern Asia,15,Wheat,Production,2006,t,141200.000000,A
+5304,South-eastern Asia,15,Wheat,Production,2007,t,156313.610000,A
+5304,South-eastern Asia,15,Wheat,Production,2008,t,171445.220000,A
+5304,South-eastern Asia,15,Wheat,Production,2009,t,180263.010000,A
+5304,South-eastern Asia,15,Wheat,Production,2010,t,182107.410000,A
+5304,South-eastern Asia,15,Wheat,Production,2011,t,170915.480000,A
+5305,Western Asia,15,Wheat,Production,2006,t,31839921.000000,A
+5305,Western Asia,15,Wheat,Production,2007,t,28237127.000000,A
+5305,Western Asia,15,Wheat,Production,2008,t,25547223.000000,A
+5305,Western Asia,15,Wheat,Production,2009,t,30028477.000000,A
+5305,Western Asia,15,Wheat,Production,2010,t,28881167.320000,A
+5305,Western Asia,15,Wheat,Production,2011,t,32129761.000000,A
+5400,Europe,15,Wheat,Production,2006,t,191716450.400000,A
+5400,Europe,15,Wheat,Production,2007,t,189702276.900000,A
+5400,Europe,15,Wheat,Production,2008,t,248280738.570000,A
+5400,Europe,15,Wheat,Production,2009,t,228877935.850000,A
+5400,Europe,15,Wheat,Production,2010,t,201373287.820000,A
+5400,Europe,15,Wheat,Production,2011,t,224032710.720000,A
+5401,Eastern Europe,15,Wheat,Production,2006,t,85753758.000000,A
+5401,Eastern Europe,15,Wheat,Production,2007,t,88166325.000000,A
+5401,Eastern Europe,15,Wheat,Production,2008,t,126152037.000000,A
+5401,Eastern Europe,15,Wheat,Production,2009,t,114625916.000000,A
+5401,Eastern Europe,15,Wheat,Production,2010,t,89248697.000000,A
+5401,Eastern Europe,15,Wheat,Production,2011,t,113071188.000000,A
+5402,Northern Europe,15,Wheat,Production,2006,t,24994012.000000,A
+5402,Northern Europe,15,Wheat,Production,2007,t,24450546.000000,A
+5402,Northern Europe,15,Wheat,Production,2008,t,29736151.000000,A
+5402,Northern Europe,15,Wheat,Production,2009,t,27628116.000000,A
+5402,Northern Europe,15,Wheat,Production,2010,t,26833135.000000,A
+5402,Northern Europe,15,Wheat,Production,2011,t,27698983.000000,A
+5403,Southern Europe,15,Wheat,Production,2006,t,18315156.000000,A
+5403,Southern Europe,15,Wheat,Production,2007,t,18884831.000000,A
+5403,Southern Europe,15,Wheat,Production,2008,t,21844514.570000,A
+5403,Southern Europe,15,Wheat,Production,2009,t,17618691.160000,A
+5403,Southern Europe,15,Wheat,Production,2010,t,17956636.820000,A
+5403,Southern Europe,15,Wheat,Production,2011,t,19212195.420000,A
+5404,Western Europe,15,Wheat,Production,2006,t,62653524.400000,A
+5404,Western Europe,15,Wheat,Production,2007,t,58200574.900000,A
+5404,Western Europe,15,Wheat,Production,2008,t,70548036.000000,A
+5404,Western Europe,15,Wheat,Production,2009,t,69005212.700000,A
+5404,Western Europe,15,Wheat,Production,2010,t,67334819.000000,A
+5404,Western Europe,15,Wheat,Production,2011,t,64050344.300000,A
+5500,Oceania,15,Wheat,Production,2006,t,11083426.000000,A
+5500,Oceania,15,Wheat,Production,2007,t,13913812.000000,A
+5500,Oceania,15,Wheat,Production,2008,t,21763527.000000,A
+5500,Oceania,15,Wheat,Production,2009,t,22237473.000000,A
+5500,Oceania,15,Wheat,Production,2010,t,27854966.000000,A
+5500,Oceania,15,Wheat,Production,2011,t,30288271.000000,A
+5501,Australia and New Zealand,15,Wheat,Production,2006,t,11083426.000000,A
+5501,Australia and New Zealand,15,Wheat,Production,2007,t,13913812.000000,A
+5501,Australia and New Zealand,15,Wheat,Production,2008,t,21763527.000000,A
+5501,Australia and New Zealand,15,Wheat,Production,2009,t,22237473.000000,A
+5501,Australia and New Zealand,15,Wheat,Production,2010,t,27854966.000000,A
+5501,Australia and New Zealand,15,Wheat,Production,2011,t,30288271.000000,A
+5502,Melanesia,15,Wheat,Production,2006,t,0.000000,A
+5502,Melanesia,15,Wheat,Production,2007,t,0.000000,A
+5502,Melanesia,15,Wheat,Production,2008,t,0.000000,A
+5502,Melanesia,15,Wheat,Production,2009,t,0.000000,A
+5502,Melanesia,15,Wheat,Production,2010,t,0.000000,A
+5502,Melanesia,15,Wheat,Production,2011,t,0.000000,A
+5707,European Union (27),15,Wheat,Production,2006,t,112792557.400000,A
+5707,European Union (27),15,Wheat,Production,2007,t,107849383.900000,A
+5707,European Union (27),15,Wheat,Production,2008,t,134107918.570000,A
+5707,European Union (27),15,Wheat,Production,2009,t,125718524.860000,A
+5707,European Union (27),15,Wheat,Production,2010,t,122501974.820000,A
+5707,European Union (27),15,Wheat,Production,2011,t,123634113.720000,A
+5801,Least Developed Countries (LDCs),15,Wheat,Production,2006,t,9000064.000000,A
+5801,Least Developed Countries (LDCs),15,Wheat,Production,2007,t,10795852.920000,A
+5801,Least Developed Countries (LDCs),15,Wheat,Production,2008,t,8623532.670000,A
+5801,Least Developed Countries (LDCs),15,Wheat,Production,2009,t,11884352.300000,A
+5801,Least Developed Countries (LDCs),15,Wheat,Production,2010,t,11551593.460000,A
+5801,Least Developed Countries (LDCs),15,Wheat,Production,2011,t,10417672.070000,A
+5802,Land Locked Developing Countries (LLDCs),15,Wheat,Production,2006,t,35177535.160000,A
+5802,Land Locked Developing Countries (LLDCs),15,Wheat,Production,2007,t,37252731.920000,A
+5802,Land Locked Developing Countries (LLDCs),15,Wheat,Production,2008,t,32545791.470000,A
+5802,Land Locked Developing Countries (LLDCs),15,Wheat,Production,2009,t,42060861.360000,A
+5802,Land Locked Developing Countries (LLDCs),15,Wheat,Production,2010,t,33824215.170000,A
+5802,Land Locked Developing Countries (LLDCs),15,Wheat,Production,2011,t,45498549.470000,A
+5803,Small Island Developing States (SIDS),15,Wheat,Production,2006,t,0.000000,A
+5803,Small Island Developing States (SIDS),15,Wheat,Production,2007,t,0.000000,A
+5803,Small Island Developing States (SIDS),15,Wheat,Production,2008,t,0.000000,A
+5803,Small Island Developing States (SIDS),15,Wheat,Production,2009,t,0.000000,A
+5803,Small Island Developing States (SIDS),15,Wheat,Production,2010,t,0.000000,A
+5803,Small Island Developing States (SIDS),15,Wheat,Production,2011,t,0.000000,A
+5815,Low Income Food Deficit Countries (LIFDCs),15,Wheat,Production,2006,t,21309691.110000,A
+5815,Low Income Food Deficit Countries (LIFDCs),15,Wheat,Production,2007,t,22040469.570000,A
+5815,Low Income Food Deficit Countries (LIFDCs),15,Wheat,Production,2008,t,17727051.100000,A
+5815,Low Income Food Deficit Countries (LIFDCs),15,Wheat,Production,2009,t,23544583.870000,A
+5815,Low Income Food Deficit Countries (LIFDCs),15,Wheat,Production,2010,t,22658285.460000,A
+5815,Low Income Food Deficit Countries (LIFDCs),15,Wheat,Production,2011,t,21365894.070000,A
+5817,Net Food Importing Developing Countries (NFIDCs),15,Wheat,Production,2006,t,46823299.620000,A
+5817,Net Food Importing Developing Countries (NFIDCs),15,Wheat,Production,2007,t,45152063.410000,A
+5817,Net Food Importing Developing Countries (NFIDCs),15,Wheat,Production,2008,t,43031367.780000,A
+5817,Net Food Importing Developing Countries (NFIDCs),15,Wheat,Production,2009,t,53330168.300000,A
+5817,Net Food Importing Developing Countries (NFIDCs),15,Wheat,Production,2010,t,48857006.400000,A
+5817,Net Food Importing Developing Countries (NFIDCs),15,Wheat,Production,2011,t,52624727.540000,A

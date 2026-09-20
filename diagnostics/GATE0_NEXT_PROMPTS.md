@@ -12,7 +12,7 @@ The R-science first-match table is **exhausted** on this host. G0-P stays
 | **A8** mean-of-members | **S1 implemented** (China H 112.7 / EA 3.31) | live host is member-sum |
 | **Item 3** wander | last/first **1.444** vs author 1.004; labelled; no sourced D.22 | **S2 done**; freeze not adopted |
 | **A1** USDA quantities | **S3 done** (FBSH H/C vs member-sum; China 1.00; moy worsened; not adopted) | USDA stays default; never FAO ΔS as S |
-| **A7** cannot-set | FAO cleaned FB / EU28+Egypt / start-2000 still absent | **S4** inventory; do not invent Egypt |
+| **A7** cannot-set | FAO cleaned FB reconstruction labelled (not adopted); EU28+Egypt / start-2000 still absent | **S4** inventory; do not invent Egypt |
 
 Do not walk R8…R12 as science. R8 may piggyback tests. R11 stays skipped
 while `wheat_params()` are unchanged. R12 / S6 only after items 1–3 move.

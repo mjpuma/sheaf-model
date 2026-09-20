@@ -1,4 +1,4 @@
-"""R6 obtain: raw FAOSTAT FBSH is vendored; author cleaned FB absent; USDA default."""
+"""R6 obtain: raw FAOSTAT FBSH is vendored; labelled reconstruction present; USDA default."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -30,8 +30,9 @@ def test_faostat_network_is_e0_not_food_balances():
 def test_inventory_separates_raw_fbsh_from_author_cleaned():
     inv = inventory()
     assert inv["e0_files"]
-    assert inv["food_balance_files"] == []
-    assert inv["author_fb_present"] == []
+    assert any(p.endswith("wheat_food_balance_fao.csv") for p in inv["food_balance_files"])
+    assert "wheat_food_balance_fao.csv" in inv["author_fb_present"]
+    assert inv["author_fb_bit_identical"] is False
     assert inv["fbsh_wheat_files"]
     assert "wheat_fbsh_2006_2011.csv" in inv["fbsh_wheat_files"]
     assert inv["usda_is_default"] is True
@@ -87,6 +88,7 @@ def test_bulk_zip_is_gitignored():
     gi = (ROOT / ".gitignore").read_text()
     assert "data/faostat_fb/*.zip" in gi
     assert "data/faostat_fb/*_All_Data*" in gi
+    assert "data/faostat_qcl_tcl/*.zip" in gi
 
 
 def test_dispatch_obtain_then_parallel_wheatdata():
@@ -102,7 +104,7 @@ def test_faostat_fb_dir_has_provenance_and_not_author_cleaned():
     assert (FAOSTAT_FB / "PROVENANCE.txt").is_file()
     assert (FAOSTAT_FB / "wheat_fbsh_2006_2011.csv").is_file()
     assert not (FAOSTAT_FB / "wheat_food_balance_fao.csv").exists()
-    assert not (ROOT / "data" / "food_balances").exists()
+    assert (ROOT / "data" / "food_balances" / "wheat_food_balance_fao.csv").is_file()
     prov = (FAOSTAT_FB / "PROVENANCE.txt").read_text()
     assert "5074" in prov
     assert "prepare_wheat" in prov or "USDA" in prov

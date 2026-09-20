@@ -25,7 +25,7 @@ Checked 2026-09-20 (R6 obtain): FAOSTAT JSON API FBSH **521**; bulk zip
 | USDA PSD country P/C/S | zip + grain extracts | `PYTHONPATH=. python scripts/fetch_external_data.py --psd-only` | No API key. Units 1000 MT → ×1e-3 MMT. S1: 2007–09 baseline is member-sum then mean (`ending_stocks` is S; never FAO ΔS). |
 | USDA world aggregates | yes | none | `data/usda_world/` (scoring 27-node sum vs world) |
 | FAOSTAT E0 trade shares | yes | none | `data/faostat_network/` — **E0 only**, not Food Balances (A1) |
-| FAOSTAT Food Balances | **raw FBSH yes** / author cleaned **no** | `--faostat-fb` (opt-in) | `data/faostat_fb/` wheat 2006–11 item 2511. Not `wheat_food_balance_fao.csv`. USDA stays `prepare_wheat` default. |
+| FAOSTAT Food Balances | **raw FBSH yes** / host reconstruction **yes** (not bit-identical; **not adopted**) | `--faostat-fb` then `--faostat-qcl-tcl` then `scripts/build_author_fb_fao.py` | `data/faostat_fb/` wheat 2006–11 item 2511. Labelled `data/food_balances/wheat_food_balance_fao.csv`. USDA stays `prepare_wheat` default. |
 | AMIS / E.4 restrictions | yes (XLSX+CSV) | Browser download, then `--amis-only` | oecd.org is Cloudflare-blocked unattended (HEAD 403 this run) |
 | Pink Sheet monthly/annual | yes | `--prices-only` | URL hash changes; script scrapes the WB page |
 | Wheat harvest months | yes | none | Start/end months. Host uses **E.27 raised-cosine** (`sheaf.agrimate.harvest`), not the triangular/twin-pin paragraph that described the legacy host. |
@@ -50,6 +50,10 @@ PYTHONPATH=. python scripts/fetch_external_data.py --prices-only
 
 # FAOSTAT FBSH wheat 2006–11 (opt-in; not in the default fetch)
 PYTHONPATH=. python scripts/fetch_external_data.py --faostat-fb
+
+# FAOSTAT QCL+TCL wheat 2006–11 (opt-in; reconstruction inputs)
+PYTHONPATH=. python scripts/fetch_external_data.py --faostat-qcl-tcl
+PYTHONPATH=. python scripts/build_author_fb_fao.py
 ```
 
 Default (no flags) refreshes PSD + AMIS + Pink Sheet only — **not** FB.
@@ -57,12 +61,13 @@ Default (no flags) refreshes PSD + AMIS + Pink Sheet only — **not** FB.
 Script: `scripts/fetch_external_data.py`. Metadata:
 `data/usda_psd/DOWNLOAD_META.json`,
 `data/world_prices/DOWNLOAD_META.json`,
-`data/faostat_fb/DOWNLOAD_META.json`. Provenance files sit next to
+`data/faostat_fb/DOWNLOAD_META.json`,
+`data/faostat_qcl_tcl/DOWNLOAD_META.json`. Provenance files sit next to
 the CSVs.
 
 The script does **not** mention zenodo / 14022004 / 10688435 / αI /
-p_sto / xmin. `--faostat-fb` does **not** change `wheat_params` or
-`prepare_wheat`. Do not add a silent fit.
+p_sto / xmin. `--faostat-fb` and `--faostat-qcl-tcl` do **not** change
+`wheat_params` or `prepare_wheat`. Do not add a silent fit.
 
 ## Semi-automated (browser once)
 
@@ -120,10 +125,13 @@ forced scenarios, git `old-demand-dynamics`. Those knobs belong on a
 ### FAOSTAT Food Balances (A1) — how to get them
 
 Author AgriculturalData expects cleaned `wheat_food_balance_fao.csv`.
-That file is **still not** in the repo (not in `data/faostat_network/`,
-which is E0 trade only: nine `*E0.csv` plus
-`country_conversion_table.csv`). FoodTradeNetwork `inputs_processed/`
-P0/R0 are 2015–21 *averages*, not 2006–11 annual FB. Do not copy those.
+A **labelled host reconstruction** of `impute_food_balance_fao("wheat")`
+is now at `data/food_balances/wheat_food_balance_fao.csv` (FBSH 2006–11
++ QCL Production + TCL trade, AgriculturalData item-group factors,
+`reverse_stock_variation_sign`, `remove_aggregate_areas`). It is **not**
+Kuhla's unpublished local CSV (not bit-identical; window 2006–11 only;
+not rebalanced). It is **not adopted** as `prepare_wheat`. Do not copy
+FoodTradeNetwork `inputs_processed/` P0/R0 (2015–21 *averages*).
 
 **Raw FAOSTAT FBSH** (old methodology through 2013) wheat 2006–11 **is**
 vendored:
@@ -157,6 +165,7 @@ visible.
 | USDA PSD grain extracts, world aggregates | `--psd-only` if you want a newer FAS dump |
 | FAOSTAT E0 | none (vendored) |
 | FAOSTAT FBSH wheat 2006–11 | `--faostat-fb` (opt-in; zip gitignored) |
+| FAOSTAT QCL/TCL wheat 2006–11 | `--faostat-qcl-tcl` then `scripts/build_author_fb_fao.py` |
 | AMIS/OECD restrictions | browser XLSX, then `--amis-only` |
 | Pink Sheet | `--prices-only` |
 | Harvest calendars | none (vendored) |
@@ -222,6 +231,8 @@ PYTHONPATH=. python scripts/score_agrimate_methods.py
 - `data/usda_world/PROVENANCE.txt`
 - `data/faostat_network/PROVENANCE.txt`
 - `data/faostat_fb/PROVENANCE.txt` (raw FBSH wheat 2006–11; USDA still default)
+- `data/faostat_qcl_tcl/PROVENANCE.txt` (QCL Production + TCL trade wheat 2006–11)
+- `data/food_balances/PROVENANCE.txt` (host reconstruction of impute_food_balance_fao; not adopted)
 - `data/amis_policies/PROVENANCE.txt`
 - `data/world_prices/PROVENANCE.txt`
 - `data/crop_calendars/PROVENANCE.txt` (live host is E.27; legacy
