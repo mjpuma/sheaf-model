@@ -22,7 +22,7 @@ Do not implement G1/G2 here. Do not restore L1–L8 to chase Pink Sheet.
 Post-P12 inventory: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md),
 [`GATE0_DATA.md`](GATE0_DATA.md). R-queue exhausted. Post-R development:
 [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md). Next paste:
-[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S2**).
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S4**).
 
 ## Command
 
@@ -134,7 +134,9 @@ FAOSTAT Food Balances remain labelled A1. Bai found FAO anomalies closer to
 prices in 2020–24. P10 checked `data/faostat_network/` (E0 only). R6 obtain
 vendored raw FBSH wheat 2006–11; R6 ran a labelled `prepare_wheat_fbsh`
 parallel vs USDA on 2006–08 harvest+AMIS (**not adopted**; Psi stayed USDA).
-USDA stays the default. See `faostat_fb.md`, `fb_wheatdata.md`.
+S3 re-scored that parallel against member-sum USDA (China H 1.00; moy
+20.1×→33.0×; items 1–3 unchanged). **Not adopted.** USDA stays the
+default. See `s3_fbsh.md`, `faostat_fb.md`, `fb_wheatdata.md`.
 
 Agrimate Fig. 4 author series: Zenodo 10688435 unpacked (P7). Score in
 `diagnostics/gate0_agrimate/fig4.md`. Independent implementation, not a
@@ -146,7 +148,9 @@ R7: `diagnostics/gate0_agrimate/a8_sum.md` — 2007–09 H/C/S mean vs
 sum (USDA ending stocks, not FAO ΔS); S1 implements the sum.
 P10: `diagnostics/gate0_agrimate/faostat_fb.md` — `data/faostat_network/`
 is E0 only; A1 left; USDA default. R6 obtain: raw FBSH at
-`data/faostat_fb/`; author cleaned still absent.
+`data/faostat_fb/`; labelled host reconstruction at
+`data/food_balances/wheat_food_balance_fao.csv` (not bit-identical;
+not adopted).
 P11: `diagnostics/gate0_agrimate/pulse.md` — 8-run 2008 prescribed-Δ,
 clean; not Bai's 36; not G2.
 P12: `diagnostics/gate0_agrimate/methods.md` — G0-P market-section

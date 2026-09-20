@@ -8,9 +8,11 @@ What is here
 
 What is not here
   The bulk zip is gitignored (regenerate with --faostat-fb).
-  Agrimate's cleaned wheat_food_balance_fao.csv (QCL+TCL impute/rebalance)
-    is still not shipped; this extract is the official FAOSTAT dump, not
-    that pipeline.
+  Agrimate's unpublished local wheat_food_balance_fao.csv is still not
+    shipped. A labelled host reconstruction of impute_food_balance_fao
+    lives in data/food_balances/ (not bit-identical; not adopted).
+    This extract is the official FAOSTAT dump, the FBS input to that
+    reconstruction, not the author's local product.
   FoodTradeNetwork 2015–21 P0/R0 averages are not copied.
   FBS 2010+ (new methodology) is not mixed into this extract.
 

@@ -7,7 +7,9 @@ AMIS/OECD export-restrictions: converts a browser-downloaded XLSX into CSVs
 World Bank Pink Sheet annual prices: discovered from the Commodity Markets page
 (download URL hash changes monthly).
 FAOSTAT Food Balances (optional, --faostat-fb): FBSH bulk zip, wheat 2006–11
-extract only. Not a silent fit; USDA stays prepare_wheat default.
+extract only. FAOSTAT QCL/TCL wheat 2006–11 (optional, --faostat-qcl-tcl):
+production and trade quantity extracts for the labelled food-balance
+reconstruction. Not a silent fit; USDA stays prepare_wheat default.
 """
 from __future__ import annotations
 
@@ -29,6 +31,15 @@ PSD_DIR = ROOT / "data" / "usda_psd"
 AMIS_DIR = ROOT / "data" / "amis_policies"
 PRICE_DIR = ROOT / "data" / "world_prices"
 FB_DIR = ROOT / "data" / "faostat_fb"
+QCL_TCL_DIR = ROOT / "data" / "faostat_qcl_tcl"
+QCL_URL = (
+    "https://bulks-faostat.fao.org/production/"
+    "Production_Crops_Livestock_E_All_Data_(Normalized).zip"
+)
+TCL_URL = (
+    "https://bulks-faostat.fao.org/production/"
+    "Trade_CropsLivestock_E_All_Data_(Normalized).zip"
+)
 PSD_URL = "https://apps.fas.usda.gov/psdonline/downloads/psd_alldata_csv.zip"
 WB_COMMODITY_PAGE = "https://www.worldbank.org/en/research/commodity-markets"
 # FAOSTAT Food Balances (-2013, old methodology). One vintage for 2006–11.
@@ -437,6 +448,43 @@ def fetch_faostat_fb() -> None:
     print("FAOSTAT FBSH wheat 2006–11 extract complete.")
 
 
+def _download_zip(url: str, zip_path: Path) -> None:
+    if zip_path.exists() and zip_path.stat().st_size > 1_000_000:
+        print(f"Reusing {zip_path.name} ({zip_path.stat().st_size / 1e6:.1f} MB)")
+        return
+    print(f"Downloading {url} ...")
+    urllib.request.urlretrieve(url, zip_path)
+    print(f"  wrote {zip_path} ({zip_path.stat().st_size / 1e6:.1f} MB)")
+
+
+def fetch_faostat_qcl_tcl() -> None:
+    """Download FAOSTAT QCL+TCL bulks and extract wheat 2006–11 quantities.
+
+    Intermediate inputs for the labelled reconstruction of
+    wheat_food_balance_fao.csv. Not a prepare_wheat switch. USDA remains
+    the default. Does not mix FBS 2010+ into FBSH.
+    """
+    from sheaf.agrimate.author_fb import (
+        extract_wheat_from_zip,
+        write_qcl_tcl_meta,
+    )
+
+    QCL_TCL_DIR.mkdir(parents=True, exist_ok=True)
+    qcl_zip = QCL_TCL_DIR / "Production_Crops_Livestock_E_All_Data_(Normalized).zip"
+    tcl_zip = QCL_TCL_DIR / "Trade_CropsLivestock_E_All_Data_(Normalized).zip"
+    _download_zip(QCL_URL, qcl_zip)
+    _download_zip(TCL_URL, tcl_zip)
+    n_qcl = extract_wheat_from_zip(
+        qcl_zip, "QCL", QCL_TCL_DIR / "wheat_qcl_2006_2011.csv",
+    )
+    n_tcl = extract_wheat_from_zip(
+        tcl_zip, "TCL", QCL_TCL_DIR / "wheat_tcl_2006_2011.csv",
+    )
+    write_qcl_tcl_meta(n_qcl, n_tcl)
+    print(f"  QCL Production rows: {n_qcl}; TCL quantity rows: {n_tcl}")
+    print("FAOSTAT QCL/TCL wheat 2006–11 extract complete.")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--psd-only", action="store_true")
@@ -446,11 +494,17 @@ def main():
                     help="Download FAOSTAT FBSH and extract wheat 2006–11. "
                          "Opt-in; not part of the default PSD/AMIS/Pink fetch. "
                          "Does not change wheat_params or prepare_wheat.")
+    ap.add_argument("--faostat-qcl-tcl", action="store_true",
+                    help="Download FAOSTAT QCL+TCL and extract wheat 2006–11 "
+                         "production/trade quantities. Opt-in. Does not change "
+                         "wheat_params or prepare_wheat.")
     ap.add_argument("--amis-xlsx", type=Path, default=None,
                     help="Path to a browser-downloaded OECD/AMIS XLSX")
     args = ap.parse_args()
     if args.faostat_fb:
         fetch_faostat_fb()
+    elif args.faostat_qcl_tcl:
+        fetch_faostat_qcl_tcl()
     elif args.amis_only:
         refresh_amis_csvs(args.amis_xlsx)
     elif args.psd_only:

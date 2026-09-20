@@ -14,7 +14,7 @@ Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
 Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
 (P0–P12 done). Post-P12 R-queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md)
 (**exhausted**). Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
-next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S2**).
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S4**).
 Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
 [`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
@@ -66,9 +66,9 @@ government games will be added **after** G0-P.
 | Stage | Work | Exit |
 |---|---|---|
 | **G0-N** | Make the supplier programme numerically solvent on the 24-step wheat year. Record residual, runtime, and when the inverse-demand floor binds. | **Feasible** on 2003–11 (failed/fallback 0; residual 0; offer-floor 0). Unconverged scipy **1743/5832** on harvest+AMIS is labelled N5 (`solver.md`); not first-order stationary. Pink-Sheet scoring is G0-H. |
-| **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | **Met for retrieved code.** 27-region C.1 wheat list, author params, p_sto, x_min penalty, E.27, D.1 weights. β/τ_P labelled unused on wheat path (P3). D.30a formula wired (P4); author x1=demand labelled. Raw FAOSTAT FBSH vendored (R6 obtain); author cleaned FB absent; A1 USDA default. Fig. 4 zip unpacked (P7); not a replication. |
+| **G0-S** | Close source gaps that change economics: C.1 ISO list, D.8 vs F.1, ζ0, D.1b, E.27 support, FAOSTAT Food Balance vs USDA (A1–A6). Retrieve Zenodo code/data if available. Unsent questions: `GATE0_AGRIMATE_BRIEF.md`. | **Met for retrieved code.** 27-region C.1 wheat list, author params, p_sto, x_min penalty, E.27, D.1 weights. β/τ_P labelled unused on wheat path (P3). D.30a formula wired (P4); author x1=demand labelled. Raw FAOSTAT FBSH vendored (R6 obtain); labelled host reconstruction of wheat_food_balance_fao.csv (not bit-identical; not adopted); A1 USDA default. Fig. 4 zip unpacked (P7); not a replication. |
 | **G0-U** | Undisturbed / harvest-only / harvest+AMIS. Accounting identities. Score prices **and** USDA supply/stocks. Ukraine / Eastern Africa mechanism panels. OAT diagnostic without retuning. Protocol: `GATE0_VALIDATION.md`. | Three-scenario report in `diagnostics/gate0_agrimate/`; documented seasonal baseline; material balance. |
-| **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | **P8–P11 done:** `hindcast.md` sourced shortfall; `regional.md` named-node vs PSD; `faostat_fb.md` — raw FBSH vendored, author cleaned absent, A1 left, USDA default. `pulse.md` 8-run 2008 prescribed-Δ (Ukraine/Russia × {0.5,1.0} × {6,12}m) is clean; not Bai's 36; not G2. |
+| **G0-H** | 2006–11 wheat hindcast vs Pink Sheet **and** vs Agrimate Fig. 4 / regional tables if author output exists. Report levels, paths, hike ratios, stocks, consumption, trade. | **P8–P11 done:** `hindcast.md` sourced shortfall; `regional.md` named-node vs PSD; `faostat_fb.md` — raw FBSH vendored; labelled reconstruction at `data/food_balances/` (not adopted); A1 left, USDA default. `pulse.md` 8-run 2008 prescribed-Δ (Ukraine/Russia × {0.5,1.0} × {6,12}m) is clean; not Bai's 36; not G2. |
 | **G0-P** | Gate 0 note at publication standard (methods, data, hindcast, limits). No substitution, no government game. | **Note written, not accepted.** `diagnostics/gate0_agrimate/methods.md` is the market-section offer. Items 3 and 5 fail. G1 stays blocked. |
 | **G1** | Cross-crop substitution (wheat/rice/maize), distinct from Agrimate origin CES. Disabled G1 recovers G0. | Identity test + spillover experiments. No σ* fit to 2008. |
 | **G2** | Government restriction game, distinct from supplier oligopoly and from AMIS/E.4. Disabled G2 recovers E.4 Agrimate. | Mechanism tests on the *accepted* G0 host. Train/hold-out if estimated. |
@@ -107,7 +107,10 @@ approval.
    That is a G0-H score, not a reason to restore L1–L8. G0-U exit is the
    **workflow**, not publication-quality hindcast. **R-science is exhausted.**
    Remaining gaps are labelled (item-3 wander, A7 cannot-set, A1 USDA).
-   **S1 implemented** A8 member-sum. Next paste **S2**
+   **S1 implemented** A8 member-sum. **S2 labelled** item 3 at 1.444
+   (no sourced D.22; freeze not adopted). **S3** re-scored FBSH vs
+   member-sum USDA (China H 1.00; moy 20.1×→33.0×; not adopted).
+   Next paste **S4**
    (`GATE0_NEXT_PROMPTS.md`), not R8.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
 5. **P1 (done).** Step identities on 2006 harvest+AMIS.
@@ -177,7 +180,7 @@ approval.
     Items 3 and 5 still fail; tests lock honesty not Fig. 4 match;
     fetch does not download Zenodo or FAO FB. Adaptive queue:
     `GATE0_REPRO_PROMPTS.md` (exhausted). Living next-paste:
-    `GATE0_REPRO_DISPATCH.md` (**S1**; `GATE0_NEXT_PROMPTS.md`).
+    `GATE0_REPRO_DISPATCH.md` (**S3**; `GATE0_NEXT_PROMPTS.md`).
 18. **R2 (done).** `fig4_experiment_params()` is αI=3.5, ζ=1, N_for=6.
     FAO/EU28/start-2000 cannot-set. Short 2006–08 harvest+AMIS: moy
     26.8×→13.3× (drop ≥2); hike ×2.31→×2.22 (barely). Unconverged
@@ -191,11 +194,30 @@ approval.
 20. **R-science exhausted.** First-match table has nowhere to go without
     breaking hard stops (R11 forbidden; freeze not sourced; FAO/EU28
     cannot-set; labelled-off experiments did not move live items 1–3).
-    Remaining gaps after S1: live item-3 wander, A7 cannot-set, A1 USDA.
+    Remaining gaps after S3: A7 cannot-set (A1 left USDA; item 3 labelled
+    1.444; FBSH parallel not adopted).
 21. **S1 (done).** `prepare_wheat` 2007–09 baseline is member-sum then
     mean (same as `psd_regional_annual()`). USDA `ending_stocks` only.
     Never FAO ΔS. China H 56.4→112.7, Eastern Africa 0.33→3.31, USA
     1.00. `wheat_params()` stay 14022004. Next paste **S2**.
+22. **S2 (done).** Member-sum host undisturbed last/first **1.444** vs
+    author **1.004** (pre-S1 1.630). Still >1.1. No sourced D.22
+    variant (0 `*.jl` in tree). `freeze_q_oth` stays diagnostic,
+    default off, not a `wheat_params()` field. Not adopted. Not a pin.
+    Writeup: `diagnostics/gate0_agrimate/item3.md`. Next paste **S3**.
+23. **S3 (done).** Re-scored raw FBSH H/C vs S1 member-sum USDA on
+    2006–08 harvest+AMIS. China H 112.7 vs 112.3 (ratio 1.00); EA 0.99.
+    moy 20.1× → 33.0× (worsened). Items 1–3 did not improve. Psi USDA
+    (`ending_stocks`); 5074 is ΔS, not S. Author cleaned FB was still
+    absent at S3. **Not adopted.** USDA stays `prepare_wheat` default.
+    Writeup: `diagnostics/gate0_agrimate/s3_fbsh.md`. Next paste **S4**.
+24. **Author FB reconstruction.** Labelled host
+    `data/food_balances/wheat_food_balance_fao.csv` from sourced
+    `impute_food_balance_fao` (FBSH 2006–11 + QCL + TCL). Not
+    bit-identical to Kuhla's unpublished local CSV. Not rebalanced.
+    **Not adopted** as `prepare_wheat`. Egypt remains a FAOSTAT area
+    row, not a C.1 node. Writeup: `diagnostics/gate0_agrimate/author_fb.md`.
+    Next paste still **S4** (EU28+Egypt / start-2000 still cannot-set).
 
 Reference command:
 

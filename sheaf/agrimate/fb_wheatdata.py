@@ -5,6 +5,9 @@ rebalance). Not FoodTradeNetwork 2015–21 averages. Not a ``prepare_wheat``
 switch. Stocks cannot be read from FBSH Stock Variation (5074); Psi is
 copied from the USDA host and labelled. Anomalies are H_y / H_star − 1
 on the 2006–11 extract, not 10-year LOWESS and not author FAO-since-2005.
+
+S3: re-score that parallel against the S1 member-sum USDA host on one
+harvest+AMIS window. Historical R6 note/CSVs stay frozen (China 0.50×).
 """
 from __future__ import annotations
 
@@ -451,7 +454,10 @@ def write_fb_wheatdata_note(
 
 
 def write_r6_dispatch(score: dict, path: Path | None = None) -> Path:
+    """Historical R6 writer. Does not clobber a moved living dispatch."""
     path = Path(path) if path else DISPATCH
+    if path.is_file() and "Last completed: R6" not in path.read_text():
+        return path
     why = (
         f"FBSH parallel not adopted; China H {_fmt(score['China_H_usda'], 1)}→"
         f"{_fmt(score['China_H_fbsh'], 1)} (A8); hike ×{_fmt(score['hike_usda'])}→"
@@ -507,4 +513,241 @@ def run_fb_wheatdata_score(out_dir: Path | None = None) -> dict[str, Path]:
     for name in PROTECTED_THREE_SCENARIO:
         assert (out_dir / name).is_file(), name
     assert wheat_params().alpha_i == 3.2
+    return {"note": note, "quantities": qpath, "score": spath, "dispatch": dispatch}
+
+
+# S1 USDA 2003–11 harvest+AMIS (living host). Not the R6 2006–08-only window.
+S1_HOST_HIKE = 3.71
+S1_HOST_MOY = 16.8
+S1_HOST_LAST_FIRST = 1.444
+AUTHOR_HIKE = 1.62
+AUTHOR_MOY = 1.45
+AUTHOR_LAST_FIRST = 1.004
+
+
+def s3_adoption_verdict(score: dict) -> dict:
+    """Adopt FBSH only if items 1–3 improve and moy does not worsen.
+
+    This run is harvest+AMIS 2006–08. Item 3 is undisturbed 2006–11
+    last/first on the USDA host (S2: 1.444) and is not re-measured here.
+    Author cleaned FB is still absent. Psi is still USDA (5074 is ΔS).
+    """
+    moy_usda = float(score["moy_usda"])
+    moy_fbsh = float(score["moy_fbsh"])
+    moy_worsened = moy_fbsh > moy_usda + 1e-12
+    item3_improved = False
+    reasons = [
+        "item 3 undisturbed last/first still "
+        f"{_fmt(S1_HOST_LAST_FIRST, 3)} on the USDA host (author "
+        f"{_fmt(AUTHOR_LAST_FIRST, 3)}); FBSH not scored undisturbed",
+        "author wheat_food_balance_fao.csv still absent (A7/A1 cannot-set)",
+        "Psi still USDA ending_stocks (FBSH 5074 is ΔS, not S)",
+    ]
+    if moy_worsened:
+        reasons.append(
+            f"moy worsened {_fmt(moy_usda, 1)}× → {_fmt(moy_fbsh, 1)}× "
+            f"on this 2006–08 window (S1 host 2003–11 moy {S1_HOST_MOY:g}×)"
+        )
+    else:
+        reasons.append(
+            f"moy {_fmt(moy_usda, 1)}× → {_fmt(moy_fbsh, 1)}× does not "
+            "unlock a switch without items 1–3"
+        )
+    return {
+        "adopt": False,
+        "item3_improved": item3_improved,
+        "moy_worsened": moy_worsened,
+        "why": "; ".join(reasons),
+    }
+
+
+def write_s3_fbsh_note(score: dict, tab: pd.DataFrame, verdict: dict,
+                       out_dir: Path) -> Path:
+    cn = tab[tab["region"] == "China"].iloc[0]
+    ea = tab[tab["region"] == "Eastern Africa"].iloc[0]
+    us = tab[tab["region"] == "USA"].iloc[0]
+    eu = tab[tab["region"] == "EU-27"].iloc[0]
+    inv = inventory()
+    p = wheat_params()
+    lines = [
+        "# S3 — FBSH H/C vs S1 member-sum USDA (one harvest+AMIS window)",
+        "",
+        "**Not adopted. Leave A1. USDA remains the 2006–11 `prepare_wheat`",
+        "default.** `wheat_params()` stay "
+        f"αI={p.alpha_i:g}, p_sto={p.p_sto_annual:g}, xmin={p.xmin_share:g},",
+        f"ζ={p.zeta_penalty:g}, N_for={p.n_for_months:g}. L1–L8 stay rejected.",
+        "Bai α_foreign=10 not adopted. Unforced price is not pinned. G1/G2",
+        "stay blocked. Historical R6 note (`fb_wheatdata.md`) is frozen.",
+        "",
+        "Raw FAOSTAT **FBSH** wheat 2006–11 (item 2511, 1000 t) vs USDA",
+        "member-sum (S1). This is **not** author `wheat_food_balance_fao.csv`.",
+        "FoodTradeNetwork 2015–21 averages were not copied. FBS 2010+ was",
+        "not mixed in. FBSH Stock Variation (element **5074**) is not S.",
+        "",
+        "## Verification protocol (CLAUDE.md)",
+        "",
+        "1. **Claim.** Agrimate E.1 uses FAOSTAT Food Balances. S3 may switch",
+        "`prepare_wheat` to the FBSH parallel only if DEVELOPMENT items 1–3",
+        "improve **and** moy does not worsen versus the S1 USDA host.",
+        "",
+        "2. **Implementation.** `prepare_wheat` is USDA PSD member-sum then",
+        "mean (`ending_stocks` is S). `prepare_wheat_fbsh` is a labelled",
+        "parallel: FBSH H/C/X, Psi copied from USDA, 5074 unused as a stock",
+        "level.",
+        "",
+        "3. **Match.** Default path is still USDA (A1). After S1, China and",
+        "Eastern Africa H sit next to FBSH (not 0.50× / 0.10×). Author",
+        "cleaned FB is still absent.",
+        "",
+        "4. **Counterexample.** China H USDA "
+        f"{_fmt(cn['H_usda'], 1)} vs FBSH {_fmt(cn['H_fbsh'], 1)} "
+        f"(ratio {_fmt(cn['H_ratio'])}). USA "
+        f"{_fmt(us['H_usda'], 1)} vs {_fmt(us['H_fbsh'], 1)}. "
+        f"2006–08 harvest+AMIS moy USDA {_fmt(score['moy_usda'], 1)}× vs",
+        f"FBSH {_fmt(score['moy_fbsh'], 1)}×; hike ×{_fmt(score['hike_usda'])}",
+        f"vs ×{_fmt(score['hike_fbsh'])} (S1 2003–11 host ×{S1_HOST_HIKE:g};",
+        f"author ×{AUTHOR_HIKE:g}). Item 3 last/first is still",
+        f"{_fmt(S1_HOST_LAST_FIRST, 3)} on the USDA host.",
+        "",
+        "5. **Correctness of not switching.** "
+        f"{verdict['why']}. Switching would retune 2006–11 quantities",
+        "without a sourced cleaned FB or an item-3 gain.",
+        "",
+        "6. **Change.** None to economics. USDA stays default. Do not retune",
+        "αI / p_sto / xmin. Do not treat 5074 as stocks.",
+        "",
+        "## 2007–09 baseline (MMT, after T* rebuild)",
+        "",
+        "| Region | H USDA | H FBSH | ratio | C USDA | C FBSH |",
+        "|---|---:|---:|---:|---:|---:|",
+        f"| USA | {_fmt(us['H_usda'], 1)} | {_fmt(us['H_fbsh'], 1)} | "
+        f"{_fmt(us['H_ratio'])} | {_fmt(us['C_usda'], 1)} | {_fmt(us['C_fbsh'], 1)} |",
+        f"| China | {_fmt(cn['H_usda'], 1)} | {_fmt(cn['H_fbsh'], 1)} | "
+        f"{_fmt(cn['H_ratio'])} | {_fmt(cn['C_usda'], 1)} | {_fmt(cn['C_fbsh'], 1)} |",
+        f"| EU-27 | {_fmt(eu['H_usda'], 1)} | {_fmt(eu['H_fbsh'], 1)} | "
+        f"{_fmt(eu['H_ratio'])} | {_fmt(eu['C_usda'], 1)} | {_fmt(eu['C_fbsh'], 1)} |",
+        f"| Eastern Africa | {_fmt(ea['H_usda'], 2)} | {_fmt(ea['H_fbsh'], 2)} | "
+        f"{_fmt(ea['H_ratio'])} | {_fmt(ea['C_usda'], 1)} | {_fmt(ea['C_fbsh'], 1)} |",
+        f"| World 27-node | {_fmt(score['H_sum_usda'], 1)} | "
+        f"{_fmt(score['H_sum_fbsh'], 1)} | "
+        f"{_fmt(score['H_sum_fbsh'] / score['H_sum_usda'] if score['H_sum_usda'] else float('nan'))} | — | — |",
+        "",
+        "China H is comparable after S1 (R6 was 56.4 vs 112.3). Remaining",
+        "H/C gaps are EU-27 consumption (USDA ~126 vs FBSH ~84) and other",
+        "multi-country C. World 27-node H now matches (~0.99). Psi identical",
+        "(USDA) on both objects.",
+        f"Laptop `{inv['laptop_data']['path']}` mounted="
+        f"{inv['laptop_data']['exists']}. "
+        f"Author cleaned FB files: {inv['food_balance_files'] or 'none'}.",
+        "",
+        "## 2006–08 harvest+AMIS (this window, not the 2003–11 host)",
+        "",
+        "| | USDA member-sum | FBSH parallel | S1 2003–11 host | author |",
+        "|---|---:|---:|---:|---:|",
+        f"| hike_2008 | ×{_fmt(score['hike_usda'])} | ×{_fmt(score['hike_fbsh'])} | "
+        f"×{S1_HOST_HIKE:g} | ×{AUTHOR_HIKE:g} |",
+        f"| moy max/min | {_fmt(score['moy_usda'], 1)}× | {_fmt(score['moy_fbsh'], 1)}× | "
+        f"{S1_HOST_MOY:g}× | {AUTHOR_MOY:g}× |",
+        f"| 2006 mean USD/t | {_fmt(score['mean_2006_usda'], 1)} | "
+        f"{_fmt(score['mean_2006_fbsh'], 1)} | — | — |",
+        f"| unconverged | {int(score['unconverged_usda'])}/{int(score['n_solves'])} | "
+        f"{int(score['unconverged_fbsh'])}/{int(score['n_solves'])} | 2304 | — |",
+        f"| failed | {int(score['failed_usda'])} | {int(score['failed_fbsh'])} | 0 | — |",
+        f"| XI* annual | {_fmt(score['XI_world_usda'], 1)} | "
+        f"{_fmt(score['XI_world_fbsh'], 1)} | — | — |",
+        "",
+        f"`wheat_params` αI={score['alpha_i']:g}, ζ={score['zeta_penalty']:g}, "
+        f"N_for={int(score['n_for_months'])}. Psi was USDA on both runs.",
+        "The 2006–08 last/first columns are **not** item 3 (item 3 is",
+        f"undisturbed 2006–11 = {_fmt(S1_HOST_LAST_FIRST, 3)}).",
+        "",
+        "## Remaining cannot-set (A1 / A7)",
+        "",
+        "- Author cleaned FB / QCL+TCL rebalance",
+        "- Ending stocks from FAO (Psi stayed USDA; 5074 is ΔS)",
+        "- FAO-since-2005 LOWESS anomalies; AgrimateEU28+Egypt",
+        "- 2015–21 FoodTradeNetwork averages (not used)",
+        "",
+        f"**Adoption:** not adopted. {verdict['why']}.",
+        "",
+        "**Next paste: S4.** A7 cannot-set inventory (EU28+Egypt / start-2000",
+        "/ cleaned FB). Do not start G1. Do not retune αI / p_sto / xmin.",
+        "",
+    ]
+    path = Path(out_dir) / "s3_fbsh.md"
+    path.write_text("\n".join(lines) + "\n")
+    return path
+
+
+def write_s3_dispatch(score: dict, verdict: dict, path: Path | None = None) -> Path:
+    """Living S3 writer. Does not clobber a later S-session dispatch."""
+    path = Path(path) if path else DISPATCH
+    if path.is_file():
+        text = path.read_text()
+        if "Last completed: S2" not in text and "Last completed: S3" not in text:
+            return path
+    body = "\n".join([
+        "# Gate 0 reproduction dispatch",
+        "",
+        "Living next-paste. R-science queue exhausted. Template:",
+        "`GATE0_NEXT_PROMPTS.md` (S1–S6). Do not walk R8…R12 as science.",
+        "",
+        "```",
+        "Last completed: S3",
+        "Window / scenario: 2006–08 harvest+AMIS FBSH vs S1 member-sum USDA",
+        f"hike_2008 USDA→FBSH: ×{_fmt(score['hike_usda'])} → ×{_fmt(score['hike_fbsh'])} "
+        f"(S1 2003–11 ×{S1_HOST_HIKE:g}; author ×{AUTHOR_HIKE:g})",
+        f"moy max/min: {_fmt(score['moy_usda'], 1)}× → {_fmt(score['moy_fbsh'], 1)}× "
+        f"(S1 host {S1_HOST_MOY:g}×; author {AUTHOR_MOY:g}×)",
+        f"undisturbed last/first: {S1_HOST_LAST_FIRST:g} vs author {AUTHOR_LAST_FIRST:g} (S2; FBSH not scored)",
+        f"unconverged / failed: USDA {int(score['unconverged_usda'])}/"
+        f"{int(score['n_solves'])} / {int(score['failed_usda'])}; "
+        f"FBSH {int(score['unconverged_fbsh'])}/{int(score['n_solves'])} / "
+        f"{int(score['failed_fbsh'])}",
+        "What you could set / could not set: FBSH H/C re-scored; Psi USDA; 5074 not S; author cleaned FB cannot-set",
+        "Next paste: S4",
+        "Why: China H ~1.00 vs FBSH after S1; items 1–3 + moy do not justify switch; USDA stays default",
+        "Skip: R8-as-science; R11; G1/G2; 2006 pin; Bai 10; L1–L8; FAO ΔS as stocks; FTN 2015–21",
+        "```",
+    ])
+    path.write_text(body + "\n")
+    return path
+
+
+def run_s3_fbsh_score(out_dir: Path | None = None) -> dict[str, Path]:
+    """Re-score FBSH vs member-sum USDA. Does not adopt. Does not overwrite R6."""
+    out_dir = Path(out_dir) if out_dir else OUT_DEFAULT
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for name in PROTECTED_THREE_SCENARIO:
+        assert (out_dir / name).is_file(), name
+    before = {name: (out_dir / name).read_bytes() for name in PROTECTED_THREE_SCENARIO}
+    r6_note = (out_dir / "fb_wheatdata.md").read_bytes()
+    r6_csv = (out_dir / "score_fb_wheatdata.csv").read_bytes()
+    r6_q = (out_dir / "score_fb_wheatdata_quantities.csv").read_bytes()
+    params = wheat_params()
+    assert params.alpha_i == 3.2
+    assert params.zeta_penalty == 0.0
+    usda = prepare_wheat(start_year=START_YEAR, end_year=END_YEAR, params=params)
+    fbsh = prepare_wheat_fbsh(start_year=START_YEAR, end_year=END_YEAR, params=params)
+    assert np.allclose(usda.Psi, fbsh.Psi)
+    tab = quantity_table(usda, fbsh)
+    score = score_harvest_amis(usda, fbsh, params)
+    score["China_H_usda"] = float(usda.H_annual[usda.regions.index("China")])
+    score["China_H_fbsh"] = float(fbsh.H_annual[fbsh.regions.index("China")])
+    verdict = s3_adoption_verdict(score)
+    assert verdict["adopt"] is False
+    qpath = out_dir / "score_s3_fbsh_quantities.csv"
+    tab.to_csv(qpath, index=False)
+    spath = out_dir / "score_s3_fbsh.csv"
+    pd.DataFrame([{**score, "adopt": False, "why": verdict["why"]}]).to_csv(
+        spath, index=False)
+    note = write_s3_fbsh_note(score, tab, verdict, out_dir)
+    dispatch = write_s3_dispatch(score, verdict)
+    after = {name: (out_dir / name).read_bytes() for name in PROTECTED_THREE_SCENARIO}
+    assert before == after, "S3 must not overwrite 2003–11 three-scenario CSVs"
+    assert (out_dir / "fb_wheatdata.md").read_bytes() == r6_note
+    assert (out_dir / "score_fb_wheatdata.csv").read_bytes() == r6_csv
+    assert (out_dir / "score_fb_wheatdata_quantities.csv").read_bytes() == r6_q
+    assert wheat_params().alpha_i == 3.2
+    assert not any(n.startswith("PARALLEL") for n in usda.notes)
     return {"note": note, "quantities": qpath, "score": spath, "dispatch": dispatch}

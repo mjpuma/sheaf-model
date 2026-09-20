@@ -1,0 +1,33 @@
+FAOSTAT QCL (Crops and livestock products) and TCL (trade) wheat extracts.
+
+What is here
+  wheat_qcl_2006_2011.csv  QCL Production, item 15 Wheat, years 2006–2011, unit t
+  wheat_tcl_2006_2011.csv  TCL Import/Export Quantity for AgriculturalData
+                           wheat item-group codes, years 2006–2011, unit t
+  DOWNLOAD_META.json       fetch timestamp and source URLs
+
+What is not here
+  The bulk zips are gitignored (regenerate with --faostat-qcl-tcl).
+  This is not wheat_food_balance_fao.csv (that lives in data/food_balances/
+    after impute). These are the QCL+TCL inputs to that reconstruction.
+  FoodTradeNetwork 2015–21 P0/R0 averages are not copied.
+  FBS 2010+ (new methodology) is not mixed in.
+
+Source
+  QCL: https://www.fao.org/faostat/en/#data/QCL
+  Bulk: https://bulks-faostat.fao.org/production/Production_Crops_Livestock_E_All_Data_(Normalized).zip
+  TCL: https://www.fao.org/faostat/en/#data/TCL
+  Bulk: https://bulks-faostat.fao.org/production/Trade_CropsLivestock_E_All_Data_(Normalized).zip
+  Wheat primary item 15. Processed trade items follow AgriculturalData
+  item_groups_fao wheat codes (16, 17, 18, 20, 21, 22, 41, 110, 114, 115, 19).
+  Element names canonicalized to AgriculturalData ("Import Quantity").
+
+Refresh
+  PYTHONPATH=. python scripts/fetch_external_data.py --faostat-qcl-tcl
+  Then: PYTHONPATH=. python scripts/build_author_fb_fao.py
+
+Use
+  USDA PSD remains prepare_wheat default (A1 labelled). These extracts feed
+  the labelled reconstruction of impute_food_balance_fao. Do not retune
+  αI / p_sto / xmin. Do not treat QCL/TCL as G0-P acceptance. Do not
+  treat stock variation as a stock level.

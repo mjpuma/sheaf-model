@@ -1,0 +1,52 @@
+Host reconstruction of AgriculturalData.impute_food_balance_fao("wheat").
+
+What this file is
+  wheat_food_balance_fao.csv  — imputed FAO food-balance table for
+  wheat, years 2006–2011, unit 1000 t. Columns match the sourced
+  AgriculturalData output: ISO3 Code, Area, Area Code, Year,
+  Production, Domestic supply quantity, Import Quantity,
+  Export Quantity, Stock Variation, Source (FBS or QCL+TCL).
+
+What this file is not
+  Not Kuhla's unpublished local CSV (not bit-identical).
+  Not a prepare_wheat switch. USDA PSD remains the 2006–11 default (A1).
+  Not FoodTradeNetwork 2015–21 P0/R0 averages.
+  Not FBS 2010+ (new methodology) mixed into FBSH.
+  Not rebalanced / trade-harmonized (those are later pipeline steps;
+  Agrimate timeseries.py reads this imputed file).
+  Stock Variation is ΔS (FBSH 5074, sign-flipped per sourced
+  reverse_stock_variation_sign). It is not USDA ending stocks.
+  Do not treat 5074 as a stock level.
+
+Algorithm (Zenodo 14022004 AgriculturalData, CC-BY-4.0)
+  1. FBS = vendored FBSH wheat item 2511, 2006–11, unit 1000 t.
+     reverse_stock_variation_sign (Stock Variation × −1).
+     remove_aggregate_areas (Area Code < 350, drop 260–270).
+  2. QCL Production (item 15 Wheat, tonnes / 1000).
+  3. TCL Import/Export Quantity for item_groups_fao wheat codes,
+     converted to primary equivalent, tonnes / 1000.
+  4. For area-years missing FBS: Domestic supply = max(P+I−X, 0);
+     Stock Variation = min(P+I−X, 0); Source = QCL+TCL.
+  5. ISO3 from data/faostat_network/country_conversion_table.csv
+     plus data_faostat aliases (41→CHN, 107→CIV, 214→TWN) and TMP→TLS.
+
+Labelled adaptations vs the unpublished author product
+  Window 2006–11 only (vendored FBSH), not the author's longer span.
+  Current FAOSTAT QCL/TCL vintages (downloaded this reconstruction),
+  not whatever dump Kuhla cleaned locally.
+  Sourced impute converted a copy of df_trade then divided the
+  unconverted dfs['trade']; reconstruction applies conversion to the
+  pivoted frame (intended pipeline).
+  Belgium-Luxembourg (15) is kept (author remove_aggregate_areas);
+  the FBSH WheatData parallel still drops it as a duplicate total.
+
+Sanity (2007 Production, 1000 t, Source=FBS)
+  United States of America 55820.000 (FBSH 55820).
+  China, mainland 109298.000 (FBSH 109298).
+  Rows: 1193 (FBS 1049; QCL+TCL imputed 144).
+
+Refresh
+  PYTHONPATH=. python scripts/fetch_external_data.py --faostat-qcl-tcl
+  PYTHONPATH=. python scripts/build_author_fb_fao.py
+  Does not change wheat_params or prepare_wheat. Not G0-P acceptance.
+

@@ -1,9 +1,10 @@
 """P10/R6 obtain: FAOSTAT Food Balance inventory.
 
 Agrimate E.1 uses FAOSTAT Food Balances. This host uses USDA PSD (A1).
-Raw FBSH wheat 2006–11 is vendored under data/faostat_fb/; author cleaned
-wheat_food_balance_fao.csv is still absent. USDA remains prepare_wheat
-default. This module does not build a parallel WheatData.
+Raw FBSH wheat 2006–11 is vendored under data/faostat_fb/. A labelled
+host reconstruction of wheat_food_balance_fao.csv lives under
+data/food_balances/ (not bit-identical author output; not adopted).
+USDA remains prepare_wheat default.
 """
 from __future__ import annotations
 
@@ -75,10 +76,14 @@ def inventory() -> dict:
         "network_files": network,
         "e0_files": e0,
         "p0_r0_files": p0,
-        # Author-cleaned names only. Raw FBSH lives in fbsh_wheat_files so
-        # Fig. 4 A7 still treats FAO Food Balances as cannot-set.
+        # Author-cleaned names (host reconstruction of impute_food_balance_fao).
+        # Raw FBSH lives in fbsh_wheat_files. USDA remains prepare_wheat default.
         "food_balance_files": list(author_fb),
         "author_fb_present": [Path(p).name for p in author_fb],
+        "author_fb_reconstruction": any(
+            Path(p).name == "wheat_food_balance_fao.csv" for p in author_fb
+        ),
+        "author_fb_bit_identical": False,
         "faostat_fb_dir_files": fb_dir_files,
         "fbsh_wheat_files": fbsh_wheat,
         "laptop_data": laptop,
@@ -110,8 +115,10 @@ def write_faostat_fb_note(inv: dict | None = None, out_dir: Path | None = None) 
         "",
         "R6 obtain vendored FAOSTAT **FBSH** (Food Balances −2013, old",
         "methodology) wheat item 2511, years 2006–2011, unit 1000 t.",
-        "That extract is **not** Agrimate's cleaned",
-        "`wheat_food_balance_fao.csv` (impute / QCL+TCL / rebalance).",
+        "That extract is **not** bit-identical Agrimate cleaned",
+        "`wheat_food_balance_fao.csv`. A labelled host reconstruction of",
+        "`impute_food_balance_fao` now lives under `data/food_balances/`",
+        "(not adopted as `prepare_wheat`).",
         "Do not mix FBS 2010+ (new methodology) into this vintage.",
         "R6 `prepare_wheat_fbsh` is a labelled parallel vs USDA on one",
         "harvest+AMIS window; **not adopted**.",
@@ -139,7 +146,10 @@ def write_faostat_fb_note(inv: dict | None = None, out_dir: Path | None = None) 
         f"(FB hits: {laptop_hits}).",
         "- Author AgriculturalData (Zenodo 14022004) expects cleaned",
         "  `wheat_food_balance_fao.csv` / `wheat_food_balance.csv` /",
-        "  `wheat_production.csv`. None of those names exist under `data/`.",
+        "  `wheat_production.csv`. A labelled host reconstruction of",
+        "  `wheat_food_balance_fao.csv` is under `data/food_balances/`",
+        "  (not bit-identical; not adopted). The other two names are still",
+        "  absent.",
         "- Upstream `mjpuma/FoodTradeNetwork` `inputs_processed/` has",
         "  Wheat P0/Production/Reserves only as **2015–21 window averages**,",
         "  not 2006–11 annual Food Balances. Copying those would not force",
@@ -172,8 +182,9 @@ def write_faostat_fb_note(inv: dict | None = None, out_dir: Path | None = None) 
         "   they are not a 27-node `WheatData` substitute.",
         "2. **Author code** `AgriculturalData` (14022004) has the",
         "   preprocess (`impute_food_balance_fao`, QCL+TCL merge,",
-        "   rebalance). The cleaned arrays it reads are a local product",
-        "   of that pipeline, not shipped in the code zip or in 10688435.",
+        "   rebalance). The author's local CSV is still unpublished.",
+        "   This host reconstructed `impute_food_balance_fao` for 2006–11",
+        "   under `data/food_balances/` (labelled; not adopted).",
         "3. This **raw FBSH dump** is official FAOSTAT, not that pipeline.",
         "   Old FBS vs new Food Balances also breaks across ~2010; this",
         "   extract stays on FBSH through 2011.",
@@ -184,9 +195,11 @@ def write_faostat_fb_note(inv: dict | None = None, out_dir: Path | None = None) 
         "2. **Implementation.** `prepare_wheat` (`wheat_data.py`) groups",
         "   USDA PSD 2007–09 and notes \"not FAOSTAT Food Balances (E.1.1).\"",
         "3. **Match.** They do not, by labelled adaptation A1.",
-        "4. **Counterexample.** Raw FBSH is on disk; author-cleaned names",
-        "   are not (`inventory()[\"food_balance_files\"]` empty;",
-        "   `fbsh_wheat_files` present). `prepare_wheat` still USDA.",
+        "4. **Counterexample.** Raw FBSH is on disk. A labelled",
+        "   reconstruction of `wheat_food_balance_fao.csv` is also on",
+        "   disk (`inventory()[\"food_balance_files\"]`); it is not",
+        "   bit-identical author output and is **not adopted**.",
+        "   `prepare_wheat` still USDA.",
         "5. **Correctness of stopping.** E0 is present and used. Wiring",
         "   FBSH into the 27-node host needs region maps, stock treatment,",
         "   and a labelled parallel WheatData (`fb_wheatdata.md`, not",
@@ -199,6 +212,7 @@ def write_faostat_fb_note(inv: dict | None = None, out_dir: Path | None = None) 
         "",
         "- this note",
         "- `data/faostat_fb/PROVENANCE.txt`",
+        "- `data/food_balances/PROVENANCE.txt` (host reconstruction)",
         "- `data/faostat_network/PROVENANCE.txt` (E0 only)",
         "",
         "Next paste: **R7** (A8 mean-vs-sum). Not G1. Do not retune",

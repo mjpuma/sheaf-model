@@ -196,6 +196,18 @@ Fig. 4 knobs not adopted.
    matches D.22; the wander is the realised XI path feeding it.
    Not a decay knob. Not L1–L8. Next paste **R5**.
 
+**S2 follow-up (A8 member-sum host).** Re-measured from living
+`prices_three_scenarios.csv` (no NLP re-run; `xi_split` probes not
+re-run). Host last/first **1.444** ($45.82 → $66.15) vs author **1.004**.
+Still >1.1. 0 `*.jl` in tree — no sourced D.22 variant. `freeze_q_oth`
+stays diagnostic, default off, not in `wheat_params()`. Not adopted.
+Not a pin. Writeup: `item3.md`. Next paste **S3**.
+
+**S3 follow-up (FBSH vs member-sum USDA).** 2006–08 harvest+AMIS:
+China H 112.7 vs FBSH 112.3 (ratio 1.00). moy 20.1× → 33.0× (worsened).
+Items 1–3 did not improve. Psi USDA; 5074 is ΔS, not S. Author cleaned
+FB still absent. **Not adopted.** Writeup: `s3_fbsh.md`. Next paste **S4**.
+
 ---
 
 ## Step 6 — World-price object
@@ -296,7 +308,7 @@ HTTP HEAD/GET (2026-09-19):
 | Pink Sheet | scoring | scoring only | `--prices-only` (WB page HEAD 200) |
 | Fig. 4 series | 10688435 NetCDF | extracted CSVs in `author_fig4/` | **manual** Zenodo (record HEAD 200); zip not vendored |
 | Author Julia | 14022004 | not copied | record HEAD 200; **not in fetch script**; **not in repo** |
-| FAOSTAT FB arrays | E.1.1 | USDA default (A1); **raw FBSH** in `data/faostat_fb/` (R6 obtain); author cleaned still absent | `--faostat-fb` (opt-in; bulk zip 200 this run; JSON API 521) |
+| FAOSTAT FB arrays | E.1.1 | USDA default (A1); **raw FBSH** in `data/faostat_fb/` (R6 obtain); labelled host reconstruction in `data/food_balances/` (not bit-identical; **not adopted**) | `--faostat-fb` / `--faostat-qcl-tcl` (opt-in; bulk zip 200 this run; JSON API 521) |
 
 `scripts/fetch_external_data.py` contains none of: `zenodo`,
 `14022004`, `10688435`, `alpha_i`, `p_sto`, `xmin`. There is **no**

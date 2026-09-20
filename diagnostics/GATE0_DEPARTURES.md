@@ -20,12 +20,22 @@ A1 **USDA PSD not FAOSTAT Food Balances (P10 confirmed; R6 parallel).**
 `data/faostat_network/` is E0 trade only. FoodTradeNetwork P0/R0 are
 2015–21 averages, not 2006–11 annual FB. Zenodo 10688435 is FAO-forced
 model *output*, not FB inputs. Author AgriculturalData expects cleaned
-`wheat_food_balance_fao.csv`, which is still not shipped. R6 obtain
+`wheat_food_balance_fao.csv`. A **labelled host reconstruction** of
+`impute_food_balance_fao("wheat")` now lives at
+`data/food_balances/wheat_food_balance_fao.csv` (FBSH 2006–11 + QCL +
+TCL; sign-flipped 5074; not rebalanced; not bit-identical to Kuhla's
+unpublished local CSV). **Not adopted** as `prepare_wheat`. R6 obtain
 vendored raw FAOSTAT **FBSH** wheat 2006–11 under `data/faostat_fb/`.
 R6 built a labelled `prepare_wheat_fbsh` parallel (members summed,
-China ~2× USDA A8 mean; Psi stayed USDA; anomalies H/Hstar−1).
-**Not adopted.** USDA remains the 2006–11 `prepare_wheat` default.
-Writeup: `diagnostics/gate0_agrimate/faostat_fb.md`, `fb_wheatdata.md`.
+China ~2× USDA A8 *mean*; Psi stayed USDA; anomalies H/Hstar−1).
+**Not adopted.** **S3** re-scored that parallel against the S1
+member-sum USDA host (2006–08 harvest+AMIS): China H 112.7 vs FBSH
+112.3 (ratio 1.00); EA 0.99; world H 0.99. moy 20.1× → 33.0×
+(worsened vs this window and vs S1 host 16.8×). Items 1–3 did not
+improve (item 3 still 1.444; Psi still USDA `ending_stocks`; 5074 is
+ΔS, not S). **Not adopted.** USDA remains the 2006–11 `prepare_wheat`
+default. Writeup: `diagnostics/gate0_agrimate/author_fb.md` (S3:
+`s3_fbsh.md`; historical R6: `fb_wheatdata.md`, `faostat_fb.md`).
 A2 E0 shares rescaled; A3 A_d not E.30 (F.1 Egypt 0.17 unused: Egypt is inside Northern Africa);
 A4 A_c income-group proxies; A5 restriction weights inside multi-country
 regions; A6 inverse-demand floor 0.05 (numerical).
@@ -75,12 +85,17 @@ A6.
 R4 **Undisturbed last/first channel (characterisation, not adopted).**
 On 2003–11 undisturbed, freezing D.22 `q_oth` at XI*_world−XI*_r
 (diagnostic hook `freeze_q_oth`, default off) yields last/first **1.019**
-vs author **1.004** vs live host **1.630**. xmin_off (ζ=1) **0.548** and
+vs author **1.004** vs live host **1.630** (pre-S1 pooled-mean). xmin_off (ζ=1) **0.548** and
 calendar_replan (stride=24) **0.523** overshoot below 1. XI still spans
 137–235 MMT under the freeze — last/first is the D.7 offer mix, not XI
 volume. Author Agrimate still updates D.22; freeze is a diagnostic
 isolation, not a copy. Not a decay knob. Not L1–L8. `wheat_params()`
-unchanged. Writeup: `diagnostics/gate0_agrimate/xi_split.md`.
+unchanged. Historical writeup: `diagnostics/gate0_agrimate/xi_split.md`.
+**S2 re-measure (A8 member-sum host):** last/first **1.444** vs author
+**1.004** (still >1.1). No sourced D.22 variant from retrieved 14022004
+wheat (0 `*.jl` in tree). `freeze_q_oth` stays diagnostic, default off,
+not a `wheat_params()` field. Not adopted. Not a pin. Writeup:
+`diagnostics/gate0_agrimate/item3.md`.
 
 N4 **D.7 international scale.** Argument is `(XI_r + Q_{-r}) / XI*_world`
 with `XI*_world` the per-step year-average (wheat_data note; Agrimate

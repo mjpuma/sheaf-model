@@ -23,7 +23,7 @@ replication.
 | World price | §5.2 international tx; XI-weighted lagged D.7 offers × p0 | blend + pin | `model.py` `volume_weighted_offer_index` | R3 host identity; not D.7 of world XI*; 14022004 `plot_wm_price_timeseries` still not in-tree; not a 2006 pin |
 | Harvest shape | E.27 author raised-cosine | triangular | `harvest.py` | `test_harvest_profile_normalised` |
 | Restrictions | E.4 / AMIS OECD columns PolicyMeasure_Name, CommodityClass_Name | extra AMIS types | `restrictions.py` | wheat Δ nonempty 2007/08 |
-| Baseline quantities | FAOSTAT FB E.1 | USDA+E0 | USDA PSD + E0 rescale | A1; raw FBSH vendored; labelled `prepare_wheat_fbsh` not adopted (`fb_wheatdata.md`); USDA default |
+| Baseline quantities | FAOSTAT FB E.1 | USDA+E0 | USDA PSD + E0 rescale | A1; S3 FBSH vs member-sum China H 1.00, moy worsened, not adopted (`s3_fbsh.md`); USDA default; 5074 is not S |
 | Storage cost | Tbl. D.8 p_sto=0.1 / Nyear | cover rule | `optimize.py` unit costs | G0-S |
 | x_min | Tbl. D.8 0.2 even spread | n/a | quadratic penalty, ζ=0 | G0-S |
 | Three-scenario validation | Agrimate Fig. 4 design; Bai/Wada/Puma copy workflow | Pink-Sheet only | `validation.py` / `run_agrimate_validation.py` | prices **and** USDA supply/stocks |
@@ -42,7 +42,7 @@ replication.
 | World-price recipe | §5.2; host mix vs author `plot_wm_price_timeseries` | n/a | `volume_weighted_offer_index` / `world_price.md` | R3 host identity; Julia absent |
 | Fig. 4 knobs vs author | R2 2006–08 run vs `author_fig4/` | n/a | `fig4_author_score.py` / `fig4_config_score.md` | R10 not a match; remaining A7 |
 | N5 on Fig. 4 knobs | P5 unconverged split on R2 object | n/a | `fig4_solver.py` / `solver_fig4.md` | R9; `plan_maxiter=40` kept; next R4 |
-| Undisturbed xd/xi | item 3 last/first 1.630 vs author 1.004 | n/a | `xi_split.py` / `xi_split.md` | R4; D.22 `q_oth` freeze 1.019 (not adopted); xmin/calendar overshoot |
+| Undisturbed xd/xi | item 3 last/first 1.444 vs author 1.004 (pre-S1 1.630) | n/a | `xi_split.py` / `item3.md` | S2 labelled; R4 D.22 freeze 1.019 (not adopted); no sourced Julia |
 | S4 x1=demand | author two-market x1 := D.30/D.30a requests | T*+domestic | `x1_from_demand` / `x1_demand.md` | R5 labelled, default off; p_w silent; not adopted |
 
 Unresolved (labelled, not guessed): paper 28 vs code 27;

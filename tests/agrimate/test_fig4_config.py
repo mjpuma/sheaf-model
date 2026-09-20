@@ -61,7 +61,7 @@ def test_cannot_set_is_labelled_and_region_path_is_none():
     assert "2000" in joined
     assert "old-demand-dynamics" in joined
     assert "14022004" in joined
-    assert avail["faostat_fb_files"] == []
+    assert any("wheat_food_balance_fao.csv" in p for p in avail["faostat_fb_files"])
     assert avail["usda_is_default"] is True
     assert avail["host_has_egypt_node"] is False
     assert avail["host_has_eu28"] is False
