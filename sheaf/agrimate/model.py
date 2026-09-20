@@ -171,11 +171,17 @@ def _purchaser_baseline(H_star, p_wld, C_star, Psi, A_c, params: AgrimateParams)
 
 class AgrimateSim:
     def __init__(self, data: WheatData, params: AgrimateParams | None = None,
-                 use_restrictions: bool = True, use_anomalies: bool = True):
+                 use_restrictions: bool = True, use_anomalies: bool = True,
+                 replan_stride: int = 1, freeze_q_oth: bool = False):
         self.data = data
         self.params = params or wheat_params()
         self.use_restrictions = use_restrictions
         self.use_anomalies = use_anomalies
+        # Diagnostic hooks (R4). Defaults recover the live host.
+        # replan_stride=1: every step (N2 rolling year). 24 = January only.
+        # freeze_q_oth: hold D.22 rivals at XI*_world − XI*_r (no EMA).
+        self.replan_stride = max(int(replan_stride), 1)
+        self.freeze_q_oth = bool(freeze_q_oth)
         self.n_r = len(data.regions)
         self.n_y = self.params.n_year
         self.n_years = data.end_year - data.start_year + 1
@@ -266,44 +272,49 @@ class AgrimateSim:
             new_d = plan_d.copy()
             new_i = plan_i.copy()
             xi_ship0 = np.zeros(n_r)
-            for r in range(n_r):
-                others = np.full(n_y, q_oth[r])
-                x0_d = np.empty(n_y)
-                x0_i = np.empty(n_y)
-                for k in range(n_y):
-                    tt = min(t + k, T - 1)
-                    x0_d[k] = frozen_d[r, tt]
-                    x0_i[k] = frozen_i[r, tt]
-                dhat = expected_restriction(float(delta[r]), n_y)
-                Hhat = expected_harvest(
-                    H_star_roll[r], H_roll[r], n_y,
-                    n_for=p.n_for, tau_for_steps=p.tau_for * n_y)
-                # D.7 international argument is world volume / world XI*
-                # (scalar year-average per step). Domestic uses own XD*.
-                sol = solve_supplier_plan(
-                    Hhat, float(S_p[r]), others,
-                    d.XI_world, d.XD_star[r],
-                    p.alpha_i, float(d.alpha_d[r]), p,
-                    delta_hat=dhat, x0=np.concatenate([x0_d, x0_i]),
-                )
-                if not sol["success"]:
-                    failed += 1
-                if sol["fallback"]:
-                    fallback += 1
-                if not sol["converged"]:
-                    unconverged += 1
-                floor_binds_plan += int(sol["floor_binds"])
-                plan_residual = max(plan_residual, float(sol["residual"]))
-                if sol["success"]:
+            do_replan = (t % self.replan_stride) == 0
+            if do_replan:
+                for r in range(n_r):
+                    others = np.full(n_y, q_oth[r])
+                    x0_d = np.empty(n_y)
+                    x0_i = np.empty(n_y)
                     for k in range(n_y):
-                        tt = t + k
-                        if tt < T:
-                            new_d[r, tt] = sol["xd"][k]
-                            new_i[r, tt] = sol["xi"][k]
-                    xi_ship0[r] = float(sol["xi_ship"][0])
-                else:
-                    xi_ship0[r] = frozen_i[r, t] * (1.0 - delta[r])
-            plan_d, plan_i = new_d, new_i
+                        tt = min(t + k, T - 1)
+                        x0_d[k] = frozen_d[r, tt]
+                        x0_i[k] = frozen_i[r, tt]
+                    dhat = expected_restriction(float(delta[r]), n_y)
+                    Hhat = expected_harvest(
+                        H_star_roll[r], H_roll[r], n_y,
+                        n_for=p.n_for, tau_for_steps=p.tau_for * n_y)
+                    # D.7 international argument is world volume / world XI*
+                    # (scalar year-average per step). Domestic uses own XD*.
+                    sol = solve_supplier_plan(
+                        Hhat, float(S_p[r]), others,
+                        d.XI_world, d.XD_star[r],
+                        p.alpha_i, float(d.alpha_d[r]), p,
+                        delta_hat=dhat, x0=np.concatenate([x0_d, x0_i]),
+                    )
+                    if not sol["success"]:
+                        failed += 1
+                    if sol["fallback"]:
+                        fallback += 1
+                    if not sol["converged"]:
+                        unconverged += 1
+                    floor_binds_plan += int(sol["floor_binds"])
+                    plan_residual = max(plan_residual, float(sol["residual"]))
+                    if sol["success"]:
+                        for k in range(n_y):
+                            tt = t + k
+                            if tt < T:
+                                new_d[r, tt] = sol["xd"][k]
+                                new_i[r, tt] = sol["xi"][k]
+                        xi_ship0[r] = float(sol["xi_ship"][0])
+                    else:
+                        xi_ship0[r] = frozen_i[r, t] * (1.0 - delta[r])
+                plan_d, plan_i = new_d, new_i
+            else:
+                for r in range(n_r):
+                    xi_ship0[r] = plan_i[r, t] * (1.0 - delta[r])
             star_w = max(float(d.XI_world), 1e-8)
             for r in range(n_r):
                 q_i_arg = (xi_ship0[r] + q_oth[r]) / star_w
@@ -325,7 +336,8 @@ class AgrimateSim:
             sold_d_path[:, t] = sold_d
             H_path[:, t] = H
             realized_oth = np.maximum(float(sold_i.sum()) - sold_i, 0.0)
-            q_oth = (1.0 - w_exp) * q_oth + w_exp * realized_oth
+            if not self.freeze_q_oth:
+                q_oth = (1.0 - w_exp) * q_oth + w_exp * realized_oth
             # 6 delivery: queue exporter XI; world price on that lag; consumers
             # receive T* destination allocation of the same lag (E.1), not own XI.
             q_i.append(sold_i.copy())
@@ -392,12 +404,16 @@ class AgrimateSim:
 
 def run_agrimate(data: WheatData | None = None, use_restrictions: bool = True,
                  use_anomalies: bool = True, start_year: int = 2003,
-                 end_year: int = 2011, params: AgrimateParams | None = None
+                 end_year: int = 2011, params: AgrimateParams | None = None,
+                 replan_stride: int = 1, freeze_q_oth: bool = False
                  ) -> AgrimateResult:
     if data is None:
         data = prepare_wheat(start_year=start_year, end_year=end_year, params=params)
-    return AgrimateSim(data, params=params, use_restrictions=use_restrictions,
-                       use_anomalies=use_anomalies).run()
+    return AgrimateSim(
+        data, params=params, use_restrictions=use_restrictions,
+        use_anomalies=use_anomalies, replan_stride=replan_stride,
+        freeze_q_oth=freeze_q_oth,
+    ).run()
 
 
 def run_wheat(**kwargs) -> AgrimateResult:

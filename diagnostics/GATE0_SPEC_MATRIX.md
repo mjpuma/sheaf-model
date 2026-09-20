@@ -42,6 +42,7 @@ replication.
 | World-price recipe | §5.2; host mix vs author `plot_wm_price_timeseries` | n/a | `volume_weighted_offer_index` / `world_price.md` | R3 host identity; Julia absent |
 | Fig. 4 knobs vs author | R2 2006–08 run vs `author_fig4/` | n/a | `fig4_author_score.py` / `fig4_config_score.md` | R10 not a match; remaining A7 |
 | N5 on Fig. 4 knobs | P5 unconverged split on R2 object | n/a | `fig4_solver.py` / `solver_fig4.md` | R9; `plan_maxiter=40` kept; next R4 |
+| Undisturbed xd/xi | item 3 last/first 1.630 vs author 1.004 | n/a | `xi_split.py` / `xi_split.md` | R4; D.22 `q_oth` freeze 1.019 (not adopted); xmin/calendar overshoot |
 
 Unresolved (labelled, not guessed): paper 28 vs code 27;
 D.8 αI=3.5 vs code 3.2. FAOSTAT FB vs USDA is A1 (P10: arrays not in

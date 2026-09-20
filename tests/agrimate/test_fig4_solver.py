@@ -10,8 +10,6 @@ from sheaf.agrimate.fig4_solver import _bucket
 from sheaf.agrimate.params import fig4_experiment_params, wheat_params
 from sheaf.agrimate.validation import OUT_DEFAULT
 
-ROOT = Path(__file__).resolve().parents[2]
-
 
 def test_plan_maxiter_not_raised_on_defaults_or_fig4_object():
     assert wheat_params().plan_maxiter == 40
@@ -77,7 +75,6 @@ def test_r9_did_not_overwrite_p5_or_three_scenario():
     assert "1743/5832" in p5
     for name in PROTECTED_THREE_SCENARIO:
         assert (OUT_DEFAULT / name).is_file(), name
-    dispatch = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
-    assert "Last completed: R9" in dispatch
-    assert "Next paste: R4" in dispatch
-    assert "plan_maxiter stays 40" in dispatch
+    # Living dispatch moves after R4. R9 numbers stay in solver_fig4.md.
+    text = (OUT_DEFAULT / "solver_fig4.md").read_text()
+    assert "Leave `plan_maxiter=40`" in text

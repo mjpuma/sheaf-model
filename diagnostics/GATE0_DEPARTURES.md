@@ -63,6 +63,15 @@ N3 **Jacobi IBR inside the step.** Each region best-responds to last-step
 expected rivals (D.22), then all plans update. Gauss–Seidel (28 stacked
 replies in one step) is not a stage Nash and raced isoelastic Cournot onto
 A6.
+R4 **Undisturbed last/first channel (characterisation, not adopted).**
+On 2003–11 undisturbed, freezing D.22 `q_oth` at XI*_world−XI*_r
+(diagnostic hook `freeze_q_oth`, default off) yields last/first **1.019**
+vs author **1.004** vs live host **1.630**. xmin_off (ζ=1) **0.548** and
+calendar_replan (stride=24) **0.523** overshoot below 1. XI still spans
+137–235 MMT under the freeze — last/first is the D.7 offer mix, not XI
+volume. Author Agrimate still updates D.22; freeze is a diagnostic
+isolation, not a copy. Not a decay knob. Not L1–L8. `wheat_params()`
+unchanged. Writeup: `diagnostics/gate0_agrimate/xi_split.md`.
 
 N4 **D.7 international scale.** Argument is `(XI_r + Q_{-r}) / XI*_world`
 with `XI*_world` the per-step year-average (wheat_data note; Agrimate
