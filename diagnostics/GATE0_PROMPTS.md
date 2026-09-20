@@ -5,10 +5,11 @@ Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
 [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md). Protocol:
 [`GATE0_VALIDATION.md`](GATE0_VALIDATION.md).
 
-**Now:** P0–P12 done. G0-P **not accepted.** Post-P12 queue is
-[`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md); paste
-[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) **Next paste**
-(currently **R10**). Do not paste G1/G2.
+**Now:** P0–P12 done. G0-P **not accepted.** R-science queue
+[`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md) is **exhausted.**
+Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
+paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) **Next paste**
+(currently **S1**). Do not paste G1/G2.
 
 ## Shared preamble (prepend to every prompt)
 

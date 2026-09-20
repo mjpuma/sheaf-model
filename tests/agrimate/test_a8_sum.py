@@ -12,8 +12,6 @@ from sheaf.agrimate.params import wheat_params
 from sheaf.agrimate.validation import OUT_DEFAULT
 from sheaf.agrimate.wheat_data import prepare_wheat
 
-ROOT = Path(__file__).resolve().parents[2]
-
 
 def test_host_still_uses_mean_not_sum():
     p = wheat_params()
@@ -89,7 +87,7 @@ def test_r7_note_does_not_rewrite_host():
     assert 0.45 < float(ch["H_mean_over_sum"]) < 0.55
     for name in PROTECTED_THREE_SCENARIO:
         assert (OUT_DEFAULT / name).is_file(), name
-    dispatch = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
-    assert "Last completed: R7" in dispatch
-    assert "Next paste: R8" in dispatch
-    assert "host not rewritten" in dispatch.lower() or "host unchanged" in dispatch.lower()
+    # Living dispatch moves after the R-queue plan. R7 numbers stay in a8_sum.md.
+    text = note.read_text()
+    assert "Next paste: R8" in text
+    assert "host unchanged" in text.lower() or "Host unchanged" in text

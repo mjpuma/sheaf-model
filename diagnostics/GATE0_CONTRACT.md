@@ -12,8 +12,9 @@ Otto, *Ecological Economics* 231 (2025) 108546; ODD supplement §D; wheat §E).
 - Spec map: `diagnostics/GATE0_SPEC_MATRIX.md`
 - Validation protocol: `diagnostics/GATE0_VALIDATION.md`
 - Prompt list (P0–P12, done): `diagnostics/GATE0_PROMPTS.md`
-- Reproduction prompts (adaptive): `diagnostics/GATE0_REPRO_PROMPTS.md`
-- Next paste: `diagnostics/GATE0_REPRO_DISPATCH.md`
+- Reproduction prompts (R-queue, exhausted): `diagnostics/GATE0_REPRO_PROMPTS.md`
+- Post-R development (S1–S6): `diagnostics/GATE0_NEXT_PROMPTS.md`
+- Next paste: `diagnostics/GATE0_REPRO_DISPATCH.md` (currently **S1**)
 - Validation scores: `diagnostics/gate0_agrimate/validation.md`
 - G0-P methods note: `diagnostics/gate0_agrimate/methods.md` (written; **not accepted**)
 - Red team (post-P12): `diagnostics/GATE0_REDTEAM.md`
