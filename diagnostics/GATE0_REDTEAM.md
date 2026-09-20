@@ -412,7 +412,8 @@ the lineage than opening G1.
 
 **Adaptive**, not a skip-nothing ladder. Menu:
 [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md). Living next-paste:
-[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (right now **R6**).
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (R-queue exhausted;
+now **S1** in [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md)).
 Data cookbook: [`GATE0_DATA.md`](GATE0_DATA.md).
 
 R2 is the only forced first evidence run (A7). After that, the

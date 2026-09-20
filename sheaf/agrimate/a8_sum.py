@@ -224,7 +224,10 @@ def write_a8_note(tab: pd.DataFrame, out_dir: Path | None = None) -> Path:
 
 
 def write_r7_dispatch(tab: pd.DataFrame, path: Path | None = None) -> Path:
+    """Historical R7 writer. Does not clobber a moved living dispatch."""
     path = Path(path) if path else DISPATCH
+    if path.is_file() and "Last completed: R7" not in path.read_text():
+        return path
     ch, ea = _row(tab, "China"), _row(tab, "Eastern Africa")
     why = (
         f"A8 labelled; China H {_fmt(ch['H_mean'], 1)}→{_fmt(ch['H_sum'], 1)}, "
@@ -266,10 +269,10 @@ def run_a8_sum_score(out_dir: Path | None = None) -> dict[str, Path]:
     tab = a8_mean_vs_sum_table()
     csv = write_a8_csv(tab, out_dir)
     note = write_a8_note(tab, out_dir)
-    dispatch = write_r7_dispatch(tab)
+    # Living dispatch moved off R7 (S-queue). Do not rewrite it.
     for name in PROTECTED_THREE_SCENARIO:
         assert (out_dir / name).is_file(), name
     assert wheat_params().alpha_i == 3.2
     assert wheat_params().p_sto_annual == 0.1
     assert wheat_params().xmin_share == 0.2
-    return {"note": note, "csv": csv, "dispatch": dispatch}
+    return {"note": note, "csv": csv}

@@ -12,8 +12,9 @@ repeat it.
 Canonical contract: [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md).
 Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
 Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
-(P0–P12 done). Post-P12: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md);
-next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md).
+(P0–P12 done). Post-P12 R-queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md)
+(**exhausted**). Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S1**).
 Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
 [`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
@@ -104,7 +105,9 @@ approval.
    491 region-steps; harvest vs harvest+AMIS no longer identical). Undisturbed
    still drifts (annual-mean ratio 1.63); Pink-Sheet corr remains negative.
    That is a G0-H score, not a reason to restore L1–L8. G0-U exit is the
-   **workflow**, not publication-quality hindcast.
+   **workflow**, not publication-quality hindcast. **R-science is exhausted.**
+   Remaining gaps are labelled (item-3 wander, A7 cannot-set, A8 mean, A1
+   USDA). Next paste **S1** (`GATE0_NEXT_PROMPTS.md`), not R8.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
 5. **P1 (done).** Step identities on 2006 harvest+AMIS.
 6. **P2 (done).** Delivery bug: lagged XI was credited to the *exporter*
@@ -172,14 +175,25 @@ approval.
     `diagnostics/GATE0_REDTEAM.md`, `diagnostics/GATE0_DATA.md`.
     Items 3 and 5 still fail; tests lock honesty not Fig. 4 match;
     fetch does not download Zenodo or FAO FB. Adaptive queue:
-    `GATE0_REPRO_PROMPTS.md`. Living next-paste:
-    `GATE0_REPRO_DISPATCH.md` (**R10**: score Fig. 4 knobs vs author).
+    `GATE0_REPRO_PROMPTS.md` (exhausted). Living next-paste:
+    `GATE0_REPRO_DISPATCH.md` (**S1**; `GATE0_NEXT_PROMPTS.md`).
 18. **R2 (done).** `fig4_experiment_params()` is αI=3.5, ζ=1, N_for=6.
     FAO/EU28/start-2000 cannot-set. Short 2006–08 harvest+AMIS: moy
     26.8×→13.3× (drop ≥2); hike ×2.31→×2.22 (barely). Unconverged
     611→553 / 1944, failed=0. `wheat_params()` unchanged.
     Writeup: `diagnostics/gate0_agrimate/fig4_config.md`.
-   **Next:** paste **R10**. G0-P is still not accepted. Do not paste G1.
+19. **R3–R7, R9, R10 (done).** World-price identity; item-3 characterisation
+    (`qoth_freeze` 1.019, not adopted); x1=demand default off; raw FBSH
+    vendored, parallel WheatData not adopted; A8 mean-vs-sum labelled
+    (China 0.50× / EA 0.10×, USDA stocks, host unchanged). Fig. 4 knobs
+    scored, not adopted. G0-P still **not accepted**.
+20. **R-science exhausted.** First-match table has nowhere to go without
+    breaking hard stops (R11 forbidden; freeze not sourced; FAO/EU28
+    cannot-set; labelled-off experiments did not move live items 1–3).
+    Remaining gaps: live item-3 wander, A7 cannot-set, A8 mean-of-members,
+    A1 USDA quantities. **Next:** paste **S1** (A8 member-sum adapter).
+    Do not paste R8 as science. Do not paste G1. Do not treat FAO ΔS as
+    stocks. Do not pin. `wheat_params()` stay 14022004.
 
 Reference command:
 

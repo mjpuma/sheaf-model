@@ -48,9 +48,13 @@ China (China+Hong Kong) mean 56.4 / 53.6 / 23.3 vs sum 112.7 / 107.1 /
 3.31 / 6.56 / 0.55 (0.10×). Single-row nodes (USA, EU-27 `European
 Union`, Ukraine, …) match. Stocks here are USDA `ending_stocks`, not
 FAOSTAT FBSH ΔS. Anomalies are still computed on the *summed* member
-series. R7 labelled the C/S numbers (`a8_sum.md`); **not fixed** —
-summing would rescale China ×2 and Eastern Africa ×10 and rewrite the
-2003–11 host. Not a parameter fit.
+series. R7 labelled the C/S numbers (`a8_sum.md`); **not fixed** on the
+live host — summing would rescale China ×2 and Eastern Africa ×10 and
+rewrite the 2003–11 host. Not a parameter fit.
+**S1 (approved, not implemented):** switch `prepare_wheat` 2007–09
+baseline from `groupby(region).mean()` to member-sum (same construction
+as `psd_regional_annual()`). USDA `ending_stocks` only. Never FAO ΔS.
+Do not retune αI / p_sto / xmin. See `GATE0_NEXT_PROMPTS.md`.
 
 ## G0-N numerical representation (not economic departures)
 

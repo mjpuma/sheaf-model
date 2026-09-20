@@ -80,6 +80,7 @@ def test_provenance_and_cookbook_exist():
         "diagnostics/GATE0_REDTEAM.md",
         "diagnostics/GATE0_REPRO_PROMPTS.md",
         "diagnostics/GATE0_REPRO_DISPATCH.md",
+        "diagnostics/GATE0_NEXT_PROMPTS.md",
         "diagnostics/gate0_agrimate/world_price.md",
         "archive/README.md",
     ):

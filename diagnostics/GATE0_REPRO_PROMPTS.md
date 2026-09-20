@@ -1,19 +1,16 @@
 # Gate 0 reproduction prompt list (post-P12)
 
-**Where:** this file. Living next-paste: [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md).
-Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
-[`GATE0_DATA.md`](GATE0_DATA.md).
+**Where:** this file (R-queue, **exhausted**). Living next-paste:
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md). Post-R development:
+[`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md). Red team:
+[`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data: [`GATE0_DATA.md`](GATE0_DATA.md).
 
-P0–P12 were a **fixed** queue (identities, then drift, then … methods).
-This follow-up is **adaptive**. Paste **one** prompt per session. After
-the run, rewrite the dispatch from the **numbers you just got**. The
-next session pastes `Next paste`, not `R{n+1}`. Skip IDs that the
-dispatch has already ruled out. Do not open G1/G2.
-
-**Now:** paste **R6**. R5 labelled `x1_from_demand` (default off; p_w
-silent; inflow moves; not adopted). Item 3 still fails on the live
-host (1.630). G0-P is **not accepted**. `wheat_params()` stay 14022004
-defaults.
+P0–P12 were a **fixed** queue. This R follow-up was **adaptive**. The
+first-match table below has **nowhere to go** without breaking hard
+stops. Remaining gaps are labelled, not open R-experiments. **Now:**
+paste **S1** from `GATE0_NEXT_PROMPTS.md`. Do not paste R8 as science.
+Do not open G1/G2. G0-P is **not accepted**. `wheat_params()` stay
+14022004 defaults.
 
 ## Adaptive rule (read before picking an ID after R2)
 
@@ -32,7 +29,10 @@ Why (one sentence): …
 Skip: …
 ```
 
-Choose **Next paste** from this table, in order, first match wins:
+**This table is closed.** After R7, choose **Next paste** from
+`GATE0_NEXT_PROMPTS.md`, not from the rows below.
+
+Historical first-match table (do not walk):
 
 | If the last run showed… | Next paste | Skip |
 |---|---|---|
@@ -90,8 +90,8 @@ Next session pastes that file's **Next paste**, not the next integer.
 | **R4** | Undisturbed XI-split characterisation | **done** (qoth_freeze 1.019 vs author 1.004; not adopted; next R5) |
 | **R5** | S4 x1=demand labelled experiment | **done** (default off; p_w silent; not adopted; next R6) |
 | R6 | FAOSTAT FB obtain + labelled parallel WheatData | **done** (not adopted; USDA default; next R7) |
-| R7 | A8 mean-vs-sum sensitivity (do not rewrite host) | **done** (China/EA H,C,S labelled; USDA stocks; next R8) |
-| R8 | Expand Fig. 4 *score* tests (honest FAIL until match) | **next** |
+| R7 | A8 mean-vs-sum sensitivity (do not rewrite host) | **done** (China/EA H,C,S labelled; USDA stocks; R-queue closed) |
+| R8 | Expand Fig. 4 *score* tests (honest FAIL until match) | housekeeping; not a science gate |
 | **R9** | N5 on the Fig. 4 config | **done** (`plan_maxiter` stays 40; next R4) |
 | **R10** | Score Fig. 4 config vs author hike/drift/amplitude | **done** (not a match; knobs not adopted) |
 | R11 | Re-run default three-scenario | **skip** unless defaults changed (forbidden) |
