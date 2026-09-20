@@ -19,8 +19,6 @@ from sheaf.agrimate.params import wheat_params
 from sheaf.agrimate.validation import OUT_DEFAULT
 from sheaf.agrimate.wheat_data import prepare_wheat
 
-ROOT = Path(__file__).resolve().parents[2]
-
 
 def test_usda_prepare_wheat_still_default():
     p = wheat_params()
@@ -99,7 +97,7 @@ def test_r6_note_does_not_adopt():
     assert float(cn["H_ratio"]) > 1.5
     for name in PROTECTED_THREE_SCENARIO:
         assert (OUT_DEFAULT / name).is_file(), name
-    dispatch = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
-    assert "Last completed: R6" in dispatch
-    assert "Next paste: R7" in dispatch
-    assert "do not adopt" in dispatch.lower() or "not adopted" in dispatch.lower()
+    # Living dispatch moves after R7. R6 numbers stay in fb_wheatdata.md.
+    text = (OUT_DEFAULT / "fb_wheatdata.md").read_text()
+    assert "Next paste: R7" in text
+    assert "not adopted" in text.lower() or "Not adopted" in text
