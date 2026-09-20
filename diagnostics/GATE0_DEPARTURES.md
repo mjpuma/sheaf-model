@@ -40,14 +40,17 @@ R10 scores that 2006–08 run against `author_fig4/`: hike ×2.22 vs ×1.62,
 moy 13.3× vs 1.51×, 2006 index 1.677 vs 1.183 (knobs moved *away*),
 undisturbed last/first 0.409 vs 1.006. **Not adopted.** Remaining A7
 unchanged (`fig4_config_score.md`).
-A8 **Multi-country PSD baseline uses `groupby.mean()` not sum (P9).**
+A8 **Multi-country PSD baseline uses `groupby.mean()` not sum (P9; R7).**
 `prepare_wheat` averages country-year rows; `psd_regional_annual()` sums
-members. Counterexample 2007–09 production: China (China+Hong Kong)
-host H 56.4 vs PSD sum 112.7; Eastern Africa (10 countries) 0.33 vs
-3.31. Single-row nodes (USA, EU-27 `European Union`, Ukraine, …) match.
-Anomalies are still computed on the *summed* member series. Labelled,
-not fixed in P9 — summing would rescale China ×2 and Eastern Africa ×10
-and rewrite the 2003–11 host. Not a parameter fit.
+members. Counterexample 2007–09 USDA (H / C / ending stocks):
+China (China+Hong Kong) mean 56.4 / 53.6 / 23.3 vs sum 112.7 / 107.1 /
+46.6 (0.50×); Eastern Africa (10 countries) 0.33 / 0.66 / 0.055 vs
+3.31 / 6.56 / 0.55 (0.10×). Single-row nodes (USA, EU-27 `European
+Union`, Ukraine, …) match. Stocks here are USDA `ending_stocks`, not
+FAOSTAT FBSH ΔS. Anomalies are still computed on the *summed* member
+series. R7 labelled the C/S numbers (`a8_sum.md`); **not fixed** —
+summing would rescale China ×2 and Eastern Africa ×10 and rewrite the
+2003–11 host. Not a parameter fit.
 
 ## G0-N numerical representation (not economic departures)
 

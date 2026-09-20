@@ -62,6 +62,12 @@ FBSH parallel WheatData vs USDA (R6; does **not** switch `prepare_wheat`):
 PYTHONPATH=. python scripts/score_agrimate_fb_wheatdata.py
 ```
 
+A8 mean-vs-sum sensitivity (R7; does **not** rewrite the host; USDA stocks):
+
+```bash
+PYTHONPATH=. python scripts/score_agrimate_a8_sum.py
+```
+
 G0-P methods note (does **not** re-run the host; P12):
 
 ```bash
@@ -133,8 +139,10 @@ Agrimate Fig. 4 author series: Zenodo 10688435 unpacked (P7). Score in
 `diagnostics/gate0_agrimate/fig4.md`. Independent implementation, not a
 replication. PDF digitisation was not used. G0-H writeup (P8):
 `diagnostics/gate0_agrimate/hindcast.md` — sourced shortfall, not a retune.
-Regional USDA (P9): `diagnostics/gate0_agrimate/regional.md` — coverage
-labelled (A8 China 0.50× / Eastern Africa 0.10×); no stock-level fit.
+P9: `diagnostics/gate0_agrimate/regional.md` — coverage labelled
+(A8 China 0.50× / Eastern Africa 0.10×); no stock-level fit.
+R7: `diagnostics/gate0_agrimate/a8_sum.md` — 2007–09 H/C/S if members
+summed (USDA ending stocks, not FAO ΔS); host unchanged.
 P10: `diagnostics/gate0_agrimate/faostat_fb.md` — `data/faostat_network/`
 is E0 only; A1 left; USDA default. R6 obtain: raw FBSH at
 `data/faostat_fb/`; author cleaned still absent.

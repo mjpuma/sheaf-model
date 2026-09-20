@@ -89,9 +89,9 @@ Next session pastes that file's **Next paste**, not the next integer.
 | **R3** | World-price recipe vs author plot | **done** (host identity; 14022004 Julia absent; next still R10) |
 | **R4** | Undisturbed XI-split characterisation | **done** (qoth_freeze 1.019 vs author 1.004; not adopted; next R5) |
 | **R5** | S4 x1=demand labelled experiment | **done** (default off; p_w silent; not adopted; next R6) |
-| R6 | FAOSTAT FB obtain-or-leave | **next** |
-| R7 | A8 mean-vs-sum sensitivity (do not rewrite host) | adaptive |
-| R8 | Expand Fig. 4 *score* tests (honest FAIL until match) | piggyback |
+| R6 | FAOSTAT FB obtain + labelled parallel WheatData | **done** (not adopted; USDA default; next R7) |
+| R7 | A8 mean-vs-sum sensitivity (do not rewrite host) | **done** (China/EA H,C,S labelled; USDA stocks; next R8) |
+| R8 | Expand Fig. 4 *score* tests (honest FAIL until match) | **next** |
 | **R9** | N5 on the Fig. 4 config | **done** (`plan_maxiter` stays 40; next R4) |
 | **R10** | Score Fig. 4 config vs author hike/drift/amplitude | **done** (not a match; knobs not adopted) |
 | R11 | Re-run default three-scenario | **skip** unless defaults changed (forbidden) |
