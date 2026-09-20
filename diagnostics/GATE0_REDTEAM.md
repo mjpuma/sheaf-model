@@ -380,7 +380,8 @@ Allowed under hard stops (labelled, `wheat_params()` defaults unchanged):
    is the last/first channel (freeze 1.019 vs author 1.004); xmin and
    calendar replan overshoot. Not adopted.
 3. **S4:** author x1=demand as a labelled experiment, not a guessed
-   rationing rule.
+   rationing rule. **R5 done:** `x1_from_demand` default off; 2006
+   harvest+AMIS max |Δp_w|=0, Σ inflow 478→908 MMT. Not adopted.
 4. **A1:** add FAOSTAT FB *only* with PROVENANCE and a parallel
    WheatData; USDA stays default until G0-P says otherwise.
 5. **World-price recipe test** vs author `plot_wm_price_timeseries`
@@ -409,7 +410,7 @@ the lineage than opening G1.
 
 **Adaptive**, not a skip-nothing ladder. Menu:
 [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md). Living next-paste:
-[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (right now **R5**).
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (right now **R6**).
 Data cookbook: [`GATE0_DATA.md`](GATE0_DATA.md).
 
 R2 is the only forced first evidence run (A7). After that, the
@@ -417,11 +418,10 @@ dispatch picks R10 if knobs moved Fig. 4 metrics, R4/R3 if they did
 not, skips R11 while defaults are unchanged, and holds R12 until
 items 1–5 actually moved. Hard stops do not adapt.
 
-**R4 done (2026-09-19).** Undisturbed last/first: live host **1.630**,
-qoth_freeze probe **1.019** vs author **1.004**. xmin_off 0.548 and
-calendar_replan 0.523 overshoot. Freeze is a diagnostic isolation,
-not adopted. `wheat_params()` stay 14022004. Living next-paste is
-**R5**. Item 3 still fails on the live host.
+**R5 done (2026-09-20).** `x1_from_demand` labelled, default off. 2006
+harvest+AMIS: max |Δp_w|=0, Σ inflow 478→908 MMT. Not a CES ration.
+Not adopted. Julia still absent. Living next-paste is **R6**.
+`wheat_params()` stay 14022004. Item 3 still fails on the live host.
 
 ---
 
