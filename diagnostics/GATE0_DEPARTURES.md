@@ -75,12 +75,17 @@ A6.
 R4 **Undisturbed last/first channel (characterisation, not adopted).**
 On 2003–11 undisturbed, freezing D.22 `q_oth` at XI*_world−XI*_r
 (diagnostic hook `freeze_q_oth`, default off) yields last/first **1.019**
-vs author **1.004** vs live host **1.630**. xmin_off (ζ=1) **0.548** and
+vs author **1.004** vs live host **1.630** (pre-S1 pooled-mean). xmin_off (ζ=1) **0.548** and
 calendar_replan (stride=24) **0.523** overshoot below 1. XI still spans
 137–235 MMT under the freeze — last/first is the D.7 offer mix, not XI
 volume. Author Agrimate still updates D.22; freeze is a diagnostic
 isolation, not a copy. Not a decay knob. Not L1–L8. `wheat_params()`
-unchanged. Writeup: `diagnostics/gate0_agrimate/xi_split.md`.
+unchanged. Historical writeup: `diagnostics/gate0_agrimate/xi_split.md`.
+**S2 re-measure (A8 member-sum host):** last/first **1.444** vs author
+**1.004** (still >1.1). No sourced D.22 variant from retrieved 14022004
+wheat (0 `*.jl` in tree). `freeze_q_oth` stays diagnostic, default off,
+not a `wheat_params()` field. Not adopted. Not a pin. Writeup:
+`diagnostics/gate0_agrimate/item3.md`.
 
 N4 **D.7 international scale.** Argument is `(XI_r + Q_{-r}) / XI*_world`
 with `XI*_world` the per-step year-average (wheat_data note; Agrimate

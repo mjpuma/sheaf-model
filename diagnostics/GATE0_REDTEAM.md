@@ -196,6 +196,13 @@ Fig. 4 knobs not adopted.
    matches D.22; the wander is the realised XI path feeding it.
    Not a decay knob. Not L1–L8. Next paste **R5**.
 
+**S2 follow-up (A8 member-sum host).** Re-measured from living
+`prices_three_scenarios.csv` (no NLP re-run; `xi_split` probes not
+re-run). Host last/first **1.444** ($45.82 → $66.15) vs author **1.004**.
+Still >1.1. 0 `*.jl` in tree — no sourced D.22 variant. `freeze_q_oth`
+stays diagnostic, default off, not in `wheat_params()`. Not adopted.
+Not a pin. Writeup: `item3.md`. Next paste **S3**.
+
 ---
 
 ## Step 6 — World-price object
