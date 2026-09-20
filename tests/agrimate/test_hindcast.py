@@ -22,10 +22,10 @@ def test_hindcast_note_is_a_sourced_shortfall():
     assert "L1–L8" in text
     assert "α_foreign=10" in text
     assert "not adopted" in text
-    assert "1.63" in text
-    assert "1743/5832" in text
+    assert "1.444" in text or "1.443" in text
+    assert "2304/5832" in text
     assert "not pin" in text.lower() or "Do not pin" in text
-    assert "65.3" in text or "$65" in text
+    assert "81.5" in text or "$81" in text
     assert "213.5" in text or "$213" in text
     # Pre-P2 3× stocks must not be repeated as current.
     assert "not 3×" in text
@@ -69,7 +69,7 @@ def test_stock_level_bias_is_not_three_times_usda():
     prod = qty[(qty["scenario"] == "harvest_amis")
                & (qty["field"] == "production")].iloc[0]
     assert 1.2 < stk["level_ratio"] < 2.0  # ~1.58× after P2, not ~3×
-    assert abs(prod["corr_level"] - 0.795) < 0.02
+    assert abs(prod["corr_level"] - 0.803) < 0.02
     assert abs(stk["corr_anomaly"] - stk["corr_level"]) < 1e-9
 
 

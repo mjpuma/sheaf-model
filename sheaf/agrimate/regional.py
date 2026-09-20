@@ -214,6 +214,34 @@ def write_regional_note(
     ch = construction[construction["region"] == "China"].iloc[0]
     ea = construction[construction["region"] == "Eastern Africa"].iloc[0]
     usa = construction[construction["region"] == "USA"].iloc[0]
+    world_stk = float("nan")
+    for name in ("score_hindcast_quantities.csv", "score_supply_stocks.csv"):
+        path = Path(out_dir) / name
+        if not path.is_file():
+            continue
+        tab = pd.read_csv(path)
+        hit = tab[(tab["scenario"] == "harvest_amis") & (tab["field"] == "ending_stocks")]
+        if hit.empty:
+            continue
+        if "level_ratio" in hit.columns:
+            world_stk = float(hit.iloc[0]["level_ratio"])
+            break
+        mh, mo = hit.iloc[0].get("mean_model"), hit.iloc[0].get("mean_obs")
+        if mh is None:
+            mh, mo = hit.iloc[0].get("mean_host"), hit.iloc[0].get("mean_usda")
+        if mh and mo:
+            world_stk = float(mh) / float(mo)
+            break
+    ukr_h = ukr_a = float("nan")
+    for tag, key in (("harvest", "ukr_h"), ("harvest_amis", "ukr_a")):
+        p = Path(out_dir) / f"ukraine_{tag}.csv"
+        if p.is_file():
+            t = pd.read_csv(p).set_index("year")
+            if 2007 in t.index:
+                if key == "ukr_h":
+                    ukr_h = float(t.loc[2007, "consumption"])
+                else:
+                    ukr_a = float(t.loc[2007, "consumption"])
     lines = [
         "# G0-H — regional USDA vs 27-node host (P9)",
         "",
@@ -222,7 +250,9 @@ def write_regional_note(
         "`psd_regional_annual()` (mapped PSD members, marketing year).",
         "Coverage gaps stay labelled. `wheat_params()` stay αI=3.2,",
         "p_sto=0.1, xmin=0.2. No fit to close the stock-level gap.",
-        "L1–L8 stay rejected. Bai α_foreign=10 not adopted.",
+        "L1–L8 stay rejected. Bai α_foreign=10 not adopted. S5 re-scored",
+        "world hike / quiet-year / moy / last/first from the S1 CSVs;",
+        "not R11; `wheat_params()` unchanged.",
         "",
         "Harvest is reconstructed from `H_annual × (1+anomaly)` (no NLP);",
         "it matches the saved Ukraine mechanism CSVs year-for-year.",
@@ -322,9 +352,10 @@ def write_regional_note(
         "(A8 member-sum). Do not fit xmin or p_sto to the stock column: Ukraine",
         f"stocks are {_fmt(_ratio('Ukraine', 'ending_stocks'), 2)}× mapped",
         "PSD; Eastern Africa stocks are "
-        f"{_fmt(_ratio('Eastern Africa', 'ending_stocks'), 2)}×. The world 1.58×",
+        f"{_fmt(_ratio('Eastern Africa', 'ending_stocks'), 2)}×. The world "
+        f"{_fmt(world_stk, 2)}×",
         "gap in `hindcast.md` is a different comparison (27-node sum vs",
-        "world PSD; stale until S5 re-score).",
+        "world PSD; S5 re-scored).",
         "",
         "Eastern Africa *consumption* is not the old 0.1× PSD: inflows come from",
         "T* (A2), so the purchaser can eat imported grain. Host H is now the",
@@ -340,9 +371,11 @@ def write_regional_note(
         "",
         "Production is identical by construction (same anomalies). AMIS",
         "moves consumption on restricting exporters: Ukraine 2007 is",
-        "1.93 MMT harvest-only vs 10.34 MMT harvest+AMIS (grain stays",
-        "home under E.4). See `ukraine_*.csv`. This table does not",
-        "restore L1–L8 or retune αI.",
+        f"{_fmt(ukr_h, 2)} MMT harvest-only vs {_fmt(ukr_a, 2)} MMT harvest+AMIS",
+        "(sign flipped vs the pre-S1 pooled-mean host; grain does **not**",
+        "stay home under E.4 on this member-sum path). See `ukraine_*.csv`.",
+        "This table does not restore L1–L8 or retune αI. S5 re-scored",
+        "hike / quiet-year / moy / last/first; it did not re-run NLP.",
         "",
         "## Files",
         "",
@@ -356,6 +389,15 @@ def write_regional_note(
     path = Path(out_dir) / "regional.md"
     path.write_text("\n".join(lines) + "\n")
     return path
+
+
+def rewrite_regional_note_from_csvs(out_dir: Path | None = None) -> Path:
+    """Regenerate regional.md from existing CSVs. Does not re-run NLP."""
+    out_dir = Path(out_dir) if out_dir else OUT_DEFAULT
+    construction = pd.read_csv(out_dir / "score_regional_construction.csv")
+    summary = pd.read_csv(out_dir / "score_regional_summary.csv")
+    long = pd.read_csv(out_dir / "score_regional.csv")
+    return write_regional_note(construction, summary, long, out_dir)
 
 
 def run_regional_score(

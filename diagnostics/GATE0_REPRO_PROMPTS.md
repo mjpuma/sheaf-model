@@ -8,7 +8,7 @@
 P0–P12 were a **fixed** queue. This R follow-up was **adaptive**. The
 first-match table below has **nowhere to go** without breaking hard
 stops. Remaining gaps are labelled, not open R-experiments. **Now:**
-paste **S5** from `GATE0_NEXT_PROMPTS.md`. S4 is done. Do not paste R8 as science.
+paste **stay not-accepted** from `GATE0_REPRO_DISPATCH.md`. S5 is done. Do not paste R8 as science.
 Do not open G1/G2. G0-P is **not accepted**. `wheat_params()` stay
 14022004 defaults.
 

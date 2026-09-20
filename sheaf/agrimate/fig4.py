@@ -404,10 +404,32 @@ def write_fig4_report(
 ) -> Path:
     out_dir = Path(out_dir)
     a0 = attrs.iloc[0]
+    ha = prices[prices["scenario"] == "harvest_amis"].iloc[0] if not prices.empty else None
+    prices_path = out_dir / "score_prices.csv"
+    item3_path = out_dir / "score_item3.csv"
+    unconverged = failed = None
+    last_first = float("nan")
+    if prices_path.is_file():
+        pr = pd.read_csv(prices_path)
+        row = pr[pr["scenario"] == "harvest_amis"]
+        if not row.empty:
+            unconverged = int(row.iloc[0]["unconverged"])
+            failed = int(row.iloc[0]["failed"])
+    if item3_path.is_file():
+        last_first = float(pd.read_csv(item3_path)["last_first"].iloc[0])
+    hike_h = float(ha["hike_2008_host"]) if ha is not None else float("nan")
+    hike_a = float(ha["hike_2008_author"]) if ha is not None else float("nan")
+    m06_h = float(ha["mean_2006_host"]) if ha is not None else float("nan")
+    m06_a = float(ha["mean_2006_author"]) if ha is not None else float("nan")
+    prod_u = supply[(supply["scenario"] == "undisturbed") & (supply["field"] == "production")]
+    host_prod = float(prod_u.iloc[0]["mean_host"]) if not prod_u.empty else float("nan")
+    auth_prod = float(prod_u.iloc[0]["mean_author"]) if not prod_u.empty else float("nan")
     lines = [
-        "# Agrimate Fig. 4 — author series vs this host (P7)",
+        "# Agrimate Fig. 4 — author series vs this host (P7 / S5)",
         "",
         "Independent implementation. Do **not** claim replication.",
+        "S5 re-scores the S1 member-sum CSVs. Not R11: the NLP runner",
+        "was not re-run. `wheat_params()` stay αI=3.2.",
         "",
         "## G0-U items 1–3 (before historical fit)",
         "",
@@ -419,10 +441,13 @@ def write_fig4_report(
         "   labelled S3/S4/A1–A6/N5. The Fig. 4 NetCDF is a *different*",
         "   executable than that host (see experiment mismatch below).",
         "2. **Numerical reliability.** Plans are feasible (residual 0,",
-        "   failed/fallback 0) but **not** first-order stationary: harvest+AMIS",
-        "   unconverged scipy 1743/5832 (N5). Counted, not papered over.",
+        f"   failed/fallback {failed if failed is not None else 0}) but **not** "
+        "first-order stationary: harvest+AMIS",
+        f"   unconverged scipy {unconverged if unconverged is not None else 'nan'}/5832 (N5). "
+        "Counted, not papered over.",
         "3. **Undisturbed dynamics.** Seasonal shape repeats (corr 0.98) but",
-        "   the annual-mean world-price ratio 2011/2006 is **1.63** (`undisturbed.md`).",
+        f"   the annual-mean world-price ratio 2011/2006 is **{_fmt(last_first, 3)}** "
+        "(`item3.md`).",
         "   Author Fig. 4 baseline on the same window is repeating",
         f"   (last/first = {_fmt(drift['last_over_first'], 3)},",
         f"   seasonal corr {_fmt(drift['seasonal_corr_first_last'], 3)}).",
@@ -469,16 +494,19 @@ def write_fig4_report(
     lines += [
         "",
         "Author harvest+AMIS 2008 hike is the published-experiment number to",
-        "beat, not Pink Sheet ×1.88. Host hike remains several times larger",
-        "and 2006 levels are ~0.3 vs author ~1.1. Correlation of the raw",
+        f"beat, not Pink Sheet ×1.88. Host hike remains several times larger "
+        f"(×{_fmt(hike_h, 2)} vs ×{_fmt(hike_a, 2)})",
+        f"and 2006 levels are {_fmt(m06_h, 2)} vs author {_fmt(m06_a, 2)}. "
+        "Correlation of the raw",
         "index is not a replication claim.",
         "",
         "## World supply / consumption / stocks vs Fig. 4 series",
         "",
         "Author units 1000 t, converted /1000 → MMT. Host is the 27-node USDA",
-        "sum (A1). Level bias is expected. Undisturbed production corr is nan",
+        "sum (A1, S1 member-sum). Level bias is expected. Undisturbed production corr is nan",
         "because both series are constant (author repeating FAO baseline,",
-        "host repeating USDA 2007–09 mean) at different levels (542 vs 631 MMT).",
+        f"host repeating USDA 2007–09 mean) at different levels "
+        f"({_fmt(host_prod, 0)} vs {_fmt(auth_prod, 0)} MMT).",
         "",
         "| scenario | field | corr | RMSE | mean host | mean author |",
         "|---|---|---:|---:|---:|---:|",
@@ -512,9 +540,11 @@ def write_fig4_report(
         "## Verdict",
         "",
         "Independent implementation, Fig. 4 series **in hand**, scored, **not",
-        "a replication**. G0-U (3) fails on the host (drift 1.63 vs author",
-        "1.00). G0-U (2) is N5, not a unique maximizer. Do not restore L1–L8.",
-        "Do not retune αI. P8 writes the G0-H hindcast note from these numbers.",
+        f"a replication**. G0-U (3) fails on the host (drift {_fmt(last_first, 3)} vs author",
+        "1.00). G0-U (2) is N5, not a unique maximizer. Items 1–3 did **not**",
+        "newly pass. Do not restore L1–L8. Do not adopt Bai αI=10. Do not pin",
+        "2006. Do not retune αI. Do not start G1. See `hindcast.md` (S5) for",
+        "the G0-H score.",
         "",
         "## Files",
         "",

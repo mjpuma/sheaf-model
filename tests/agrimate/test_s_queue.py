@@ -1,4 +1,4 @@
-"""Post-R S-queue: S4 A7 inventory done; Next paste S5."""
+"""Post-R S-queue: S5 re-score done; Next paste stay not-accepted."""
 from __future__ import annotations
 
 from dataclasses import fields
@@ -9,6 +9,7 @@ import pandas as pd
 from sheaf.agrimate.a8_sum import write_r7_dispatch
 from sheaf.agrimate.fb_wheatdata import write_r6_dispatch, write_s3_dispatch
 from sheaf.agrimate.s4_a7 import write_s4_dispatch
+from sheaf.agrimate.s5_score import write_s5_dispatch
 from sheaf.agrimate.fig4_config import PROTECTED_THREE_SCENARIO
 from sheaf.agrimate.methods import publication_bar
 from sheaf.agrimate.model import AgrimateSim
@@ -54,20 +55,19 @@ def test_s1_implements_member_sum():
     assert any("5074" in n for n in d.notes)
 
 
-def test_dispatch_next_paste_is_s5():
+def test_dispatch_next_paste_is_stay_not_accepted():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: S4" in text
-    assert "Next paste: S5" in text
-    assert "Next paste: S4" not in text.split("Next paste: S5")[0][-80:]
+    assert "Last completed: S5" in text
+    assert "Next paste: stay not-accepted" in text
+    assert "Next paste: S6" not in text
     assert "R11" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
     assert "FAO ΔS" in text
     assert "2006 pin" in text or "pin" in text
     assert "Bai 10" in text
-    assert "USDA stays default" in text or "USDA stays" in text
-    assert "invent Egypt" in text or "Egypt not invented" in text
+    assert "not accepted" in text.lower()
 
 
 def test_s2_prompt_forbids_pin_and_l1l8():
@@ -111,7 +111,7 @@ def test_pointers_name_s_queue():
     ):
         body = (ROOT / rel).read_text()
         assert "GATE0_NEXT_PROMPTS.md" in body, rel
-        assert "S4" in body, rel
+        assert "S5" in body, rel
     repro = (ROOT / "diagnostics" / "GATE0_REPRO_PROMPTS.md").read_text()
     assert "exhausted" in repro.lower()
     dep = (ROOT / "diagnostics" / "GATE0_DEPARTURES.md").read_text()
@@ -127,7 +127,7 @@ def test_r7_dispatch_writer_does_not_clobber_s5(tmp_path):
     living = tmp_path / "GATE0_REPRO_DISPATCH.md"
     living.write_text(DISPATCH.read_text())
     before = living.read_text()
-    assert "Next paste: S5" in before
+    assert "Last completed: S5" in before
     from sheaf.agrimate.a8_sum import a8_mean_vs_sum_table
 
     tab = a8_mean_vs_sum_table()
@@ -313,7 +313,74 @@ def test_s4_inventory_does_not_invent_egypt_or_retune():
 
 def test_s4_dispatch_writer_does_not_clobber_later(tmp_path):
     living = tmp_path / "GATE0_REPRO_DISPATCH.md"
-    living.write_text("Last completed: S5\nNext paste: S6\n")
+    living.write_text("Last completed: S5\nNext paste: stay not-accepted\n")
     inv = pd.read_csv(OUT_DEFAULT / "score_s4_a7.csv").iloc[0].to_dict()
     write_s4_dispatch(inv, path=living)
-    assert living.read_text() == "Last completed: S5\nNext paste: S6\n"
+    assert living.read_text() == "Last completed: S5\nNext paste: stay not-accepted\n"
+
+
+def test_s5_rescored_from_csvs_not_r11():
+    from sheaf.agrimate.s5_score import live_s5_metrics
+    from sheaf.agrimate.params import fig4_experiment_params
+
+    note = OUT_DEFAULT / "s5_score.md"
+    csv = OUT_DEFAULT / "score_s5.csv"
+    assert note.is_file()
+    assert csv.is_file()
+    text = note.read_text()
+    assert "not r11" in text.lower()
+    assert "L1–L8" in text
+    assert "Bai" in text
+    assert "not accepted" in text.lower()
+    assert "Do not start G1" in text
+    assert "Next paste: stay not-accepted" in text
+    p = wheat_params()
+    assert p.alpha_i == 3.2
+    assert p.zeta_penalty == 0.0
+    assert p.n_for_months == 3
+    fig4 = fig4_experiment_params()
+    assert fig4.alpha_i == 3.5
+    m = live_s5_metrics()
+    assert m["items_13_changed"] is False
+    assert m["item3_pass"] is False
+    assert m["last_first"] > 1.1
+    assert abs(m["last_first"] - 1.444) < 0.01
+    assert m["unconverged"] == 2304
+    assert m["failed"] == 0
+    assert m["hike_host"] > m["hike_author"]
+    assert m["hike_host"] > 3.0
+    assert m["moy_host"] > 10
+    assert abs(m["mean_2006_host_usd"] - 81.5) < 1.5
+    assert abs(m["mean_2006_pink_usd"] - 213.5) < 1.0
+    assert m["alpha_i"] == 3.2
+    tab = pd.read_csv(csv).iloc[0]
+    assert bool(tab["items_13_changed"]) is False
+    assert float(tab["alpha_i"]) == 3.2
+    hind = (OUT_DEFAULT / "hindcast.md").read_text()
+    assert "2304/5832" in hind
+    assert "1.444" in hind or "1.443" in hind
+    assert "×3.71" in hind or "×3.7" in hind
+    assert "L1–L8" in hind
+    assert "not r11" in hind.lower()
+    fig = (OUT_DEFAULT / "fig4.md").read_text()
+    assert "2304/5832" in fig
+    assert "1.444" in fig or "1.443" in fig
+    assert "Do **not** claim replication" in fig
+    reg = (OUT_DEFAULT / "regional.md").read_text()
+    assert "stale until S5" not in reg
+    assert "S5 re-scored" in reg
+    src = (ROOT / "sheaf" / "agrimate" / "params.py").read_text()
+    assert "def wheat_params" in src
+    assert "alpha_i=3.2" in src or "alpha_i = 3.2" in src
+    for name in PROTECTED_THREE_SCENARIO:
+        assert (OUT_DEFAULT / name).is_file(), name
+
+
+def test_s5_dispatch_writer_does_not_clobber_later(tmp_path):
+    living = tmp_path / "GATE0_REPRO_DISPATCH.md"
+    living.write_text("Last completed: S6\nNext paste: G1\n")
+    from sheaf.agrimate.s5_score import live_s5_metrics
+    metrics = live_s5_metrics()
+    write_s5_dispatch(metrics, path=living)
+    assert living.read_text() == "Last completed: S6\nNext paste: G1\n"
+

@@ -213,6 +213,52 @@ def write_seasonal_figure(
     return out_path
 
 
+def _solver_row(out_dir: Path, scenario: str = "harvest_amis") -> pd.Series | None:
+    path = Path(out_dir) / "score_prices.csv"
+    if not path.is_file():
+        return None
+    tab = pd.read_csv(path)
+    hit = tab[tab["scenario"] == scenario]
+    return None if hit.empty else hit.iloc[0]
+
+
+def _item3_row(out_dir: Path) -> pd.Series | None:
+    path = Path(out_dir) / "score_item3.csv"
+    if not path.is_file():
+        return None
+    return pd.read_csv(path).iloc[0]
+
+
+def _ukraine_2007(out_dir: Path) -> dict[str, float]:
+    out = {}
+    for tag in ("harvest", "harvest_amis"):
+        path = Path(out_dir) / f"ukraine_{tag}.csv"
+        if not path.is_file():
+            continue
+        tab = pd.read_csv(path).set_index("year")
+        if 2007 not in tab.index:
+            continue
+        out[f"{tag}_consumption"] = float(tab.loc[2007, "consumption"])
+        out[f"{tag}_exports"] = float(tab.loc[2007, "exports"])
+    return out
+
+
+def _fig4_supply_means(out_dir: Path) -> dict[str, float]:
+    path = Path(out_dir) / "score_fig4_supply.csv"
+    if not path.is_file():
+        return {}
+    tab = pd.read_csv(path)
+    out = {}
+    for field in ("production", "ending_stocks"):
+        hit = tab[(tab["scenario"] == "harvest_amis") & (tab["field"] == field)]
+        if hit.empty:
+            continue
+        out[f"{field}_host"] = float(hit.iloc[0]["mean_host"])
+        out[f"{field}_author"] = float(hit.iloc[0]["mean_author"])
+        out[f"{field}_corr"] = float(hit.iloc[0]["corr"])
+    return out
+
+
 def write_hindcast_note(
     seasonal: pd.DataFrame,
     qty: pd.DataFrame,
@@ -227,32 +273,49 @@ def write_hindcast_note(
     stk = qty[(qty["scenario"] == "harvest_amis") & (qty["field"] == "ending_stocks")].iloc[0]
     stk_h = qty[(qty["scenario"] == "harvest") & (qty["field"] == "ending_stocks")].iloc[0]
     cons = qty[(qty["scenario"] == "harvest_amis") & (qty["field"] == "consumption")].iloc[0]
+    solver = _solver_row(out_dir)
+    item3 = _item3_row(out_dir)
+    ukr = _ukraine_2007(out_dir)
+    fig4s = _fig4_supply_means(out_dir)
+    unconverged = int(solver["unconverged"]) if solver is not None else None
+    failed = int(solver["failed"]) if solver is not None else None
+    last_first = float(item3["last_first"]) if item3 is not None else float("nan")
+    last_first_author = (
+        float(item3["last_first_author"]) if item3 is not None else 1.004
+    )
+    quiet_pct = 100.0 * float(ha["level_vs_pink"]) if np.isfinite(ha["level_vs_pink"]) else float("nan")
+    corr_pink = float(ha["corr_vs_pink"])
+    corr_word = "negative" if corr_pink < 0 else ("near zero" if abs(corr_pink) < 0.05 else "positive")
+    yd = float(ha["corr_year_demeaned_vs_pink"])
+    yd_word = "negative" if yd < 0 else ("near zero" if abs(yd) < 0.05 else "positive")
 
     lines = [
-        "# G0-H — 2006–11 wheat hindcast (P8)",
+        "# G0-H — 2006–11 wheat hindcast (P8 / S5)",
         "",
         "**Explicit sourced shortfall versus Agrimate Fig. 4.** Independent",
         "implementation, not a replication. Not a retune. `wheat_params()`",
         "stay αI=3.2, p_sto=0.1, xmin=0.2. Bai α_foreign=10 is listed in the",
         "P6 OAT and **not adopted** (it raises the already-too-large spike).",
-        "L1–L8 stay rejected. G1/G2 stay blocked.",
+        "L1–L8 stay rejected. G1/G2 stay blocked. This is **not R11**: S5",
+        "re-scores the S1 member-sum CSVs; the NLP runner was not re-run.",
         "",
         "Numbers are from `diagnostics/gate0_agrimate/` three-scenario CSVs",
-        "(spin-up 2003–05, score 2006–11) and P7 author series. The runner",
-        "was not re-run.",
+        "(spin-up 2003–05, score 2006–11, A8 member-sum) and P7 author series.",
         "",
         "## G0-U items 1–3 (pass rule before judging historical fit)",
         "",
         "1. **Source fidelity.** Met for retrieved Zenodo 14022004 code with",
         "   labelled S3/S4/A1–A6/N5. Fig. 4 NetCDF is a different executable",
         "   (AgrimateEU28+Egypt, FAO anomalies, α_foreign=3.5, ζ=1, N_for=6).",
-        "2. **Numerical reliability.** Feasible (failed/fallback 0, residual 0)",
+        "2. **Numerical reliability.** Feasible "
+        f"(failed/fallback {failed if failed is not None else 0}, residual 0)",
         "   but **not** first-order stationary: harvest+AMIS unconverged",
-        "   1743/5832 (N5). Counted, not papered over.",
+        f"   {unconverged if unconverged is not None else 'nan'}/5832 (N5).",
+        "   Counted, not papered over.",
         "3. **Undisturbed dynamics.** Seasonal *shape* repeats (corr 0.98) but",
-        "   the annual-mean world-price ratio 2011/2006 is **1.63**. Author",
-        "   Fig. 4 baseline on the same window is 1.004. P2 drift is",
-        "   unexplained. Not a price pin.",
+        f"   the annual-mean world-price ratio 2011/2006 is **{_fmt(last_first, 3)}**.",
+        f"   Author Fig. 4 baseline on the same window is {_fmt(last_first_author, 3)}.",
+        "   P2 drift is unexplained. Not a price pin.",
         "",
         "Items 1–3 do **not** all hold. Item 5 is still reported, as an",
         "explicit shortfall, not as a replication claim.",
@@ -261,7 +324,7 @@ def write_hindcast_note(
         "",
         f"Harvest+AMIS 2006 mean is **${_fmt(ha['mean_2006_host_usd'], 1)}/t** vs Pink",
         f"Sheet **${_fmt(ha['mean_2006_pink_usd'], 1)}/t** (ratio",
-        f"{_fmt(ha['level_vs_pink'], 2)}; about 31% of the observed quiet-year",
+        f"{_fmt(ha['level_vs_pink'], 2)}; about {_fmt(quiet_pct, 0)}% of the observed quiet-year",
         "level). Undisturbed is lower still",
         f"(${_fmt(un['mean_2006_host_usd'], 1)}/t) because 2006 is a trough on",
         "the drifting unforced path, not a calibrated intercept.",
@@ -284,8 +347,10 @@ def write_hindcast_note(
         f"| Pink Sheet | ×{_fmt(ha['hike_2008_pink'], 2)} | ${_fmt(ha['mean_2006_pink_usd'], 1)} | {ha['crisis_peak_pink']} |",
         f"| Agrimate Fig. 4d harvest+AMIS | ×{_fmt(ha['hike_2008_author'], 2)} | index {_fmt(ha['mean_2006_author_index'], 3)} | {ha['crisis_peak_author']} |",
         "",
-        "Host overshoots Pink (×4.54 vs ×1.88) **and** overshoots Agrimate",
-        "(×4.54 vs ×1.62). Peak timing is also wrong: host crisis peak is",
+        f"Host overshoots Pink (×{_fmt(ha['hike_2008_host'], 2)} vs "
+        f"×{_fmt(ha['hike_2008_pink'], 2)}) **and** overshoots Agrimate",
+        f"(×{_fmt(ha['hike_2008_host'], 2)} vs ×{_fmt(ha['hike_2008_author'], 2)}).",
+        "Peak timing is also wrong: host crisis peak is",
         f"**{ha['crisis_peak_host']}** (harvest-calendar spike); Pink peaks",
         f"**{ha['crisis_peak_pink']}**; author Fig. 4d peaks **{ha['crisis_peak_author']}**.",
         "Bai α_foreign=10 is not a remedy: the P6 short-window OAT moves the",
@@ -294,9 +359,10 @@ def write_hindcast_note(
         "",
         "## Seasonal path, not only correlation",
         "",
-        "Full-window corr vs Pink is **negative** (harvest+AMIS −0.082).",
+        f"Full-window corr vs Pink is **{corr_word}** (harvest+AMIS "
+        f"{_fmt(corr_pink, 3)}).",
         "That is a path failure, not a noisy +0.5. Year-demeaned corr is",
-        f"still negative ({_fmt(ha['corr_year_demeaned_vs_pink'], 3)}).",
+        f"{yd_word} ({_fmt(yd, 3)}).",
         "",
         "Month-of-year mean profile (2006–11):",
         "",
@@ -315,8 +381,9 @@ def write_hindcast_note(
         f"| Agrimate Fig. 4d (harvest+AMIS) | {int(ha['moy_peak_month_author'])} | — | "
         f"{_fmt(ha['moy_maxmin_author'], 2)} | — | 1 |",
         "",
-        "Host within-year amplitude is **~18×** on the month-of-year mean",
-        f"({_fmt(ha['moy_maxmin_host'], 1)}), versus Pink **{_fmt(ha['moy_maxmin_pink'], 2)}×**",
+        f"Host within-year amplitude is **{_fmt(ha['moy_maxmin_host'], 1)}×** "
+        "on the month-of-year mean",
+        f"versus Pink **{_fmt(ha['moy_maxmin_pink'], 2)}×**",
         f"and Agrimate Fig. 4d **{_fmt(ha['moy_maxmin_author'], 2)}×**. The host",
         "shares Agrimate's northern-harvest *calendar* (May–June peak; moy",
         f"corr vs author {_fmt(ha['moy_corr_vs_author'], 2)}) and inverts Pink",
@@ -334,16 +401,39 @@ def write_hindcast_note(
         f"**{_fmt(prod['corr_level'], 3)}** (prompt ballpark +0.80). Anomaly",
         f"corr on this six-year window is the same number ({_fmt(prod['corr_anomaly'], 3)}):",
         "the series are short and the mean offset is nearly constant.",
-        f"Level is close: host {_fmt(prod['mean_host'], 1)} MMT vs USDA",
+        f"Level: host {_fmt(prod['mean_host'], 1)} MMT vs USDA",
         f"{_fmt(prod['mean_usda'], 1)} (ratio {_fmt(prod['level_ratio'], 3)}).",
         "Undisturbed production is the repeating 2007–09 mean, so corr vs",
-        "USDA is undefined/zero — as designed.",
+        "USDA is undefined/zero — as designed. A8 member-sum (S1) raised the",
+        "27-node production sum versus the rejected pooled-mean host.",
         "",
-        "Vs Agrimate Fig. 4 harvest, production corr is 0.986 at different",
-        "levels (host 542 vs author 624 MMT) because A1 is USDA PSD, not",
-        "FAOSTAT Food Balances, and the region lists differ (Brazil named",
-        "here; Egypt split there).",
-        "",
+    ]
+    if fig4s:
+        lines += [
+            f"Vs Agrimate Fig. 4 harvest+AMIS, production corr is "
+            f"{_fmt(fig4s.get('production_corr', float('nan')), 3)} at different",
+            f"levels (host {_fmt(fig4s.get('production_host', float('nan')), 0)} vs "
+            f"author {_fmt(fig4s.get('production_author', float('nan')), 0)} MMT) because A1 is USDA PSD, not",
+            "FAOSTAT Food Balances, and the region lists differ (Brazil named",
+            "here; Egypt split there).",
+            "",
+        ]
+    else:
+        lines += [
+            "Vs Agrimate Fig. 4 harvest, production levels differ because A1",
+            "is USDA PSD, not FAOSTAT Food Balances, and the region lists",
+            "differ (Brazil named here; Egypt split there).",
+            "",
+        ]
+    stk_vs_author = ""
+    if fig4s:
+        stk_vs_author = (
+            f"Against Agrimate Fig. 4 the host is "
+            f"{_fmt(fig4s.get('ending_stocks_host', float('nan')), 0)} vs author "
+            f"{_fmt(fig4s.get('ending_stocks_author', float('nan')), 0)} MMT harvest+AMIS, "
+            "so the remaining USDA gap is not “the host holds three worlds of grain.” "
+        )
+    lines += [
         "## Stock *level* bias vs stock *anomaly* corr",
         "",
         "The P8 prompt's “~3× USDA world / anomaly corr ~+0.94” is the",
@@ -356,9 +446,7 @@ def write_hindcast_note(
         f"Harvest-only is {_fmt(stk_h['level_ratio'], 2)}× with corr",
         f"{_fmt(stk_h['corr_level'], 3)}.",
         "",
-        "Against Agrimate Fig. 4 the host is *below* author stocks (248 vs",
-        "325 MMT harvest+AMIS), so the remaining USDA gap is not “the host",
-        "holds three worlds of grain.” Coverage (27 nodes vs world PSD) and",
+        f"{stk_vs_author}Coverage (27 nodes vs world PSD) and",
         "A1 still explain part of the level offset. Do not fit xmin or p_sto",
         "to close it.",
         "",
@@ -377,15 +465,23 @@ def write_hindcast_note(
         f"  ${_fmt(attrib['jun2007_harvest'], 0)} harvest-only vs",
         f"  ${_fmt(attrib['jun2007_amis'], 0)} harvest+AMIS. The 2007 spike is",
         "  **harvest-driven**.",
-        f"- 2008 means diverge (${_fmt(attrib['mean_2008_harvest'], 1)} vs",
-        f"  ${_fmt(attrib['mean_2008_amis'], 1)}). May 2008 is",
+        f"- 2008 means: ${_fmt(attrib['mean_2008_harvest'], 1)} vs",
+        f"  ${_fmt(attrib['mean_2008_amis'], 1)}. May 2008 is",
         f"  ${_fmt(attrib['may2008_harvest'], 0)} vs ${_fmt(attrib['may2008_amis'], 0)}",
         f"  (max |Δ| ${_fmt(attrib['max_abs_delta_usd'], 0)} at",
-        f"  {attrib['max_abs_delta_at']}). AMIS **adds** a 2008 spring spike",
-        "  on top of an already-too-large 2007 harvest spike.",
-        "- Ukraine 2007 exports 15.0 → 6.0 MMT with AMIS; 2007 consumption",
-        "  1.93 → 10.3 MMT. The restriction does what E.4 says on the",
-        "  exporter. It does not repair world-price *path* or *level*.",
+        f"  {attrib['max_abs_delta_at']}). On the member-sum host the largest",
+        "  harvest vs harvest+AMIS price gap is not a 2008 spring spike.",
+    ]
+    if ukr:
+        lines.append(
+            f"- Ukraine 2007 exports {_fmt(ukr.get('harvest_exports', float('nan')), 1)} → "
+            f"{_fmt(ukr.get('harvest_amis_exports', float('nan')), 1)} MMT with AMIS; "
+            f"2007 consumption {_fmt(ukr.get('harvest_consumption', float('nan')), 2)} → "
+            f"{_fmt(ukr.get('harvest_amis_consumption', float('nan')), 2)} MMT "
+            "(sign flipped vs the pre-S1 pooled-mean host). AMIS still moves the "
+            "exporter. It does not repair world-price *path* or *level*."
+        )
+    lines += [
         "",
         "Mean |price harvest+AMIS − harvest| over 2006–11 is",
         f"${_fmt(attrib['mean_abs_delta_usd'], 1)}/t.",
@@ -393,38 +489,46 @@ def write_hindcast_note(
         "## Comparison to Agrimate published wheat Fig. 4",
         "",
         "P7 unpacked Zenodo 10688435. Headlines from `fig4.md`, restated as",
-        "a hindcast verdict:",
+        "a hindcast verdict (S5 re-score on the S1 member-sum CSVs):",
         "",
-        "- Quiet-year index: host ~0.31 vs author ~1.18.",
-        "- 2008 hike: host ×4.54 vs author ×1.62 vs Pink ×1.88. Agrimate is",
+        f"- Quiet-year index: host {_fmt(ha['mean_2006_host_usd'] / ha['mean_2006_pink_usd'], 2)} "
+        f"vs author {_fmt(ha['mean_2006_author_index'], 2)}.",
+        f"- 2008 hike: host ×{_fmt(ha['hike_2008_host'], 2)} vs author "
+        f"×{_fmt(ha['hike_2008_author'], 2)} vs Pink ×{_fmt(ha['hike_2008_pink'], 2)}. "
+        "Agrimate is",
         "  the closer of the two models to Pink on this metric; the host is",
         "  not comparable to Agrimate.",
-        "- Seasonal amplitude: host ~18× vs author ~1.45× vs Pink ~1.07×.",
-        "  Host matches Agrimate's *calendar* (moy corr 0.91) and misses",
+        f"- Seasonal amplitude: host {_fmt(ha['moy_maxmin_host'], 1)}× vs author "
+        f"{_fmt(ha['moy_maxmin_author'], 2)}× vs Pink {_fmt(ha['moy_maxmin_pink'], 2)}×.",
+        f"  Host matches Agrimate's *calendar* (moy corr {_fmt(ha['moy_corr_vs_author'], 2)}) and misses",
         "  Agrimate's *amplitude*.",
-        "- Undisturbed: author last/first 1.004; host 1.63 (P2).",
-        "- Production anomalies track (corr 0.99) at USDA vs FAO levels.",
+        f"- Undisturbed: author last/first {_fmt(last_first_author, 3)}; host "
+        f"{_fmt(last_first, 3)} (S2).",
+        "- Production anomalies track at USDA vs FAO levels.",
         "- This is **not** a bit-reproduction: different region list, FAO vs",
         "  USDA (A1), α_foreign 3.5 vs 3.2, ζ=1 vs 0, N_for 6 vs 3 months,",
         "  git `old-demand-dynamics` vs 14022004. Labelling that mismatch",
-        "  does not make the host's ×4.54 hike a success.",
+        f"  does not make the host's ×{_fmt(ha['hike_2008_host'], 2)} hike a success.",
         "",
         "## Verdict",
         "",
         "Sourced shortfall. Gate 0 wheat is **not** at the publication bar",
         "on historical performance (DEVELOPMENT item 5) and still fails",
-        "item 3 (undisturbed). Do not restore L1–L8. Do not adopt Bai",
-        "α_foreign=10. Do not pin 2006. Regional USDA (P9): `regional.md`",
-        "(coverage labelled; no xmin/p_sto fit). P11 prescribed-Δ: `pulse.md`",
-        "(8-run 2008 clean; not 36; not G2). P12 methods note: `methods.md`",
-        "(written; **not accepted** as the SHEAF market section).",
+        "item 3 (undisturbed). Items 1–3 evidence did **not** newly pass",
+        "(unconverged still N5; last/first still >1.1). Do not restore L1–L8.",
+        "Do not adopt Bai α_foreign=10. Do not pin 2006. Do not start G1.",
+        "Regional USDA (P9): `regional.md` (coverage labelled; no xmin/p_sto",
+        "fit). P11 prescribed-Δ: `pulse.md` (8-run 2008 clean; not 36; not G2).",
+        "P12 methods note: `methods.md` (written; **not accepted** as the",
+        "SHEAF market section). S6 is not next: items 1–3 still fail.",
         "",
         "## Files",
         "",
         "- `score_hindcast_seasonal.csv` — path metrics used above",
         "- `score_hindcast_quantities.csv` — USDA level vs anomaly",
         "- `figures/fig6_hindcast_seasonal.png`",
-        "- `fig4.md` — P7 author-series score (unchanged)",
+        "- `fig4.md` — P7/S5 author-series score",
+        "- `regional.md` — P9 named-node USDA (coverage, not a fit)",
         "",
     ]
     path = Path(out_dir) / "hindcast.md"
