@@ -10,10 +10,10 @@ the run, rewrite the dispatch from the **numbers you just got**. The
 next session pastes `Next paste`, not `R{n+1}`. Skip IDs that the
 dispatch has already ruled out. Do not open G1/G2.
 
-**Now:** paste **R5**. R4 found live D.22 `q_oth` is the host last/first
-channel (freeze 1.019 vs author 1.004; not adopted). Item 3 still
-fails on the live host (1.630). G0-P is **not accepted**.
-`wheat_params()` stay 14022004 defaults.
+**Now:** paste **R6**. R5 labelled `x1_from_demand` (default off; p_w
+silent; inflow moves; not adopted). Item 3 still fails on the live
+host (1.630). G0-P is **not accepted**. `wheat_params()` stay 14022004
+defaults.
 
 ## Adaptive rule (read before picking an ID after R2)
 
@@ -88,8 +88,8 @@ Next session pastes that file's **Next paste**, not the next integer.
 | **R2** | Labelled Fig. 4-config comparison run | **done** (moy 26.8×→13.3×; next R10) |
 | **R3** | World-price recipe vs author plot | **done** (host identity; 14022004 Julia absent; next still R10) |
 | **R4** | Undisturbed XI-split characterisation | **done** (qoth_freeze 1.019 vs author 1.004; not adopted; next R5) |
-| R5 | S4 x1=demand labelled experiment | **next** |
-| R6 | FAOSTAT FB obtain-or-leave | adaptive / maybe stop |
+| **R5** | S4 x1=demand labelled experiment | **done** (default off; p_w silent; not adopted; next R6) |
+| R6 | FAOSTAT FB obtain-or-leave | **next** |
 | R7 | A8 mean-vs-sum sensitivity (do not rewrite host) | adaptive |
 | R8 | Expand Fig. 4 *score* tests (honest FAIL until match) | piggyback |
 | **R9** | N5 on the Fig. 4 config | **done** (`plan_maxiter` stays 40; next R4) |

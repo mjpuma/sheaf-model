@@ -125,6 +125,11 @@ Pink-Sheet refit). Physical inflow remains T* + domestic sales. Author
 two-market `x1` is *fixed* to those requests; host supplier plan still
 sets current sales (labelled, not a guessed CES-rationing rule).
 Classification **H** for the formula (95–100%); remaining x1 gap is **D**.
+R5 adds `x1_from_demand=False` (default recovers T*+domestic). `True`
+assigns Ndel-lagged foreign D.30/D.30a requests as international arrival
+(`x1_demand.md`). 2006 harvest+AMIS: max |Δp_w|=0 (XI-weighted offers);
+Σ inflow 478→908 MMT. Not a min(supply, demand) ration. Not adopted.
+14022004 Julia still not in-tree. `wheat_params()` unchanged.
 
 ## Documentation G-fix (not an economic departure)
 
@@ -143,7 +148,7 @@ B1 **International delivery (P2).** Pre-fix, lagged XI was credited to the
 *exporter* as consumer inflow (`inflow = sold_d + own XI_{t−Ndel}`). That
 is not D.3/E.1. Host now routes XI along row-normalised international T*.
 D.30 CES / D.30a requests are computed; quantity delivered is still T*
-(author x1=demand is labelled, not copied). Not a world-price pin.
+by default. R5 labelled `x1_from_demand` (not adopted). Not a world-price pin.
 
 ## Proposed extensions (not implemented)
 

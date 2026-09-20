@@ -13,6 +13,7 @@ from sheaf.agrimate.equations import (
     inverse_demand,
     purchaser_commodity_quantity,
     purchaser_demand,
+    foreign_request_quantity,
 )
 from sheaf.agrimate.harvest import step_profile_from_months
 from sheaf.agrimate.optimize import nash_ibr, solve_supplier_plan
@@ -94,6 +95,13 @@ def test_d30a_quantity_falls_when_price_index_rises():
     D1 = purchaser_commodity_quantity(1.0, 0.2, 1.0 / 3.0, 5.0)
     D2 = purchaser_commodity_quantity(1.5, 0.2, 1.0 / 3.0, 5.0)
     assert D2 < D1
+
+
+def test_foreign_request_quantity_drops_own_origin():
+    q = np.array([1.0, 2.0, 3.0])
+    assert abs(foreign_request_quantity(q, 1) - 4.0) < 1e-12
+    assert abs(foreign_request_quantity(q, 0) - 5.0) < 1e-12
+    assert foreign_request_quantity(np.zeros(3), 0) == 0.0
 
 
 def test_crop_budget_share_clips_and_adds_extra_demand():

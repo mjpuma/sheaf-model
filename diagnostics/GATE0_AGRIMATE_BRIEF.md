@@ -20,7 +20,9 @@ Closed from the executable model (not guessed):
    wheat path; not a guessed local-price rule).
 7. **D.30a:** wheat uses it. `ε_d_adjust=false` so `determine_demands`
    (single ε_d=1/α=1/3, A_d, B) not the two-market ε_d split. Host formula
-   matches; A_d not refit. Inflow still T* (author x1=demand labelled).
+   matches; A_d not refit. Inflow still T* by default. R5 labelled
+   `x1_from_demand` (Ndel-lagged requests as arrive; default off; not
+   adopted).
 8. **FAOSTAT Food Balances vs USDA (P10):** not in
    `data/faostat_network/` (E0 trade only). FoodTradeNetwork P0/R0 are
    2015–21 averages, not 2006–11 annual FB. A1 left; USDA default.
