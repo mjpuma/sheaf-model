@@ -18,7 +18,6 @@ FAOSTAT_NETWORK = ROOT / "data" / "faostat_network"
 FAOSTAT_FB = ROOT / "data" / "faostat_fb"
 DATA_DIR = ROOT / "data"
 LAPTOP_DATA = Path("/Users/mjp38/GitHub/sheaf-model/data")
-DISPATCH = ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md"
 
 # Author AgriculturalData expected cleaned FB files (14022004). None are vendored.
 AUTHOR_FB_NAMES = (
@@ -102,8 +101,9 @@ def write_faostat_fb_note(inv: dict | None = None, out_dir: Path | None = None) 
     lines = [
         "# A1 — FAOSTAT Food Balances: raw FBSH vendored; USDA still default",
         "",
-        "**Leave A1. USDA remains the 2006–11 default.** No parallel",
-        "`WheatData`. No three-scenario FAO run. `wheat_params()` stay",
+        "**Leave A1. USDA remains the 2006–11 default.** Labelled parallel",
+        "`WheatData` is `fb_wheatdata.md` (**not adopted**). No three-scenario",
+        "FAO run. `wheat_params()` stay",
         "αI=3.2, p_sto=0.1, xmin=0.2. L1–L8 stay rejected. Bai",
         "α_foreign=10 not adopted. Bai's 2020–24 FAO-anomaly finding is a",
         "different window; it is not a reason to switch this wheat run.",
@@ -113,8 +113,8 @@ def write_faostat_fb_note(inv: dict | None = None, out_dir: Path | None = None) 
         "That extract is **not** Agrimate's cleaned",
         "`wheat_food_balance_fao.csv` (impute / QCL+TCL / rebalance).",
         "Do not mix FBS 2010+ (new methodology) into this vintage.",
-        "Next paste **R6** builds a labelled parallel WheatData vs USDA",
-        "on one harvest+AMIS window. This note does not do that.",
+        "R6 `prepare_wheat_fbsh` is a labelled parallel vs USDA on one",
+        "harvest+AMIS window; **not adopted**.",
         "",
         "## Inventory",
         "",
@@ -189,9 +189,8 @@ def write_faostat_fb_note(inv: dict | None = None, out_dir: Path | None = None) 
         "   `fbsh_wheat_files` present). `prepare_wheat` still USDA.",
         "5. **Correctness of stopping.** E0 is present and used. Wiring",
         "   FBSH into the 27-node host needs region maps, stock treatment,",
-        "   and a labelled parallel WheatData — that is the next R6 paste,",
-        "   not a silent default switch. Switching the host would retune",
-        "   2006–11 quantities, which this obtain forbids.",
+        "   and a labelled parallel WheatData (`fb_wheatdata.md`, not",
+        "   adopted). Switching the host would retune 2006–11 quantities.",
         "6. **Change.** None to economics. USDA stays default until G0-P.",
         "",
         f"`prepare_wheat` default note holds; αI={inv['alpha_i']:g}.",
@@ -202,8 +201,8 @@ def write_faostat_fb_note(inv: dict | None = None, out_dir: Path | None = None) 
         "- `data/faostat_fb/PROVENANCE.txt`",
         "- `data/faostat_network/PROVENANCE.txt` (E0 only)",
         "",
-        "Next paste: **R6** (parallel WheatData vs USDA, one harvest+AMIS",
-        "window). Not G1. Do not retune αI / p_sto / xmin.",
+        "Next paste: **R7** (A8 mean-vs-sum). Not G1. Do not retune",
+        "αI / p_sto / xmin. Do not adopt FBSH as prepare_wheat.",
         "",
     ]
     path = out_dir / "faostat_fb.md"
@@ -211,45 +210,7 @@ def write_faostat_fb_note(inv: dict | None = None, out_dir: Path | None = None) 
     return path
 
 
-def write_r6_obtain_dispatch(inv: dict | None = None, path: Path | None = None) -> Path:
-    inv = inv or inventory()
-    path = Path(path) if path else DISPATCH
-    n_fbsh = len(inv.get("fbsh_wheat_files") or [])
-    laptop = inv.get("laptop_data") or {}
-    why = (
-        f"raw FBSH vendored ({n_fbsh} csv); author wheat_food_balance_fao.csv "
-        f"absent; laptop data mounted={bool(laptop.get('exists'))}; "
-        "USDA still prepare_wheat default; no parallel WheatData this paste"
-    )
-    body = "\n".join([
-        "# Gate 0 reproduction dispatch",
-        "",
-        "Living next-paste. Rewrite after every R-session from **that run’s",
-        "numbers**. Do not walk R3…R12 in order. Template:",
-        "`GATE0_REPRO_PROMPTS.md` (Adaptive rule).",
-        "",
-        "```",
-        "Last completed: R6 obtain",
-        "Window / scenario: FAOSTAT FBSH wheat 2006–11 extract (not a WheatData switch)",
-        "hike_2008 (default → knobs → author): ×2.31 → ×2.22 → ×1.62",
-        "moy max/min: 26.8× → 13.3× → 1.51×",
-        "undisturbed last/first: default 1.630 → qoth_freeze 1.019 → author 1.004",
-        "unconverged / failed: host not re-run",
-        "What you could set / could not set: FBSH bulk 200; JSON API 521; "
-        "author cleaned FB absent; laptop /Users/mjp38/.../data not mounted",
-        "Next paste: R6",
-        f"Why: {why}",
-        "Skip: R11; G1/G2; do not retune αI; do not copy 2015–21 averages; "
-        "do not switch prepare_wheat",
-        "```",
-        "",
-    ])
-    path.write_text(body)
-    return path
-
-
 def run_faostat_fb_inventory(out_dir: Path | None = None) -> dict[str, Path]:
     inv = inventory()
     note = write_faostat_fb_note(inv, out_dir)
-    dispatch = write_r6_obtain_dispatch(inv)
-    return {"note": note, "dispatch": dispatch}
+    return {"note": note}

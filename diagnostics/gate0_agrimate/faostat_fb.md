@@ -1,7 +1,8 @@
 # A1 — FAOSTAT Food Balances: raw FBSH vendored; USDA still default
 
-**Leave A1. USDA remains the 2006–11 default.** No parallel
-`WheatData`. No three-scenario FAO run. `wheat_params()` stay
+**Leave A1. USDA remains the 2006–11 default.** Labelled parallel
+`WheatData` is `fb_wheatdata.md` (**not adopted**). No three-scenario
+FAO run. `wheat_params()` stay
 αI=3.2, p_sto=0.1, xmin=0.2. L1–L8 stay rejected. Bai
 α_foreign=10 not adopted. Bai's 2020–24 FAO-anomaly finding is a
 different window; it is not a reason to switch this wheat run.
@@ -11,8 +12,8 @@ methodology) wheat item 2511, years 2006–2011, unit 1000 t.
 That extract is **not** Agrimate's cleaned
 `wheat_food_balance_fao.csv` (impute / QCL+TCL / rebalance).
 Do not mix FBS 2010+ (new methodology) into this vintage.
-Next paste **R6** builds a labelled parallel WheatData vs USDA
-on one harvest+AMIS window. This note does not do that.
+R6 `prepare_wheat_fbsh` is a labelled parallel vs USDA on one
+harvest+AMIS window; **not adopted**.
 
 ## Inventory
 
@@ -83,9 +84,8 @@ Does not change `wheat_params` or `prepare_wheat`.
    `fbsh_wheat_files` present). `prepare_wheat` still USDA.
 5. **Correctness of stopping.** E0 is present and used. Wiring
    FBSH into the 27-node host needs region maps, stock treatment,
-   and a labelled parallel WheatData — that is the next R6 paste,
-   not a silent default switch. Switching the host would retune
-   2006–11 quantities, which this obtain forbids.
+   and a labelled parallel WheatData (`fb_wheatdata.md`, not
+   adopted). Switching the host would retune 2006–11 quantities.
 6. **Change.** None to economics. USDA stays default until G0-P.
 
 `prepare_wheat` default note holds; αI=3.2.
@@ -96,6 +96,6 @@ Does not change `wheat_params` or `prepare_wheat`.
 - `data/faostat_fb/PROVENANCE.txt`
 - `data/faostat_network/PROVENANCE.txt` (E0 only)
 
-Next paste: **R6** (parallel WheatData vs USDA, one harvest+AMIS
-window). Not G1. Do not retune αI / p_sto / xmin.
+Next paste: **R7** (A8 mean-vs-sum). Not G1. Do not retune
+αI / p_sto / xmin. Do not adopt FBSH as prepare_wheat.
 

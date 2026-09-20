@@ -72,7 +72,7 @@ def test_p10_note_leaves_a1():
     text = (OUT_DEFAULT / "faostat_fb.md").read_text()
     assert "Leave A1" in text
     assert "USDA remains" in text
-    assert "No parallel" in text
+    assert "No three-scenario" in text or "No parallel" in text
     assert "L1–L8" in text
     assert "α_foreign=10" in text or "Bai" in text
     assert "10688435" in text
@@ -90,10 +90,11 @@ def test_bulk_zip_is_gitignored():
 
 
 def test_dispatch_obtain_then_parallel_wheatdata():
-    text = (ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md").read_text()
-    assert "Last completed: R6 obtain" in text
-    assert "Next paste: R6" in text
-    assert "do not switch prepare_wheat" in text.lower() or "USDA still" in text
+    # Living dispatch moves after the R6 WheatData paste. Obtain facts stay
+    # in faostat_fb.md / PROVENANCE.txt.
+    text = (OUT_DEFAULT / "faostat_fb.md").read_text()
+    assert "Leave A1" in text
+    assert "FBSH" in text
 
 
 def test_faostat_fb_dir_has_provenance_and_not_author_cleaned():

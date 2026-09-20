@@ -35,8 +35,9 @@ Checked 2026-09-20 (R6 obtain): FAOSTAT JSON API FBSH **521**; bulk zip
 Default three-scenario run needs only the vendored trees (PSD extracts,
 E0, AMIS CSV, calendars, Pink Sheet). You do **not** need Zenodo, and
 you do **not** need FAOSTAT FB, to run the host. You **do** need
-`author_fig4/*.csv` to score Fig. 4 (already committed). FBSH is for a
-labelled parallel WheatData (next R6), not the default path.
+`author_fig4/*.csv` to score Fig. 4 (already committed). FBSH is a
+labelled parallel WheatData (`prepare_wheat_fbsh`, not adopted), not the
+default path.
 
 ## Automated refresh (no keys)
 
@@ -136,9 +137,10 @@ Writes `data/faostat_fb/wheat_fbsh_2006_2011.csv` (+ `_long.csv`,
 Wheat and products, unit 1000 t, Stock Variation element **5074**.
 Do **not** mix FBS 2010+ (new methodology) into this extract.
 
-USDA remains `prepare_wheat` default. Next R6 builds a **parallel**
-WheatData and compares one harvest+AMIS window; this obtain does not
-switch the host. Do not retune αI / p_sto / xmin to FBSH numbers.
+USDA remains `prepare_wheat` default. R6 `prepare_wheat_fbsh` is a
+labelled parallel (members summed; Psi stayed USDA; **not adopted**).
+Do not retune αI / p_sto / xmin to FBSH numbers. Scorer:
+`PYTHONPATH=. python scripts/score_agrimate_fb_wheatdata.py`.
 
 Laptop path `/Users/mjp38/GitHub/sheaf-model/data` is a local checkout.
 This cloud VM does not mount it. On the laptop, run the same
