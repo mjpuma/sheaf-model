@@ -139,8 +139,10 @@ Do **not** mix FBS 2010+ (new methodology) into this extract.
 
 USDA remains `prepare_wheat` default. R6 `prepare_wheat_fbsh` is a
 labelled parallel (members summed; Psi stayed USDA; **not adopted**).
-Do not retune αI / p_sto / xmin to FBSH numbers. Scorer:
-`PYTHONPATH=. python scripts/score_agrimate_fb_wheatdata.py`.
+S3 re-scored H/C vs the member-sum USDA host (China 1.00; moy
+worsened; **not adopted**). Do not retune αI / p_sto / xmin to FBSH
+numbers. Scorer: `PYTHONPATH=. python scripts/score_agrimate_s3_fbsh.py`
+(historical R6: `score_agrimate_fb_wheatdata.py`).
 
 Laptop path `/Users/mjp38/GitHub/sheaf-model/data` is a local checkout.
 This cloud VM does not mount it. On the laptop, run the same

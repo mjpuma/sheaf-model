@@ -1,4 +1,4 @@
-"""Post-R S-queue: S2 labelled item 3; Next paste S3."""
+"""Post-R S-queue: S3 FBSH not adopted; Next paste S4."""
 from __future__ import annotations
 
 from dataclasses import fields
@@ -7,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 
 from sheaf.agrimate.a8_sum import write_r7_dispatch
+from sheaf.agrimate.fb_wheatdata import write_r6_dispatch, write_s3_dispatch
 from sheaf.agrimate.fig4_config import PROTECTED_THREE_SCENARIO
 from sheaf.agrimate.methods import publication_bar
 from sheaf.agrimate.model import AgrimateSim
@@ -52,20 +53,19 @@ def test_s1_implements_member_sum():
     assert any("5074" in n for n in d.notes)
 
 
-def test_dispatch_next_paste_is_s3():
+def test_dispatch_next_paste_is_s4():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: S2" in text
-    assert "Next paste: S3" in text
-    assert "Next paste: S2" not in text.split("Next paste: S3")[0][-80:]
+    assert "Last completed: S3" in text
+    assert "Next paste: S4" in text
+    assert "Next paste: S3" not in text.split("Next paste: S4")[0][-80:]
     assert "R11" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
     assert "FAO ΔS" in text
     assert "2006 pin" in text or "pin" in text
     assert "Bai 10" in text
-    assert "1.444" in text
-    assert "freeze" in text.lower()
+    assert "USDA stays default" in text or "USDA stays" in text
 
 
 def test_s2_prompt_forbids_pin_and_l1l8():
@@ -90,6 +90,14 @@ def test_s3_prompt_forbids_fao_delta_s():
     assert "Next paste S4" in text
 
 
+def test_s4_prompt_does_not_invent_egypt():
+    text = NEXT.read_text()
+    assert "Task S4 only" in text
+    assert "Do not invent an Egypt node" in text
+    assert "put Fig. 4 knobs into wheat_params()" in text
+    assert "Next paste S5" in text
+
+
 def test_pointers_name_s_queue():
     for rel in (
         "diagnostics/DEVELOPMENT.md",
@@ -101,21 +109,22 @@ def test_pointers_name_s_queue():
     ):
         body = (ROOT / rel).read_text()
         assert "GATE0_NEXT_PROMPTS.md" in body, rel
-        assert "S3" in body, rel
+        assert "S4" in body, rel
     repro = (ROOT / "diagnostics" / "GATE0_REPRO_PROMPTS.md").read_text()
     assert "exhausted" in repro.lower()
     dep = (ROOT / "diagnostics" / "GATE0_DEPARTURES.md").read_text()
     assert "S1 implemented" in dep or "implemented**" in dep
     assert "Never FAO ΔS" in dep or "not FAOSTAT FBSH ΔS" in dep
     assert "1.444" in dep
+    assert "s3_fbsh.md" in dep
     assert "approved, not implemented" not in dep
 
 
-def test_r7_dispatch_writer_does_not_clobber_s3(tmp_path):
+def test_r7_dispatch_writer_does_not_clobber_s4(tmp_path):
     living = tmp_path / "GATE0_REPRO_DISPATCH.md"
     living.write_text(DISPATCH.read_text())
     before = living.read_text()
-    assert "Next paste: S3" in before
+    assert "Next paste: S4" in before
     from sheaf.agrimate.a8_sum import a8_mean_vs_sum_table
 
     tab = a8_mean_vs_sum_table()
@@ -123,13 +132,22 @@ def test_r7_dispatch_writer_does_not_clobber_s3(tmp_path):
     assert living.read_text() == before
 
 
-def test_r4_dispatch_writer_does_not_clobber_s3(tmp_path):
+def test_r4_dispatch_writer_does_not_clobber_s4(tmp_path):
     living = tmp_path / "GATE0_REPRO_DISPATCH.md"
     living.write_text(DISPATCH.read_text())
     before = living.read_text()
     csv = OUT_DEFAULT / "score_xi_split.csv"
     summary = pd.read_csv(csv)
     write_r4_dispatch(summary, path=living)
+    assert living.read_text() == before
+
+
+def test_r6_dispatch_writer_does_not_clobber_s4(tmp_path):
+    living = tmp_path / "GATE0_REPRO_DISPATCH.md"
+    living.write_text(DISPATCH.read_text())
+    before = living.read_text()
+    score = pd.read_csv(OUT_DEFAULT / "score_fb_wheatdata.csv").iloc[0].to_dict()
+    write_r6_dispatch(score, path=living)
     assert living.read_text() == before
 
 
@@ -190,3 +208,48 @@ def test_s2_dispatch_writer_does_not_clobber_later(tmp_path):
     metrics = live_host_last_first()
     write_s2_dispatch(metrics, path=living)
     assert living.read_text() == "Last completed: S3\nNext paste: S4\n"
+
+
+def test_s3_fbsh_not_adopted_usda_default():
+    note = OUT_DEFAULT / "s3_fbsh.md"
+    csv = OUT_DEFAULT / "score_s3_fbsh.csv"
+    q = OUT_DEFAULT / "score_s3_fbsh_quantities.csv"
+    assert note.is_file()
+    assert csv.is_file()
+    assert q.is_file()
+    text = note.read_text()
+    assert "Not adopted" in text or "not adopted" in text.lower()
+    assert "Leave A1" in text
+    assert "5074" in text
+    assert "L1–L8" in text
+    assert "Next paste: S4" in text
+    assert "FoodTradeNetwork" in text
+    assert wheat_params().alpha_i == 3.2
+    tab = pd.read_csv(q)
+    cn = tab[tab["region"] == "China"].iloc[0]
+    ea = tab[tab["region"] == "Eastern Africa"].iloc[0]
+    us = tab[tab["region"] == "USA"].iloc[0]
+    assert abs(float(cn["H_ratio"]) - 1.0) < 0.05
+    assert abs(float(ea["H_ratio"]) - 1.0) < 0.05
+    assert abs(float(us["H_ratio"]) - 1.0) < 0.05
+    score = pd.read_csv(csv).iloc[0]
+    assert bool(score["adopt"]) is False
+    assert float(score["moy_fbsh"]) > float(score["moy_usda"])
+    d = prepare_wheat(start_year=2006, end_year=2006, params=wheat_params())
+    assert any("USDA PSD" in n and "not FAOSTAT Food Balances" in n for n in d.notes)
+    assert not any(n.startswith("PARALLEL") for n in d.notes)
+    r6 = pd.read_csv(OUT_DEFAULT / "score_fb_wheatdata_quantities.csv")
+    r6_cn = r6[r6["region"] == "China"].iloc[0]
+    assert float(r6_cn["H_ratio"]) > 1.5
+    for name in PROTECTED_THREE_SCENARIO:
+        assert (OUT_DEFAULT / name).is_file(), name
+
+
+def test_s3_dispatch_writer_does_not_clobber_later(tmp_path):
+    living = tmp_path / "GATE0_REPRO_DISPATCH.md"
+    living.write_text("Last completed: S4\nNext paste: S5\n")
+    score = pd.read_csv(OUT_DEFAULT / "score_s3_fbsh.csv").iloc[0].to_dict()
+    from sheaf.agrimate.fb_wheatdata import s3_adoption_verdict
+    verdict = s3_adoption_verdict(score)
+    write_s3_dispatch(score, verdict, path=living)
+    assert living.read_text() == "Last completed: S4\nNext paste: S5\n"

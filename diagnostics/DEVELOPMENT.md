@@ -14,7 +14,7 @@ Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
 Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
 (P0–P12 done). Post-P12 R-queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md)
 (**exhausted**). Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
-next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S3**).
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S4**).
 Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
 [`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
@@ -108,7 +108,9 @@ approval.
    **workflow**, not publication-quality hindcast. **R-science is exhausted.**
    Remaining gaps are labelled (item-3 wander, A7 cannot-set, A1 USDA).
    **S1 implemented** A8 member-sum. **S2 labelled** item 3 at 1.444
-   (no sourced D.22; freeze not adopted). Next paste **S3**
+   (no sourced D.22; freeze not adopted). **S3** re-scored FBSH vs
+   member-sum USDA (China H 1.00; moy 20.1×→33.0×; not adopted).
+   Next paste **S4**
    (`GATE0_NEXT_PROMPTS.md`), not R8.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
 5. **P1 (done).** Step identities on 2006 harvest+AMIS.
@@ -192,8 +194,8 @@ approval.
 20. **R-science exhausted.** First-match table has nowhere to go without
     breaking hard stops (R11 forbidden; freeze not sourced; FAO/EU28
     cannot-set; labelled-off experiments did not move live items 1–3).
-    Remaining gaps after S2: A7 cannot-set, A1 USDA (item 3 labelled
-    1.444 vs author 1.004; freeze not sourced).
+    Remaining gaps after S3: A7 cannot-set (A1 left USDA; item 3 labelled
+    1.444; FBSH parallel not adopted).
 21. **S1 (done).** `prepare_wheat` 2007–09 baseline is member-sum then
     mean (same as `psd_regional_annual()`). USDA `ending_stocks` only.
     Never FAO ΔS. China H 56.4→112.7, Eastern Africa 0.33→3.31, USA
@@ -203,6 +205,12 @@ approval.
     variant (0 `*.jl` in tree). `freeze_q_oth` stays diagnostic,
     default off, not a `wheat_params()` field. Not adopted. Not a pin.
     Writeup: `diagnostics/gate0_agrimate/item3.md`. Next paste **S3**.
+23. **S3 (done).** Re-scored raw FBSH H/C vs S1 member-sum USDA on
+    2006–08 harvest+AMIS. China H 112.7 vs 112.3 (ratio 1.00); EA 0.99.
+    moy 20.1× → 33.0× (worsened). Items 1–3 did not improve. Psi USDA
+    (`ending_stocks`); 5074 is ΔS, not S. Author cleaned FB still
+    absent. **Not adopted.** USDA stays `prepare_wheat` default.
+    Writeup: `diagnostics/gate0_agrimate/s3_fbsh.md`. Next paste **S4**.
 
 Reference command:
 

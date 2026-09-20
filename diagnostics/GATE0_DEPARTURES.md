@@ -23,9 +23,16 @@ model *output*, not FB inputs. Author AgriculturalData expects cleaned
 `wheat_food_balance_fao.csv`, which is still not shipped. R6 obtain
 vendored raw FAOSTAT **FBSH** wheat 2006–11 under `data/faostat_fb/`.
 R6 built a labelled `prepare_wheat_fbsh` parallel (members summed,
-China ~2× USDA A8 mean; Psi stayed USDA; anomalies H/Hstar−1).
-**Not adopted.** USDA remains the 2006–11 `prepare_wheat` default.
-Writeup: `diagnostics/gate0_agrimate/faostat_fb.md`, `fb_wheatdata.md`.
+China ~2× USDA A8 *mean*; Psi stayed USDA; anomalies H/Hstar−1).
+**Not adopted.** **S3** re-scored that parallel against the S1
+member-sum USDA host (2006–08 harvest+AMIS): China H 112.7 vs FBSH
+112.3 (ratio 1.00); EA 0.99; world H 0.99. moy 20.1× → 33.0×
+(worsened vs this window and vs S1 host 16.8×). Items 1–3 did not
+improve (item 3 still 1.444; author cleaned FB still absent; Psi
+still USDA `ending_stocks`; 5074 is ΔS, not S). **Not adopted.**
+USDA remains the 2006–11 `prepare_wheat` default. Writeup:
+`diagnostics/gate0_agrimate/s3_fbsh.md` (historical R6:
+`fb_wheatdata.md`, `faostat_fb.md`).
 A2 E0 shares rescaled; A3 A_d not E.30 (F.1 Egypt 0.17 unused: Egypt is inside Northern Africa);
 A4 A_c income-group proxies; A5 restriction weights inside multi-country
 regions; A6 inverse-demand floor 0.05 (numerical).

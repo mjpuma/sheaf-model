@@ -203,6 +203,11 @@ Still >1.1. 0 `*.jl` in tree — no sourced D.22 variant. `freeze_q_oth`
 stays diagnostic, default off, not in `wheat_params()`. Not adopted.
 Not a pin. Writeup: `item3.md`. Next paste **S3**.
 
+**S3 follow-up (FBSH vs member-sum USDA).** 2006–08 harvest+AMIS:
+China H 112.7 vs FBSH 112.3 (ratio 1.00). moy 20.1× → 33.0× (worsened).
+Items 1–3 did not improve. Psi USDA; 5074 is ΔS, not S. Author cleaned
+FB still absent. **Not adopted.** Writeup: `s3_fbsh.md`. Next paste **S4**.
+
 ---
 
 ## Step 6 — World-price object

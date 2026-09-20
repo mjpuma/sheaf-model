@@ -11,7 +11,7 @@ The R-science first-match table is **exhausted** on this host. G0-P stays
 |---|---|---|
 | **A8** mean-of-members | **S1 implemented** (China H 112.7 / EA 3.31) | live host is member-sum |
 | **Item 3** wander | last/first **1.444** vs author 1.004; labelled; no sourced D.22 | **S2 done**; freeze not adopted |
-| **A1** USDA quantities | USDA default; author cleaned FB absent; R6 FBSH not adopted | **S3** inventory / re-score; never FAO ΔS as S |
+| **A1** USDA quantities | **S3 done** (FBSH H/C vs member-sum; China 1.00; moy worsened; not adopted) | USDA stays default; never FAO ΔS as S |
 | **A7** cannot-set | FAO cleaned FB / EU28+Egypt / start-2000 still absent | **S4** inventory; do not invent Egypt |
 
 Do not walk R8…R12 as science. R8 may piggyback tests. R11 stays skipped
@@ -92,8 +92,8 @@ Next session pastes that file's **Next paste**, not the next integer.
 | R12 | Methods note v2 | wait for items 1–5; use **S6** |
 | **S1** | A8 member-sum `prepare_wheat` adapter | **done** |
 | **S2** | Item 3 re-measure on S1 host | **done** (1.444 labelled; freeze not adopted) |
-| **S3** | A1 after A8 (USDA S only) | **next** |
-| S4 | A7 cannot-set inventory | after S3 |
+| **S3** | A1 after A8 (USDA S only) | **done** (FBSH not adopted; China H 1.00; moy 20.1×→33.0×) |
+| **S4** | A7 cannot-set inventory | **next** |
 | S5 | Re-score Fig. 4 / hindcast on new host | after adapter change |
 | S6 | G0-P methods v2 | only if live items 1–3 changed |
 | — | G1 / G2 | **blocked until G0-P accepted** |
@@ -158,7 +158,7 @@ End: rewrite GATE0_REPRO_DISPATCH.md. Next paste S3 if item 3 is
 labelled or sourced-fixed.
 ```
 
-## S3 — A1 after A8 (USDA stocks only; next)
+## S3 — A1 after A8 (USDA stocks only; done)
 
 ```
 [SHARED PREAMBLE]
@@ -181,7 +181,7 @@ GATE0_DEPARTURES.md A1.
 End: rewrite GATE0_REPRO_DISPATCH.md. Next paste S4.
 ```
 
-## S4 — A7 cannot-set inventory
+## S4 — A7 cannot-set inventory (next)
 
 ```
 [SHARED PREAMBLE]
