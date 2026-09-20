@@ -96,7 +96,7 @@ Next session pastes that file's **Next paste**, not the next integer.
 | **S3** | A1 after A8 (USDA S only) | **done** (FBSH not adopted; China H 1.00; moy 20.1×→33.0×) |
 | **S4** | A7 cannot-set inventory | **done** (Egypt not invented; parallel list labelled; knobs stay on comparison object) |
 | **S5** | Re-score Fig. 4 / hindcast on new host | **done** (hike ×3.71; last/first 1.444; unconverged 2304; items 1–3 still fail) |
-| S6 | G0-P methods v2 | **not next** — items 1–3 did not newly pass |
+| **S6** | G0-P methods v2 | **done** (still **not accepted**; live 1.444 / ×3.71 / 2304) |
 | — | G1 / G2 | **blocked until G0-P accepted** |
 
 ---

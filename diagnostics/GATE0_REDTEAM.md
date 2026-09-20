@@ -23,7 +23,13 @@ scenario runner was **not** re-run; scores are the committed
 of retrieved Zenodo 14022004 wheat code, with labelled gaps. It does
 **not** reproduce Agrimate Fig. 4. Most tests pass *because they lock
 that honesty*, not because the price path matches Agrimate. G0-P remains
-**not accepted**. Do not start G1.
+**not accepted** (S6 methods v2, S1–S5 numbers). Do not start G1.
+
+**S5/S6 live harvest+AMIS (2006–11, member-sum host):** hike ×3.71 vs
+Agrimate ×1.62 vs Pink ×1.88; 2006 mean $81.5 vs Pink $213.5; moy
+16.8× vs author 1.45×; undisturbed last/first **1.444** vs author
+**1.004**; unconverged **2304/5832**, failed 0. Pre-S1 echoes in
+older paragraphs below (×4.54 / 1.630 / $65.3 / 1743) are historical.
 
 ---
 
@@ -425,7 +431,8 @@ the lineage than opening G1.
 **Adaptive**, not a skip-nothing ladder. Menu:
 [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md). Living next-paste:
 [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (R-queue exhausted;
-now **S1** in [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md)).
+S1–S6 done; G0-P **not accepted**; now **T1** in
+[`GATE0_CONTINUE.md`](GATE0_CONTINUE.md)).
 Data cookbook: [`GATE0_DATA.md`](GATE0_DATA.md).
 
 R2 is the only forced first evidence run (A7). After that, the
@@ -446,11 +453,10 @@ Not adopted. Julia still absent. Living next-paste is **R6**.
 |---|---|---|
 | 1. Source fidelity | Met for 14022004 wheat code, labelled gaps | H / labelled F |
 | 2. Numerical reliability | Feasible; not first-order stationary (N5) | C |
-| 3. Undisturbed | **Fail** 1.630 vs 1.004; R4: D.22 q_oth is the last/first channel (freeze 1.019, not adopted) | C; not a pin |
+| 3. Undisturbed | **Fail** 1.444 vs 1.004; R4: D.22 q_oth is the last/first channel (freeze 1.019, not adopted) | C; not a pin |
 | 4. Reference reproduction | Independent; Fig. 4 is a **different experiment** (A7) | F |
 | 5. Historical performance | **Fail** vs Fig. 4 and Pink | F |
 | 6. Controlled experiments | Three scenarios + P11; AMIS/D.3 bind | H |
 
-**Do not accept G0-P. Do not start G1.** The shortest honest path
-toward Agrimate reproduction is R2 (run the Fig. 4 *experiment*),
-not a parameter search on Pink Sheet.
+**Do not accept G0-P. Do not start G1.** Sourced continuation is T1
+(obtain-or-leave 14022004 Julia to inspect D.22), not a Pink-Sheet fit.

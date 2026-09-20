@@ -1,4 +1,4 @@
-# SHEAF Gate 0 wheat — methods note (G0-P)
+# SHEAF Gate 0 wheat — methods note (G0-P / S6)
 
 **This is the market section offered for acceptance or rejection.**
 It is an independent Agrimate copy (Kuhla, Kubiczek & Otto 2025,
@@ -7,18 +7,19 @@ replication of Agrimate Fig. 4. It does **not** implement
 cross-crop substitution (G1) or a government restriction game (G2).
 
 **Verdict. Not accepted.** DEVELOPMENT items 3 and 5 fail
-(undisturbed last/first **1.63** vs author
-1.004; harvest+AMIS 2008 hike ×4.54 vs
+(undisturbed last/first **1.444** vs author
+1.004; harvest+AMIS 2008 hike ×3.71 vs
 Agrimate ×1.62 vs Pink
 ×1.88). G1 and G2 stay blocked.
 Do not start them from this note. `wheat_params()` stay
 αI=3.2, p_sto=0.1, xmin=0.2.
 L1–L8 stay rejected. Bai α_foreign=10 is not adopted. The unforced
-world price is not pinned to the 2006 mean.
+world price is not pinned to the 2006 mean. S6 rewrites this note
+from S1–S5 CSVs; the NLP runner was not re-run.
 
 Numbers are from existing `diagnostics/gate0_agrimate/` CSVs
-(spin-up 2003–05, score 2006–11). The three-scenario runner was
-not re-run for this note.
+(spin-up 2003–05, score 2006–11, A8 member-sum). The three-scenario
+runner was not re-run for this note (not R11).
 
 ## 1. What we implemented
 
@@ -78,10 +79,12 @@ an OAT alternative (P6), not ours.
 
 ## 3. Data vintage
 
-- **Baseline quantities:** USDA PSD 2007–09 mean, not FAOSTAT Food
-  Balances E.1 (A1). P10: `data/faostat_network/` is E0 trade only;
-  author `wheat_food_balance_fao.csv` is not shipped; USDA stays
-  the default (`faostat_fb.md`).
+- **Baseline quantities:** USDA PSD 2007–09 **member-sum then mean**
+  (A8 / S1), not FAOSTAT Food Balances E.1 (A1). Never FAOSTAT FBSH
+  element 5074 ΔS as a stock level. P10: `data/faostat_network/` is
+  E0 trade only. Labelled host reconstruction at
+  `data/food_balances/wheat_food_balance_fao.csv` is **not adopted**;
+  USDA stays the default (`faostat_fb.md`, `s3_fbsh.md`).
 - **Trade pattern:** FAOSTAT E0 2006–07, rescaled to USDA exports (A2).
 - **Anomalies:** USDA PSD, LOWESS residual, applied to the 2007–09
   mean harvest.
@@ -94,9 +97,10 @@ an OAT alternative (P6), not ours.
 
 A_d is not E.30 (A3; F.1 Egypt 0.17 unused because Egypt is inside
 Northern Africa). A_c uses income-group proxies (A4). Multi-country
-PSD nodes use `groupby.mean()` not sum (A8): China 0.50× and Eastern
-Africa 0.10× mapped PSD production; single-row exporters match.
-Labelled, not fixed — summing would rewrite the 2003–11 host.
+PSD nodes **sum** members within year, then mean 2007–09 (A8, S1):
+China H 112.7 and Eastern Africa 3.31 match mapped PSD sums; USA
+stays 1.00. The rejected pooled `groupby.mean()` was China 0.50× /
+EA 0.10×. Not a parameter fit.
 
 ## 4. Three scenarios (G0-U)
 
@@ -121,7 +125,9 @@ N1 fraction parameterization of D.11–D.21 (equivalent feasible set).
 N2 rolling forthcoming-year plan. N3 Jacobi IBR inside the step.
 N4 D.7 scaled by world XI*. N5: feasible L-BFGS-B with
 `success=False` — harvest+AMIS unconverged
-**1743/5832** (maxiter 1033 + ABNORMAL 710).
+**2304/5832** (N5). P5 on the pre-S1 path was
+1743/5832 (maxiter 1033 + ABNORMAL 710); S1 moved the count, not
+the diagnosis. First-order stationarity is still not established.
 Failed 0; fallback 0; residual 0.
 `plan_maxiter=40` kept: 200 vs 400 iters disagree by as much as
 40 vs 400, so there is no unique stationary point to adopt
@@ -130,7 +136,7 @@ reference path.
 
 B1 (P2): international delivery now follows E.1 T* to importers.
 Pre-fix, lagged XI was credited to the exporter as consumer inflow.
-That ballooned exporter stocks; it did **not** cause the 1.63
+That ballooned exporter stocks; it did **not** cause the 1.444
 undisturbed drift (p_w is on XI, not on who receives it).
 
 ## 6. What this market section does not do
@@ -159,48 +165,49 @@ as an explicit sourced shortfall (`hindcast.md`, `fig4.md`).
 
 | series | 2006 mean | 2008 hike | crisis peak |
 |---|---:|---:|---|
-| host harvest+AMIS | $65.3/t | ×4.54 | 2007-06 |
-| host harvest-only | $65.3/t | ×4.53 | — |
-| host undisturbed | $43.1/t | ×4.78 | — |
+| host harvest+AMIS | $81.5/t | ×3.71 | 2008-06 |
+| host harvest-only | $81.5/t | ×3.85 | — |
+| host undisturbed | $45.8/t | ×4.87 | — |
 | Pink Sheet | $213.5/t | ×1.88 | 2008-03 |
 | Agrimate Fig. 4d harvest+AMIS | index 1.183 | ×1.62 | 2008-05 |
 
-Quiet-year host is ~31% of Pink ($65.3 vs
-$213.5) and ~0.31 vs author ~1.18 on
+Quiet-year host is ~38% of Pink ($81.5 vs
+$213.5) and 0.38 vs author 1.18 on
 the index. Host hike overshoots Pink **and** Agrimate. Agrimate is
 the closer of the two models to Pink on this metric. Peak timing is
-wrong: host **2007-06** (harvest-calendar spike);
+wrong: host **2008-06** (harvest-calendar spike);
 Pink **2008-03**; author **2008-05**.
 Bai αI=10 is the wrong direction (P6 short-window hike ×2.31 → ×3.58,
 pidx_max 473). Not adopted. Do not pin 2006 to close the level gap.
 
 ### Path, not only correlation
 
-Harvest+AMIS corr vs Pink is **-0.082** (negative).
-Month-of-year max/min is **17.8×** vs Pink
+Harvest+AMIS corr vs Pink is **0.014** (near zero).
+Month-of-year max/min is **16.8×** vs Pink
 **1.07×** vs Agrimate Fig. 4d
 **1.45×**. The host shares Agrimate's
-northern-harvest calendar (moy corr vs author 0.91)
-and inverts Pink (moy corr -0.64).
-September 2007: host **$2.8/t** vs Pink
+northern-harvest calendar (moy corr vs author 0.90)
+and inverts Pink (moy corr -0.65).
+September 2007: host **$14.3/t** vs Pink
 **$342/t**. Correlation alone would hide
 this. Figure: `figures/fig6_hindcast_seasonal.png`.
 
 ### Undisturbed (item 3)
 
 Seasonal *shape* repeats (year-to-year corr ≈ 0.98). Annual-mean
-world-price ratio 2011/2006 is **1.63**. Author Fig. 4 baseline on
-the same window is **1.004**. Remaining candidate: non-periodic
-xd/xi split under constant H (`undisturbed.md`). Not a price pin.
+world-price ratio 2011/2006 is **1.444**. Author Fig. 4 baseline on
+the same window is **1.004**. Remaining candidate: live D.22 `q_oth`
+EMA (`item3.md`; R4 freeze 1.019 on the pre-S1 host, not adopted).
+Not a price pin.
 
 ### Production, stocks, consumption
 
-Harvest+AMIS production vs USDA world: corr **0.795**,
-level 541.5 vs 519.4 MMT
-(ratio 1.043). Ending stocks
-**1.58×** USDA after B1 (not the pre-P2 3×
-echo). Consumption corr 0.171; level ratio
-1.022. Vs Agrimate Fig. 4, production corr
+Harvest+AMIS production vs USDA world: corr **0.803**,
+level 661.4 vs 519.4 MMT
+(ratio 1.273). Ending stocks
+**1.65×** USDA after B1 (not the pre-P2 3×
+echo). Consumption corr -0.390; level ratio
+1.248. Vs Agrimate Fig. 4, production corr
 is 0.986 at different levels (USDA vs FAO; region lists differ).
 Do not fit xmin or p_sto to the stock gap (`regional.md`).
 
@@ -208,17 +215,22 @@ Do not fit xmin or p_sto to the stock gap (`regional.md`).
 
 Production is identical by construction. AMIS wheat Δ binds 491
 region-steps (Argentina, China, India, Kazakhstan, Russia, Ukraine,
-Northern Africa; max 0.95). The 2007 spike is harvest-driven; AMIS
-adds a May 2008 spike on top of an already-too-large 2007 harvest
-spike. Ukraine 2007 exports 15.0 → 6.0 MMT with AMIS; consumption
-1.93 → 10.3 MMT. E.4 does what it says on the exporter. It does
-not repair world-price path or level.
+Northern Africa; max 0.95). The 2007 spike is harvest-driven. On the
+member-sum host the largest harvest vs harvest+AMIS price gap is not
+a 2008 spring spike (`hindcast.md`).
+
+Ukraine 2007 exports 6.7 → 14.5 MMT with AMIS; consumption 10.09 → 2.83 MMT (sign flipped vs the pre-S1 pooled-mean host). E.4 still moves the exporter. It does not repair world-price path or level.
 
 Fig. 4 NetCDF is a **different experiment** (A7): AgrimateEU28+Egypt,
 FAO anomalies, α_foreign=3.5, ζ=1, N_for=6, git `old-demand-dynamics`.
-Labelling that mismatch does not make ×4.54 a success.
+Labelling that mismatch does not make ×3.71 a success.
 
 ## 8. Prescribed-Δ pulse (P11, not G2)
+
+Eight 2008 harvest-anomaly runs versus harvest-only: Ukraine and
+Russia × {0.5, 1.0} × {6, 12} months (`pulse.md`). AMIS diary off;
+`restriction_pulse` overlays one synthetic exporter. Not a
+government best-response. Not Bai's 36-run 2020 grid.
 
 Eight 2008 harvest-anomaly runs versus harvest-only: Ukraine and
 Russia × {0.5, 1.0} × {6, 12} months (`pulse.md`). AMIS diary off;
@@ -244,9 +256,9 @@ Full register: `diagnostics/GATE0_DEPARTURES.md`. Compact:
 | A2 | E0 shares rescaled to USDA XI | labelled |
 | A3 | A_d not E.30 | labelled |
 | A7 | Fig. 4 executable ≠ 14022004 wheat | labelled; not a retune |
-| A8 | `groupby.mean()` vs PSD sum | labelled, not fixed |
+| A8 | 2007–09 baseline is member-sum then mean (S1) | **implemented**; USDA S only |
 | N1–N4 | fraction map, rolling year, Jacobi, XI* scale | numerical, not economics |
-| N5 | unconverged L-BFGS-B 1743/5832 | counted; maxiter 40 kept |
+| N5 | unconverged L-BFGS-B 2304/5832 | counted; maxiter 40 kept |
 | S1 | 27 not 28 | follows executable |
 | S2 | αI=3.2 not D.8 3.5 | follows executable |
 | S3 | β/τ_P unused | matches wheat `two_markets` path |
@@ -256,12 +268,12 @@ Full register: `diagnostics/GATE0_DEPARTURES.md`. Compact:
 
 ## 10. Limits
 
-1. Undisturbed annual-mean drift 1.63 is unexplained after B1.
-2. ~30% of harvest+AMIS plans are unconverged feasible iterates (N5).
-3. Off-season world price collapses (~18× moy max/min vs Agrimate 1.45×).
+1. Undisturbed annual-mean drift 1.444 is unexplained after B1; no sourced D.22 freeze (0 `*.jl` in tree).
+2. ~40% of harvest+AMIS plans are unconverged feasible iterates (N5).
+3. Off-season world price collapses (16.8× moy max/min vs Agrimate 1.45×).
 4. Quiet-year level is not on Agrimate's or Pink's scale.
-5. Baseline quantities are USDA, not FAOSTAT FB (A1); A8 mean-of-members
-   rescales China and Eastern Africa.
+5. Baseline quantities are USDA, not FAOSTAT FB (A1). A8 member-sum
+   is implemented; FAO ΔS is not stocks.
 6. Physical inflow remains T* + domestic; author two-market x1=demand
    is labelled, not copied (S4). εc and σ are silent on world price
    in the P6 OAT, as expected under that gap.
@@ -280,7 +292,7 @@ Offer this note as the SHEAF wheat market section.
 |---|---|
 | 1. Source fidelity | Met for retrieved 14022004 code, with labelled gaps |
 | 2. Numerical reliability | Feasible (failed=0, residual=0); not first-order stationary (N5) |
-| 3. Undisturbed dynamics | **Fail** — last/first 1.63 vs author 1.004 |
+| 3. Undisturbed dynamics | **Fail** — last/first 1.444 vs author 1.004 |
 | 4. Reference reproduction | Independent implementation, **not** a replication |
 | 5. Historical performance | **Fail** — level, hike, path vs Agrimate Fig. 4 and Pink |
 | 6. Controlled experiments | Three scenarios + P11 pulse run; AMIS moves the exporter |
@@ -289,12 +301,15 @@ Offer this note as the SHEAF wheat market section.
 Items 1–3 do not all hold; item 5 is a sourced shortfall. G1 and
 G2 stay blocked until a later G0-P acceptance. Do not start G1 in
 the same session as this note. `wheat_params()` unchanged.
+Sourced continuation (not G1): obtain-or-leave Zenodo 14022004
+Julia to inspect D.22 vs this host (`GATE0_CONTINUE.md`).
 
 ## Files
 
 - this note (`methods.md`)
-- `hindcast.md`, `fig4.md`, `regional.md`, `faostat_fb.md`, `pulse.md`,
-  `undisturbed.md`, `solver.md`, `validation.md`
+- `hindcast.md`, `fig4.md`, `regional.md`, `s5_score.md`, `item3.md`,
+  `faostat_fb.md`, `pulse.md`, `undisturbed.md`, `solver.md`,
+  `validation.md`
 - `GATE0_DEPARTURES.md`, `GATE0_SPEC_MATRIX.md`, `GATE0_CONTRACT.md`
 
 G1/G2 remain the blocked pair in `GATE0_EXTENSION_PLAN.md`.

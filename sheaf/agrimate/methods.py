@@ -36,6 +36,11 @@ def publication_bar(out_dir: Path | None = None) -> dict:
     ha = prices[prices["scenario"] == "harvest_amis"].iloc[0]
     seasonal = pd.read_csv(out_dir / "score_hindcast_seasonal.csv")
     sha = seasonal[seasonal["scenario"] == "harvest_amis"].iloc[0]
+    item3_path = out_dir / "score_item3.csv"
+    if item3_path.is_file():
+        drift = float(pd.read_csv(item3_path)["last_first"].iloc[0])
+    else:
+        drift = float("nan")
     return {
         "n_regions": len(REGION_NAMES),
         "alpha_i": float(p.alpha_i),
@@ -53,7 +58,7 @@ def publication_bar(out_dir: Path | None = None) -> dict:
         "hike_2008_host": float(sha["hike_2008_host"]),
         "hike_2008_author": float(sha["hike_2008_author"]),
         "hike_2008_pink": float(sha["hike_2008_pink"]),
-        "drift_undisturbed": 1.63,
+        "drift_undisturbed": drift,
         "accepted": False,
     }
 
@@ -82,9 +87,24 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
     cons = _qty(qty, "harvest_amis", "consumption")
     pulse_path = out_dir / "score_pulse.csv"
     pulse = pd.read_csv(pulse_path) if pulse_path.exists() else None
+    quiet_pct = 100.0 * float(sha["level_vs_pink"]) if np.isfinite(sha["level_vs_pink"]) else float("nan")
+    corr_pink = float(ha["corr"])
+    corr_word = (
+        "negative" if corr_pink < -0.05 else
+        ("near zero" if abs(corr_pink) < 0.05 else "positive")
+    )
+    ukr2007 = {}
+    for tag in ("harvest", "harvest_amis"):
+        pth = out_dir / f"ukraine_{tag}.csv"
+        if pth.is_file():
+            t = pd.read_csv(pth).set_index("year")
+            if 2007 in t.index:
+                ukr2007[f"{tag}_c"] = float(t.loc[2007, "consumption"])
+                ukr2007[f"{tag}_x"] = float(t.loc[2007, "exports"])
+    drift = bar["drift_undisturbed"]
 
     lines = [
-        "# SHEAF Gate 0 wheat — methods note (G0-P)",
+        "# SHEAF Gate 0 wheat — methods note (G0-P / S6)",
         "",
         "**This is the market section offered for acceptance or rejection.**",
         "It is an independent Agrimate copy (Kuhla, Kubiczek & Otto 2025,",
@@ -93,18 +113,19 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "cross-crop substitution (G1) or a government restriction game (G2).",
         "",
         f"**Verdict. Not accepted.** DEVELOPMENT items 3 and 5 fail",
-        f"(undisturbed last/first **{bar['drift_undisturbed']}** vs author",
+        f"(undisturbed last/first **{_fmt(drift, 3)}** vs author",
         f"1.004; harvest+AMIS 2008 hike ×{_fmt(bar['hike_2008_host'], 2)} vs",
         f"Agrimate ×{_fmt(bar['hike_2008_author'], 2)} vs Pink",
         f"×{_fmt(bar['hike_2008_pink'], 2)}). G1 and G2 stay blocked.",
         "Do not start them from this note. `wheat_params()` stay",
         f"αI={p.alpha_i:g}, p_sto={p.p_sto_annual:g}, xmin={p.xmin_share:g}.",
         "L1–L8 stay rejected. Bai α_foreign=10 is not adopted. The unforced",
-        "world price is not pinned to the 2006 mean.",
+        "world price is not pinned to the 2006 mean. S6 rewrites this note",
+        "from S1–S5 CSVs; the NLP runner was not re-run.",
         "",
         "Numbers are from existing `diagnostics/gate0_agrimate/` CSVs",
-        "(spin-up 2003–05, score 2006–11). The three-scenario runner was",
-        "not re-run for this note.",
+        "(spin-up 2003–05, score 2006–11, A8 member-sum). The three-scenario",
+        "runner was not re-run for this note (not R11).",
         "",
         "## 1. What we implemented",
         "",
@@ -164,10 +185,12 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "",
         "## 3. Data vintage",
         "",
-        "- **Baseline quantities:** USDA PSD 2007–09 mean, not FAOSTAT Food",
-        "  Balances E.1 (A1). P10: `data/faostat_network/` is E0 trade only;",
-        "  author `wheat_food_balance_fao.csv` is not shipped; USDA stays",
-        "  the default (`faostat_fb.md`).",
+        "- **Baseline quantities:** USDA PSD 2007–09 **member-sum then mean**",
+        "  (A8 / S1), not FAOSTAT Food Balances E.1 (A1). Never FAOSTAT FBSH",
+        "  element 5074 ΔS as a stock level. P10: `data/faostat_network/` is",
+        "  E0 trade only. Labelled host reconstruction at",
+        "  `data/food_balances/wheat_food_balance_fao.csv` is **not adopted**;",
+        "  USDA stays the default (`faostat_fb.md`, `s3_fbsh.md`).",
         "- **Trade pattern:** FAOSTAT E0 2006–07, rescaled to USDA exports (A2).",
         "- **Anomalies:** USDA PSD, LOWESS residual, applied to the 2007–09",
         "  mean harvest.",
@@ -180,9 +203,10 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "",
         "A_d is not E.30 (A3; F.1 Egypt 0.17 unused because Egypt is inside",
         "Northern Africa). A_c uses income-group proxies (A4). Multi-country",
-        "PSD nodes use `groupby.mean()` not sum (A8): China 0.50× and Eastern",
-        "Africa 0.10× mapped PSD production; single-row exporters match.",
-        "Labelled, not fixed — summing would rewrite the 2003–11 host.",
+        "PSD nodes **sum** members within year, then mean 2007–09 (A8, S1):",
+        "China H 112.7 and Eastern Africa 3.31 match mapped PSD sums; USA",
+        "stays 1.00. The rejected pooled `groupby.mean()` was China 0.50× /",
+        "EA 0.10×. Not a parameter fit.",
         "",
         "## 4. Three scenarios (G0-U)",
         "",
@@ -207,7 +231,9 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "N2 rolling forthcoming-year plan. N3 Jacobi IBR inside the step.",
         "N4 D.7 scaled by world XI*. N5: feasible L-BFGS-B with",
         f"`success=False` — harvest+AMIS unconverged",
-        f"**{int(ha['unconverged'])}/5832** (maxiter 1033 + ABNORMAL 710).",
+        f"**{int(ha['unconverged'])}/5832** (N5). P5 on the pre-S1 path was",
+        "1743/5832 (maxiter 1033 + ABNORMAL 710); S1 moved the count, not",
+        "the diagnosis. First-order stationarity is still not established.",
         f"Failed {int(ha['failed'])}; fallback {int(ha['fallback'])}; residual 0.",
         "`plan_maxiter=40` kept: 200 vs 400 iters disagree by as much as",
         "40 vs 400, so there is no unique stationary point to adopt",
@@ -216,7 +242,7 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "",
         "B1 (P2): international delivery now follows E.1 T* to importers.",
         "Pre-fix, lagged XI was credited to the exporter as consumer inflow.",
-        "That ballooned exporter stocks; it did **not** cause the 1.63",
+        f"That ballooned exporter stocks; it did **not** cause the {_fmt(drift, 3)}",
         "undisturbed drift (p_w is on XI, not on who receives it).",
         "",
         "## 6. What this market section does not do",
@@ -256,8 +282,9 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         f"| Agrimate Fig. 4d harvest+AMIS | index {_fmt(sha['mean_2006_author_index'], 3)} | "
         f"×{_fmt(sha['hike_2008_author'], 2)} | {sha['crisis_peak_author']} |",
         "",
-        f"Quiet-year host is ~31% of Pink (${_fmt(sha['mean_2006_host_usd'], 1)} vs",
-        f"${_fmt(sha['mean_2006_pink_usd'], 1)}) and ~0.31 vs author ~1.18 on",
+        f"Quiet-year host is ~{_fmt(quiet_pct, 0)}% of Pink (${_fmt(sha['mean_2006_host_usd'], 1)} vs",
+        f"${_fmt(sha['mean_2006_pink_usd'], 1)}) and {_fmt(sha['level_vs_pink'], 2)} vs author "
+        f"{_fmt(sha['mean_2006_author_index'], 2)} on",
         "the index. Host hike overshoots Pink **and** Agrimate. Agrimate is",
         "the closer of the two models to Pink on this metric. Peak timing is",
         f"wrong: host **{sha['crisis_peak_host']}** (harvest-calendar spike);",
@@ -267,7 +294,7 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "",
         "### Path, not only correlation",
         "",
-        f"Harvest+AMIS corr vs Pink is **{_fmt(ha['corr'], 3)}** (negative).",
+        f"Harvest+AMIS corr vs Pink is **{_fmt(corr_pink, 3)}** ({corr_word}).",
         f"Month-of-year max/min is **{_fmt(sha['moy_maxmin_host'], 1)}×** vs Pink",
         f"**{_fmt(sha['moy_maxmin_pink'], 2)}×** vs Agrimate Fig. 4d",
         f"**{_fmt(sha['moy_maxmin_author'], 2)}×**. The host shares Agrimate's",
@@ -280,9 +307,10 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "### Undisturbed (item 3)",
         "",
         "Seasonal *shape* repeats (year-to-year corr ≈ 0.98). Annual-mean",
-        "world-price ratio 2011/2006 is **1.63**. Author Fig. 4 baseline on",
-        "the same window is **1.004**. Remaining candidate: non-periodic",
-        "xd/xi split under constant H (`undisturbed.md`). Not a price pin.",
+        f"world-price ratio 2011/2006 is **{_fmt(drift, 3)}**. Author Fig. 4 baseline on",
+        "the same window is **1.004**. Remaining candidate: live D.22 `q_oth`",
+        "EMA (`item3.md`; R4 freeze 1.019 on the pre-S1 host, not adopted).",
+        "Not a price pin.",
         "",
         "### Production, stocks, consumption",
         "",
@@ -299,17 +327,32 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "",
         "Production is identical by construction. AMIS wheat Δ binds 491",
         "region-steps (Argentina, China, India, Kazakhstan, Russia, Ukraine,",
-        "Northern Africa; max 0.95). The 2007 spike is harvest-driven; AMIS",
-        "adds a May 2008 spike on top of an already-too-large 2007 harvest",
-        "spike. Ukraine 2007 exports 15.0 → 6.0 MMT with AMIS; consumption",
-        "1.93 → 10.3 MMT. E.4 does what it says on the exporter. It does",
-        "not repair world-price path or level.",
+        "Northern Africa; max 0.95). The 2007 spike is harvest-driven. On the",
+        "member-sum host the largest harvest vs harvest+AMIS price gap is not",
+        "a 2008 spring spike (`hindcast.md`).",
+        "",
+        (
+            f"Ukraine 2007 exports {_fmt(ukr2007.get('harvest_x', float('nan')), 1)} → "
+            f"{_fmt(ukr2007.get('harvest_amis_x', float('nan')), 1)} MMT with AMIS; "
+            f"consumption {_fmt(ukr2007.get('harvest_c', float('nan')), 2)} → "
+            f"{_fmt(ukr2007.get('harvest_amis_c', float('nan')), 2)} MMT "
+            "(sign flipped vs the pre-S1 pooled-mean host). E.4 still moves "
+            "the exporter. It does not repair world-price path or level."
+            if ukr2007 else
+            "E.4 still moves the restricting exporter. It does not repair "
+            "world-price path or level."
+        ),
         "",
         "Fig. 4 NetCDF is a **different experiment** (A7): AgrimateEU28+Egypt,",
         "FAO anomalies, α_foreign=3.5, ζ=1, N_for=6, git `old-demand-dynamics`.",
-        "Labelling that mismatch does not make ×4.54 a success.",
+        f"Labelling that mismatch does not make ×{_fmt(bar['hike_2008_host'], 2)} a success.",
         "",
         "## 8. Prescribed-Δ pulse (P11, not G2)",
+        "",
+        "Eight 2008 harvest-anomaly runs versus harvest-only: Ukraine and",
+        "Russia × {0.5, 1.0} × {6, 12} months (`pulse.md`). AMIS diary off;",
+        "`restriction_pulse` overlays one synthetic exporter. Not a",
+        "government best-response. Not Bai's 36-run 2020 grid.",
         "",
         "Eight 2008 harvest-anomaly runs versus harvest-only: Ukraine and",
         "Russia × {0.5, 1.0} × {6, 12} months (`pulse.md`). AMIS diary off;",
@@ -346,9 +389,9 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "| A2 | E0 shares rescaled to USDA XI | labelled |",
         "| A3 | A_d not E.30 | labelled |",
         "| A7 | Fig. 4 executable ≠ 14022004 wheat | labelled; not a retune |",
-        "| A8 | `groupby.mean()` vs PSD sum | labelled, not fixed |",
+        "| A8 | 2007–09 baseline is member-sum then mean (S1) | **implemented**; USDA S only |",
         "| N1–N4 | fraction map, rolling year, Jacobi, XI* scale | numerical, not economics |",
-        "| N5 | unconverged L-BFGS-B 1743/5832 | counted; maxiter 40 kept |",
+        f"| N5 | unconverged L-BFGS-B {int(ha['unconverged'])}/5832 | counted; maxiter 40 kept |",
         "| S1 | 27 not 28 | follows executable |",
         "| S2 | αI=3.2 not D.8 3.5 | follows executable |",
         "| S3 | β/τ_P unused | matches wheat `two_markets` path |",
@@ -358,12 +401,15 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "",
         "## 10. Limits",
         "",
-        "1. Undisturbed annual-mean drift 1.63 is unexplained after B1.",
-        "2. ~30% of harvest+AMIS plans are unconverged feasible iterates (N5).",
-        "3. Off-season world price collapses (~18× moy max/min vs Agrimate 1.45×).",
+        f"1. Undisturbed annual-mean drift {_fmt(drift, 3)} is unexplained after B1; "
+        "no sourced D.22 freeze (0 `*.jl` in tree).",
+        f"2. ~{100.0 * int(ha['unconverged']) / 5832:.0f}% of harvest+AMIS plans "
+        "are unconverged feasible iterates (N5).",
+        f"3. Off-season world price collapses ({_fmt(sha['moy_maxmin_host'], 1)}× moy "
+        f"max/min vs Agrimate {_fmt(sha['moy_maxmin_author'], 2)}×).",
         "4. Quiet-year level is not on Agrimate's or Pink's scale.",
-        "5. Baseline quantities are USDA, not FAOSTAT FB (A1); A8 mean-of-members",
-        "   rescales China and Eastern Africa.",
+        "5. Baseline quantities are USDA, not FAOSTAT FB (A1). A8 member-sum",
+        "   is implemented; FAO ΔS is not stocks.",
         "6. Physical inflow remains T* + domestic; author two-market x1=demand",
         "   is labelled, not copied (S4). εc and σ are silent on world price",
         "   in the P6 OAT, as expected under that gap.",
@@ -382,7 +428,7 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "|---|---|",
         "| 1. Source fidelity | Met for retrieved 14022004 code, with labelled gaps |",
         "| 2. Numerical reliability | Feasible (failed=0, residual=0); not first-order stationary (N5) |",
-        "| 3. Undisturbed dynamics | **Fail** — last/first 1.63 vs author 1.004 |",
+        f"| 3. Undisturbed dynamics | **Fail** — last/first {_fmt(drift, 3)} vs author 1.004 |",
         "| 4. Reference reproduction | Independent implementation, **not** a replication |",
         "| 5. Historical performance | **Fail** — level, hike, path vs Agrimate Fig. 4 and Pink |",
         "| 6. Controlled experiments | Three scenarios + P11 pulse run; AMIS moves the exporter |",
@@ -391,12 +437,15 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "Items 1–3 do not all hold; item 5 is a sourced shortfall. G1 and",
         "G2 stay blocked until a later G0-P acceptance. Do not start G1 in",
         "the same session as this note. `wheat_params()` unchanged.",
+        "Sourced continuation (not G1): obtain-or-leave Zenodo 14022004",
+        "Julia to inspect D.22 vs this host (`GATE0_CONTINUE.md`).",
         "",
         "## Files",
         "",
         "- this note (`methods.md`)",
-        "- `hindcast.md`, `fig4.md`, `regional.md`, `faostat_fb.md`, `pulse.md`,",
-        "  `undisturbed.md`, `solver.md`, `validation.md`",
+        "- `hindcast.md`, `fig4.md`, `regional.md`, `s5_score.md`, `item3.md`,",
+        "  `faostat_fb.md`, `pulse.md`, `undisturbed.md`, `solver.md`,",
+        "  `validation.md`",
         "- `GATE0_DEPARTURES.md`, `GATE0_SPEC_MATRIX.md`, `GATE0_CONTRACT.md`",
         "",
         "G1/G2 remain the blocked pair in `GATE0_EXTENSION_PLAN.md`.",
@@ -407,7 +456,54 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
     return path
 
 
+ROOT = Path(__file__).resolve().parents[2]
+DISPATCH = ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md"
+
+
+def write_s6_dispatch(bar: dict, path: Path | None = None) -> Path:
+    """Living S6 writer. Does not clobber a later T-session dispatch."""
+    path = Path(path) if path else DISPATCH
+    if path.is_file():
+        text = path.read_text()
+        if "Last completed: S5" not in text and "Last completed: S6" not in text:
+            return path
+    hike = float(bar["hike_2008_host"])
+    author = float(bar["hike_2008_author"])
+    pink = float(bar["hike_2008_pink"])
+    drift = float(bar["drift_undisturbed"])
+    unc = int(bar["unconverged_harvest_amis"])
+    failed = int(bar["failed_harvest_amis"])
+    body = "\n".join([
+        "# Gate 0 reproduction dispatch",
+        "",
+        "Living next-paste. R-science and S-queue exhausted. Template:",
+        "`GATE0_CONTINUE.md` (T1–). Do not walk R8…R12 as science. Do not start G1.",
+        "",
+        "```",
+        "Last completed: S6",
+        "Window / scenario: G0-P methods v2 from S1–S5 CSVs (not R11)",
+        f"hike_2008: harvest+AMIS ×{hike:.2f}; author ×{author:.2f}; Pink ×{pink:.2f}",
+        "moy max/min: host 16.8×; author 1.45×; Pink 1.07×",
+        f"undisturbed last/first: {drift:.3f} vs author 1.004",
+        f"unconverged / failed: {unc}/5832 / {failed}",
+        "What you could set / could not set: methods note from CSVs; "
+        "could not retune wheat_params; could not make items 1–3 pass",
+        "Next paste: T1",
+        "Why: G0-P still not accepted; sourced next is obtain-or-leave "
+        "14022004 Julia to inspect D.22; do not start G1",
+        "Skip: G1/G2; R11; 2006 pin; Bai 10; L1–L8; FAO ΔS as stocks; freeze_q_oth",
+        "```",
+        "",
+    ])
+    path.write_text(body)
+    return path
+
+
 def run_methods_note(out_dir: Path | None = None) -> dict[str, Path]:
     out_dir = Path(out_dir) if out_dir else OUT_DEFAULT
     note = write_methods_note(out_dir)
-    return {"note": note}
+    bar = publication_bar(out_dir)
+    assert bar["accepted"] is False
+    assert bar["item3_undisturbed"] is False
+    dispatch = write_s6_dispatch(bar)
+    return {"note": note, "dispatch": dispatch}
