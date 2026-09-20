@@ -45,15 +45,17 @@ def test_seasonal_path_is_inverted_vs_pink_not_just_low_corr():
     sc = score_seasonal_paths(prices, author["monthly"])
     ha = sc[sc["scenario"] == "harvest_amis"].iloc[0]
     assert list(sc["scenario"]) == list(SCENARIO_ORDER)
-    assert ha["corr_vs_pink"] < 0
+    # S1 member-sum moved full-window corr through zero; shape is still inverted.
+    assert ha["corr_vs_pink"] < 0.2
     assert ha["moy_corr_vs_pink"] < -0.4
     assert ha["moy_maxmin_host"] > 10
     assert ha["moy_maxmin_pink"] < 1.2
     assert ha["moy_maxmin_author"] < 2.0
-    assert ha["hike_2008_host"] > 4.0
+    assert ha["hike_2008_host"] > ha["hike_2008_author"]
+    assert ha["hike_2008_host"] > 3.0
     assert 1.5 < ha["hike_2008_pink"] < 2.2
     assert 1.4 < ha["hike_2008_author"] < 1.9
-    assert abs(ha["mean_2006_host_usd"] - 65.3) < 1.0
+    assert abs(ha["mean_2006_host_usd"] - 81.5) < 1.5
     assert abs(ha["mean_2006_pink_usd"] - 213.5) < 1.0
     s = prices["harvest_amis"]
     s = s[(s.index.year >= 2006) & (s.index.year <= 2011)]
@@ -71,12 +73,14 @@ def test_stock_level_bias_is_not_three_times_usda():
     assert abs(stk["corr_anomaly"] - stk["corr_level"]) < 1e-9
 
 
-def test_amis_adds_2008_spike_not_2007():
+def test_amis_still_differs_from_harvest_only():
     prices = load_host_prices(OUT_DEFAULT)
     a = harvest_vs_amis_attribution(prices)
-    assert a["max_abs_delta_at"] == "2008-05"
-    assert a["may2008_amis"] - a["may2008_harvest"] > 100
+    # S1: max |AMIS−harvest| moved to 2011-07; May 2008 lift is small.
+    assert a["max_abs_delta_at"] == "2011-07"
+    assert a["max_abs_delta_usd"] > 50
     assert abs(a["jun2007_amis"] - a["jun2007_harvest"]) < 10
+    assert 0 < a["may2008_amis"] - a["may2008_harvest"] < 50
 
 
 def test_month_of_year_profile_length():

@@ -14,7 +14,7 @@ Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
 Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
 (P0–P12 done). Post-P12 R-queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md)
 (**exhausted**). Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
-next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S1**).
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S2**).
 Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
 [`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
@@ -106,8 +106,9 @@ approval.
    still drifts (annual-mean ratio 1.63); Pink-Sheet corr remains negative.
    That is a G0-H score, not a reason to restore L1–L8. G0-U exit is the
    **workflow**, not publication-quality hindcast. **R-science is exhausted.**
-   Remaining gaps are labelled (item-3 wander, A7 cannot-set, A8 mean, A1
-   USDA). Next paste **S1** (`GATE0_NEXT_PROMPTS.md`), not R8.
+   Remaining gaps are labelled (item-3 wander, A7 cannot-set, A1 USDA).
+   **S1 implemented** A8 member-sum. Next paste **S2**
+   (`GATE0_NEXT_PROMPTS.md`), not R8.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
 5. **P1 (done).** Step identities on 2006 harvest+AMIS.
 6. **P2 (done).** Delivery bug: lagged XI was credited to the *exporter*
@@ -146,9 +147,9 @@ approval.
     spike. Bai αI=10 not adopted. `wheat_params()` unchanged.
 13. **P9 (done).** Regional USDA: `diagnostics/gate0_agrimate/regional.md`.
     Named exporters + Eastern Africa vs `psd_regional_annual()` 2006–11.
-    Single-row nodes match production *means*; China 0.50× and Eastern
-    Africa 0.10× because `prepare_wheat` `groupby.mean()`s members (A8,
-   labelled, not fixed). No xmin/p_sto fit. `wheat_params()` unchanged.
+    Single-row nodes match production *means*; China/EA were 0.50× / 0.10×
+    because `prepare_wheat` `groupby.mean()`s members (A8, labelled in P9).
+    **S1 implemented** member-sum. No xmin/p_sto fit. `wheat_params()` unchanged.
 14. **P10 (done).** FAOSTAT Food Balance arrays are **not** in
     `data/faostat_network/` (the path named in the prompt: E0 trade only).
     FoodTradeNetwork P0/R0 are 2015–21 averages, not 2006–11 FB. A1 left.
@@ -185,15 +186,16 @@ approval.
 19. **R3–R7, R9, R10 (done).** World-price identity; item-3 characterisation
     (`qoth_freeze` 1.019, not adopted); x1=demand default off; raw FBSH
     vendored, parallel WheatData not adopted; A8 mean-vs-sum labelled
-    (China 0.50× / EA 0.10×, USDA stocks, host unchanged). Fig. 4 knobs
-    scored, not adopted. G0-P still **not accepted**.
+    (China 0.50× / EA 0.10×, USDA stocks). **S1 implemented** member-sum.
+    Fig. 4 knobs scored, not adopted. G0-P still **not accepted**.
 20. **R-science exhausted.** First-match table has nowhere to go without
     breaking hard stops (R11 forbidden; freeze not sourced; FAO/EU28
     cannot-set; labelled-off experiments did not move live items 1–3).
-    Remaining gaps: live item-3 wander, A7 cannot-set, A8 mean-of-members,
-    A1 USDA quantities. **Next:** paste **S1** (A8 member-sum adapter).
-    Do not paste R8 as science. Do not paste G1. Do not treat FAO ΔS as
-    stocks. Do not pin. `wheat_params()` stay 14022004.
+    Remaining gaps after S1: live item-3 wander, A7 cannot-set, A1 USDA.
+21. **S1 (done).** `prepare_wheat` 2007–09 baseline is member-sum then
+    mean (same as `psd_regional_annual()`). USDA `ending_stocks` only.
+    Never FAO ΔS. China H 56.4→112.7, Eastern Africa 0.33→3.31, USA
+    1.00. `wheat_params()` stay 14022004. Next paste **S2**.
 
 Reference command:
 

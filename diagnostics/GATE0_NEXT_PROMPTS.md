@@ -89,8 +89,8 @@ Next session pastes that file's **Next paste**, not the next integer.
 | R8 | Honest Fig. 4 *score* tests | housekeeping; piggyback, not a science gate |
 | R11 | Default three-scenario re-run | **skip** unless `wheat_params()` change (forbidden) |
 | R12 | Methods note v2 | wait for items 1–5; use **S6** |
-| **S1** | A8 member-sum `prepare_wheat` adapter | **next** |
-| S2 | Item 3 re-measure on S1 host | after S1 |
+| **S1** | A8 member-sum `prepare_wheat` adapter | **done** |
+| **S2** | Item 3 re-measure on S1 host | **next** |
 | S3 | A1 after A8 (USDA S only) | after S2 |
 | S4 | A7 cannot-set inventory | after S3 |
 | S5 | Re-score Fig. 4 / hindcast on new host | after adapter change |
@@ -99,7 +99,7 @@ Next session pastes that file's **Next paste**, not the next integer.
 
 ---
 
-## S1 — A8 member-sum host adapter (next)
+## S1 — A8 member-sum host adapter (done)
 
 ```
 [SHARED PREAMBLE]
@@ -134,7 +134,7 @@ Eastern Africa: 0.33/0.66/0.055 → 3.31/6.55/0.55. USA stays 1.00.
 End: rewrite GATE0_REPRO_DISPATCH.md. Next paste is S2 if S1 shipped.
 ```
 
-## S2 — Item 3 re-measure (sourced only)
+## S2 — Item 3 re-measure (sourced only; next)
 
 ```
 [SHARED PREAMBLE]

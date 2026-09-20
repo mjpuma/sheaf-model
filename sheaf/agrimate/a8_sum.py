@@ -1,11 +1,10 @@
-"""R7: labelled A8 mean-vs-sum sensitivity. Does not rewrite the host.
+"""R7/S1: A8 mean-vs-sum table. S1 switched the host to member-sum.
 
-``prepare_wheat`` uses ``groupby(region).mean()`` on USDA PSD country-year
-rows (2007–09). ``psd_regional_annual()`` sums members within a year.
-This module reports what China / Eastern Africa H, C, and **USDA ending
-stocks** become if members are summed. It does not change
-``prepare_wheat``, does not fit xmin/p_sto, and does not treat FAOSTAT
-FBSH Stock Variation (ΔS) as a stock level.
+R7 labelled ``groupby(region).mean()`` vs ``psd_regional_annual()`` sum.
+S1 implements the approved adapter: ``prepare_wheat`` now uses member-sum
+within year, then mean over 2007–09. This module still reports the mean
+vs sum counterexample. Stocks are USDA ``ending_stocks``. Do not treat
+FAOSTAT FBSH Stock Variation (ΔS) as a stock level.
 """
 from __future__ import annotations
 
@@ -91,7 +90,7 @@ def a8_mean_vs_sum_table(year0: int = YEAR0, year1: int = YEAR1) -> pd.DataFrame
             "stock_source": "USDA PSD ending_stocks",
             "construction": (
                 "single_psd_row" if n == 1 else
-                "groupby_mean_of_members" if n > 1 else
+                "member_sum" if n > 1 else
                 "unmapped"
             ),
             "alpha_i": float(params.alpha_i),
@@ -116,14 +115,15 @@ def write_a8_note(tab: pd.DataFrame, out_dir: Path | None = None) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
     usa, eu, ch, ea = (_row(tab, r) for r in FOCUS)
     lines = [
-        "# R7 — A8 mean-vs-sum sensitivity (2007–09 USDA only)",
+        "# S1 — A8 member-sum host adapter (2007–09 USDA)",
         "",
-        "**Host unchanged. Not adopted.** `prepare_wheat` still uses",
-        "`groupby(region).mean()` on USDA PSD country-year rows.",
-        "`wheat_params()` stay αI=3.2, p_sto=0.1, xmin=0.2, ζ=0, N_for=3.",
-        "No xmin/p_sto fit. L1–L8 stay rejected. Bai α_foreign=10 not",
-        "adopted. G1/G2 stay blocked. 2003–11 three-scenario CSVs are",
-        "not rewritten.",
+        "**Implemented.** `prepare_wheat` uses member-sum within year, then",
+        "mean over 2007–09 (same construction as `psd_regional_annual()`).",
+        "The pooled country-year `groupby.mean()` is the rejected A8",
+        "construction (R7 labelled). `wheat_params()` stay αI=3.2,",
+        "p_sto=0.1, xmin=0.2, ζ=0, N_for=3. No xmin/p_sto fit. L1–L8 stay",
+        "rejected. Bai α_foreign=10 not adopted. G1/G2 stay blocked.",
+        "FAOSTAT FBSH is not adopted.",
         "",
         "**Stocks are USDA PSD `ending_stocks`.** FAOSTAT FBSH Stock",
         "Variation (element 5074) is ΔS, a food-balance residual, not a",
@@ -132,28 +132,28 @@ def write_a8_note(tab: pd.DataFrame, out_dir: Path | None = None) -> Path:
         "",
         "## Verification protocol",
         "",
-        "1. **Claim.** A8: multi-country PSD baseline uses mean, not sum;",
-        "   China 0.50× and Eastern Africa 0.10× on harvest.",
-        "2. **Implementation.** `prepare_wheat` (`wheat_data.py`) ",
-        "   `groupby(\"region\").mean()`; `psd_regional_annual()` sums.",
-        "3. **Match.** They match. This note reports C and S on the same",
-        "   construction, still USDA.",
-        "4. **Counterexample.** China 2007–09 H mean "
+        "1. **Claim.** A8 S1: 2007–09 baseline is member-sum, not mean;",
+        "   China and Eastern Africa host H match PSD sum.",
+        "2. **Implementation.** `prepare_wheat` (`wheat_data.py`)",
+        "   `psd_member_sum_then_mean()`; `psd_regional_annual()` sums.",
+        "3. **Match.** Host H equals the year-sum then 2007–09 mean.",
+        "4. **Counterexample (old mean).** China 2007–09 H mean "
         f"{_fmt(ch['H_mean'], 1)} vs sum {_fmt(ch['H_sum'], 1)} "
         f"(ratio {_fmt(ch['H_mean_over_sum'], 2)}); EA "
         f"{_fmt(ea['H_mean'], 2)} vs {_fmt(ea['H_sum'], 2)} "
         f"(ratio {_fmt(ea['H_mean_over_sum'], 2)}). USA is 1.00.",
-        "5. **Correctness of not rewriting.** Summing would rescale China",
-        "   H/C/S ×2 and Eastern Africa ×10 and rewrite the 2003–11 host.",
-        "   That is a data-adapter change, not a parameter fit. Host C",
-        "   after T* is already not the PSD mean (inflows).",
-        "6. **Change.** None to economics. Mean stays the default.",
+        "5. **Correctness of switching.** Summing rescales China H/C/S ×2",
+        "   and Eastern Africa ×10. That is the approved data adapter,",
+        "   not a parameter fit. Anomalies stay on the summed member",
+        "   series. Host C after T* is still rebuilt from inflows.",
+        "6. **Change.** Baseline construction only. `wheat_params()`",
+        "   unchanged. Do not pin. Do not restore L1–L8.",
         "",
         "## 2007–09 USDA PSD (MMT)",
         "",
-        "Mean = pooled country-year rows (what `prepare_wheat` uses for",
-        "H and for S_ann). Sum = members summed within each year, then",
-        "averaged over 2007–09 (what `psd_regional_annual()` uses).",
+        "Mean = pooled country-year rows (the rejected A8 construction).",
+        "Sum = members summed within each year, then averaged over 2007–09",
+        "(what `prepare_wheat` and `psd_regional_annual()` now share).",
         "",
         "| region | members | H mean | H sum | C mean | C sum | S mean | S sum | mean/sum |",
         "|---|---|---:|---:|---:|---:|---:|---:|---:|",
@@ -176,46 +176,46 @@ def write_a8_note(tab: pd.DataFrame, out_dir: Path | None = None) -> Path:
         f"{_fmt(ea['S_mean'], 3)} | {_fmt(ea['S_sum'], 2)} | "
         f"{_fmt(ea['H_mean_over_sum'], 2)} |",
         "",
-        "If members are **summed**, China H/C/S become "
+        "S1 **sums** members. China H/C/S are now "
         f"{_fmt(ch['H_sum'], 1)} / {_fmt(ch['C_sum'], 1)} / {_fmt(ch['S_sum'], 1)} "
-        f"(now {_fmt(ch['H_mean'], 1)} / {_fmt(ch['C_mean'], 1)} / "
-        f"{_fmt(ch['S_mean'], 1)}). Eastern Africa becomes "
+        f"(were {_fmt(ch['H_mean'], 1)} / {_fmt(ch['C_mean'], 1)} / "
+        f"{_fmt(ch['S_mean'], 1)}). Eastern Africa is now "
         f"{_fmt(ea['H_sum'], 2)} / {_fmt(ea['C_sum'], 2)} / {_fmt(ea['S_sum'], 2)} "
-        f"(now {_fmt(ea['H_mean'], 2)} / {_fmt(ea['C_mean'], 2)} / "
+        f"(were {_fmt(ea['H_mean'], 2)} / {_fmt(ea['C_mean'], 2)} / "
         f"{_fmt(ea['S_mean'], 3)}). Hong Kong wheat production and stocks",
-        "are ~0, so China mean is ½ of China mainland. Eastern Africa is",
+        "are ~0, so China mean was ½ of China mainland. Eastern Africa was",
         f"the mean of {int(ea['n_psd_members'])} mapped PSD rows",
         f"({ea['psd_members']}).",
         "",
-        "## Host after T* (unchanged)",
+        "## Host after T* (S1 member-sum)",
         "",
-        "`prepare_wheat` H follows the **mean** for these nodes. S_ann is",
-        "the mean of USDA ending stocks; host S = Ψ C* = S_ann. C* is",
-        "rebuilt from T* inflows, so host C is not the PSD mean.",
+        "`prepare_wheat` H follows the **sum** for these nodes. S_ann is",
+        "the member-sum of USDA ending stocks; host S = Ψ C* after T*",
+        "rebuilds C. C* is rebuilt from T* inflows, so host C is not the",
+        "PSD consumption column.",
         "",
-        "| region | host H | PSD H mean | host C (T*) | PSD C mean | host S | PSD S mean |",
+        "| region | host H | PSD H sum | host C (T*) | PSD C sum | host S | PSD S sum |",
         "|---|---:|---:|---:|---:|---:|---:|",
-        f"| China | {_fmt(ch['host_H'], 1)} | {_fmt(ch['H_mean'], 1)} | "
-        f"{_fmt(ch['host_C_after_Tstar'], 1)} | {_fmt(ch['C_mean'], 1)} | "
-        f"{_fmt(ch['host_S_usda'], 1)} | {_fmt(ch['S_mean'], 1)} |",
-        f"| Eastern Africa | {_fmt(ea['host_H'], 2)} | {_fmt(ea['H_mean'], 2)} | "
-        f"{_fmt(ea['host_C_after_Tstar'], 2)} | {_fmt(ea['C_mean'], 2)} | "
-        f"{_fmt(ea['host_S_usda'], 3)} | {_fmt(ea['S_mean'], 3)} |",
-        f"| USA | {_fmt(usa['host_H'], 1)} | {_fmt(usa['H_mean'], 1)} | "
-        f"{_fmt(usa['host_C_after_Tstar'], 1)} | {_fmt(usa['C_mean'], 1)} | "
-        f"{_fmt(usa['host_S_usda'], 1)} | {_fmt(usa['S_mean'], 1)} |",
+        f"| China | {_fmt(ch['host_H'], 1)} | {_fmt(ch['H_sum'], 1)} | "
+        f"{_fmt(ch['host_C_after_Tstar'], 1)} | {_fmt(ch['C_sum'], 1)} | "
+        f"{_fmt(ch['host_S_usda'], 1)} | {_fmt(ch['S_sum'], 1)} |",
+        f"| Eastern Africa | {_fmt(ea['host_H'], 2)} | {_fmt(ea['H_sum'], 2)} | "
+        f"{_fmt(ea['host_C_after_Tstar'], 2)} | {_fmt(ea['C_sum'], 2)} | "
+        f"{_fmt(ea['host_S_usda'], 2)} | {_fmt(ea['S_sum'], 2)} |",
+        f"| USA | {_fmt(usa['host_H'], 1)} | {_fmt(usa['H_sum'], 1)} | "
+        f"{_fmt(usa['host_C_after_Tstar'], 1)} | {_fmt(usa['C_sum'], 1)} | "
+        f"{_fmt(usa['host_S_usda'], 1)} | {_fmt(usa['S_sum'], 1)} |",
         "",
-        "Eastern Africa host C is already 3.61 vs PSD mean 0.66 because",
-        "T* inflows fill the node. Summing members would still ×10 H and",
-        "S. That is why this stays a labelled sensitivity, not a silent",
-        "host rewrite.",
+        "Eastern Africa host C was already near the member-sum because",
+        "T* inflows filled the node. S1 still ×10 H and S. USA is 1.00",
+        "(single PSD row). Anomalies stay on the summed member series.",
         "",
         f"`wheat_params` αI={float(usa['alpha_i']):g}, "
         f"p_sto={float(usa['p_sto_annual']):g}, "
         f"xmin={float(usa['xmin_share']):g}.",
         "",
-        "**Next paste: R8.** Honest Fig. 4 score tests. R7 does not unlock",
-        "G1. Do not rewrite the 2003–11 host. Do not retune αI.",
+        "**Next paste: S2.** Re-measure item-3 last/first on this host.",
+        "Do not pin. Do not retune αI. Do not start G1.",
         "",
     ]
     path = out_dir / "a8_sum.md"

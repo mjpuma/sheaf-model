@@ -27,8 +27,8 @@ def test_g0_p_is_not_accepted():
     assert bar["alpha_i"] == 3.2
     assert bar["n_regions"] == 27
     assert bar["failed_harvest_amis"] == 0
-    assert bar["unconverged_harvest_amis"] == 1743
-    assert bar["hike_2008_host"] > 4.0
+    assert bar["unconverged_harvest_amis"] == 2304
+    assert bar["hike_2008_host"] > 3.0
     assert 1.5 < bar["hike_2008_author"] < 1.9
 
 

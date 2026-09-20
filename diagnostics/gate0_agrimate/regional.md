@@ -13,29 +13,29 @@ Consumption and ending stocks are from a dedicated three-scenario
 dump. Ukraine 2006–11 consumption matches the P0c panel CSV
 bit-for-bit (N5 did not move these annuals).
 
-## Construction gap (A8, labelled, not fixed)
+## Construction (A8, S1 implemented)
 
-`prepare_wheat` baseline (2007–09) uses `groupby(region).mean()` on
-country-year PSD rows. `psd_regional_annual()` **sums** members
-within a year. They match if and only if the node is one PSD row.
-Counterexample, 2007–09 production:
+`prepare_wheat` 2007–09 baseline **sums** PSD members within each
+year, then means over 2007–09 — the same construction as
+`psd_regional_annual()`. Stocks are USDA `ending_stocks`, never
+FAOSTAT FBSH Stock Variation (element 5074). Pooled country-year
+`groupby.mean()` is the rejected A8 construction (R7 labelled).
+2007–09 production:
 
-| region | PSD members | host H (mean of rows) | PSD sum | host/sum |
+| region | PSD members | host H (member-sum) | PSD sum | host/sum |
 |---|---|---:|---:|---:|
 | USA | 1 (United States) | 61.4 | 61.4 | 1.00 |
-| China | 2 (China|Hong Kong) | 56.4 | 112.7 | 0.50 |
-| Eastern Africa | 10 countries | 0.33 | 3.31 | 0.10 |
+| China | 2 (China|Hong Kong) | 112.7 | 112.7 | 1.00 |
+| Eastern Africa | 10 countries | 3.31 | 3.31 | 1.00 |
 
-China is China+Hong Kong; HK production is ~0, so the mean is
-~½ of China (56.4 vs 112.7 MMT). Eastern Africa is the
-mean of 10 mapped countries (0.33 vs 3.31).
+China is China+Hong Kong; HK production is ~0, so the *old* mean
+was ~½ of mainland (56.4 vs 112.7 MMT). Eastern Africa's *old*
+mean of 10 mapped countries was 0.33 vs 3.31. Host H now matches the sum.
 EU-27 is USDA's single `European Union` aggregate, not 27 ISO3
 sums (United Kingdom is Rest of Europe). Verification protocol:
-the claim is A1 node-level USDA; the implementation averages
-members. Mean is not a regional total. **Not fixed in P9** —
-summing would rescale China harvest ×2 and Eastern Africa ×10
-and rewrite the 2003–11 host. That is a data-adapter change,
-not a parameter fit, and not this prompt.
+the claim is A8 member-sum; the implementation matches
+`psd_regional_annual()`. **S1 implemented.** Not a parameter fit.
+Do not retune αI / p_sto / xmin. Do not treat FAO ΔS as stocks.
 
 Other labelled coverage: calendar-year model stocks vs USDA
 marketing year; 27-node sum vs world PSD at the global score;
@@ -69,10 +69,10 @@ FAOSTAT Food Balances still absent (A1).
 | India | production | 0.410 | 77.4 | 78.7 | 0.98 |
 | India | consumption | -0.822 | 81.4 | 77.0 | 1.06 |
 | India | ending_stocks | 0.390 | 4.5 | 12.5 | 0.36 |
-| China | production | -0.857 | 57.0 | 113.6 | 0.50 |
+| China | production | -0.857 | 114.0 | 113.6 | 1.00 |
 | China | consumption | -0.892 | 58.6 | 110.0 | 0.53 |
 | China | ending_stocks | 0.089 | 16.8 | 48.9 | 0.34 |
-| Eastern Africa | production | 0.444 | 0.3 | 3.4 | 0.10 |
+| Eastern Africa | production | 0.444 | 3.3 | 3.4 | 0.95 |
 | Eastern Africa | consumption | -0.705 | 5.7 | 7.0 | 0.81 |
 | Eastern Africa | ending_stocks | -0.455 | 1.9 | 0.5 | 3.45 |
 
@@ -82,20 +82,19 @@ production (Ukraine ratio 1.07, USA 1.05). Weather-driven series correlate
 (USA 1.00; Ukraine 0.97). India (0.41) and China (-0.86) do not: host harvest is the
 2007–09 mean times a LOWESS residual, while PSD is a rising
 level. That is Agrimate-style anomaly forcing, not a missing
-knob. China production is 0.50× mapped PSD
-(A8). Eastern Africa production is 0.10×
-(A8). Do not fit xmin or p_sto to the stock column: Ukraine
+knob. China production is 1.00× mapped PSD
+(A8 member-sum). Eastern Africa production is 0.95×
+(A8 member-sum). Do not fit xmin or p_sto to the stock column: Ukraine
 stocks are 2.41× mapped
-PSD; Eastern Africa stocks are 3.45× on a tiny
-denominator after the mean-of-members harvest. The world 1.58×
+PSD; Eastern Africa stocks are 3.45×. The world 1.58×
 gap in `hindcast.md` is a different comparison (27-node sum vs
-world PSD).
+world PSD; stale until S5 re-score).
 
-Eastern Africa *consumption* is not 0.1× PSD: inflows come from
-T* (A2), so the purchaser can eat imported grain even when local
-H is the 10-country mean (ratio 0.81). USA
+Eastern Africa *consumption* is not the old 0.1× PSD: inflows come from
+T* (A2), so the purchaser can eat imported grain. Host H is now the
+10-country sum (ratio 0.81). USA
 consumption is 0.50× mapped
-PSD (2007–08 host ~6 MMT vs PSD ~30) — who-eats / export drain,
+PSD (2007–08 host vs PSD ~30) — who-eats / export drain,
 not xmin. Argentina ending stocks are 5.34×. Those are
 labelled regional gaps. Do not fit a storage-cost knob to them.
 
@@ -113,5 +112,5 @@ restore L1–L8 or retune αI.
 - `score_regional_summary.csv` — 2006–11 corr / level
 - `score_regional_construction.csv` — 2007–09 mean vs sum
 
-Next: P12 methods note is `methods.md` (not accepted). P11: `pulse.md`. P10 left A1 (`faostat_fb.md`).
+Next: P10 FAOSTAT FB vs USDA (A1) only if those arrays exist.
 
