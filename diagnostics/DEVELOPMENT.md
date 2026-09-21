@@ -14,7 +14,7 @@ Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
 Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
 (P0–P12 done). Post-P12 R-queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md)
 (**exhausted**). Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
-next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S6 done**; G0-P **not accepted**; T1–T3 done; D.22 and solver **implemented**; next **leave labelled** in [`GATE0_CONTINUE.md`](GATE0_CONTINUE.md)).
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S6 done**; G0-P **not accepted**; D.22 and solver **implemented**; rt-solver **recorded**; next **leave labelled** in [`GATE0_CONTINUE.md`](GATE0_CONTINUE.md)).
 Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
 [`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
@@ -280,7 +280,7 @@ approval.
     clobbered. Last/first **0.772** vs author **1.004** (S1 snapshot
     1.444). Two-sided repeating still fails; quiet-year USD ~$456 vs
     S1 $46. Unconverged 1986/5832. Next paste **solver**.
-33. **Solver (this).** Independent Python of sourced 14022004 wheat
+33. **Solver (done).** Independent Python of sourced 14022004 wheat
     programme: current x1 locked to last CES requests (domestic
     first, ι·X_avg per-step floor); scipy SLSQP on remaining
     fractions. Not NLopt/Julia. Not a freeze. Not a pin. Not an αI
@@ -288,8 +288,13 @@ approval.
     default off. S1 three-scenario CSVs not clobbered. Last/first
     **0.812** vs author **1.004** (D.22 0.772; S1 1.444). Two-sided
     [1/1.1, 1.1] still fails; quiet-year USD ~$305 vs S1 $46.
-    Unconverged 1091/5832; failed 0. Next paste **leave labelled**
-    (exact Fig. 4 later). Do not start G1.
+    Unconverged 1091/5832; failed 0. Next paste **leave labelled**.
+34. **rt-solver (this).** Red team of 0.812 vs 1.004 from committed
+    CSVs. NLP not re-run. 0.812 is honest. Item 3 still fail.
+    Solver undisturbed moy **2374×** vs author **1.32×** vs S1
+    **27×**. Fig. 4 1.004 is A7, not a 14022004 twin. Remaining
+    NLP deltas labelled, not implemented. `wheat_params()`
+    unchanged. Next paste **leave labelled**. Do not start G1.
 
 Reference command:
 
