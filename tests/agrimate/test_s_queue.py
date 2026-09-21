@@ -56,11 +56,11 @@ def test_s1_implements_member_sum():
     assert any("5074" in n for n in d.notes)
 
 
-def test_dispatch_next_paste_is_a1_after_align_strategy():
+def test_dispatch_next_paste_is_a3_after_a1_inventory():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: align-strategy" in text
-    assert "Next paste: A1" in text
+    assert "Last completed: A1" in text
+    assert "Next paste: A3" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
     assert "R11" in text
