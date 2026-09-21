@@ -9,7 +9,9 @@ G0-P was rewritten from S1–S5 evidence and **still rejected**. Items 2
 and 3 fail on the S1 three-scenario CSVs. G1/G2 stay blocked. T1–T3
 **done** (labelled, not adopted). Stay not-accepted **recorded**. D.22
 vector+shift is **implemented**. Solver (x1-fixed scipy SLSQP) is
-**implemented**. Exact Fig. 4 is later. Do not start G1.
+**implemented**. Red-teamed: 0.812 is honest; last/first is a weak
+item-3 statistic (moy 2374× vs author 1.32×). Exact Fig. 4 is later.
+Do not start G1.
 
 ## Adaptive rule
 
@@ -60,8 +62,9 @@ Already done (do not re-do):
 - D.22 vector+shift of planned foreign sales is live (d22.py).
 - Solver: current x1 from demand + scipy SLSQP on the rest.
 - Quiet-year last/first is 0.812 vs author 1.004 (score_solver_x1.csv).
-  D.22-only was 0.772. Two-sided repeating still fails. Quiet-year USD
-  ~$305 vs S1 $46. Unconverged 1091/5832.
+  D.22-only was 0.772. Two-sided repeating still fails. 2006 mean USD
+  ~$305 vs S1 $46. Undisturbed moy 2374× vs author 1.32×.
+  Unconverged 1091/5832.
 - Harvest+AMIS three-scenario CSVs are the S1 snapshot; do not clobber
   them unless you re-run that experiment.
 
@@ -81,6 +84,7 @@ Next session pastes that file's **Next paste**.
 | **stay not-accepted** | Reaffirm G0-P rejection after T1–T3 | **done** (recorded; G0-P still **not accepted**) |
 | **D.22** | Implement sourced vector+shift of planned foreign sales | **done** (not a freeze) |
 | **solver** | NLopt / x1-fixed vs host L-BFGS-B | **done** (scipy SLSQP; last/first 0.812) |
+| **rt-solver** | Red team 0.812 vs 1.004 | **done** (CSV; moy 2374×; item 3 fail) |
 | — | G1 / G2 | **blocked until G0-P accepted** |
 
 ---

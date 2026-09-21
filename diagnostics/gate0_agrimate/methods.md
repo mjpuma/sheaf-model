@@ -204,7 +204,9 @@ law). Weight 1/12 matches. Freeze is absent in author Julia and is
 not a `AgrimateParams` field. Not a price pin. Solver is **implemented**
 (x1 from demand + scipy SLSQP). Living last/first is **0.812**
 (`score_solver_x1.csv`; D.22-only 0.772) with 2006 mean $304.9/t.
-Two-sided repeating
+Month-of-year max/min on that path is **2374×** vs author baseline
+**1.32×** (`rt_solver.md`; CSV recompute). Seasonal *shape* corr
+0.987. Two-sided repeating
 [1/1.1, 1.1] still **fails**. Next paste **leave labelled**.
 
 ### Production, stocks, consumption
@@ -328,7 +330,7 @@ acceptance is still required.
 - `hindcast.md`, `fig4.md`, `regional.md`, `s5_score.md`, `item3.md`,
   `faostat_fb.md`, `pulse.md`, `undisturbed.md`, `solver.md`,
   `t1_julia.md`, `t2_delta.md`, `t3_fig4_inputs.md`,
-  `stay_not_accepted.md`, `d22.md`, `solver_x1.md`, `validation.md`
+  `stay_not_accepted.md`, `d22.md`, `solver_x1.md`, `rt_solver.md`, `validation.md`
 - `GATE0_DEPARTURES.md`, `GATE0_SPEC_MATRIX.md`, `GATE0_CONTRACT.md`
 
 G1/G2 remain the blocked pair in `GATE0_EXTENSION_PLAN.md`.

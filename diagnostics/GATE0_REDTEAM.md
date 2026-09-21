@@ -235,6 +235,24 @@ China H 112.7 vs FBSH 112.3 (ratio 1.00). moy 20.1× → 33.0× (worsened).
 Items 1–3 did not improve. Psi USDA; 5074 is ΔS, not S. Author cleaned
 FB still absent. **Not adopted.** Writeup: `s3_fbsh.md`. Next paste **S4**.
 
+**Solver follow-up (x1-fixed SLSQP).** Live independent Python of
+sourced 14022004 x1 lock + scipy SLSQP. Undisturbed last/first
+**0.812** vs author Fig. 4 baseline **1.004**. Unconverged 1091/5832.
+Writeup: `solver_x1.md`. Next paste was **leave labelled**.
+
+**rt-solver follow-up (this).** CSV recompute, NLP not re-run.
+0.812 is honest. Item 3 still **fail**. last/first is a weak
+repeating statistic: solver undisturbed moy **2374×** vs author
+baseline **1.32×** vs S1 undisturbed **27×**. Seasonal shape corr
+0.987 still holds. Fig. 4 1.004 is A7 (different experiment).
+Remaining 14022004 NLP deltas labelled (horizon, quantity vs
+fraction, x_init, demand revenue_curve, domestic others, R5 T*
+inflow, price object). Class H on x1-lock/SLSQP family; **G** on
+`solver_x1.md` calling the remaining programme H; **E** on the
+comparator. Freeze / 2006 pin / αI retune still forbidden. 0
+`*.jl` in sheaf. Writeup: `rt_solver.md`. Next paste **leave
+labelled**. Do not start G1.
+
 ---
 
 ## Step 6 — World-price object
