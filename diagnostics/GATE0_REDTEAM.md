@@ -479,7 +479,8 @@ Not adopted. Julia still absent. Living next-paste is **R6**.
 | 5. Historical performance | **Fail** vs Fig. 4 and Pink | F |
 | 6. Controlled experiments | Three scenarios + P11; AMIS/D.3 bind | H |
 
-**Do not accept G0-P. Do not start G1.** T-queue exhausted. T3 labelled
+**Do not accept G0-P. Do not start G1.** T-queue exhausted. Stay
+not-accepted recorded (`stay_not_accepted.md`). T3 labelled
 FAO-since-2005 + AgrimateEU28+Egypt arrays (`t3_fig4_inputs.md`), not
 adopted, not C.1. D.22 delta is labelled (`t2_delta.md`), not adopted.
 Do not copy Julia. Do not adopt freeze. Do not invent Egypt.

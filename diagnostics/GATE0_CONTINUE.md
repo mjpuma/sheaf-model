@@ -7,7 +7,8 @@ G0-P **not accepted**). R-queue exhausted.
 
 G0-P was rewritten from S1–S5 evidence and **still rejected**. Items 2
 and 3 fail. G1/G2 stay blocked. T1–T3 **done** (labelled, not adopted).
-T-queue is exhausted. Next paste **stay not-accepted**. Do not start G1.
+T-queue is exhausted. Stay not-accepted is **recorded**. G0-P still
+**not accepted**. Do not start G1.
 
 ## Adaptive rule
 
@@ -59,8 +60,8 @@ Next session pastes that file's **Next paste**.
 | **T1** | Obtain-or-leave 14022004 Julia (inspect D.22 / solver) | **done** (deltas exist; 0 `*.jl` in sheaf) |
 | **T2** | Label sourced D.22/solver delta | **done** (labelled, not adopted) |
 | **T3** | Obtain-or-leave FAO-since-2005 + EU28 inputs | **done** (labelled, not adopted; not C.1) |
+| **stay not-accepted** | Reaffirm G0-P rejection after T1–T3 | **done** (recorded; G0-P still **not accepted**) |
 | — | G1 / G2 | **blocked until G0-P accepted** |
-| — | stay not-accepted | **next** (T-queue exhausted; G0-P still **not accepted**) |
 
 ---
 
@@ -112,4 +113,22 @@ Read first: GATE0_DEPARTURES.md A7, s4_a7.md, fig4_config.md.
 
 End: rewrite GATE0_REPRO_DISPATCH.md. Next paste stay not-accepted
 if the extract is labelled and not adopted; else retry T3. Do not start G1.
+```
+
+## stay not-accepted — G0-P after T-queue
+
+```
+[SHARED PREAMBLE]
+
+Task stay-not-accepted only. Reaffirm G0-P rejection after T1–T3.
+Update methods.md with labelled T-queue evidence. Do not start G1.
+Do not retune αI. Do not pin 2006. Do not invent Egypt. USDA stays
+prepare_wheat. If stay_not_accepted.md already records T1–T3 and
+publication_bar accepted is False, do not invent a new science queue.
+
+Read first: methods.md, t1_julia.md, t2_delta.md, t3_fig4_inputs.md,
+DEVELOPMENT.md pass rule (items 1–3 before 5).
+
+End: rewrite GATE0_REPRO_DISPATCH.md. Next paste stay not-accepted.
+Do not start G1.
 ```
