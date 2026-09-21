@@ -35,3 +35,34 @@ Recorded, not a question for Agrimate: Bai/Wada/Puma copy uses α_foreign=10
 as a 2017–25 fit. Host keeps author 3.2. Their finding that one parameter
 set cannot fit both 2008 and 2022 is a G0-H question, not a split-calibration
 of this 2006–11 run.
+
+## Open (2026-09-21) — for the Agrimate team
+
+Independent Python host (`sheaf/agrimate/`) of 14022004 wheat. D.22
+vector+shift and x1-fixed SLSQP are live. Undisturbed 2006–11
+last/first is 0.812; month-of-year max/min is ~2374×. We have been
+scoring that against Fig. 4 baseline last/first 1.004 / moy 1.32×.
+Red team: that Fig. 4 series is a different experiment (A7). These
+are the questions that close Bar A vs Bar B. Not a retune request.
+
+10. **Which git produced Fig. 4d?** Confirm `old-demand-dynamics-150-gbfc02cb-dirty`
+    versus 14022004 `agrimate-equal-sales-penalty` (`two_markets=true`).
+    If they differ, Fig. 4 last/first 1.004 is not the 14022004 twin.
+11. **What quantity is plotted as world price in Fig. 4d?** Bilateral
+    international transaction price (`plot_wm_price_timeseries`) versus
+    an XI-weighted mix of regional D.7 offers? File:line if easy.
+12. **Can you share a 14022004 wheat undisturbed monthly world-price
+    series** (27 `AgrimateRegionsWheat`, α_foreign=3.2, ζ=0, N_for=3,
+    no FAO anomalies, no AMIS), 2006–11? Last/first and month-of-year
+    max/min on *that* series is the Bar A comparator. Fig. 4 NetCDF
+    is Bar B.
+13. **On that 14022004 undisturbed path, is last/first ≈ 1 and moy
+    O(1) expected?** If yes, our 0.812 / 2374× is still a host bug
+    relative to the wheat executable. If no, item 3 against Fig. 4
+    1.004 was the wrong bar.
+14. **World-price units.** Is the Fig. 4 index 1 at Nash/baseline, and
+    is a USD scale applied outside the model? Host uses 2006 Pink mean
+    as a unit scale `p0`, not a path pin.
+
+Do not need from the team: permission to freeze D.22, pin 2006, or
+set α_foreign=10. Those stay off.

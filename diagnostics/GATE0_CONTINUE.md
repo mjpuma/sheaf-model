@@ -3,14 +3,17 @@
 **Where:** this file. Living next-paste:
 [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md).
 S-queue: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md) (**S1–S6 done**;
-G0-P **not accepted**). R-queue exhausted.
+G0-P **not accepted**). R-queue exhausted. Alignment queue:
+[`GATE0_ALIGN_PROMPTS.md`](GATE0_ALIGN_PROMPTS.md). Strategy:
+[`GATE0_ALIGN.md`](GATE0_ALIGN.md).
 
 G0-P was rewritten from S1–S5 evidence and **still rejected**. Items 2
 and 3 fail on the S1 three-scenario CSVs. G1/G2 stay blocked. T1–T3
 **done** (labelled, not adopted). Stay not-accepted **recorded**. D.22
 vector+shift is **implemented**. Solver (x1-fixed scipy SLSQP) is
 **implemented**. Red-teamed: 0.812 is honest; last/first is a weak
-item-3 statistic (moy 2374× vs author 1.32×). Exact Fig. 4 is later.
+item-3 statistic (moy 2374× vs author 1.32×). **New strategy:** do not
+implement more NLP against Fig. 4 1.004. Next is **A1** inventory.
 Do not start G1.
 
 ## Adaptive rule
@@ -20,6 +23,10 @@ Rewrite `GATE0_REPRO_DISPATCH.md` in ≤20 lines. Next session pastes
 
 | If the last run showed… | Next paste | Skip |
 |---|---|---|
+| `align_inventory.md` **absent** | **A1** | do not implement remaining NLP; do not copy Julia |
+| A1 present; `align_scorecards.md` **absent** | **A3** | do not mix Fig. 4 1.004 into Bar A |
+| A3 present; A1 marks implement-now | **A4** | one row; re-measure last/first **and** moy |
+| Team sent a 14022004 undisturbed monthly; not scored | **A5** | not Fig. 4 NetCDF |
 | solver x1-fixed SLSQP **implemented** | **leave labelled** | exact Fig. 4 later; do not start G1 |
 | D.22 vector+shift **implemented**; NLopt / x1-fixed still differs | **solver** | do not pin; do not freeze; do not copy Julia |
 | Obtain failed (GitLab/Zenodo unreachable; no inspectable tree) | **T1** | do not adopt `freeze_q_oth`; do not pin |
@@ -85,6 +92,8 @@ Next session pastes that file's **Next paste**.
 | **D.22** | Implement sourced vector+shift of planned foreign sales | **done** (not a freeze) |
 | **solver** | NLopt / x1-fixed vs host L-BFGS-B | **done** (scipy SLSQP; last/first 0.812) |
 | **rt-solver** | Red team 0.812 vs 1.004 | **done** (CSV; moy 2374×; item 3 fail) |
+| **align** | Split Bar A / Bar B; stop one-delta vs Fig. 4 1.004 | **done** (strategy + A-queue) |
+| **A1** | Wheat-path inventory (inspect-only) | **next** |
 | — | G1 / G2 | **blocked until G0-P accepted** |
 
 ---
