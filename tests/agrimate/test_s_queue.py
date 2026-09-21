@@ -1,4 +1,4 @@
-"""Post-R S-queue: S6 methods v2 done; Next paste T1."""
+"""Post-R S-queue: S6 methods v2 done; T1 Julia inspect done; Next paste T2."""
 from __future__ import annotations
 
 from dataclasses import fields
@@ -56,17 +56,17 @@ def test_s1_implements_member_sum():
     assert any("5074" in n for n in d.notes)
 
 
-def test_dispatch_next_paste_is_t1():
+def test_dispatch_next_paste_is_t2():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: S6" in text
-    assert "Next paste: T1" in text
+    assert "Last completed: T1" in text
+    assert "Next paste: T2" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
     assert "R11" in text
-    assert "not accepted" in text.lower()
     assert "Bai 10" in text
     assert "freeze_q_oth" in text
+    assert "copy Julia" in text or "sheaf/agrimate" in text
 
 
 def test_s2_prompt_forbids_pin_and_l1l8():
@@ -127,11 +127,11 @@ def test_pointers_name_s_queue():
     assert "approved, not implemented" not in dep
 
 
-def test_r7_dispatch_writer_does_not_clobber_s5(tmp_path):
+def test_r7_dispatch_writer_does_not_clobber_later(tmp_path):
     living = tmp_path / "GATE0_REPRO_DISPATCH.md"
     living.write_text(DISPATCH.read_text())
     before = living.read_text()
-    assert "Last completed: S6" in before
+    assert "Last completed: R7" not in before
     from sheaf.agrimate.a8_sum import a8_mean_vs_sum_table
 
     tab = a8_mean_vs_sum_table()

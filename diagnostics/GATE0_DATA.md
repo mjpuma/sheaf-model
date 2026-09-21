@@ -18,6 +18,10 @@ Checked 2026-09-20 (R6 obtain): FAOSTAT JSON API FBSH **521**; bulk zip
 `bulks-faostat.fao.org` **200**. `--faostat-fb` is opt-in. Laptop
 `/Users/mjp38/GitHub/sheaf-model/data` is **not** mounted here.
 
+Checked 2026-09-21 (T1): GitLab agrimate clone **ok**; Zenodo 14022004
+API **403**; inspect used `/tmp/agrimate-model.zip`. Still **not**
+copied into `sheaf/agrimate/`.
+
 ## One-screen map
 
 | Need | Vendored? | Command | Notes |
@@ -30,7 +34,7 @@ Checked 2026-09-20 (R6 obtain): FAOSTAT JSON API FBSH **521**; bulk zip
 | Pink Sheet monthly/annual | yes | `--prices-only` | URL hash changes; script scrapes the WB page |
 | Wheat harvest months | yes | none | Start/end months. Host uses **E.27 raised-cosine** (`sheaf.agrimate.harvest`), not the triangular/twin-pin paragraph that described the legacy host. |
 | Fig. 4 author series | extracted CSVs | see Zenodo below | NetCDF zip **not** vendored |
-| Author Julia 14022004 | **not in repo** | not copied | Executable spec retrieved 2026-09-16; do not vendor copyrighted code |
+| Author Julia 14022004 | **not in repo** (T1 inspected under `/tmp`) | not copied | Executable spec retrieved 2026-09-16; GitLab clone 2026-09-21; do not vendor |
 
 Default three-scenario run needs only the vendored trees (PSD extracts,
 E0, AMIS CSV, calendars, Pink Sheet). You do **not** need Zenodo, and
@@ -110,17 +114,18 @@ forced scenarios, git `old-demand-dynamics`. Those knobs belong on a
 
 ### Zenodo 14022004 (author Julia)
 
-- Record: https://doi.org/10.5281/zenodo.14022004 (HEAD 200 this run)
-- Retrieved 2026-09-16 as the **executable specification**. **Not copied**
-  into this package (`/agrimate/` at repo root is gitignored PDF extracts
-  only).
-- Needed to diff `plot_wm_price_timeseries`, `two_markets`, ζ, D.30a x1.
-- R3 searched this checkout: Julia is still **not** present. Host
-  identity (`volume_weighted_offer_index`, `world_price.md`,
-  `tests/agrimate/test_world_price.py`) locks the XI-weighted lagged
-  D.7 mix. Do not treat that as a bit-diff of author `plot.jl`.
-- Do not vendor it. Do not “tune” host knobs from a local checkout
-  except as a labelled comparison object (R2).
+- Record: https://doi.org/10.5281/zenodo.14022004
+- Retrieved 2026-09-16 as the **executable specification**. **T1
+  (2026-09-21):** GitLab paper repo cloned to `/tmp/agrimate-gitlab`
+  (`f2de9655`, 41 `*.jl`); 14022004 equal-sales-penalty zip unpacked
+  under `/tmp/agrimate-14022004` (`79951111`, 32 `*.jl`). Zenodo API
+  was **403** this run; inspect used the already-on-disk zip. **Not
+  copied** into this package (`sheaf/agrimate/` still has 0 `*.jl`;
+  `/agrimate/` at repo root is gitignored PDF extracts only).
+- Wheat D.22 and the NLopt supplier programme **differ** from the host
+  (`t1_julia.md`). Do not vendor. Do not adopt `freeze_q_oth`. Do not
+  “tune” host knobs from a local checkout except as a labelled
+  comparison (R2 / T2).
 
 ### FAOSTAT Food Balances (A1) — how to get them
 
@@ -170,7 +175,7 @@ visible.
 | Pink Sheet | `--prices-only` |
 | Harvest calendars | none (vendored) |
 | Fig. 4 author CSVs | none (`author_fig4/` committed); NetCDF zip is manual Zenodo |
-| Author Julia 14022004 | **not** fetched; retrieve yourself, do not vendor |
+| Author Julia 14022004 | **not** vendored (T1 inspected under `/tmp`) | retrieve yourself, do not copy into `sheaf/agrimate/` |
 
 `pip install -r requirements.txt` then the commands above. No API keys
 except the OECD browser step. Zenodo is only for Fig. 4 NetCDF / author
