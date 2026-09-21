@@ -218,6 +218,11 @@ host is a scalar EMA of realized XI (weight 1/12 matches). Solver is
 NLopt LD_SLSQP, not L-BFGS-B. **No freeze** in author. Not adopted.
 Writeup: `t1_julia.md`. Next paste **T2**.
 
+**T2 follow-up (sourced delta labelled).** File:line in `t2_delta.md`.
+Class **D** (D.22 state/observation/update) / **C** (NLopt vs L-BFGS-B) /
+**H** (weight, Jacobi, no freeze, S_end off). **Not implemented.**
+`wheat_params()` unchanged. Next paste **T3**.
+
 **S3 follow-up (FBSH vs member-sum USDA).** 2006–08 harvest+AMIS:
 China H 112.7 vs FBSH 112.3 (ratio 1.00). moy 20.1× → 33.0× (worsened).
 Items 1–3 did not improve. Psi USDA; 5074 is ΔS, not S. Author cleaned
@@ -467,5 +472,6 @@ Not adopted. Julia still absent. Living next-paste is **R6**.
 | 5. Historical performance | **Fail** vs Fig. 4 and Pink | F |
 | 6. Controlled experiments | Three scenarios + P11; AMIS/D.3 bind | H |
 
-**Do not accept G0-P. Do not start G1.** Sourced continuation is T2
-(label the D.22 / NLopt delta). Do not copy Julia. Do not adopt freeze.
+**Do not accept G0-P. Do not start G1.** Sourced continuation is T3
+(FAO-since-2005 / AgrimateEU28 obtain-or-leave). D.22 delta is labelled
+(`t2_delta.md`), not adopted. Do not copy Julia. Do not adopt freeze.

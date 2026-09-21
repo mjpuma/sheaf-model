@@ -1,4 +1,4 @@
-"""Post-R S-queue: S6 methods v2 done; T1 Julia inspect done; Next paste T2."""
+"""Post-R S-queue: S6 methods v2 done; T1–T2 done; Next paste T3."""
 from __future__ import annotations
 
 from dataclasses import fields
@@ -56,11 +56,11 @@ def test_s1_implements_member_sum():
     assert any("5074" in n for n in d.notes)
 
 
-def test_dispatch_next_paste_is_t2():
+def test_dispatch_next_paste_is_t3():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: T1" in text
-    assert "Next paste: T2" in text
+    assert "Last completed: T2" in text
+    assert "Next paste: T3" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
     assert "R11" in text
@@ -124,6 +124,7 @@ def test_pointers_name_s_queue():
     assert "1.444" in dep
     assert "s3_fbsh.md" in dep
     assert "s4_a7.md" in dep
+    assert "t2_delta.md" in dep or "t1_julia.md" in dep
     assert "approved, not implemented" not in dep
 
 
