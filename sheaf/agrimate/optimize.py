@@ -89,6 +89,74 @@ def sales_to_fractions(
     return fd, fi
 
 
+def clip_demand_x1(
+        xd: float, xi: float, S0: float, H0: float, loss: float = 0.0,
+        ) -> tuple[float, float]:
+    """Author current sales: min(demand, availability), domestic first.
+
+    ``X1_dom = min(D_dom, H+S)``, ``X1_for = min(D_for, H+S−X1_dom)``.
+    """
+    A = max((1.0 - float(loss)) * max(float(S0), 0.0) + float(H0), 0.0)
+    xd = min(max(float(xd), 0.0), A)
+    xi = min(max(float(xi), 0.0), max(A - xd, 0.0))
+    return xd, xi
+
+
+def pack_future_fractions(z_fut: np.ndarray, fd0: float, fi0: float, n: int
+                          ) -> np.ndarray:
+    """Rebuild length-2n fractions with step-0 locked."""
+    z_fut = np.asarray(z_fut, float).reshape(-1)
+    z = np.empty(2 * n)
+    z[0] = fd0
+    z[1:n] = z_fut[: n - 1]
+    z[n] = fi0
+    z[n + 1:] = z_fut[n - 1:]
+    return z
+
+
+def unpack_future_fractions(z: np.ndarray, n: int) -> np.ndarray:
+    z = np.asarray(z, float).reshape(-1)
+    return np.concatenate([z[1:n], z[n + 1:]])
+
+
+def demand_x1_from_ask(
+        ask: np.ndarray, r: int, S0: float, H0: float,
+        iota: float, x_avg: float, loss: float = 0.0,
+        ) -> tuple[float, float]:
+    """Current sales from last origin-by-buyer requests, iota floor, clip.
+
+    ``x_avg`` is per-step mean harvest/sales (author ``X_avg``), not annual.
+    """
+    ask = np.asarray(ask, float)
+    r = int(r)
+    d_dom = float(ask[r, r])
+    d_for = float(max(ask[r].sum() - d_dom, 0.0))
+    floor = float(iota) * max(float(x_avg), 0.0)
+    if d_dom < floor:
+        d_dom = 0.0
+    if d_for < floor:
+        d_for = 0.0
+    return clip_demand_x1(d_dom, d_for, S0, H0, loss)
+
+
+def baseline_ask_matrix(xd_star: np.ndarray, xi_star: np.ndarray,
+                        t_star: np.ndarray) -> np.ndarray:
+    """Nash-scale origin-by-buyer demand used before the first procurement."""
+    xd_star = np.asarray(xd_star, float).reshape(-1)
+    xi_star = np.asarray(xi_star, float).reshape(-1)
+    t_star = np.asarray(t_star, float)
+    n_r = xd_star.size
+    ask = np.zeros((n_r, n_r))
+    for e in range(n_r):
+        ask[e, e] = max(xd_star[e], 0.0)
+        row = t_star[e].copy()
+        row[e] = 0.0
+        tot = float(row.sum())
+        if tot > 1e-15:
+            ask[e] += max(xi_star[e], 0.0) * (row / tot)
+    return ask
+
+
 def _inv_demand_dpdq(q: np.ndarray, alpha: float, lam: float, floor: float
                      ) -> np.ndarray:
     """∂p/∂q of D.7, zero where the numerical argument floor binds."""
@@ -215,12 +283,19 @@ def solve_supplier_plan(
         params: AgrimateParams,
         delta_hat: np.ndarray | None = None,
         x0: np.ndarray | None = None,
+        x1: tuple[float, float] | None = None,
         ) -> dict:
     """Maximise supplier profit over (XD, XI) subject to storage ≥ 0.
 
     ``x0`` is concatenated *intended* sales (xd, xi), converted internally to
     fractions. Failed/non-finite optimiser output falls back to that feasible
     projection; it is not replaced by a legacy price rule.
+
+    ``x1=(xd0, xi0)`` locks current-step sales to demand (clipped by
+    availability, domestic first) and optimises only the remaining steps
+    with scipy SLSQP — independent Python of the sourced wheat programme
+    (x1 fixed, ``:LD_SLSQP``). ``x1 is None`` keeps the older 2N free
+    L-BFGS-B path for unit tests of the fraction map.
     """
     n = int(H.size)
     H = np.asarray(H, float)
@@ -245,31 +320,73 @@ def solve_supplier_plan(
         ])
     fd0, fi0 = sales_to_fractions(x0[:n], x0[n:], S0, H, loss, delta_hat)
     z0 = np.concatenate([fd0, fi0])
+    x1_fixed = x1 is not None
+    method = "SLSQP" if x1_fixed else "L-BFGS-B"
+    fd1 = float(z0[0])
+    fi1 = float(z0[n])
+    if x1_fixed:
+        xd1, xi1 = clip_demand_x1(x1[0], x1[1], S0, H[0], loss)
+        A0 = (1.0 - loss) * max(float(S0), 0.0) + float(H[0])
+        if A0 > 1e-15:
+            fd1 = xd1 / A0
+            rest0 = A0 - xd1
+            fi1 = xi1 / rest0 if rest0 > 1e-15 else 0.0
+        else:
+            fd1, fi1 = 0.0, 0.0
+        z0[0] = fd1
+        z0[n] = fi1
 
-    def fun(z):
+    def fun_full(z):
         return _plan_objective_grad(
             z, H, S0, xi_others, xi_star, xd_star,
             alpha_i, alpha_d, params, delta_hat,
         )
 
-    bounds = [(0.0, 1.0)] * (2 * n)
-    res = minimize(
-        fun, z0, method="L-BFGS-B", jac=True, bounds=bounds,
-        options={"maxiter": params.plan_maxiter, "ftol": 1e-8},
-    )
     fallback = False
-    z = np.asarray(res.x, float)
-    if z.size != 2 * n or not np.all(np.isfinite(z)):
-        z = z0
-        fallback = True
-    z = np.clip(z, 0.0, 1.0)
+    if x1_fixed and n >= 2:
+        def fun_fut(zf):
+            z = pack_future_fractions(zf, fd1, fi1, n)
+            obj, grad = fun_full(z)
+            return obj, unpack_future_fractions(grad, n)
+
+        zf0 = unpack_future_fractions(z0, n)
+        bounds_f = [(0.0, 1.0)] * (2 * (n - 1))
+        res = minimize(
+            fun_fut, zf0, method="SLSQP", jac=True, bounds=bounds_f,
+            options={"maxiter": params.plan_maxiter, "ftol": 1e-8, "disp": False},
+        )
+        zf = np.asarray(res.x, float)
+        if zf.size != 2 * (n - 1) or not np.all(np.isfinite(zf)):
+            zf = zf0
+            fallback = True
+        z = pack_future_fractions(np.clip(zf, 0.0, 1.0), fd1, fi1, n)
+    else:
+        bounds = [(0.0, 1.0)] * (2 * n)
+        res = minimize(
+            fun_full, z0, method="L-BFGS-B", jac=True, bounds=bounds,
+            options={"maxiter": params.plan_maxiter, "ftol": 1e-8},
+        )
+        z = np.asarray(res.x, float)
+        if z.size != 2 * n or not np.all(np.isfinite(z)):
+            z = z0
+            fallback = True
+        z = np.clip(z, 0.0, 1.0)
+        if x1_fixed:
+            z[0] = fd1
+            z[n] = fi1
+
     xd, xi_int, xi_ship, S = fractions_to_sales(z[:n], z[n:], S0, H, loss, delta_hat)
     finite = bool(np.all(np.isfinite(xd)) and np.all(np.isfinite(xi_int))
                   and np.all(np.isfinite(S)))
     feasible = finite and bool(np.min(S) >= -1e-8)
     if not feasible:
         fallback = True
-        xd, xi_int, xi_ship, S = fractions_to_sales(fd0, fi0, S0, H, loss, delta_hat)
+        z_fb = z0.copy()
+        if x1_fixed:
+            z_fb[0] = fd1
+            z_fb[n] = fi1
+        xd, xi_int, xi_ship, S = fractions_to_sales(
+            z_fb[:n], z_fb[n:], S0, H, loss, delta_hat)
         finite = bool(np.all(np.isfinite(S)))
         feasible = finite and bool(np.min(S) >= -1e-8)
 
@@ -300,6 +417,8 @@ def solve_supplier_plan(
         "pgnorm": projected_grad_norm(np.clip(z, 0.0, 1.0), grad),
         "floor_binds": floor_binds,
         "residual": residual,
+        "method": method,
+        "x1_fixed": bool(x1_fixed),
     }
 
 

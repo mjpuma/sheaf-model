@@ -14,7 +14,7 @@ Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
 Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
 (P0–P12 done). Post-P12 R-queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md)
 (**exhausted**). Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
-next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S6 done**; G0-P **not accepted**; T1–T3 done; next **stay not-accepted** in [`GATE0_CONTINUE.md`](GATE0_CONTINUE.md)).
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S6 done**; G0-P **not accepted**; T1–T3 done; D.22 and solver **implemented**; next **leave labelled** in [`GATE0_CONTINUE.md`](GATE0_CONTINUE.md)).
 Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
 [`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
@@ -273,14 +273,23 @@ approval.
     accepted** (last/first 1.444; hike ×3.71; unconverged 2304/5832).
     T1–T3 labelled, not adopted. Methods note reaffirmed. Do not
     start G1. Next paste **stay not-accepted**.
-32. **D.22 (this).** Implemented sourced wheat D.22 as independent
+32. **D.22 (done).** Implemented sourced wheat D.22 as independent
     Python (`sheaf/agrimate/d22.py`): horizon vector + shift of
     *planned* foreign sales. Not a freeze. Not a pin. Not a Julia
-    copy. `wheat_params()` unchanged. Solver still L-BFGS-B / x1
-    free (secondary). S1 three-scenario CSVs not clobbered. Last/first
-    **0.772** vs author **1.004** (S1 snapshot 1.444). Two-sided
-    repeating [1/1.1, 1.1] still fails; quiet-year USD ~$456 vs S1
-    $46. Unconverged 1986/5832. Next paste **solver**. Do not start G1.
+    copy. `wheat_params()` unchanged. S1 three-scenario CSVs not
+    clobbered. Last/first **0.772** vs author **1.004** (S1 snapshot
+    1.444). Two-sided repeating still fails; quiet-year USD ~$456 vs
+    S1 $46. Unconverged 1986/5832. Next paste **solver**.
+33. **Solver (this).** Independent Python of sourced 14022004 wheat
+    programme: current x1 locked to last CES requests (domestic
+    first, ι·X_avg per-step floor); scipy SLSQP on remaining
+    fractions. Not NLopt/Julia. Not a freeze. Not a pin. Not an αI
+    retune. `plan_maxiter` stays 40. R5 `x1_from_demand` stays
+    default off. S1 three-scenario CSVs not clobbered. Last/first
+    **0.812** vs author **1.004** (D.22 0.772; S1 1.444). Two-sided
+    [1/1.1, 1.1] still fails; quiet-year USD ~$305 vs S1 $46.
+    Unconverged 1091/5832; failed 0. Next paste **leave labelled**
+    (exact Fig. 4 later). Do not start G1.
 
 Reference command:
 

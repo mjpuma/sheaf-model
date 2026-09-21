@@ -23,7 +23,12 @@ from .equations import (
     purchaser_demand,
     update_producer_storage,
 )
-from .optimize import nash_ibr, solve_supplier_plan
+from .optimize import (
+    baseline_ask_matrix,
+    demand_x1_from_ask,
+    nash_ibr,
+    solve_supplier_plan,
+)
 from .params import AgrimateParams, wheat_params
 from .wheat_data import WheatData, prepare_wheat, international_destination_shares
 
@@ -272,6 +277,7 @@ class AgrimateSim:
         )
         Q = init_expected_others_foreign(d.XI_star_path, n_start=0)
         w_exp = ema_weight(p.tau_exp, n_y)
+        last_ask = baseline_ask_matrix(d.XD_star, d.XI_star, d.T_star)
 
         t0 = perf_counter()
         for t in range(T):
@@ -307,11 +313,19 @@ class AgrimateSim:
                         n_for=p.n_for, tau_for_steps=p.tau_for * n_y)
                     # D.7 international argument is world volume / world XI*
                     # (scalar year-average per step). Domestic uses own XD*.
+                    # Current x1 is demand (clipped), not a free choice.
+                    # Author X_avg is mean baseline harvest per step
+                    # (initialization.jl); XD*+XI* is that identity here.
+                    x_avg = float(d.XD_star[r]) + float(d.XI_star[r])
+                    x1 = demand_x1_from_ask(
+                        last_ask, r, float(S_p[r]), float(H[r]),
+                        p.iota, x_avg, p.delta_loss)
                     sol = solve_supplier_plan(
                         Hhat, float(S_p[r]), others,
                         d.XI_world, d.XD_star[r],
                         p.alpha_i, float(d.alpha_d[r]), p,
                         delta_hat=dhat, x0=np.concatenate([x0_d, x0_i]),
+                        x1=x1,
                     )
                     if not sol["success"]:
                         failed += 1
@@ -389,6 +403,7 @@ class AgrimateSim:
                     prices, B, p.sigma_ces, shares[:, s],
                     A_d=A_t, eps_d=p.eps_d,
                 )
+                last_ask[:, s] = q_ask
                 req_now[s] = foreign_request_quantity(q_ask, s)
                 inflow = float(arrive[s]) + float(sold_d[s])
                 p_c[s] = consumer_price_mix(p_w, inflow, p_c[s], S_c[s])

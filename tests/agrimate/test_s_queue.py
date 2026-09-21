@@ -56,18 +56,18 @@ def test_s1_implements_member_sum():
     assert any("5074" in n for n in d.notes)
 
 
-def test_dispatch_next_paste_is_solver_after_d22():
+def test_dispatch_next_paste_is_leave_labelled_after_solver():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: D.22" in text
-    assert "Next paste: solver" in text
+    assert "Last completed: solver" in text
+    assert "Next paste: leave labelled" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
     assert "R11" in text
     assert "Bai 10" in text
     assert "freeze_q_oth" in text
-    assert "copy Julia" in text or "sheaf/agrimate" in text
-    assert "0.772" in text or "0.77" in text
+    assert "copy Julia" in text or "NLopt" in text
+    assert "0.812" in text or "0.81" in text
 
 
 def test_s2_prompt_forbids_pin_and_l1l8():
