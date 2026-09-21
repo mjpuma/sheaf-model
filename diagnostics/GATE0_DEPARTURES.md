@@ -112,7 +112,9 @@ that vector+shift of planned foreign sales. Last/first **0.772** vs
 author **1.004** (S1 snapshot 1.444; two-sided repeating still fails).
 Quiet-year USD ~$456 vs S1 $46. `freeze_q_oth` stays
 diagnostic, default off, not a `wheat_params()` field. Not a pin.
-Solver still L-BFGS-B (N5). Writeup: `diagnostics/gate0_agrimate/item3.md`
+**Solver implemented:** current x1 from demand + scipy SLSQP on the
+rest (`optimize.py`; `solver_x1.md`). Last/first **0.812** vs author
+**1.004**. Writeup: `diagnostics/gate0_agrimate/item3.md`
 (S2 snapshot 1.444); T1: `t1_julia.md`; T2: `t2_delta.md`; living D.22:
 `d22.md`.
 
@@ -127,9 +129,11 @@ kept: more iters move the price path, but 200 vs 400 disagree by a similar
 RMSE, so there is no demonstrated unique stationary point to adopt.
 Writeup: `diagnostics/gate0_agrimate/solver.md`. Not a pin and not L1–L8.
 **T1:** author wheat solver is NLopt `:LD_SLSQP` (`maxtime=60`, current x1
-fixed to demand). Sourced solver delta; **T2** labelled file:line
-(`t2_delta.md`), not adopted. `equal_constraint` default is **false** so
-S_end equality is off on wheat. Do not raise `plan_maxiter`.
+fixed to demand). **Implemented** as independent scipy SLSQP with x1
+locked (`optimize.py`); not a NLopt/Julia copy. `plan_maxiter` stays 40.
+Undisturbed unconverged **1091/5832** (failed 0). `equal_constraint`
+default is **false** so S_end equality is off on wheat. Do not raise
+`plan_maxiter`. Harvest+AMIS N5 counts remain the S1 CSVs (not re-run).
 R9 repeats the count on `fig4_experiment_params()` harvest+AMIS 2006–08
 (`solver_fig4.md`): failed still 0; unconverged still counted; labelled
 maxiter=200/400 probes do **not** raise the default cap and are not adopted.

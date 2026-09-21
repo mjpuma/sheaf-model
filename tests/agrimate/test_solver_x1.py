@@ -97,6 +97,9 @@ def test_solver_score_locks_when_present():
     assert bool(tab["nlopt_copied"]) is False
     assert int(tab["plan_maxiter"]) == 40
     assert float(tab["alpha_i"]) == 3.2
+    assert abs(float(tab["last_first"]) - 0.812) < 0.01
+    assert bool(tab["item3_pass"]) is False
+    assert "Next paste: leave labelled" in text
     for name in PROTECTED_THREE_SCENARIO:
         assert (OUT_DEFAULT / name).is_file(), name
 

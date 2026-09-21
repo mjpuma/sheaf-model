@@ -15,7 +15,7 @@ Otto, *Ecological Economics* 231 (2025) 108546; ODD supplement §D; wheat §E).
 - Reproduction prompts (R-queue, exhausted): `diagnostics/GATE0_REPRO_PROMPTS.md`
 - Post-R development (S1–S6, **done**): `diagnostics/GATE0_NEXT_PROMPTS.md`
 - Continuation (T1–): `diagnostics/GATE0_CONTINUE.md`
-- Next paste: `diagnostics/GATE0_REPRO_DISPATCH.md` (S6 done; G0-P **not accepted**; T1–T3 done; next **stay not-accepted**)
+- Next paste: `diagnostics/GATE0_REPRO_DISPATCH.md` (S6 done; G0-P **not accepted**; D.22 and solver **implemented**; next **leave labelled**)
 - Validation scores: `diagnostics/gate0_agrimate/validation.md`
 - G0-P methods note: `diagnostics/gate0_agrimate/methods.md` (written; **not accepted**)
 - Red team (post-P12): `diagnostics/GATE0_REDTEAM.md`
