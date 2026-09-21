@@ -30,15 +30,18 @@ Hard stops do not adapt. L1–L8, 2006 pin, Bai αI=10, maize/rice
 acceptance, G1/G2, FAO ΔS as stocks, and writing `freeze_q_oth` into
 `wheat_params()` stay off.
 
-## Shared preamble (prepend to every T-prompt)
+## Shared preamble (prepend to every prompt from here)
 
 ```
 You are continuing SHEAF Gate 0 wheat: an independent Agrimate copy
 (Kuhla et al. 2025; sheaf/agrimate/). Read diagnostics/GATE0_CONTRACT.md,
 diagnostics/DEVELOPMENT.md, diagnostics/GATE0_VALIDATION.md,
 diagnostics/GATE0_REDTEAM.md, diagnostics/GATE0_DATA.md,
-diagnostics/GATE0_CONTINUE.md, and this prompt's "Read first"
+diagnostics/GATE0_CONTINUE.md, diagnostics/gate0_agrimate/d22.md,
+diagnostics/gate0_agrimate/t2_delta.md, and this prompt's "Read first"
 files before editing.
+
+NEVER cheat.
 
 Hard stops:
 - Do not implement Gate 1 substitution or Gate 2 government games.
@@ -47,7 +50,17 @@ Hard stops:
 - Do not treat FAOSTAT FBSH element 5074 ΔS as a stock level.
 - Do not copy author Julia into sheaf/agrimate/.
 - Do not write freeze_q_oth into wheat_params().
-- Author AgrimateParams stay the defaults.
+- Do not freeze D.22 (author still updates).
+- wheat_params() stay 14022004 defaults (αI=3.2, ζ=0, N_for=3).
+- Fig. 4 knobs stay on fig4_experiment_params(). Exact Fig. 4 is later.
+  USDA stays prepare_wheat. Do not invent Egypt.
+
+Already done (do not re-do):
+- D.22 vector+shift of planned foreign sales is live (d22.py).
+- Quiet-year last/first is 0.772 vs author 1.004 (score_d22.csv).
+  Two-sided repeating still fails. Quiet-year USD ~$456 vs S1 $46.
+- Harvest+AMIS three-scenario CSVs are the S1 snapshot; do not clobber
+  them unless you re-run that experiment.
 
 Exit: pytest tests/agrimate. One prompt, one PR-sized change.
 Rewrite diagnostics/GATE0_REPRO_DISPATCH.md from this run (≤20 lines).
