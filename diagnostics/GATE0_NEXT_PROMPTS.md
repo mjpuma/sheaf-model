@@ -10,9 +10,9 @@ The R-science first-match table is **exhausted** on this host. G0-P stays
 | Gap | Status on live host | What S-queue does |
 |---|---|---|
 | **A8** mean-of-members | **S1 implemented** (China H 112.7 / EA 3.31) | live host is member-sum |
-| **Item 3** wander | last/first **1.444** vs author 1.004; T2: D.22 vector+shift vs scalar EMA **labelled, not adopted** | **T2 done**; next **T3** |
+| **Item 3** wander | last/first **1.444** vs author 1.004; T2: D.22 vector+shift vs scalar EMA **labelled, not adopted** | **T2 done**; T3 done; next **stay not-accepted** |
 | **A1** USDA quantities | **S3 done** (FBSH H/C vs member-sum; China 1.00; moy worsened; not adopted) | USDA stays default; never FAO ΔS as S |
-| **A7** cannot-set | **S4 done** (parallel EU28+Egypt list labelled, not C.1; start-2000 / FAO-since-2005 / Julia still absent) | **S5 done** (CSV re-score; items 1–3 still fail) |
+| **A7** cannot-set | **S4 done** (parallel list labelled, not C.1). **T3 done** (FAO-since-2005 + AgrimateEU28+Egypt arrays labelled, not adopted; start-2000 / FAO as WheatData / Julia still cannot-set) | **S5 done** (CSV re-score; items 1–3 still fail) |
 
 Do not walk R8…R12 as science. R8 may piggyback tests. R11 stays skipped
 while `wheat_params()` are unchanged. R12 / S6 only after items 1–3 move.

@@ -6,8 +6,8 @@ S-queue: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md) (**S1–S6 done**;
 G0-P **not accepted**). R-queue exhausted.
 
 G0-P was rewritten from S1–S5 evidence and **still rejected**. Items 2
-and 3 fail. G1/G2 stay blocked. Remaining work is **sourced obtain-or-
-leave**, not a parameter search and not a new red-team mill.
+and 3 fail. G1/G2 stay blocked. T1–T3 **done** (labelled, not adopted).
+T-queue is exhausted. Next paste **stay not-accepted**. Do not start G1.
 
 ## Adaptive rule
 
@@ -18,6 +18,7 @@ Rewrite `GATE0_REPRO_DISPATCH.md` in ≤20 lines. Next session pastes
 |---|---|---|
 | Obtain failed (GitLab/Zenodo unreachable; no inspectable tree) | **T1** | do not adopt `freeze_q_oth`; do not pin |
 | Julia inspected; D.22 / solver **differs**; T2 note **absent** | **T2** | label sourced delta only; do not copy Julia into `sheaf/agrimate/` |
+| T3 FAO/EU28 extract **present**, labelled, not adopted | **stay not-accepted** | do not start G1; do not invent Egypt; FAO not `prepare_wheat` |
 | T2 labelled; not implemented | **T3** | do not invent Egypt; knobs stay on `fig4_experiment_params()` |
 | Julia obtained; D.22 **matches** host (item 3 still open) | leave labelled | do not invent a decay knob |
 | Tests would still pass a *non*-match | R8 may piggyback | do not weaken identities |
@@ -57,9 +58,9 @@ Next session pastes that file's **Next paste**.
 | S1–S6 | Post-R development | **done** (G0-P **not accepted**) |
 | **T1** | Obtain-or-leave 14022004 Julia (inspect D.22 / solver) | **done** (deltas exist; 0 `*.jl` in sheaf) |
 | **T2** | Label sourced D.22/solver delta | **done** (labelled, not adopted) |
-| **T3** | Obtain-or-leave FAO-since-2005 + EU28 inputs | **next** (A7 still cannot-set) |
-| T3 | Obtain-or-leave FAO-since-2005 + EU28 inputs | A7 still cannot-set |
+| **T3** | Obtain-or-leave FAO-since-2005 + EU28 inputs | **done** (labelled, not adopted; not C.1) |
 | — | G1 / G2 | **blocked until G0-P accepted** |
+| — | stay not-accepted | **next** (T-queue exhausted; G0-P still **not accepted**) |
 
 ---
 
@@ -109,5 +110,6 @@ prepare_wheat default. Do not start G1.
 
 Read first: GATE0_DEPARTURES.md A7, s4_a7.md, fig4_config.md.
 
-End: rewrite GATE0_REPRO_DISPATCH.md.
+End: rewrite GATE0_REPRO_DISPATCH.md. Next paste stay not-accepted
+if the extract is labelled and not adopted; else retry T3. Do not start G1.
 ```

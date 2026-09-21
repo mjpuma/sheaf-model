@@ -78,6 +78,7 @@ def test_provenance_and_cookbook_exist():
         "data/world_prices/PROVENANCE.txt",
         "data/crop_calendars/PROVENANCE.txt",
         "diagnostics/gate0_agrimate/author_fig4/PROVENANCE.txt",
+        "diagnostics/gate0_agrimate/t3_fig4_inputs/PROVENANCE.txt",
         "diagnostics/GATE0_DATA.md",
         "diagnostics/GATE0_REDTEAM.md",
         "diagnostics/GATE0_REPRO_PROMPTS.md",

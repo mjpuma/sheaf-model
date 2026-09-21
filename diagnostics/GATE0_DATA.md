@@ -18,9 +18,10 @@ Checked 2026-09-20 (R6 obtain): FAOSTAT JSON API FBSH **521**; bulk zip
 `bulks-faostat.fao.org` **200**. `--faostat-fb` is opt-in. Laptop
 `/Users/mjp38/GitHub/sheaf-model/data` is **not** mounted here.
 
-Checked 2026-09-21 (T1): GitLab agrimate clone **ok**; Zenodo 14022004
-API **403**; inspect used `/tmp/agrimate-model.zip`. Still **not**
-copied into `sheaf/agrimate/`.
+Checked 2026-09-21 (T3): GitLab FAO wheat anomalies+trends obtained as
+compact annual 2000–11 extracts (`diagnostics/gate0_agrimate/t3_fig4_inputs/`);
+daily CSVs not vendored; AgrimateEU28+Egypt ISO map labelled, not C.1;
+USDA stays `prepare_wheat`. GitLab cleaned FB left (md5 differs).
 
 ## One-screen map
 
@@ -35,6 +36,7 @@ copied into `sheaf/agrimate/`.
 | Wheat harvest months | yes | none | Start/end months. Host uses **E.27 raised-cosine** (`sheaf.agrimate.harvest`), not the triangular/twin-pin paragraph that described the legacy host. |
 | Fig. 4 author series | extracted CSVs | see Zenodo below | NetCDF zip **not** vendored |
 | Author Julia 14022004 | **not in repo** (T1 inspected under `/tmp`) | not copied | Executable spec retrieved 2026-09-16; GitLab clone 2026-09-21; do not vendor |
+| Fig. 4 FAO anomalies + AgrimateEU28+Egypt | compact labelled CSVs | none | `diagnostics/gate0_agrimate/t3_fig4_inputs/` (T3). Daily FAO 4.7 MB files not vendored. **Not** `prepare_wheat`. Egypt **not** C.1. |
 
 Default three-scenario run needs only the vendored trees (PSD extracts,
 E0, AMIS CSV, calendars, Pink Sheet). You do **not** need Zenodo, and
@@ -127,6 +129,17 @@ forced scenarios, git `old-demand-dynamics`. Those knobs belong on a
   “tune” host knobs from a local checkout except as a labelled
   comparison (R2 / T2).
 
+### Fig. 4 FAO-since-2005 + AgrimateEU28+Egypt (T3, labelled)
+
+- GitLab public CC-BY-4.0 paper repo (same clone as T1).
+- Compact extracts (not daily files, not `*.jl`):
+  `diagnostics/gate0_agrimate/t3_fig4_inputs/`.
+- **Not adopted** as `prepare_wheat` or C.1. `fig4_experiment_region_path()`
+  stays `None`. USDA remains the default. Do not invent an Egypt node.
+- GitLab `data/clean/food_balances/wheat_food_balance_fao.csv` was
+  inspected and **left** (md5 `14a87dd79a2d` vs host reconstruction
+  `ba213511d9e3`; years 1992–2020 vs 2006–11). FBSH 5074 is ΔS, never S.
+
 ### FAOSTAT Food Balances (A1) — how to get them
 
 Author AgriculturalData expects cleaned `wheat_food_balance_fao.csv`.
@@ -175,6 +188,7 @@ visible.
 | Pink Sheet | `--prices-only` |
 | Harvest calendars | none (vendored) |
 | Fig. 4 author CSVs | none (`author_fig4/` committed); NetCDF zip is manual Zenodo |
+| Fig. 4 FAO/EU28 labelled extracts | none (`t3_fig4_inputs/` committed); daily FAO stays on GitLab |
 | Author Julia 14022004 | **not** vendored (T1 inspected under `/tmp`) | retrieve yourself, do not copy into `sheaf/agrimate/` |
 
 `pip install -r requirements.txt` then the commands above. No API keys

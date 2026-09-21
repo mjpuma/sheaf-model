@@ -223,6 +223,13 @@ Class **D** (D.22 state/observation/update) / **C** (NLopt vs L-BFGS-B) /
 **H** (weight, Jacobi, no freeze, S_end off). **Not implemented.**
 `wheat_params()` unchanged. Next paste **T3**.
 
+**T3 follow-up (FAO/EU28 obtain).** Compact FAO-since-2005 annual
+relative 2000–11 + AgrimateEU28 YAML + Egypt=EGY extra labelled in
+`t3_fig4_inputs/`. Daily 4.7 MB files not vendored. GitLab FB left.
+**Not adopted.** Egypt not on C.1. USDA stays `prepare_wheat`.
+`wheat_params()` unchanged. Writeup: `t3_fig4_inputs.md`. Next paste
+**stay not-accepted**.
+
 **S3 follow-up (FBSH vs member-sum USDA).** 2006–08 harvest+AMIS:
 China H 112.7 vs FBSH 112.3 (ratio 1.00). moy 20.1× → 33.0× (worsened).
 Items 1–3 did not improve. Psi USDA; 5074 is ΔS, not S. Author cleaned
@@ -472,6 +479,7 @@ Not adopted. Julia still absent. Living next-paste is **R6**.
 | 5. Historical performance | **Fail** vs Fig. 4 and Pink | F |
 | 6. Controlled experiments | Three scenarios + P11; AMIS/D.3 bind | H |
 
-**Do not accept G0-P. Do not start G1.** Sourced continuation is T3
-(FAO-since-2005 / AgrimateEU28 obtain-or-leave). D.22 delta is labelled
-(`t2_delta.md`), not adopted. Do not copy Julia. Do not adopt freeze.
+**Do not accept G0-P. Do not start G1.** T-queue exhausted. T3 labelled
+FAO-since-2005 + AgrimateEU28+Egypt arrays (`t3_fig4_inputs.md`), not
+adopted, not C.1. D.22 delta is labelled (`t2_delta.md`), not adopted.
+Do not copy Julia. Do not adopt freeze. Do not invent Egypt.
