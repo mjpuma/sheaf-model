@@ -269,6 +269,10 @@ approval.
     differs from the host reconstruction). Still cannot-set: start
     2000 live window, old-demand-dynamics, FAO as WheatData. Do not
     start G1. Next paste **stay not-accepted**.
+31. **Stay not-accepted (this).** T-queue exhausted. G0-P **still not
+    accepted** (last/first 1.444; hike ×3.71; unconverged 2304/5832).
+    T1–T3 labelled, not adopted. Methods note reaffirmed. Do not
+    start G1. Next paste **stay not-accepted**.
 
 Reference command:
 

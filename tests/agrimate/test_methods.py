@@ -56,6 +56,9 @@ def test_methods_note_is_the_market_section_offer():
     assert "A1" in text and "A8" in text
     assert "P11" in text or "restriction_pulse" in text
     assert "member-sum" in text or "S1" in text
+    assert "stay not-accepted" in text
+    assert "T3" in text or "FAO-since-2005" in text
+    assert "vector+shift" in text or "t2_delta" in text
 
 
 def test_methods_module_does_not_import_g1_g2():

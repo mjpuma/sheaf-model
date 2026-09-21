@@ -1,4 +1,4 @@
-"""Post-R S-queue: S6 methods v2 done; T1–T3 done; Next paste stay not-accepted."""
+"""Post-R S-queue: S6 methods v2 done; T1–T3 done; stay not-accepted recorded."""
 from __future__ import annotations
 
 from dataclasses import fields
@@ -59,7 +59,7 @@ def test_s1_implements_member_sum():
 def test_dispatch_next_paste_is_stay_not_accepted():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: T3" in text
+    assert "Last completed: stay-not-accepted" in text
     assert "Next paste: stay not-accepted" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
@@ -114,6 +114,8 @@ def test_pointers_name_s_queue():
         assert "S6" in body or "S5" in body, rel
     cont = (ROOT / "diagnostics" / "GATE0_CONTINUE.md").read_text()
     assert "Task T1 only" in cont
+    assert "Task stay-not-accepted only" in cont
+    assert "Do not copy Julia" in cont
     assert "Do not copy Julia" in cont
     assert "Do not start G1" in cont
     assert "freeze_q_oth" in cont
