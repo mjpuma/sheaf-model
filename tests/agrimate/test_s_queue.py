@@ -59,14 +59,15 @@ def test_s1_implements_member_sum():
 def test_dispatch_next_paste_is_solver_after_d22():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: D.22" in text or "Last completed: stay-not-accepted" in text
-    assert "Next paste: solver" in text or "Next paste: stay not-accepted" in text
+    assert "Last completed: D.22" in text
+    assert "Next paste: solver" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
     assert "R11" in text
     assert "Bai 10" in text
     assert "freeze_q_oth" in text
     assert "copy Julia" in text or "sheaf/agrimate" in text
+    assert "0.772" in text or "0.77" in text
 
 
 def test_s2_prompt_forbids_pin_and_l1l8():

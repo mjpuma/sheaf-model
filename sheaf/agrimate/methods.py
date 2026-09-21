@@ -102,6 +102,14 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
                 ukr2007[f"{tag}_c"] = float(t.loc[2007, "consumption"])
                 ukr2007[f"{tag}_x"] = float(t.loc[2007, "exports"])
     drift = bar["drift_undisturbed"]
+    d22_path = out_dir / "score_d22.csv"
+    if d22_path.is_file():
+        d22 = pd.read_csv(d22_path).iloc[0]
+        d22_lf = float(d22["last_first"])
+        d22_first = float(d22["mean_first_usd"])
+    else:
+        d22_lf = float("nan")
+        d22_first = float("nan")
 
     lines = [
         "# SHEAF Gate 0 wheat — methods note (G0-P / S6; T1–T3 reaffirm)",
@@ -314,7 +322,9 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "planned foreign sales is **implemented** (`d22.py`; T2 labelled the",
         "law). Weight 1/12 matches. Freeze is absent in author Julia and is",
         "not a `AgrimateParams` field. Not a price pin. Not a solver switch.",
-        "Living D.22 last/first is `score_d22.csv`. Next paste **solver**.",
+        f"Living D.22 last/first is **{_fmt(d22_lf, 3)}** (`score_d22.csv`)",
+        f"with 2006 mean ${_fmt(d22_first, 1)}/t. Two-sided repeating",
+        "[1/1.1, 1.1] still **fails**. Next paste **solver**.",
         "",
         "### Production, stocks, consumption",
         "",
@@ -406,14 +416,14 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "| S4 | D.30a formula wired; x1 still from plan | formula H; x1 gap D |",
         "| B1 | T* delivery, not own-XI echo | coding fix |",
         "| E1/E2 | G1 substitution / G2 game | **not implemented** |",
-        "| T2 | D.22 vector+shift / NLopt vs host | labelled, **not implemented** |",
+        "| T2 | D.22 vector+shift / NLopt vs host | D.22 **implemented**; solver labelled |",
         "| T3 | FAO-since-2005 + AgrimateEU28+Egypt | labelled, **not C.1**, not `prepare_wheat` |",
         "",
         "## 10. Limits",
         "",
-        f"1. Undisturbed annual-mean drift {_fmt(drift, 3)} is unexplained after B1; "
-        "T2 labelled sourced D.22 vector+shift (not a freeze; 0 `*.jl` in "
-        "`sheaf/`; not implemented).",
+        f"1. Undisturbed annual-mean drift {_fmt(drift, 3)} on the S1 CSV; "
+        f"D.22 vector+shift last/first {_fmt(d22_lf, 3)} (two-sided still fail; "
+        "not a freeze; 0 `*.jl` in `sheaf/`). Solver still labelled.",
         f"2. ~{100.0 * int(ha['unconverged']) / 5832:.0f}% of harvest+AMIS plans "
         "are unconverged feasible iterates (N5).",
         f"3. Off-season world price collapses ({_fmt(sha['moy_maxmin_host'], 1)}× moy "
@@ -448,7 +458,7 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "**Recommend reject** as the publishable SHEAF market section.",
         "Items 1–3 do not all hold; item 5 is a sourced shortfall. G1 and",
         "G2 stay blocked until a later G0-P acceptance. Do not start G1.",
-        "`wheat_params()` unchanged. T-queue (T1–T3) stay-not-accepted is",
+        "`wheat_params()` unchanged. T-queue (T1–T3) stay not-accepted is",
         "recorded. D.22 vector+shift is **implemented**. Next paste",
         "**solver** (`GATE0_CONTINUE.md`). Do not start G1. Human",
         "acceptance is still required.",

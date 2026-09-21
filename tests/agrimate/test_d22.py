@@ -122,6 +122,8 @@ def test_d22_score_locks_when_present():
     assert int(tab["n_julia"]) == 0
     assert float(tab["alpha_i"]) == 3.2
     assert bool(tab["solver_unchanged"]) is True
-    assert abs(float(tab["last_first_s1"]) - 1.444) < 0.01
+    assert bool(tab["item3_pass"]) is False
+    assert bool(tab["item3_onesided"]) is True
+    assert abs(float(tab["last_first"]) - 0.772) < 0.01
     for name in PROTECTED_THREE_SCENARIO:
         assert (OUT_DEFAULT / name).is_file(), name

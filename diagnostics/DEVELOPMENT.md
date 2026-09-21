@@ -278,8 +278,9 @@ approval.
     *planned* foreign sales. Not a freeze. Not a pin. Not a Julia
     copy. `wheat_params()` unchanged. Solver still L-BFGS-B / x1
     free (secondary). S1 three-scenario CSVs not clobbered. Last/first
-    re-measured on 2003–11 undisturbed (`score_d22.csv`). Next paste
-    **solver**. Do not start G1.
+    **0.772** vs author **1.004** (S1 snapshot 1.444). Two-sided
+    repeating [1/1.1, 1.1] still fails; quiet-year USD ~$456 vs S1
+    $46. Unconverged 1986/5832. Next paste **solver**. Do not start G1.
 
 Reference command:
 

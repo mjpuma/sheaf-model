@@ -108,7 +108,9 @@ unchanged. Historical writeup: `diagnostics/gate0_agrimate/xi_split.md`.
 foreign sales; host *was* a **scalar EMA** of current-step realized XI.
 EMA *weight* matches (`1/(0.5 N_year)=1/12`). **No freeze**
 in author Julia. **D.22 implemented** (`d22.py`): live host now uses
-that vector+shift of planned foreign sales. `freeze_q_oth` stays
+that vector+shift of planned foreign sales. Last/first **0.772** vs
+author **1.004** (S1 snapshot 1.444; two-sided repeating still fails).
+Quiet-year USD ~$456 vs S1 $46. `freeze_q_oth` stays
 diagnostic, default off, not a `wheat_params()` field. Not a pin.
 Solver still L-BFGS-B (N5). Writeup: `diagnostics/gate0_agrimate/item3.md`
 (S2 snapshot 1.444); T1: `t1_julia.md`; T2: `t2_delta.md`; living D.22:

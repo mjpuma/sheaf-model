@@ -156,7 +156,11 @@ def d22_metrics(result, out_dir: Path | None = None) -> dict:
         "unconverged": unconverged,
         "failed": failed,
         "n_solves": n_solves,
-        "item3_pass": bool(lf <= 1.1),
+        # S2 cap was one-sided (upward wander). Repeating seasonal is
+        # two-sided: last/first in [1/1.1, 1.1]. 0.772 meets ≤1.1 and
+        # still undershoots author 1.004 — not an item-3 pass.
+        "item3_onesided": bool(lf <= 1.1),
+        "item3_pass": bool((1.0 / 1.1) <= lf <= 1.1),
         "implemented": True,
         "author_does_freeze": False,
         "pad_documented": True,
@@ -244,7 +248,13 @@ def write_d22_note(metrics: dict, out_dir: Path | None = None) -> Path:
         "45.82 | 66.15 |",
         "| R4 qoth_freeze (pre-S1, not adopted) | 1.019 | — | — |",
         "",
-        f"G0-P item 3 is **{item3}** on this D.22 run (threshold 1.1).",
+        f"G0-P item 3 is **{item3}** on this D.22 run.",
+        "The S2 cap last/first ≤ 1.1 is one-sided (it caught 1.444).",
+        f"Repeating seasonal is two-sided [1/1.1, 1.1]. Host {_fmt(lf, 3)}",
+        f"meets the one-sided cap and undershoots author {_fmt(author, 3)}.",
+        "Quiet-year USD level also moved ($456 vs S1 $45.82). Not a pin.",
+        "Not Agrimate last/first ≈ 1. Do not treat this as G0-P item 3",
+        "acceptance.",
         f"Unconverged {int(metrics['unconverged'])}/"
         f"{int(metrics['n_solves'])}; failed "
         f"{int(metrics['failed'])}. Solver still L-BFGS-B.",
@@ -268,7 +278,7 @@ def write_d22_csv(metrics: dict, out_dir: Path | None = None) -> Path:
         "last_first_author", "author_first", "author_last",
         "n_julia", "freeze_q_oth_on_params", "alpha_i", "zeta_penalty",
         "n_for_months", "tau_exp", "n_del", "ema_weight",
-        "unconverged", "failed", "n_solves", "item3_pass",
+        "unconverged", "failed", "n_solves", "item3_onesided", "item3_pass",
         "implemented", "author_does_freeze", "pad_documented",
         "solver_unchanged", "class_d22", "class_solver", "confidence",
         "runtime_s", "s1_three_scenario_untouched",
