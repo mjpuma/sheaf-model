@@ -240,6 +240,16 @@ approval.
     accepted** (last/first 1.444; hike ×3.71; unconverged 2304/5832).
     `wheat_params()` unchanged. Do not start G1. Continuation:
     `GATE0_CONTINUE.md` **T1** (obtain-or-leave 14022004 Julia).
+28. **T1 (done).** Obtained GitLab paper repo
+    (`https://gitlab.pik-potsdam.de/agrimate/agrimate`,
+    `f2de9655`, 41 `*.jl`) and inspected Zenodo 14022004
+    `agrimate-equal-sales-penalty` zip (`79951111`, 32 `*.jl`) under
+    `/tmp`. **Not copied** into `sheaf/agrimate/` (still 0 `*.jl`).
+    Wheat D.22 **differs** (author: horizon vector + shift of planned
+    foreign sales; host: scalar EMA of realized XI; weight 1/12
+    matches). Solver **differs** (NLopt LD_SLSQP vs L-BFGS-B). No
+    freeze in author. `wheat_params()` unchanged. Do not start G1.
+    Next paste **T2**.
 
 Reference command:
 

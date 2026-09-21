@@ -99,10 +99,14 @@ volume. Author Agrimate still updates D.22; freeze is a diagnostic
 isolation, not a copy. Not a decay knob. Not L1–L8. `wheat_params()`
 unchanged. Historical writeup: `diagnostics/gate0_agrimate/xi_split.md`.
 **S2 re-measure (A8 member-sum host):** last/first **1.444** vs author
-**1.004** (still >1.1). No sourced D.22 variant from retrieved 14022004
-wheat (0 `*.jl` in tree). `freeze_q_oth` stays diagnostic, default off,
-not a `wheat_params()` field. Not adopted. Not a pin. Writeup:
-`diagnostics/gate0_agrimate/item3.md`.
+**1.004** (still >1.1). **T1 obtained** GitLab + 14022004 Julia
+(*inspect-only*; 0 `*.jl` copied into `sheaf/agrimate/`). Sourced D.22
+**differs**: author wheat is a horizon **vector + shift** of planned
+`optimal_sales_foreign[3:end]`; host is a **scalar EMA** of current-step
+realized XI. EMA *weight* matches (`1/(0.5 N_year)=1/12`). **No freeze**
+in author Julia. `freeze_q_oth` stays diagnostic, default off, not a
+`wheat_params()` field. Not adopted. Not a pin. Writeup:
+`diagnostics/gate0_agrimate/item3.md`; T1: `t1_julia.md`.
 
 N4 **D.7 international scale.** Argument is `(XI_r + Q_{-r}) / XI*_world`
 with `XI*_world` the per-step year-average (wheat_data note; Agrimate
@@ -114,6 +118,10 @@ N5 **Unconverged L-BFGS-B (P5).** Feasible fraction plans with scipy
 kept: more iters move the price path, but 200 vs 400 disagree by a similar
 RMSE, so there is no demonstrated unique stationary point to adopt.
 Writeup: `diagnostics/gate0_agrimate/solver.md`. Not a pin and not L1–L8.
+**T1:** author wheat solver is NLopt `:LD_SLSQP` (`maxtime=60`, current x1
+fixed to demand, S_end equality), not scipy L-BFGS-B. Sourced solver
+delta; not adopted this session (`t1_julia.md`). Do not raise
+`plan_maxiter`.
 R9 repeats the count on `fig4_experiment_params()` harvest+AMIS 2006–08
 (`solver_fig4.md`): failed still 0; unconverged still counted; labelled
 maxiter=200/400 probes do **not** raise the default cap and are not adopted.
@@ -160,7 +168,8 @@ R5 adds `x1_from_demand=False` (default recovers T*+domestic). `True`
 assigns Ndel-lagged foreign D.30/D.30a requests as international arrival
 (`x1_demand.md`). 2006 harvest+AMIS: max |Δp_w|=0 (XI-weighted offers);
 Σ inflow 478→908 MMT. Not a min(supply, demand) ration. Not adopted.
-14022004 Julia still not in-tree. `wheat_params()` unchanged.
+14022004 Julia inspected under `/tmp` (T1); still **not** copied
+in-tree. `wheat_params()` unchanged.
 
 ## Documentation G-fix (not an economic departure)
 

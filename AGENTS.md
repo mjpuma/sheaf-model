@@ -9,7 +9,7 @@ changing `sheaf/agrimate/`, Gate 0 docs, or the default entry point.
 - **Protocol:** [`diagnostics/GATE0_VALIDATION.md`](diagnostics/GATE0_VALIDATION.md)
 - **Prompt list (one per session):** [`diagnostics/GATE0_PROMPTS.md`](diagnostics/GATE0_PROMPTS.md)
   (P0–P12 done). Next paste: [`diagnostics/GATE0_REPRO_DISPATCH.md`](diagnostics/GATE0_REPRO_DISPATCH.md)
-  (**S6 done**; G0-P **not accepted**; next **T1**
+  (**S6 done**; G0-P **not accepted**; **T1 done**; next **T2**
   [`GATE0_CONTINUE.md`](diagnostics/GATE0_CONTINUE.md);
   S-queue [`GATE0_NEXT_PROMPTS.md`](diagnostics/GATE0_NEXT_PROMPTS.md)).
 - **Legacy benchmark:** `python scripts/score_legacy_crop.py --crop wheat`

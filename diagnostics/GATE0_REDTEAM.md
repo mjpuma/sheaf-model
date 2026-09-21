@@ -23,7 +23,9 @@ scenario runner was **not** re-run; scores are the committed
 of retrieved Zenodo 14022004 wheat code, with labelled gaps. It does
 **not** reproduce Agrimate Fig. 4. Most tests pass *because they lock
 that honesty*, not because the price path matches Agrimate. G0-P remains
-**not accepted** (S6 methods v2, S1–S5 numbers). Do not start G1.
+**not accepted** (S6 methods v2, S1–S5 numbers). **T1 obtained** GitLab
++ 14022004 Julia (inspect-only; 0 `*.jl` in `sheaf/agrimate/`). D.22 and
+the supplier solver **differ** from the host. Do not start G1.
 
 **S5/S6 live harvest+AMIS (2006–11, member-sum host):** hike ×3.71 vs
 Agrimate ×1.62 vs Pink ×1.88; 2006 mean $81.5 vs Pink $213.5; moy
@@ -208,6 +210,13 @@ re-run). Host last/first **1.444** ($45.82 → $66.15) vs author **1.004**.
 Still >1.1. 0 `*.jl` in tree — no sourced D.22 variant. `freeze_q_oth`
 stays diagnostic, default off, not in `wheat_params()`. Not adopted.
 Not a pin. Writeup: `item3.md`. Next paste **S3**.
+
+**T1 follow-up (author Julia inspect).** GitLab paper repo + 14022004
+equal-sales-penalty zip inspected under `/tmp`. **Not copied.** Wheat
+D.22 is a horizon vector + shift of planned `optimal_sales_foreign[3:end]`;
+host is a scalar EMA of realized XI (weight 1/12 matches). Solver is
+NLopt LD_SLSQP, not L-BFGS-B. **No freeze** in author. Not adopted.
+Writeup: `t1_julia.md`. Next paste **T2**.
 
 **S3 follow-up (FBSH vs member-sum USDA).** 2006–08 harvest+AMIS:
 China H 112.7 vs FBSH 112.3 (ratio 1.00). moy 20.1× → 33.0× (worsened).
@@ -458,5 +467,5 @@ Not adopted. Julia still absent. Living next-paste is **R6**.
 | 5. Historical performance | **Fail** vs Fig. 4 and Pink | F |
 | 6. Controlled experiments | Three scenarios + P11; AMIS/D.3 bind | H |
 
-**Do not accept G0-P. Do not start G1.** Sourced continuation is T1
-(obtain-or-leave 14022004 Julia to inspect D.22), not a Pink-Sheet fit.
+**Do not accept G0-P. Do not start G1.** Sourced continuation is T2
+(label the D.22 / NLopt delta). Do not copy Julia. Do not adopt freeze.
