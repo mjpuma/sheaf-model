@@ -7,9 +7,10 @@ Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
 
 **Now:** P0–P12 done. G0-P **not accepted.** R-science queue
 [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md) is **exhausted.**
-Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
+Post-R S-queue [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md) **S1–S6 done**.
+Alignment: [`GATE0_ALIGN_PROMPTS.md`](GATE0_ALIGN_PROMPTS.md);
 paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) **Next paste**
-(currently **stay not-accepted**; T1–T3 done; S6 done; G0-P **not accepted**). Do not paste G1/G2.
+(currently **A1**). Do not paste G1/G2.
 
 ## Shared preamble (prepend to every prompt)
 
