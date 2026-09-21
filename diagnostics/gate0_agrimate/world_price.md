@@ -1,9 +1,17 @@
-# Gate 0 wheat — world-price recipe (R3)
+# Gate 0 wheat — world-price recipe (R3, then the clearing loop)
 
-Host `p_w` is the **XI-weighted mix of lagged D.7 offers**, then
-`price_usd = p_w × p0`. It is **not** Eq. D.7 of world XI / XI*_world,
-and it is **not** a 2006 pin. `wheat_params()` stay αI=3.2, ζ=0,
-N_for=3. L1–L8 stay rejected. G1/G2 stay blocked.
+Live `p_w` is the volume-weighted price of **off-diagonal transactions**
+recorded at the sale (`foreign_transaction_index` /
+`fig4.world_market_price_index`), then `price_usd = p_w × p0`. Empty
+foreign volume keeps the previous index (1 at t=0). It is **not** the
+XI-weighted mix of lagged D.7 offers, **not** Eq. D.7 of world XI /
+XI*_world, and it is **not** a 2006 pin. `wheat_params()` stay αI=3.2,
+ζ=0, N_for=3. L1–L8 stay rejected. G1/G2 stay blocked.
+
+The R3 note below records the pre-clearing identity. That helper
+(`volume_weighted_offer_index`, `lagged_offer_index`) is still in
+`model.py` for the unit test of the old mix. `AgrimateSim.run` no
+longer calls it.
 
 Zenodo 14022004 Julia (`plot_wm_price_timeseries`) is **absent** from
 this checkout. This note is a host identity plus a labelled gap, not a
@@ -40,9 +48,9 @@ bit-diff of author plotting code.
 4. **Counterexample to “a single D.7 of world XI*”.** Two exporters,
    `XI=(8,2)`, `Q_{-r}=(1,1)`, `XI*=10`: regional D.7 arguments are
    0.9 and 0.3; the XI-weighted mix is not `0.9^{-α}` or `1^{-α}`.
-   Executable: `test_volume_weighted_offer_index_is_xi_mix_not_single_d7`
-   and the 2006 harvest+AMIS path in
-   `test_reported_pw_equals_lagged_xi_weighted_offers_not_world_d7`.
+   Executable: `test_volume_weighted_offer_index_is_xi_mix_not_single_d7`.
+   The 2006 harvest+AMIS path now checks the transaction index in
+   `test_reported_pw_equals_foreign_transactions_not_lagged_offers`.
    Counterexample to “2006 pin”: that path’s mean index is not 1;
    `price_usd / p0` recovers the index (`test_host_index_is_usd_over_p0`
    on the committed three-scenario CSV).
@@ -84,6 +92,19 @@ against `fig4.world_market_price_index` **and** against
 They coincide when every destination pays the exporter offer. They
 diverge if transaction prices are destination-specific. That is a
 definition gap, not a retune.
+
+## Clearing loop (live path)
+
+Sales prorate last period's requests. Foreign transfers scale by
+`(1−Δ)`. The price on the transaction is the reservation posted with
+that request. The posted price is the inverse demand of next-step
+expected sales (domestic: own home sales plus the import share of
+others' foreign plans, over baseline consumption; foreign: own foreign
+sales plus others, over XI*_world), capped at 1000. Purchase shares are
+baseline column shares times expected sales over XD* or XI*, then
+column-normalized. Delivery is the lagged buyer receipt at the
+transaction price, domestic included. `plot_wm_price_timeseries` is
+still not in this tree. Do not pin 2006.
 
 ## What this session did not do
 

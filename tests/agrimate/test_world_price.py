@@ -1,11 +1,11 @@
-"""R3: host p_w is the XI-weighted lagged D.7 offer mix. Not a 2006 pin."""
+"""World price is the off-diagonal transaction index. Not a 2006 pin."""
 from __future__ import annotations
 
 from pathlib import Path
 
 import numpy as np
 
-from sheaf.agrimate.equations import inverse_demand
+from sheaf.agrimate.equations import foreign_transaction_index, inverse_demand
 from sheaf.agrimate.fig4 import world_market_price_index
 from sheaf.agrimate.model import (
     lagged_offer_index,
@@ -70,7 +70,7 @@ def test_author_extractor_is_bilateral_off_diagonal_not_host_mix():
     assert abs(other_offer - wm[0]) > 0.1
 
 
-def test_reported_pw_equals_lagged_xi_weighted_offers_not_world_d7():
+def test_reported_pw_equals_foreign_transactions_not_lagged_offers():
     params = wheat_params()
     data = prepare_wheat(start_year=2006, end_year=2006, params=params)
     res = run_agrimate(
@@ -78,28 +78,23 @@ def test_reported_pw_equals_lagged_xi_weighted_offers_not_world_d7():
         use_anomalies=True, use_restrictions=True,
         start_year=2006, end_year=2006,
     )
-    assert res.offer is not None and res.xi_ship is not None
-    replay = lagged_offer_index(res.xi_ship, res.offer, params.n_del)
-    assert np.allclose(res.price_index, replay, rtol=0.0, atol=1e-12)
-    assert np.allclose(res.price_usd, res.price_index * data.p0)
-
-    n_r, T = res.xi_ship.shape
-    q_i = [np.zeros(n_r) for _ in range(params.n_del)]
-    single = np.empty(T)
+    assert res.tx_quantity is not None and res.tx_price is not None
+    wm = world_market_price_index(res.tx_quantity, res.tx_price)
     prev = 1.0
-    star = max(float(data.XI_world), 1e-8)
-    for t in range(T):
-        q_i.append(res.xi_ship[:, t].copy())
-        xi_lag = q_i.pop(0)
-        vol = float(np.sum(xi_lag))
-        if vol > 1e-12:
-            single[t] = float(inverse_demand(
-                vol / star, params.alpha_i, params.lam_demand,
-                params.demand_arg_floor))
+    expect = np.empty_like(res.price_index)
+    for t in range(expect.size):
+        if np.isfinite(wm[t]):
+            step = foreign_transaction_index(
+                res.tx_quantity[:, :, t], res.tx_price[:, :, t], prev)
+            assert abs(step - float(wm[t])) < 1e-8
+            expect[t] = step
         else:
-            single[t] = prev if t else 1.0
-        prev = single[t]
-    assert np.max(np.abs(res.price_index - single)) > 0.05
+            expect[t] = prev if t else 1.0
+        prev = expect[t]
+    assert np.allclose(res.price_index, expect, rtol=0.0, atol=1e-12)
+    assert np.allclose(res.price_usd, res.price_index * data.p0)
+    replay = lagged_offer_index(res.xi_ship, res.offer, params.n_del)
+    assert np.max(np.abs(res.price_index - replay)) > 0.05
     # Not a 2006 pin: year-mean index is not reset to 1.
     assert abs(float(res.price_index.mean()) - 1.0) > 0.05
 

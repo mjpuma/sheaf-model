@@ -57,14 +57,15 @@ def test_brief_has_open_team_questions():
     assert "Do not need from the team" in text
 
 
-def test_dispatch_next_paste_is_a3_after_inventory():
+def test_dispatch_next_paste_is_supplier_leftovers_after_clearing():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: A1" in text
-    assert "Next paste: A3" in text
+    assert "Last completed: clearing" in text
+    assert "supplier leftovers" in text
+    assert "5713" in text
     assert "G1/G2" in text
     assert "copy Julia" in text
-    assert "remaining NLP" in text or "A4 until A3" in text
+    assert "Do not start G1" in text
     assert (OUT_DEFAULT / "rt_solver.md").is_file()
     inv = (OUT_DEFAULT / "align_inventory.md").read_text()
     assert "implement-now" in inv

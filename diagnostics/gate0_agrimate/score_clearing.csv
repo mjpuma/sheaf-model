@@ -1,0 +1,2 @@
+last_first,moy_maxmin,seas_corr_2006_2011,mean_2006_usd,mean_2011_usd,window_min_usd,window_max_usd,unconverged,failed,n_solves,runtime_s,alpha_i,zeta,n_for_months,plan_maxiter,bar_b_last_first,n_julia,use_anomalies,use_restrictions,bar_b_moy,bar_b_seas_corr
+1.7768231703619026,5713.082240335029,0.9420867276727828,285.8317745668255,507.8725198759956,0.1598177348620933,2175.7344943106955,1180,0,5832,62.51511546600023,3.2,0.0,3,40,1.0035028350367956,0,False,False,1.3238507386593894,0.9907104471567464
