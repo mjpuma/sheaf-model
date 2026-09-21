@@ -17,9 +17,9 @@ Rewrite `GATE0_REPRO_DISPATCH.md` in ≤20 lines. Next session pastes
 | If the last run showed… | Next paste | Skip |
 |---|---|---|
 | Obtain failed (GitLab/Zenodo unreachable; no inspectable tree) | **T1** | do not adopt `freeze_q_oth`; do not pin |
-| Julia inspected; D.22 / solver **differs** from host | **T2** | label sourced delta only; do not copy Julia into `sheaf/agrimate/` |
+| Julia inspected; D.22 / solver **differs**; T2 note **absent** | **T2** | label sourced delta only; do not copy Julia into `sheaf/agrimate/` |
+| T2 labelled; not implemented | **T3** | do not invent Egypt; knobs stay on `fig4_experiment_params()` |
 | Julia obtained; D.22 **matches** host (item 3 still open) | leave labelled | do not invent a decay knob |
-| FAO-since-2005 + AgrimateEU28 arrays still missing | **T3** | do not invent Egypt; knobs stay on `fig4_experiment_params()` |
 | Tests would still pass a *non*-match | R8 may piggyback | do not weaken identities |
 
 Hard stops do not adapt. L1–L8, 2006 pin, Bai αI=10, maize/rice
@@ -56,7 +56,8 @@ Next session pastes that file's **Next paste**.
 |---|---|---|
 | S1–S6 | Post-R development | **done** (G0-P **not accepted**) |
 | **T1** | Obtain-or-leave 14022004 Julia (inspect D.22 / solver) | **done** (deltas exist; 0 `*.jl` in sheaf) |
-| **T2** | Label sourced D.22/solver delta | **next** |
+| **T2** | Label sourced D.22/solver delta | **done** (labelled, not adopted) |
+| **T3** | Obtain-or-leave FAO-since-2005 + EU28 inputs | **next** (A7 still cannot-set) |
 | T3 | Obtain-or-leave FAO-since-2005 + EU28 inputs | A7 still cannot-set |
 | — | G1 / G2 | **blocked until G0-P accepted** |
 

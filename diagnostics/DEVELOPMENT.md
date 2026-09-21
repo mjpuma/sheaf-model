@@ -250,6 +250,14 @@ approval.
     matches). Solver **differs** (NLopt LD_SLSQP vs L-BFGS-B). No
     freeze in author. `wheat_params()` unchanged. Do not start G1.
     Next paste **T2**.
+29. **T2 (done).** Labelled sourced D.22 / solver delta (equation,
+    file, line) in `t2_delta.md`. Author wheat: horizon vector+shift of
+    planned `optimal_sales_foreign[3:end]` (`producer.jl` 452–464);
+    NLopt `:LD_SLSQP` with current x1 fixed (`producer_optimization.jl`
+    68–72, 280). Host: scalar EMA of realized XI (`model.py` 347–349);
+    L-BFGS-B (`optimize.py` 256–258). Weight 1/12 matches. **No freeze**
+    in author. **Not implemented.** `wheat_params()` unchanged. Do not
+    start G1. Next paste **T3**.
 
 Reference command:
 

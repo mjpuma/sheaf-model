@@ -106,7 +106,8 @@ unchanged. Historical writeup: `diagnostics/gate0_agrimate/xi_split.md`.
 realized XI. EMA *weight* matches (`1/(0.5 N_year)=1/12`). **No freeze**
 in author Julia. `freeze_q_oth` stays diagnostic, default off, not a
 `wheat_params()` field. Not adopted. Not a pin. Writeup:
-`diagnostics/gate0_agrimate/item3.md`; T1: `t1_julia.md`.
+`diagnostics/gate0_agrimate/item3.md`; T1: `t1_julia.md`; **T2** sourced
+file:line delta (not implemented): `t2_delta.md`.
 
 N4 **D.7 international scale.** Argument is `(XI_r + Q_{-r}) / XI*_world`
 with `XI*_world` the per-step year-average (wheat_data note; Agrimate
@@ -119,9 +120,9 @@ kept: more iters move the price path, but 200 vs 400 disagree by a similar
 RMSE, so there is no demonstrated unique stationary point to adopt.
 Writeup: `diagnostics/gate0_agrimate/solver.md`. Not a pin and not L1–L8.
 **T1:** author wheat solver is NLopt `:LD_SLSQP` (`maxtime=60`, current x1
-fixed to demand, S_end equality), not scipy L-BFGS-B. Sourced solver
-delta; not adopted this session (`t1_julia.md`). Do not raise
-`plan_maxiter`.
+fixed to demand). Sourced solver delta; **T2** labelled file:line
+(`t2_delta.md`), not adopted. `equal_constraint` default is **false** so
+S_end equality is off on wheat. Do not raise `plan_maxiter`.
 R9 repeats the count on `fig4_experiment_params()` harvest+AMIS 2006–08
 (`solver_fig4.md`): failed still 0; unconverged still counted; labelled
 maxiter=200/400 probes do **not** raise the default cap and are not adopted.
