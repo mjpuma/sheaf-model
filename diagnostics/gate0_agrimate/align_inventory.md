@@ -71,3 +71,12 @@ contract). Do not switch `prepare_wheat`.
 Confidence **95–100%** on the file:line rows (same zip the T2 lines
 cite). Confidence **80–95%** on the ranking (clearing before another
 NLP fragment). G0-P stays **not accepted**. Do not start G1.
+
+## Status after the clearing loop
+
+The two implement-now rows are now the live path
+(`prorate_two_market_sales`, `expected_two_market_sales`,
+`author_inverse_demand`, `scale_baseline_shares`,
+`foreign_transaction_index`). The table above is the A1 gap list.
+Scores are in `clearing.md`. The month-of-year swing is still huge.
+Supplier leftovers stay unranked. Do not start G1.

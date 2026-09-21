@@ -9,18 +9,22 @@ import numpy as np
 from sheaf.calendar24 import STEPS_PER_YEAR
 
 from .equations import (
+    author_inverse_demand,
     ces_price_index,
     consumption_ces,
     consumer_price_mix,
     crop_budget_share,
     expected_harvest,
     expected_restriction,
+    expected_two_market_sales,
     extra_storage_demand,
     foreign_request_quantity,
-    fulfill_sales,
-    inverse_demand,
+    foreign_transaction_index,
+    import_shares_of_others,
     inverse_of_inverse_demand,
+    prorate_two_market_sales,
     purchaser_demand,
+    scale_baseline_shares,
     update_producer_storage,
 )
 from .optimize import (
@@ -30,7 +34,7 @@ from .optimize import (
     solve_supplier_plan,
 )
 from .params import AgrimateParams, wheat_params
-from .wheat_data import WheatData, prepare_wheat, international_destination_shares
+from .wheat_data import WheatData, prepare_wheat
 
 # D.22 helpers imported inside AgrimateSim.run to avoid a d22↔model cycle.
 
@@ -128,6 +132,8 @@ class AgrimateResult:
     use_restrictions: bool = True
     offer: np.ndarray | None = None
     x1_from_demand: bool = False
+    tx_quantity: np.ndarray | None = None
+    tx_price: np.ndarray | None = None
 
     def to_monthly_price(self) -> np.ndarray:
         p = np.asarray(self.price_usd, float)
@@ -237,16 +243,23 @@ class AgrimateSim:
         S_c = np.maximum(d.Psi * n_y * d.C_star, 0.0)
         offer = np.ones(n_r)
         p_c = np.ones(n_r)
-        # delivery queue: Ndel steps of exporter-indexed XI and offer prices.
-        # Arrivals to consumers are T* destination shares of that XI (E.1),
-        # not the exporter's own lagged shipments.
-        q_i = [np.zeros(n_r) for _ in range(p.n_del)]
-        q_p = [np.ones(n_r) for _ in range(p.n_del)]
-        # R5: Ndel queue of international D.30/D.30a requests (x1=demand).
+        # In-transit purchases. Length Ndel. Seeded with baseline receipts
+        # so the pipeline is full at t=0. Domestic and foreign are split
+        # so the R5 hook can replace only the foreign leg.
+        base_step = np.asarray(d.T_star, float) / float(n_y)
+        base_dom = np.diag(base_step).copy()
+        base_for = np.maximum(base_step.sum(axis=0) - base_dom, 0.0)
+        q_dom = [base_dom.copy() for _ in range(p.n_del)]
+        q_for = [base_for.copy() for _ in range(p.n_del)]
+        q_pdel = [np.ones(n_r) for _ in range(p.n_del)]
         q_req = [np.zeros(n_r) for _ in range(p.n_del)]
-        dest = international_destination_shares(d.T_star)
+        # Reservation prices posted with the previous requests. Baseline is 1.
+        p_res_dom = np.ones(n_r)
+        p_res_for = np.ones(n_r)
 
         price_index = np.ones(T)
+        tx_q = np.zeros((n_r, n_r, T))
+        tx_p = np.ones((n_r, n_r, T))
         S_p_path = np.zeros((n_r, T))
         S_c_path = np.zeros((n_r, T))
         C_path = np.zeros((n_r, T))
@@ -263,9 +276,11 @@ class AgrimateSim:
         floor_binds_plan = 0
         plan_residual = 0.0
 
-        shares = d.T_star.copy()
-        rs = shares.sum(axis=0, keepdims=True)
-        shares = np.divide(shares, np.maximum(rs, 1e-12))
+        a_star = d.T_star.copy()
+        rs = a_star.sum(axis=0, keepdims=True)
+        a_star = np.divide(a_star, np.maximum(rs, 1e-12))
+        x_avg = np.maximum(d.XD_star + d.XI_star, 0.0)
+        share_imp = import_shares_of_others(d.T_star, d.XI_star, d.XI_world, n_y)
         # D.22 rivals: horizon vector + shift of planned foreign sales.
         # Sourced wheat law (T2); independent Python in d22.py. Not a freeze.
         from .d22 import (
@@ -296,7 +311,6 @@ class AgrimateSim:
             frozen_i = plan_i.copy()
             new_d = plan_d.copy()
             new_i = plan_i.copy()
-            xi_ship0 = np.zeros(n_r)
             do_replan = (t % self.replan_stride) == 0
             if do_replan:
                 for r in range(n_r):
@@ -316,10 +330,10 @@ class AgrimateSim:
                     # Current x1 is demand (clipped), not a free choice.
                     # Author X_avg is mean baseline harvest per step
                     # (initialization.jl); XD*+XI* is that identity here.
-                    x_avg = float(d.XD_star[r]) + float(d.XI_star[r])
+                    x_avg_r = float(d.XD_star[r]) + float(d.XI_star[r])
                     x1 = demand_x1_from_ask(
                         last_ask, r, float(S_p[r]), float(H[r]),
-                        p.iota, x_avg, p.delta_loss)
+                        p.iota, x_avg_r, p.delta_loss)
                     sol = solve_supplier_plan(
                         Hhat, float(S_p[r]), others,
                         d.XI_world, d.XD_star[r],
@@ -341,61 +355,80 @@ class AgrimateSim:
                             if tt < T:
                                 new_d[r, tt] = sol["xd"][k]
                                 new_i[r, tt] = sol["xi"][k]
-                        xi_ship0[r] = float(sol["xi_ship"][0])
-                    else:
-                        xi_ship0[r] = frozen_i[r, t] * (1.0 - delta[r])
                 plan_d, plan_i = new_d, new_i
-            else:
-                for r in range(n_r):
-                    xi_ship0[r] = plan_i[r, t] * (1.0 - delta[r])
-            star_w = max(float(d.XI_world), 1e-8)
-            for r in range(n_r):
-                q_i_arg = (xi_ship0[r] + Q[r, 0]) / star_w
-                if q_i_arg <= p.demand_arg_floor:
-                    floor_binds += 1
-                offer[r] = float(inverse_demand(q_i_arg, p.alpha_i, p.lam_demand,
-                                                p.demand_arg_floor))
-                if abs(offer[r] - 1.0) < p.iota:
-                    offer[r] = 1.0
-            offer_path[:, t] = offer
+            # Sales against last period's requests. Price on each
+            # transaction is the reservation posted with that request.
             sold_d = np.zeros(n_r)
             sold_i = np.zeros(n_r)
             avail = S_p + H
             for r in range(n_r):
-                sd, si = fulfill_sales(plan_d[r, t], plan_i[r, t], avail[r], delta[r])
+                q_r, p_r, sd, si = prorate_two_market_sales(
+                    last_ask[r], r, float(plan_d[r, t]), float(plan_i[r, t]),
+                    float(avail[r]), float(delta[r]),
+                    float(p_res_dom[r]), float(p_res_for[r]),
+                )
+                tx_q[r, :, t] = q_r
+                tx_p[r, :, t] = p_r
                 sold_d[r], sold_i[r] = sd, si
                 S_p[r] = update_producer_storage(S_p[r], H[r], sd, si, p.delta_loss)
             xi_path[:, t] = sold_i
             sold_d_path[:, t] = sold_d
             H_path[:, t] = H
+            # Next-step expected sales, iota floor, then the price blend
+            # with Q[:, 0] before the D.22 shift.
+            t_next = t + 1
+            if t_next < T:
+                raw_f = plan_i[:, t_next].copy()
+                raw_d = plan_d[:, t_next].copy()
+                d_next = self.delta_at(t_next)
+            else:
+                raw_f = d.XI_star.copy()
+                raw_d = d.XD_star.copy()
+                d_next = np.zeros(n_r)
+            exp_d, exp_f = expected_two_market_sales(
+                raw_d, raw_f, d_next, p.iota, x_avg)
+            others_next = (exp_f.sum() - exp_f)
+            others_next = w_exp * others_next + (1.0 - w_exp) * Q[:, 0]
+            # Domestic argument is own expected home sales plus the import
+            # share of others' foreign plans, over baseline consumption.
+            c_safe = np.maximum(d.C_star, 1e-12)
+            for r in range(n_r):
+                arg_d = (exp_d[r] + share_imp[r] * others_next[r]) / c_safe[r]
+                arg_f = (exp_f[r] + others_next[r]) / max(float(d.XI_world), 1e-12)
+                if arg_d <= 0.0 or arg_f <= 0.0:
+                    floor_binds += 1
+                offer[r] = author_inverse_demand(
+                    arg_f, p.alpha_i, p.lam_demand)
+                p_res_dom[r] = author_inverse_demand(
+                    arg_d, float(d.alpha_d[r]), p.lam_demand)
+                p_res_for[r] = offer[r]
+            offer_path[:, t] = offer
             # D.22: Jacobi then update Q from planned foreign sales, not sold XI.
             if not self.freeze_q_oth:
                 pad = d.XI_star_path[:, t % n_y]
                 padded = pad_planned_foreign(plan_i, t, n_y, pad)
                 obs = observe_planned_foreign(padded, p.n_del)
                 Q = shift_ema_expected_others(Q, obs, w_exp)
-            # 6 delivery: queue exporter XI; world price on that lag; consumers
-            # receive T* destination allocation of the same lag (E.1), not own XI.
-            q_i.append(sold_i.copy())
-            q_p.append(offer.copy())
-            xi_lag = q_i.pop(0)
-            p_lag = q_p.pop(0)
-            p_w = volume_weighted_offer_index(
-                xi_lag, p_lag,
-                empty=(float(price_index[t - 1]) if t else 1.0),
-            )
+            prev_pw = float(price_index[t - 1]) if t else 1.0
+            p_w = foreign_transaction_index(tx_q[:, :, t], tx_p[:, :, t], prev_pw)
             price_index[t] = p_w
-            arrive_tstar = dest.T @ xi_lag
-            req_lag = q_req[0]
-            arrive = req_lag if self.x1_from_demand else arrive_tstar
+            # Deliver purchases made n_del steps ago. This step's sales
+            # enter the queue after consumption.
+            dom_arr = q_dom.pop(0)
+            for_arr = q_for.pop(0)
+            del_price = q_pdel.pop(0)
+            req_lag = q_req.pop(0)
+            arrive_for = req_lag if self.x1_from_demand else for_arr
+            inflow_vec = dom_arr + arrive_for
+            shares = scale_baseline_shares(
+                a_star, exp_d, exp_f, d.XD_star, d.XI_star)
             req_now = np.zeros(n_r)
             for s in range(n_r):
-                prices = np.maximum(offer * (1.0 + 0.0 * d.nu[s]), 1e-8)
+                prices = p_res_for.copy()
+                prices[s] = p_res_dom[s]
+                prices = np.maximum(prices, 1e-8)
                 S_star = d.Psi[s] * n_y * d.C_star[s]
                 extra = extra_storage_demand(S_c[s], S_star, p.tau_steps)
-                # D.30a: B = C*/A_d at p*=1 (author mean(p* D*)/A_d*).
-                # Default inflow is T*+domestic. x1_from_demand (R5, default
-                # off) replaces international T* with lagged foreign requests.
                 B = d.C_star[s] / max(float(d.A_d[s]), 1e-8)
                 P_idx = ces_price_index(prices, shares[:, s], p.sigma_ces)
                 A_t = crop_budget_share(d.A_d[s], P_idx, extra, B)
@@ -405,16 +438,25 @@ class AgrimateSim:
                 )
                 last_ask[:, s] = q_ask
                 req_now[s] = foreign_request_quantity(q_ask, s)
-                inflow = float(arrive[s]) + float(sold_d[s])
-                p_c[s] = consumer_price_mix(p_w, inflow, p_c[s], S_c[s])
+                inflow = float(inflow_vec[s])
+                p_c[s] = consumer_price_mix(
+                    float(del_price[s]), inflow, p_c[s], S_c[s])
                 cons = consumption_ces(p_c[s], d.A_c[s], p.eps_c, d.C_star[s])
                 cons = min(cons, S_c[s] + inflow)
                 S_c[s] = max(S_c[s] + inflow - cons, 0.0)
                 C_path[s, t] = cons
                 inflow_path[s, t] = inflow
                 p_c_path[s, t] = p_c[s]
+            buyer_q_mat = tx_q[:, :, t]
+            dom_bought = np.diag(buyer_q_mat).copy()
+            for_bought = np.maximum(buyer_q_mat.sum(axis=0) - dom_bought, 0.0)
+            q_dom.append(dom_bought)
+            q_for.append(for_bought)
+            value = (buyer_q_mat * tx_p[:, :, t]).sum(axis=0)
+            buyer_q = dom_bought + for_bought
+            buyer_p = np.where(buyer_q > 1e-15, value / np.maximum(buyer_q, 1e-15), 1.0)
+            q_pdel.append(buyer_p)
             q_req.append(req_now)
-            q_req.pop(0)
             S_p_path[:, t] = S_p
             S_c_path[:, t] = S_c
 
@@ -444,6 +486,8 @@ class AgrimateSim:
             use_restrictions=self.use_restrictions,
             offer=offer_path,
             x1_from_demand=self.x1_from_demand,
+            tx_quantity=tx_q,
+            tx_price=tx_p,
         )
 
 

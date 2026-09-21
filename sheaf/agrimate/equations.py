@@ -200,3 +200,154 @@ def preference_update(pref: np.ndarray, fill: np.ndarray, rho: float) -> np.ndar
     out = (1.0 - rho) * p + rho * f
     s = out.sum()
     return out / s if s > 0 else p
+
+
+def author_inverse_demand(x: float, alpha: float, lam: float = 0.0,
+                          cap: float = 1000.0) -> float:
+    """Wheat-path inverse demand with the author cap of 1000.
+
+    λ=0 is ``x^(-α)``. Non-positive quantity returns the cap. This is the
+    communicated offer, not the supplier programme's numerical floor.
+    """
+    z = float(x)
+    if not np.isfinite(z) or z <= 0.0:
+        return float(cap)
+    a = float(alpha)
+    if float(lam) == 0.0:
+        p = z ** (-a)
+    elif float(lam) == 1.0:
+        p = 1.0 - a * (z - 1.0)
+    else:
+        p = (1.0 - a * (z ** float(lam) - 1.0)) ** (1.0 / float(lam))
+    if not np.isfinite(p) or p > cap:
+        return float(cap)
+    return float(max(p, 0.0))
+
+
+def iota_floor(x: np.ndarray, iota: float, x_avg: np.ndarray) -> np.ndarray:
+    """Zero a sales expectation below ``ι · X_avg`` (per region)."""
+    v = np.asarray(x, float).copy()
+    thr = float(iota) * np.asarray(x_avg, float)
+    v[v < thr] = 0.0
+    return v
+
+
+def prorate_two_market_sales(
+        ask_row: np.ndarray,
+        seller: int,
+        sales_d: float,
+        sales_i: float,
+        available: float,
+        delta: float,
+        p_dom: float,
+        p_for: float,
+        ) -> tuple[np.ndarray, np.ndarray, float, float]:
+    """Prorate one supplier across buyers. Foreign transfers scale by (1−Δ).
+
+    Ratios are capped at 1, so sales cannot exceed requests. A final
+    domestic-first clip keeps ``sold_d + sold_i ≤ available``.
+    """
+    ask = np.maximum(np.asarray(ask_row, float).reshape(-1), 0.0)
+    n = int(ask.size)
+    s = int(seller)
+    d_dem = float(ask[s])
+    f_dem = float(ask.sum() - d_dem)
+    ratio_d = min(max((float(sales_d) / d_dem) if d_dem > 0.0 else 0.0, 0.0), 1.0)
+    ratio_f = min(max((float(sales_i) / f_dem) if f_dem > 0.0 else 0.0, 0.0), 1.0)
+    one_m = 1.0 - float(np.clip(delta, 0.0, 1.0))
+    q = np.empty(n)
+    price = np.empty(n)
+    foreign = np.ones(n, dtype=bool)
+    foreign[s] = False
+    q[s] = ask[s] * ratio_d
+    price[s] = float(p_dom)
+    q[foreign] = ask[foreign] * ratio_f * one_m
+    price[foreign] = float(p_for)
+    avail = max(float(available), 0.0)
+    if q[s] > avail:
+        q[s] = avail
+    rest = max(avail - float(q[s]), 0.0)
+    # Foreign already carries (1−Δ). The extra cap keeps
+    # sold_i ≤ (1−Δ)·(available − sold_d) when a plan overshoots stock.
+    cap = rest * one_m
+    sold_i = float(q[foreign].sum())
+    if sold_i > cap and sold_i > 0.0:
+        q[foreign] *= cap / sold_i
+    return q, price, float(q[s]), float(q.sum() - q[s])
+
+
+def scale_baseline_shares(
+        a_star: np.ndarray,
+        exp_d: np.ndarray,
+        exp_f: np.ndarray,
+        xd_star: np.ndarray,
+        xi_star: np.ndarray,
+        ) -> np.ndarray:
+    """Baseline column shares times expected sales / starred sales, renormalized.
+
+    Domestic origin uses expected domestic sales over XD*. Every other origin
+    uses expected foreign sales over XI*. A zero column becomes uniform.
+    """
+    a = np.maximum(np.asarray(a_star, float), 0.0)
+    n = a.shape[0]
+    exp_d = np.maximum(np.asarray(exp_d, float), 0.0)
+    exp_f = np.maximum(np.asarray(exp_f, float), 0.0)
+    xd = np.asarray(xd_star, float)
+    xi = np.asarray(xi_star, float)
+    ratio_d = np.divide(exp_d, xd, out=np.zeros(n), where=xd > 1e-12)
+    ratio_f = np.divide(exp_f, xi, out=np.zeros(n), where=xi > 1e-12)
+    ratio = np.broadcast_to(ratio_f[:, None], a.shape).copy()
+    diag = np.arange(n)
+    ratio[diag, diag] = ratio_d
+    out = a * ratio
+    col = out.sum(axis=0, keepdims=True)
+    norm = np.divide(out, np.maximum(col, 1e-15))
+    return np.where(col > 1e-15, norm, 1.0 / n)
+
+
+def expected_two_market_sales(
+        raw_d: np.ndarray,
+        raw_f: np.ndarray,
+        delta: np.ndarray,
+        iota: float,
+        x_avg: np.ndarray,
+        ) -> tuple[np.ndarray, np.ndarray]:
+    """Next-step domestic and foreign sales after the restriction and ι floor.
+
+    A foreign plan below ``ι·X_avg`` is not redirected home. Otherwise the
+    restricted slice ``Δ·raw_f`` is added to domestic sales and removed from
+    foreign sales. Both results are then zeroed if they sit below the floor.
+    """
+    raw_d = np.maximum(np.asarray(raw_d, float), 0.0)
+    raw_f = np.maximum(np.asarray(raw_f, float), 0.0)
+    delta = np.clip(np.asarray(delta, float), 0.0, 1.0)
+    thr = float(iota) * np.asarray(x_avg, float)
+    pre = raw_f.copy()
+    pre[pre < thr] = 0.0
+    restricted = pre * delta
+    exp_f = iota_floor(raw_f - restricted, iota, x_avg)
+    exp_d = iota_floor(raw_d + restricted, iota, x_avg)
+    return exp_d, exp_f
+
+
+def import_shares_of_others(t_star: np.ndarray, xi_star: np.ndarray,
+                            xi_world: float, n_year: int) -> np.ndarray:
+    """Baseline imports / other producers' foreign sales, per step."""
+    annual = np.asarray(t_star, float)
+    imp = (annual.sum(axis=0) - np.diag(annual)) / max(int(n_year), 1)
+    others = np.maximum(float(xi_world) - np.asarray(xi_star, float), 1e-12)
+    return np.maximum(imp, 0.0) / others
+
+
+def foreign_transaction_index(quantity: np.ndarray, price: np.ndarray,
+                              empty: float) -> float:
+    """Volume-weighted price of off-diagonal transactions. Empty → ``empty``."""
+    q = np.asarray(quantity, float)
+    p = np.asarray(price, float)
+    if q.shape != p.shape or q.ndim != 2:
+        raise ValueError("quantity and price must be square and aligned")
+    off = ~np.eye(q.shape[0], dtype=bool)
+    vol = float(q[off].sum())
+    if vol > 1e-12:
+        return float(np.sum(q[off] * p[off]) / vol)
+    return float(empty)

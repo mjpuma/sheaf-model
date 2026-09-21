@@ -56,18 +56,19 @@ def test_s1_implements_member_sum():
     assert any("5074" in n for n in d.notes)
 
 
-def test_dispatch_next_paste_is_a3_after_a1_inventory():
+def test_dispatch_next_paste_is_supplier_leftovers_after_clearing():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: A1" in text
-    assert "Next paste: A3" in text
+    assert "Last completed: clearing" in text
+    assert "supplier leftovers" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
     assert "R11" in text
     assert "Bai 10" in text
     assert "freeze_q_oth" in text
     assert "copy Julia" in text or "NLopt" in text
-    assert "0.812" in text or "0.81" in text
+    assert "1.777" in text
+    assert "5713" in text
 
 
 def test_s2_prompt_forbids_pin_and_l1l8():

@@ -3,17 +3,23 @@ import numpy as np
 
 from sheaf.agrimate.equations import (
     alpha_domestic_d10,
+    author_inverse_demand,
     ces_price_index,
     consumption_ces,
     crop_budget_share,
     expected_harvest,
     expected_restriction,
+    expected_two_market_sales,
+    foreign_transaction_index,
     fulfill_sales,
     harvest_weights,
     inverse_demand,
+    iota_floor,
+    prorate_two_market_sales,
     purchaser_commodity_quantity,
     purchaser_demand,
     foreign_request_quantity,
+    scale_baseline_shares,
 )
 from sheaf.agrimate.harvest import step_profile_from_months
 from sheaf.agrimate.optimize import nash_ibr, solve_supplier_plan
@@ -143,3 +149,67 @@ def test_nash_periodic_and_clears_harvest():
     rel = np.abs(sales - H.sum(axis=1)) / np.maximum(H.sum(axis=1), 1e-12)
     assert float(np.max(rel)) < 1e-12
     assert nash["success"]
+
+
+def test_prorate_caps_ratios_and_scales_foreign_by_one_minus_delta():
+    ask = np.array([2.0, 4.0, 6.0])
+    q, price, sd, si = prorate_two_market_sales(
+        ask, seller=0, sales_d=2.0, sales_i=10.0, available=100.0,
+        delta=0.5, p_dom=1.2, p_for=1.5,
+    )
+    assert abs(sd - 2.0) < 1e-12
+    assert abs(si - 5.0) < 1e-12
+    assert np.allclose(q, [2.0, 2.0, 3.0])
+    assert np.allclose(price, [1.2, 1.5, 1.5])
+    q2, _, sd2, si2 = prorate_two_market_sales(
+        ask, 0, sales_d=100.0, sales_i=100.0, available=3.0,
+        delta=0.5, p_dom=1.0, p_for=1.0,
+    )
+    assert abs(sd2 - 2.0) < 1e-12
+    assert si2 <= 0.5 * (3.0 - sd2) + 1e-12
+    assert abs(q2.sum() - sd2 - si2) < 1e-12
+
+
+def test_expected_sales_do_not_redirect_a_sub_iota_foreign_plan():
+    exp_d, exp_f = expected_two_market_sales(
+        raw_d=np.array([1.0, 1.0]),
+        raw_f=np.array([0.0001, 2.0]),
+        delta=np.array([0.5, 0.5]),
+        iota=0.001,
+        x_avg=np.array([1.0, 1.0]),
+    )
+    assert exp_f[0] == 0.0
+    assert abs(exp_d[0] - 1.0) < 1e-12
+    assert abs(exp_f[1] - 1.0) < 1e-12
+    assert abs(exp_d[1] - 2.0) < 1e-12
+    z = iota_floor(np.array([0.01, 0.0001]), 0.001, np.array([1.0, 100.0]))
+    assert z[0] == 0.01 and z[1] == 0.0
+
+
+def test_author_inverse_demand_caps_at_1000():
+    assert abs(author_inverse_demand(1.0, 3.2, 0.0) - 1.0) < 1e-12
+    assert author_inverse_demand(0.0, 3.2, 0.0) == 1000.0
+    assert author_inverse_demand(1e-6, 3.2, 0.0) == 1000.0
+
+
+def test_scale_baseline_shares_uses_expected_over_star_then_renormalizes():
+    a = np.array([[0.5, 0.0], [0.5, 1.0]])
+    out = scale_baseline_shares(
+        a, exp_d=np.array([2.0, 1.0]), exp_f=np.array([1.0, 3.0]),
+        xd_star=np.array([1.0, 1.0]), xi_star=np.array([1.0, 1.0]),
+    )
+    assert np.allclose(out.sum(axis=0), 1.0)
+    assert abs(out[0, 0] - 1.0 / 2.5) < 1e-12
+    assert abs(out[1, 0] - 1.5 / 2.5) < 1e-12
+    zero = scale_baseline_shares(
+        np.zeros((2, 2)), np.zeros(2), np.zeros(2), np.ones(2), np.ones(2),
+    )
+    assert np.allclose(zero, 0.5)
+
+
+def test_foreign_transaction_index_drops_the_diagonal():
+    q = np.array([[100.0, 10.0], [5.0, 80.0]])
+    p = np.array([[9.0, 2.0], [4.0, 7.0]])
+    got = foreign_transaction_index(q, p, empty=1.0)
+    assert abs(got - (10 * 2 + 5 * 4) / 15) < 1e-12
+    assert foreign_transaction_index(np.eye(2), np.eye(2), empty=1.25) == 1.25
