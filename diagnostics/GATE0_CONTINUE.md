@@ -6,9 +6,10 @@ S-queue: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md) (**S1–S6 done**;
 G0-P **not accepted**). R-queue exhausted.
 
 G0-P was rewritten from S1–S5 evidence and **still rejected**. Items 2
-and 3 fail. G1/G2 stay blocked. T1–T3 **done** (labelled, not adopted).
-T-queue is exhausted. Stay not-accepted is **recorded**. G0-P still
-**not accepted**. Do not start G1.
+and 3 fail on the S1 three-scenario CSVs. G1/G2 stay blocked. T1–T3
+**done** (labelled, not adopted). Stay not-accepted **recorded**. D.22
+vector+shift is **implemented** (human-authorized; not G1). Supplier
+optimizer still differs. Do not start G1.
 
 ## Adaptive rule
 
@@ -17,6 +18,7 @@ Rewrite `GATE0_REPRO_DISPATCH.md` in ≤20 lines. Next session pastes
 
 | If the last run showed… | Next paste | Skip |
 |---|---|---|
+| D.22 vector+shift **implemented**; NLopt / x1-fixed still differs | **solver** | do not pin; do not freeze; do not copy Julia |
 | Obtain failed (GitLab/Zenodo unreachable; no inspectable tree) | **T1** | do not adopt `freeze_q_oth`; do not pin |
 | Julia inspected; D.22 / solver **differs**; T2 note **absent** | **T2** | label sourced delta only; do not copy Julia into `sheaf/agrimate/` |
 | T3 FAO/EU28 extract **present**, labelled, not adopted | **stay not-accepted** | do not start G1; do not invent Egypt; FAO not `prepare_wheat` |
@@ -61,6 +63,8 @@ Next session pastes that file's **Next paste**.
 | **T2** | Label sourced D.22/solver delta | **done** (labelled, not adopted) |
 | **T3** | Obtain-or-leave FAO-since-2005 + EU28 inputs | **done** (labelled, not adopted; not C.1) |
 | **stay not-accepted** | Reaffirm G0-P rejection after T1–T3 | **done** (recorded; G0-P still **not accepted**) |
+| **D.22** | Implement sourced vector+shift of planned foreign sales | **done** (not a freeze; solver unchanged) |
+| **solver** | NLopt / x1-fixed vs host L-BFGS-B | **next** |
 | — | G1 / G2 | **blocked until G0-P accepted** |
 
 ---
@@ -131,4 +135,24 @@ DEVELOPMENT.md pass rule (items 1–3 before 5).
 
 End: rewrite GATE0_REPRO_DISPATCH.md. Next paste stay not-accepted.
 Do not start G1.
+```
+
+## solver — NLopt / x1-fixed (secondary after D.22)
+
+```
+[SHARED PREAMBLE]
+
+Task solver only. D.22 vector+shift is already live. Implement the
+sourced 14022004 wheat supplier programme as independent Python:
+NLopt LD_SLSQP (or a faithful scipy SLSQP equivalent) with current
+x1 fixed from demand, as labelled in t2_delta.md rows 7–8.
+Do not copy Julia. Do not freeze. Do not pin 2006. Do not retune αI.
+Do not start G1. Fig. 4 knobs stay on the comparison object.
+Re-measure undisturbed last/first after the solver change. Do not
+clobber harvest+AMIS three-scenario CSVs unless you re-run them.
+
+Read first: t2_delta.md, d22.md, optimize.py, solver.md.
+
+End: rewrite GATE0_REPRO_DISPATCH.md. Next paste follows the adaptive
+table. Do not start G1.
 ```

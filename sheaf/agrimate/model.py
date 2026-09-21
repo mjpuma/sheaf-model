@@ -27,6 +27,8 @@ from .optimize import nash_ibr, solve_supplier_plan
 from .params import AgrimateParams, wheat_params
 from .wheat_data import WheatData, prepare_wheat, international_destination_shares
 
+# D.22 helpers imported inside AgrimateSim.run to avoid a d22↔model cycle.
+
 # Delivery-queue empty-volume floor. Matches the run-loop mix.
 _VOL_FLOOR = 1e-12
 
@@ -182,7 +184,7 @@ class AgrimateSim:
         self.use_anomalies = use_anomalies
         # Diagnostic hooks (R4). Defaults recover the live host.
         # replan_stride=1: every step (N2 rolling year). 24 = January only.
-        # freeze_q_oth: hold D.22 rivals at XI*_world − XI*_r (no EMA).
+        # freeze_q_oth: hold D.22 Q at seasonal init (no shift+EMA).
         self.replan_stride = max(int(replan_stride), 1)
         self.freeze_q_oth = bool(freeze_q_oth)
         # R5: S4 labelled experiment. Default off recovers T*+domestic.
@@ -259,9 +261,17 @@ class AgrimateSim:
         shares = d.T_star.copy()
         rs = shares.sum(axis=0, keepdims=True)
         shares = np.divide(shares, np.maximum(rs, 1e-12))
-        # D.22 rivals' expected international sales; τ_exp = 0.5 Nyear
-        q_oth = np.maximum(d.XI_world - d.XI_star, 1e-9)
-        w_exp = 1.0 / max(p.tau_exp * n_y, 1.0)
+        # D.22 rivals: horizon vector + shift of planned foreign sales.
+        # Sourced wheat law (T2); independent Python in d22.py. Not a freeze.
+        from .d22 import (
+            ema_weight,
+            init_expected_others_foreign,
+            observe_planned_foreign,
+            pad_planned_foreign,
+            shift_ema_expected_others,
+        )
+        Q = init_expected_others_foreign(d.XI_star_path, n_start=0)
+        w_exp = ema_weight(p.tau_exp, n_y)
 
         t0 = perf_counter()
         for t in range(T):
@@ -284,7 +294,7 @@ class AgrimateSim:
             do_replan = (t % self.replan_stride) == 0
             if do_replan:
                 for r in range(n_r):
-                    others = np.full(n_y, q_oth[r])
+                    others = Q[r]
                     x0_d = np.empty(n_y)
                     x0_i = np.empty(n_y)
                     for k in range(n_y):
@@ -326,7 +336,7 @@ class AgrimateSim:
                     xi_ship0[r] = plan_i[r, t] * (1.0 - delta[r])
             star_w = max(float(d.XI_world), 1e-8)
             for r in range(n_r):
-                q_i_arg = (xi_ship0[r] + q_oth[r]) / star_w
+                q_i_arg = (xi_ship0[r] + Q[r, 0]) / star_w
                 if q_i_arg <= p.demand_arg_floor:
                     floor_binds += 1
                 offer[r] = float(inverse_demand(q_i_arg, p.alpha_i, p.lam_demand,
@@ -344,9 +354,12 @@ class AgrimateSim:
             xi_path[:, t] = sold_i
             sold_d_path[:, t] = sold_d
             H_path[:, t] = H
-            realized_oth = np.maximum(float(sold_i.sum()) - sold_i, 0.0)
+            # D.22: Jacobi then update Q from planned foreign sales, not sold XI.
             if not self.freeze_q_oth:
-                q_oth = (1.0 - w_exp) * q_oth + w_exp * realized_oth
+                pad = d.XI_star_path[:, t % n_y]
+                padded = pad_planned_foreign(plan_i, t, n_y, pad)
+                obs = observe_planned_foreign(padded, p.n_del)
+                Q = shift_ema_expected_others(Q, obs, w_exp)
             # 6 delivery: queue exporter XI; world price on that lag; consumers
             # receive T* destination allocation of the same lag (E.1), not own XI.
             q_i.append(sold_i.copy())

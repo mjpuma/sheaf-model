@@ -105,12 +105,14 @@ unchanged. Historical writeup: `diagnostics/gate0_agrimate/xi_split.md`.
 **1.004** (still >1.1). **T1 obtained** GitLab + 14022004 Julia
 (*inspect-only*; 0 `*.jl` copied into `sheaf/agrimate/`). Sourced D.22
 **differs**: author wheat is a horizon **vector + shift** of planned
-`optimal_sales_foreign[3:end]`; host is a **scalar EMA** of current-step
-realized XI. EMA *weight* matches (`1/(0.5 N_year)=1/12`). **No freeze**
-in author Julia. `freeze_q_oth` stays diagnostic, default off, not a
-`wheat_params()` field. Not adopted. Not a pin. Writeup:
-`diagnostics/gate0_agrimate/item3.md`; T1: `t1_julia.md`; **T2** sourced
-file:line delta (not implemented): `t2_delta.md`.
+foreign sales; host *was* a **scalar EMA** of current-step realized XI.
+EMA *weight* matches (`1/(0.5 N_year)=1/12`). **No freeze**
+in author Julia. **D.22 implemented** (`d22.py`): live host now uses
+that vector+shift of planned foreign sales. `freeze_q_oth` stays
+diagnostic, default off, not a `wheat_params()` field. Not a pin.
+Solver still L-BFGS-B (N5). Writeup: `diagnostics/gate0_agrimate/item3.md`
+(S2 snapshot 1.444); T1: `t1_julia.md`; T2: `t2_delta.md`; living D.22:
+`d22.md`.
 
 N4 **D.7 international scale.** Argument is `(XI_r + Q_{-r}) / XI*_world`
 with `XI*_world` the per-step year-average (wheat_data note; Agrimate
