@@ -1,0 +1,36 @@
+T3 labelled Fig. 4 *experiment* inputs. Not prepare_wheat. Not C.1.
+
+Source: public Agrimate paper repo
+  https://gitlab.pik-potsdam.de/agrimate/agrimate
+  SHA f2de96551857c1c9d11c27dfe54362732b6ad815 (2023-02-05)
+  Licence CC-BY-4.0 (Kuhla, Kubiczek & Otto).
+
+What was copied here (compact extracts only):
+  agrimate_eu28_egypt_iso3.csv
+    AgrimateEU28 YAML in src/regions.jl plus extra_regions Egypt=EGY
+    (food_crisis.jl; NetCDF extra_regions). Not a copy of regions.jl.
+  fao_since_2005_annual_relative.csv
+    Calendar-year sums of GitLab
+    data/agrimate_input/harvest_anomalies;crop=wheat;source=FAO.csv
+    and harvest_trends;crop=wheat;source=FAO.csv, aggregated by the
+    ISO map (author aggregate_areas = sum). Relative = sum(anom)/sum(trend).
+    relative_since_2005 = 0 for year < 2005 (Fig. 4 FAOsince-2005).
+    Daily 4.7 MB files are not vendored.
+
+Left, not copied:
+  GitLab data/clean/food_balances/wheat_food_balance_fao.csv
+    md5 14a87dd79a2da83b003fe331ec39fccd; years 1992–2020; 5642 rows.
+    Host reconstruction data/food_balances/wheat_food_balance_fao.csv
+    md5 ba213511d9e3fd984ec2724406c2d561 is not bit-identical and is
+    not adopted. FAOSTAT FBSH 5074 is ΔS, never a stock level.
+  Author Julia (0 *.jl in sheaf/agrimate/).
+
+Not adopted:
+  USDA remains prepare_wheat default.
+  REGION_NAMES remains AgrimateRegionsWheat (no Egypt node; EU-27; Brazil named).
+  wheat_params() remain αI=3.2, ζ=0, N_for=3.
+  fig4_experiment_region_path() remains None.
+
+GitLab daily FAO md5 (not in this tree):
+  harvest_anomalies;crop=wheat;source=FAO.csv  md5 1edc5878210a3144f262ad3e4e61f142
+  harvest_trends;crop=wheat;source=FAO.csv     md5 20583d3d299b72fb2d35a9b895f38a07

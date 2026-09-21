@@ -1,4 +1,4 @@
-"""Post-R S-queue: S6 methods v2 done; T1–T2 done; Next paste T3."""
+"""Post-R S-queue: S6 methods v2 done; T1–T3 done; Next paste stay not-accepted."""
 from __future__ import annotations
 
 from dataclasses import fields
@@ -56,17 +56,18 @@ def test_s1_implements_member_sum():
     assert any("5074" in n for n in d.notes)
 
 
-def test_dispatch_next_paste_is_t3():
+def test_dispatch_next_paste_is_stay_not_accepted():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: T2" in text
-    assert "Next paste: T3" in text
+    assert "Last completed: T3" in text
+    assert "Next paste: stay not-accepted" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
     assert "R11" in text
     assert "Bai 10" in text
     assert "freeze_q_oth" in text
     assert "copy Julia" in text or "sheaf/agrimate" in text
+    assert "invent Egypt" in text or "Egypt" in text
 
 
 def test_s2_prompt_forbids_pin_and_l1l8():
@@ -124,7 +125,7 @@ def test_pointers_name_s_queue():
     assert "1.444" in dep
     assert "s3_fbsh.md" in dep
     assert "s4_a7.md" in dep
-    assert "t2_delta.md" in dep or "t1_julia.md" in dep
+    assert "t2_delta.md" in dep or "t1_julia.md" in dep or "t3_fig4_inputs.md" in dep
     assert "approved, not implemented" not in dep
 
 

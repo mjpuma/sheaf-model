@@ -48,11 +48,14 @@ comparison object**, not a `wheat_params()` replacement. **S4** inventoried
 A7: FAO cleaned FB reconstruction is labelled and **not adopted**; a
 parallel AgrimateEU28+Egypt **name list** is labelled from NetCDF
 `region_list` + Egypt=EGY (`s4_parallel_eu28_egypt.csv`) and is **not**
-C.1. Host remains AgrimateRegionsWheat (EU-27, Brazil named, Egypt in
-Northern Africa). Still cannot-set: start 2000, FAO-since-2005 *inputs*,
+C.1. **T3** obtained compact FAO-since-2005 annual relative anomalies
+(2000–11, since-2005 mask) and the sourced AgrimateEU28 YAML + Egypt=EGY
+ISO map (`t3_fig4_inputs/`). **Not adopted.** Host remains
+AgrimateRegionsWheat (EU-27, Brazil named, Egypt in Northern Africa).
+Still cannot-set: start 2000 as the live window, FAO as `WheatData`,
 old-demand-dynamics, author Julia, bit-identical author FB, FAO as
 `prepare_wheat`. Do not invent an Egypt node. Writeup:
-`diagnostics/gate0_agrimate/s4_a7.md`.
+`diagnostics/gate0_agrimate/s4_a7.md`, `t3_fig4_inputs.md`.
 R10 scores that 2006–08 run against `author_fig4/`: hike ×2.22 vs ×1.62,
 moy 13.3× vs 1.51×, 2006 index 1.677 vs 1.183 (knobs moved *away*),
 undisturbed last/first 0.409 vs 1.006. **Not adopted.** Remaining A7

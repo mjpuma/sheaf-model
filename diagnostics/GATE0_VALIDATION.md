@@ -22,7 +22,7 @@ Do not implement G1/G2 here. Do not restore L1–L8 to chase Pink Sheet.
 Post-P12 inventory: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md),
 [`GATE0_DATA.md`](GATE0_DATA.md). R-queue exhausted. Post-R development:
 [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md). Next paste:
-[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S6 done**; G0-P **not accepted**; next **T1**).
+[`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S6 done**; G0-P **not accepted**; T1–T3 done; next **stay not-accepted**).
 
 ## Command
 

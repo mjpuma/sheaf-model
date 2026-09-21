@@ -14,7 +14,7 @@ Spec map: [`GATE0_SPEC_MATRIX.md`](GATE0_SPEC_MATRIX.md).
 Pasteable one-prompt-per-session list: [`GATE0_PROMPTS.md`](GATE0_PROMPTS.md)
 (P0–P12 done). Post-P12 R-queue: [`GATE0_REPRO_PROMPTS.md`](GATE0_REPRO_PROMPTS.md)
 (**exhausted**). Post-R development: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md);
-next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S6 done**; G0-P **not accepted**; next **T1** in [`GATE0_CONTINUE.md`](GATE0_CONTINUE.md)).
+next paste [`GATE0_REPRO_DISPATCH.md`](GATE0_REPRO_DISPATCH.md) (**S6 done**; G0-P **not accepted**; T1–T3 done; next **stay not-accepted** in [`GATE0_CONTINUE.md`](GATE0_CONTINUE.md)).
 Red team: [`GATE0_REDTEAM.md`](GATE0_REDTEAM.md). Data:
 [`GATE0_DATA.md`](GATE0_DATA.md).
 This file is the living queue.
@@ -112,9 +112,11 @@ approval.
    member-sum USDA (China H 1.00; moy 20.1×→33.0×; not adopted).
    **S4** A7 inventory (Egypt not invented). **S5** re-scored Fig. 4 /
    hindcast on the S1 CSVs (hike ×3.71, last/first 1.444, unconverged
-   2304/5832). Items 1–3 still fail. G0-P **not accepted**. Do not
+   2304/5832). Items 1–3 still fail. G0-P **not accepted**. **T1–T3
+   done** (Julia inspect; D.22 labelled not adopted; FAO-since-2005 +
+   AgrimateEU28+Egypt arrays labelled not adopted, not C.1). Do not
    start G1. Next paste **stay not-accepted**
-   (`GATE0_NEXT_PROMPTS.md`), not S6, not R8.
+   (`GATE0_CONTINUE.md`), not G1, not R8.
 4. Single-scenario smoke remains `python scripts/run_agrimate_wheat.py`.
 5. **P1 (done).** Step identities on 2006 harvest+AMIS.
 6. **P2 (done).** Delivery bug: lagged XI was credited to the *exporter*
@@ -258,6 +260,15 @@ approval.
     L-BFGS-B (`optimize.py` 256–258). Weight 1/12 matches. **No freeze**
     in author. **Not implemented.** `wheat_params()` unchanged. Do not
     start G1. Next paste **T3**.
+30. **T3 (done).** Obtained compact FAO-since-2005 annual relative
+    anomalies (2000–11, years before 2005 zeroed) and the sourced
+    AgrimateEU28 YAML + Egypt=EGY extra ISO map from GitLab
+    (`t3_fig4_inputs/`; daily 4.7 MB files not vendored; 0 `*.jl`
+    copied). **Not adopted.** Egypt not invented on C.1. USDA stays
+    `prepare_wheat`. `wheat_params()` unchanged. GitLab FB left (md5
+    differs from the host reconstruction). Still cannot-set: start
+    2000 live window, old-demand-dynamics, FAO as WheatData. Do not
+    start G1. Next paste **stay not-accepted**.
 
 Reference command:
 
