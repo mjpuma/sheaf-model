@@ -70,9 +70,9 @@ def capture_unconverged(data, params: AgrimateParams):
     orig = agr_model.solve_supplier_plan
 
     def wrapped(H, S0, others, xi_star, xd_star, alpha_i, alpha_d, p,
-                delta_hat=None, x0=None):
+                delta_hat=None, x0=None, x1=None):
         sol = orig(H, S0, others, xi_star, xd_star, alpha_i, alpha_d, p,
-                   delta_hat=delta_hat, x0=x0)
+                   delta_hat=delta_hat, x0=x0, x1=x1)
         if sol["success"] and (not sol["fallback"]) and (not sol["converged"]):
             snaps.append({
                 "nit": int(sol["nit"]),

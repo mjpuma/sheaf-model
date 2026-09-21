@@ -178,3 +178,38 @@ def test_unconverged_is_counted_separately_from_failed():
 
 def test_default_plan_maxiter_is_forty():
     assert AgrimateParams().plan_maxiter == 40
+
+
+def test_x1_demand_locks_current_sales_and_uses_slsqp():
+    """Author x1 is demand, clipped; future only is SLSQP. Not a pin."""
+    p = AgrimateParams(plan_maxiter=20)
+    H = np.ones(24) * 0.5
+    S0 = 0.4
+    A0 = S0 + H[0]
+    d_dom, d_for = 0.2, 0.15
+    sol = solve_supplier_plan(
+        H, S0, np.ones(24) * 2.0, 2.0, 0.4, 3.2, 2.0, p,
+        x1=(d_dom, d_for),
+    )
+    assert sol["success"]
+    assert sol["x1_fixed"] is True
+    assert sol["method"] == "SLSQP"
+    assert abs(sol["xd"][0] - d_dom) < 1e-8
+    assert abs(sol["xi"][0] - d_for) < 1e-8
+    assert sol["xd"][0] + sol["xi"][0] <= A0 + 1e-8
+    assert np.min(sol["S"]) >= -1e-8
+    # Without x1 the test path stays L-BFGS-B (fraction-map unit tests).
+    free = solve_supplier_plan(H, S0, np.ones(24) * 2.0, 2.0, 0.4, 3.2, 2.0, p)
+    assert free["method"] == "L-BFGS-B"
+    assert free["x1_fixed"] is False
+
+
+def test_x1_domestic_priority_when_demand_exceeds_availability():
+    from sheaf.agrimate.optimize import clip_demand_x1
+
+    xd, xi = clip_demand_x1(5.0, 5.0, S0=0.0, H0=6.0, loss=0.0)
+    assert abs(xd - 5.0) < 1e-12
+    assert abs(xi - 1.0) < 1e-12
+    xd, xi = clip_demand_x1(8.0, 1.0, S0=0.0, H0=6.0, loss=0.0)
+    assert abs(xd - 6.0) < 1e-12
+    assert abs(xi - 0.0) < 1e-12

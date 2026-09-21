@@ -57,8 +57,9 @@ def test_x1_from_demand_on_moves_inflow():
     on = run_agrimate(**kwargs, x1_from_demand=True)
     assert on.x1_from_demand is True
     assert not np.allclose(on.inflow, off.inflow)
-    # p_w is XI-weighted offers; x1 does not enter D.7.
-    assert np.allclose(on.price_index, off.price_index)
+    # R5 is the consumer-inflow hook (default off). Live supplier x1
+    # is locked from last_ask, so toggling inflow can move offers.
+    # Do not require price_index allclose; do not turn R5 on by default.
     assert wheat_params().alpha_i == 3.2
 
 
