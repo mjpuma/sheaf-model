@@ -102,6 +102,14 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
                 ukr2007[f"{tag}_c"] = float(t.loc[2007, "consumption"])
                 ukr2007[f"{tag}_x"] = float(t.loc[2007, "exports"])
     drift = bar["drift_undisturbed"]
+    d22_path = out_dir / "score_d22.csv"
+    if d22_path.is_file():
+        d22 = pd.read_csv(d22_path).iloc[0]
+        d22_lf = float(d22["last_first"])
+        d22_first = float(d22["mean_first_usd"])
+    else:
+        d22_lf = float("nan")
+        d22_first = float("nan")
 
     lines = [
         "# SHEAF Gate 0 wheat — methods note (G0-P / S6; T1–T3 reaffirm)",
@@ -308,13 +316,15 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "",
         "### Undisturbed (item 3)",
         "",
-        "Seasonal *shape* repeats (year-to-year corr ≈ 0.98). Annual-mean",
-        f"world-price ratio 2011/2006 is **{_fmt(drift, 3)}**. Author Fig. 4 baseline on",
-        "the same window is **1.004**. T1/T2 sourced D.22: author wheat is a",
-        "horizon vector + shift of planned `optimal_sales_foreign[3:end]`;",
-        "host is a scalar EMA of realized XI (weight 1/12 matches).",
-        "**Not implemented.** Freeze is absent in author Julia and is not a",
-        "`AgrimateParams` field (`t2_delta.md`). Not a price pin.",
+        "Seasonal *shape* repeats (year-to-year corr ≈ 0.98). S1 three-scenario",
+        f"last/first is **{_fmt(drift, 3)}** (`prices_three_scenarios.csv`, not",
+        "re-run). Author Fig. 4 baseline is **1.004**. D.22 vector+shift of",
+        "planned foreign sales is **implemented** (`d22.py`; T2 labelled the",
+        "law). Weight 1/12 matches. Freeze is absent in author Julia and is",
+        "not a `AgrimateParams` field. Not a price pin. Not a solver switch.",
+        f"Living D.22 last/first is **{_fmt(d22_lf, 3)}** (`score_d22.csv`)",
+        f"with 2006 mean ${_fmt(d22_first, 1)}/t. Two-sided repeating",
+        "[1/1.1, 1.1] still **fails**. Next paste **solver**.",
         "",
         "### Production, stocks, consumption",
         "",
@@ -406,14 +416,14 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "| S4 | D.30a formula wired; x1 still from plan | formula H; x1 gap D |",
         "| B1 | T* delivery, not own-XI echo | coding fix |",
         "| E1/E2 | G1 substitution / G2 game | **not implemented** |",
-        "| T2 | D.22 vector+shift / NLopt vs host | labelled, **not implemented** |",
+        "| T2 | D.22 vector+shift / NLopt vs host | D.22 **implemented**; solver labelled |",
         "| T3 | FAO-since-2005 + AgrimateEU28+Egypt | labelled, **not C.1**, not `prepare_wheat` |",
         "",
         "## 10. Limits",
         "",
-        f"1. Undisturbed annual-mean drift {_fmt(drift, 3)} is unexplained after B1; "
-        "T2 labelled sourced D.22 vector+shift (not a freeze; 0 `*.jl` in "
-        "`sheaf/`; not implemented).",
+        f"1. Undisturbed annual-mean drift {_fmt(drift, 3)} on the S1 CSV; "
+        f"D.22 vector+shift last/first {_fmt(d22_lf, 3)} (two-sided still fail; "
+        "not a freeze; 0 `*.jl` in `sheaf/`). Solver still labelled.",
         f"2. ~{100.0 * int(ha['unconverged']) / 5832:.0f}% of harvest+AMIS plans "
         "are unconverged feasible iterates (N5).",
         f"3. Off-season world price collapses ({_fmt(sha['moy_maxmin_host'], 1)}× moy "
@@ -448,9 +458,10 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "**Recommend reject** as the publishable SHEAF market section.",
         "Items 1–3 do not all hold; item 5 is a sourced shortfall. G1 and",
         "G2 stay blocked until a later G0-P acceptance. Do not start G1.",
-        "`wheat_params()` unchanged. T-queue (T1–T3) is **exhausted** and",
-        "labelled, not adopted. Next paste **stay not-accepted**",
-        "(`GATE0_CONTINUE.md`). Human acceptance is still required.",
+        "`wheat_params()` unchanged. T-queue (T1–T3) stay not-accepted is",
+        "recorded. D.22 vector+shift is **implemented**. Next paste",
+        "**solver** (`GATE0_CONTINUE.md`). Do not start G1. Human",
+        "acceptance is still required.",
         "",
         "## Files",
         "",
@@ -458,7 +469,7 @@ def write_methods_note(out_dir: Path | None = None) -> Path:
         "- `hindcast.md`, `fig4.md`, `regional.md`, `s5_score.md`, `item3.md`,",
         "  `faostat_fb.md`, `pulse.md`, `undisturbed.md`, `solver.md`,",
         "  `t1_julia.md`, `t2_delta.md`, `t3_fig4_inputs.md`,",
-        "  `stay_not_accepted.md`, `validation.md`",
+        "  `stay_not_accepted.md`, `d22.md`, `validation.md`",
         "- `GATE0_DEPARTURES.md`, `GATE0_SPEC_MATRIX.md`, `GATE0_CONTRACT.md`",
         "",
         "G1/G2 remain the blocked pair in `GATE0_EXTENSION_PLAN.md`.",

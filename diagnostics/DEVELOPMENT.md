@@ -273,6 +273,14 @@ approval.
     accepted** (last/first 1.444; hike ×3.71; unconverged 2304/5832).
     T1–T3 labelled, not adopted. Methods note reaffirmed. Do not
     start G1. Next paste **stay not-accepted**.
+32. **D.22 (this).** Implemented sourced wheat D.22 as independent
+    Python (`sheaf/agrimate/d22.py`): horizon vector + shift of
+    *planned* foreign sales. Not a freeze. Not a pin. Not a Julia
+    copy. `wheat_params()` unchanged. Solver still L-BFGS-B / x1
+    free (secondary). S1 three-scenario CSVs not clobbered. Last/first
+    **0.772** vs author **1.004** (S1 snapshot 1.444). Two-sided
+    repeating [1/1.1, 1.1] still fails; quiet-year USD ~$456 vs S1
+    $46. Unconverged 1986/5832. Next paste **solver**. Do not start G1.
 
 Reference command:
 

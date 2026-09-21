@@ -196,13 +196,15 @@ this. Figure: `figures/fig6_hindcast_seasonal.png`.
 
 ### Undisturbed (item 3)
 
-Seasonal *shape* repeats (year-to-year corr ≈ 0.98). Annual-mean
-world-price ratio 2011/2006 is **1.444**. Author Fig. 4 baseline on
-the same window is **1.004**. T1/T2 sourced D.22: author wheat is a
-horizon vector + shift of planned `optimal_sales_foreign[3:end]`;
-host is a scalar EMA of realized XI (weight 1/12 matches).
-**Not implemented.** Freeze is absent in author Julia and is not a
-`AgrimateParams` field (`t2_delta.md`). Not a price pin.
+Seasonal *shape* repeats (year-to-year corr ≈ 0.98). S1 three-scenario
+last/first is **1.444** (`prices_three_scenarios.csv`, not
+re-run). Author Fig. 4 baseline is **1.004**. D.22 vector+shift of
+planned foreign sales is **implemented** (`d22.py`; T2 labelled the
+law). Weight 1/12 matches. Freeze is absent in author Julia and is
+not a `AgrimateParams` field. Not a price pin. Not a solver switch.
+Living D.22 last/first is **0.772** (`score_d22.csv`)
+with 2006 mean $456.5/t. Two-sided repeating
+[1/1.1, 1.1] still **fails**. Next paste **solver**.
 
 ### Production, stocks, consumption
 
@@ -273,12 +275,12 @@ Full register: `diagnostics/GATE0_DEPARTURES.md`. Compact:
 | S4 | D.30a formula wired; x1 still from plan | formula H; x1 gap D |
 | B1 | T* delivery, not own-XI echo | coding fix |
 | E1/E2 | G1 substitution / G2 game | **not implemented** |
-| T2 | D.22 vector+shift / NLopt vs host | labelled, **not implemented** |
+| T2 | D.22 vector+shift / NLopt vs host | D.22 **implemented**; solver labelled |
 | T3 | FAO-since-2005 + AgrimateEU28+Egypt | labelled, **not C.1**, not `prepare_wheat` |
 
 ## 10. Limits
 
-1. Undisturbed annual-mean drift 1.444 is unexplained after B1; T2 labelled sourced D.22 vector+shift (not a freeze; 0 `*.jl` in `sheaf/`; not implemented).
+1. Undisturbed annual-mean drift 1.444 on the S1 CSV; D.22 vector+shift last/first 0.772 (two-sided still fail; not a freeze; 0 `*.jl` in `sheaf/`). Solver still labelled.
 2. ~40% of harvest+AMIS plans are unconverged feasible iterates (N5).
 3. Off-season world price collapses (16.8× moy max/min vs Agrimate 1.45×).
 4. Quiet-year level is not on Agrimate's or Pink's scale.
@@ -311,9 +313,10 @@ Offer this note as the SHEAF wheat market section.
 **Recommend reject** as the publishable SHEAF market section.
 Items 1–3 do not all hold; item 5 is a sourced shortfall. G1 and
 G2 stay blocked until a later G0-P acceptance. Do not start G1.
-`wheat_params()` unchanged. T-queue (T1–T3) is **exhausted** and
-labelled, not adopted. Next paste **stay not-accepted**
-(`GATE0_CONTINUE.md`). Human acceptance is still required.
+`wheat_params()` unchanged. T-queue (T1–T3) stay not-accepted is
+recorded. D.22 vector+shift is **implemented**. Next paste
+**solver** (`GATE0_CONTINUE.md`). Do not start G1. Human
+acceptance is still required.
 
 ## Files
 
@@ -321,7 +324,7 @@ labelled, not adopted. Next paste **stay not-accepted**
 - `hindcast.md`, `fig4.md`, `regional.md`, `s5_score.md`, `item3.md`,
   `faostat_fb.md`, `pulse.md`, `undisturbed.md`, `solver.md`,
   `t1_julia.md`, `t2_delta.md`, `t3_fig4_inputs.md`,
-  `stay_not_accepted.md`, `validation.md`
+  `stay_not_accepted.md`, `d22.md`, `validation.md`
 - `GATE0_DEPARTURES.md`, `GATE0_SPEC_MATRIX.md`, `GATE0_CONTRACT.md`
 
 G1/G2 remain the blocked pair in `GATE0_EXTENSION_PLAN.md`.

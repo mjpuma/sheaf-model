@@ -6,9 +6,10 @@ S-queue: [`GATE0_NEXT_PROMPTS.md`](GATE0_NEXT_PROMPTS.md) (**S1–S6 done**;
 G0-P **not accepted**). R-queue exhausted.
 
 G0-P was rewritten from S1–S5 evidence and **still rejected**. Items 2
-and 3 fail. G1/G2 stay blocked. T1–T3 **done** (labelled, not adopted).
-T-queue is exhausted. Stay not-accepted is **recorded**. G0-P still
-**not accepted**. Do not start G1.
+and 3 fail on the S1 three-scenario CSVs. G1/G2 stay blocked. T1–T3
+**done** (labelled, not adopted). Stay not-accepted **recorded**. D.22
+vector+shift is **implemented** (human-authorized; not G1). Supplier
+optimizer still differs. Do not start G1.
 
 ## Adaptive rule
 
@@ -17,6 +18,7 @@ Rewrite `GATE0_REPRO_DISPATCH.md` in ≤20 lines. Next session pastes
 
 | If the last run showed… | Next paste | Skip |
 |---|---|---|
+| D.22 vector+shift **implemented**; NLopt / x1-fixed still differs | **solver** | do not pin; do not freeze; do not copy Julia |
 | Obtain failed (GitLab/Zenodo unreachable; no inspectable tree) | **T1** | do not adopt `freeze_q_oth`; do not pin |
 | Julia inspected; D.22 / solver **differs**; T2 note **absent** | **T2** | label sourced delta only; do not copy Julia into `sheaf/agrimate/` |
 | T3 FAO/EU28 extract **present**, labelled, not adopted | **stay not-accepted** | do not start G1; do not invent Egypt; FAO not `prepare_wheat` |
@@ -28,15 +30,18 @@ Hard stops do not adapt. L1–L8, 2006 pin, Bai αI=10, maize/rice
 acceptance, G1/G2, FAO ΔS as stocks, and writing `freeze_q_oth` into
 `wheat_params()` stay off.
 
-## Shared preamble (prepend to every T-prompt)
+## Shared preamble (prepend to every prompt from here)
 
 ```
 You are continuing SHEAF Gate 0 wheat: an independent Agrimate copy
 (Kuhla et al. 2025; sheaf/agrimate/). Read diagnostics/GATE0_CONTRACT.md,
 diagnostics/DEVELOPMENT.md, diagnostics/GATE0_VALIDATION.md,
 diagnostics/GATE0_REDTEAM.md, diagnostics/GATE0_DATA.md,
-diagnostics/GATE0_CONTINUE.md, and this prompt's "Read first"
+diagnostics/GATE0_CONTINUE.md, diagnostics/gate0_agrimate/d22.md,
+diagnostics/gate0_agrimate/t2_delta.md, and this prompt's "Read first"
 files before editing.
+
+NEVER cheat.
 
 Hard stops:
 - Do not implement Gate 1 substitution or Gate 2 government games.
@@ -45,7 +50,17 @@ Hard stops:
 - Do not treat FAOSTAT FBSH element 5074 ΔS as a stock level.
 - Do not copy author Julia into sheaf/agrimate/.
 - Do not write freeze_q_oth into wheat_params().
-- Author AgrimateParams stay the defaults.
+- Do not freeze D.22 (author still updates).
+- wheat_params() stay 14022004 defaults (αI=3.2, ζ=0, N_for=3).
+- Fig. 4 knobs stay on fig4_experiment_params(). Exact Fig. 4 is later.
+  USDA stays prepare_wheat. Do not invent Egypt.
+
+Already done (do not re-do):
+- D.22 vector+shift of planned foreign sales is live (d22.py).
+- Quiet-year last/first is 0.772 vs author 1.004 (score_d22.csv).
+  Two-sided repeating still fails. Quiet-year USD ~$456 vs S1 $46.
+- Harvest+AMIS three-scenario CSVs are the S1 snapshot; do not clobber
+  them unless you re-run that experiment.
 
 Exit: pytest tests/agrimate. One prompt, one PR-sized change.
 Rewrite diagnostics/GATE0_REPRO_DISPATCH.md from this run (≤20 lines).
@@ -61,6 +76,8 @@ Next session pastes that file's **Next paste**.
 | **T2** | Label sourced D.22/solver delta | **done** (labelled, not adopted) |
 | **T3** | Obtain-or-leave FAO-since-2005 + EU28 inputs | **done** (labelled, not adopted; not C.1) |
 | **stay not-accepted** | Reaffirm G0-P rejection after T1–T3 | **done** (recorded; G0-P still **not accepted**) |
+| **D.22** | Implement sourced vector+shift of planned foreign sales | **done** (not a freeze; solver unchanged) |
+| **solver** | NLopt / x1-fixed vs host L-BFGS-B | **next** |
 | — | G1 / G2 | **blocked until G0-P accepted** |
 
 ---
@@ -131,4 +148,24 @@ DEVELOPMENT.md pass rule (items 1–3 before 5).
 
 End: rewrite GATE0_REPRO_DISPATCH.md. Next paste stay not-accepted.
 Do not start G1.
+```
+
+## solver — NLopt / x1-fixed (secondary after D.22)
+
+```
+[SHARED PREAMBLE]
+
+Task solver only. D.22 vector+shift is already live. Implement the
+sourced 14022004 wheat supplier programme as independent Python:
+NLopt LD_SLSQP (or a faithful scipy SLSQP equivalent) with current
+x1 fixed from demand, as labelled in t2_delta.md rows 7–8.
+Do not copy Julia. Do not freeze. Do not pin 2006. Do not retune αI.
+Do not start G1. Fig. 4 knobs stay on the comparison object.
+Re-measure undisturbed last/first after the solver change. Do not
+clobber harvest+AMIS three-scenario CSVs unless you re-run them.
+
+Read first: t2_delta.md, d22.md, optimize.py, solver.md.
+
+End: rewrite GATE0_REPRO_DISPATCH.md. Next paste follows the adaptive
+table. Do not start G1.
 ```
