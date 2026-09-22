@@ -7,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from sheaf.agrimate.equations import alpha_domestic_adjusted
 from sheaf.agrimate.fig4_config import (
     CAN_SET,
     CANNOT_SET,
@@ -80,9 +81,16 @@ def test_apply_alpha_i_keeps_usda_quantities_and_d9():
     assert (d0.anomaly == d1.anomaly).all()
     assert (d0.delta == d1.delta).all()
     for i, r in enumerate(d0.regions):
+        expect = alpha_domestic_adjusted(
+            wheat_params().alpha_i, float(d0.C_star[i]), float(d0.XI_star[i]),
+            float(d0.XD_star[i]), float(d0.XI_world),
+        )
+        assert abs(d0.alpha_d[i] - expect) < 1e-9
+        assert d0.alpha_d[i] <= 1.0 + 1e-12
         if r in D9_ALPHA:
             assert d1.alpha_d[i] == D9_ALPHA[r]
-            assert d0.alpha_d[i] == D9_ALPHA[r]
+            assert d0.alpha_d[i] < D9_ALPHA[r]
+    assert any("α_adj" in n for n in d0.notes)
 
 
 def test_fig4_config_module_does_not_import_g1g2():

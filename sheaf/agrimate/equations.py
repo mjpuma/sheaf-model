@@ -65,6 +65,33 @@ def alpha_domestic_d10(alpha_i: float, xi_r: float, xi_world: float) -> float:
     return float(alpha_i * xi_r / xi_world)
 
 
+def alpha_domestic_adjusted(
+        alpha_foreign: float,
+        consumption: float,
+        sales_foreign: float,
+        sales_domestic: float,
+        xi_world: float,
+        default: float = 1.0,
+        ) -> float:
+    """14022004 ``α_adj``: match domestic and foreign marginal revenue, cap at 1.
+
+    ``α_d = α_f · C · XI_r / (XI_world · XD_r)`` when both markets have
+    baseline sales. Otherwise the executable default ``α_domestic = 1``.
+    Values above 1 are capped at 1. ``α_d > 1`` makes domestic revenue
+    fall as sales rise.
+    """
+    xd = float(sales_domestic)
+    xf = float(sales_foreign)
+    world = float(xi_world)
+    if xd <= 0.0 or xf <= 0.0 or world <= 0.0:
+        a = float(default)
+    else:
+        a = float(alpha_foreign) * float(consumption) * xf / (world * xd)
+    if not np.isfinite(a) or a > 1.0:
+        return 1.0
+    return float(max(a, 0.0))
+
+
 def fulfill_sales(planned_d: float, planned_i: float, available: float,
                   delta: float) -> tuple[float, float]:
     """Eq. D.3: domestic first; international scaled by (1−Δ)."""

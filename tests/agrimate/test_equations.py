@@ -2,6 +2,7 @@
 import numpy as np
 
 from sheaf.agrimate.equations import (
+    alpha_domestic_adjusted,
     alpha_domestic_d10,
     author_inverse_demand,
     ces_price_index,
@@ -58,6 +59,14 @@ def test_inverse_demand_normalised():
 
 def test_alpha_d10_matches_export_share():
     assert abs(alpha_domestic_d10(3.5, 2.0, 10.0) - 0.7) < 1e-12
+
+
+def test_alpha_adj_matches_both_markets_and_caps_at_one():
+    # α_f * C * XI / (XI_world * XD) = 3.2 * 2 * 5 / (10 * 4) = 0.8
+    assert abs(alpha_domestic_adjusted(3.2, 2.0, 5.0, 4.0, 10.0) - 0.8) < 1e-12
+    assert alpha_domestic_adjusted(3.2, 10.0, 5.0, 1.0, 10.0) == 1.0
+    assert alpha_domestic_adjusted(3.2, 2.0, 0.0, 4.0, 10.0) == 1.0
+    assert alpha_domestic_adjusted(3.2, 2.0, 5.0, 0.0, 10.0) == 1.0
 
 
 def test_purchaser_demand_sums_when_prices_equal():

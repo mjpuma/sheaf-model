@@ -20,9 +20,10 @@ from sheaf.data_faostat import load_trade_matrix
 from sheaf.data_usda import detrend_anomalies, load_psd_country, load_price_series_monthly
 from sheaf.seasonal import load_harvest_calendar
 
+from .equations import alpha_domestic_adjusted
 from .harvest import step_profile_from_months
 from .params import AgrimateParams
-from .regions import D9_ALPHA, D9_NU, REGION_NAMES, iso3_to_region
+from .regions import D9_NU, REGION_NAMES, iso3_to_region
 from .restrictions import restriction_matrix
 
 _CONV = None
@@ -136,6 +137,7 @@ def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
         "C.1 wheat nodes: Zenodo 14022004 AgrimateRegionsWheat (27 names).",
         "A_d is not E.30. F.1 Egypt 0.17 unused (Egypt is in Northern Africa).",
         "Starred XI*, XD*, C* used in inverse demand are per-step averages.",
+        "Domestic α is 14022004 α_adj (cap 1), not Tbl. D.9.",
         "Anomalies use the already-summed member series (groupby region+year production.sum).",
     ]
     psd = load_psd_country("wheat")
@@ -226,10 +228,15 @@ def prepare_wheat(start_year: int = 2003, end_year: int = 2011,
         float(np.clip(0.05 + 0.4 * (M_ann[i] / max(use_C[i], 1e-8)), 0.02, 0.9))
         for i, r in enumerate(regions)
     ])
+    # 14022004 α_adj (default on). Not Tbl. D.9, whose named-exporter
+    # values sit above 1 and make domestic revenue fall with sales.
+    # Fig. 4 still applies D.9 through fig4_config.apply_alpha_i.
     alpha_d = np.array([
-        D9_ALPHA[r] if r in D9_ALPHA else (
-            params.alpha_i * XI_star[i] / XI_world if XI_world > 0 else 1.0)
-        for i, r in enumerate(regions)
+        alpha_domestic_adjusted(
+            params.alpha_i, float(C_star[i]), float(XI_star[i]),
+            float(XD_star[i]), XI_world,
+        )
+        for i in range(n_r)
     ])
     nu = np.array([D9_NU.get(r, 1.0) for r in regions])
 
