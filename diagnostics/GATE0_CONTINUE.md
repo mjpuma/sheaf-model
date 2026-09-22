@@ -12,8 +12,9 @@ and 3 fail on the S1 three-scenario CSVs. G1/G2 stay blocked. T1–T3
 **done** (labelled, not adopted). Stay not-accepted **recorded**. D.22
 vector+shift is **implemented**. Solver (x1-fixed scipy SLSQP) is
 **implemented**. Red-teamed: 0.812 is honest; last/first is a weak
-item-3 statistic (moy 2374× vs author 1.32×). **New strategy:** do not
-implement more NLP against Fig. 4 1.004. Next is **A1** inventory.
+item-3 statistic (moy 2374× vs author 1.32×). **New strategy:** do not implement more NLP against Fig. 4 1.004.
+Clearing, α_adj, and uniform x_init are live. Pulse remains.
+Next paste is **B1** in [`GATE0_B_PROMPTS.md`](GATE0_B_PROMPTS.md).
 Do not start G1.
 
 ## Adaptive rule

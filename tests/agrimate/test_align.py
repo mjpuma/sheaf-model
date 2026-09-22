@@ -61,8 +61,8 @@ def test_dispatch_next_paste_after_xinit():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
     assert "Last completed: x-init" in text
+    assert "Next paste: B1" in text
     assert "8.77" in text
-    assert "pulse" in text
     assert "G1/G2" in text
     assert "copy Julia" in text
     assert "Do not start G1" in text
@@ -73,3 +73,14 @@ def test_dispatch_next_paste_after_xinit():
     assert inv.count("**yes") == 2
     assert "Do not start G1" in inv
     assert "determine_transactions_two_markets" in inv
+    bq = ROOT / "diagnostics" / "GATE0_B_PROMPTS.md"
+    btxt = bq.read_text()
+    assert "Task B1 only" in btxt
+    assert "Task B2 only" in btxt
+    assert "Task B3 only" in btxt
+    assert "Task B4 only" in btxt
+    assert "Do not copy Julia" in btxt
+    assert "Do not start G1" in btxt
+    assert "plan_maxiter" in btxt
+    assert "dynamic_coupled" not in btxt
+    assert "dynamic_policy" not in btxt
