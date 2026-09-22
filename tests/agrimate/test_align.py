@@ -57,12 +57,12 @@ def test_brief_has_open_team_questions():
     assert "Do not need from the team" in text
 
 
-def test_dispatch_next_paste_after_alpha_adj():
+def test_dispatch_next_paste_after_xinit():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: alpha-adj" in text
-    assert "20.1" in text
-    assert "January" in text
+    assert "Last completed: x-init" in text
+    assert "8.77" in text
+    assert "pulse" in text
     assert "G1/G2" in text
     assert "copy Julia" in text
     assert "Do not start G1" in text
