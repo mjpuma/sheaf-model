@@ -102,6 +102,41 @@ def clip_demand_x1(
     return xd, xi
 
 
+def uniform_remaining_sales(
+        S0: float,
+        H: np.ndarray,
+        xd1: float,
+        xi1: float,
+        loss: float = 0.0,
+        ) -> tuple[np.ndarray, np.ndarray]:
+    """Even split of remaining grain over future domestic and foreign slots.
+
+    Author wheat both-markets start (producer_optimization.jl
+    70–74, 349–351) overwrites the previous plan with
+
+    ``(s_beg + h[1] − x1) + sum(h[2:end])`` divided by the number of free
+    decision variables. Current x1 stays locked. Host free block is
+    ``N−1`` after the lock, so ``2(N−1)`` slots. Independent Python; not
+    a Julia copy. ``plan_maxiter`` is unchanged.
+    """
+    H = np.asarray(H, float).reshape(-1)
+    n = int(H.size)
+    xd = np.zeros(n)
+    xi = np.zeros(n)
+    xd[0] = max(float(xd1), 0.0)
+    xi[0] = max(float(xi1), 0.0)
+    if n < 2:
+        return xd, xi
+    A0 = (1.0 - float(loss)) * max(float(S0), 0.0) + float(H[0])
+    stock_begin = max(A0 - xd[0] - xi[0], 0.0)
+    remaining = stock_begin + float(np.sum(H[1:]))
+    n_free = 2 * (n - 1)
+    each = remaining / n_free if n_free > 0 else 0.0
+    xd[1:] = each
+    xi[1:] = each
+    return xd, xi
+
+
 def pack_future_fractions(z_fut: np.ndarray, fd0: float, fi0: float, n: int
                           ) -> np.ndarray:
     """Rebuild length-2n fractions with step-0 locked."""
@@ -294,8 +329,10 @@ def solve_supplier_plan(
     ``x1=(xd0, xi0)`` locks current-step sales to demand (clipped by
     availability, domestic first) and optimises only the remaining steps
     with scipy SLSQP — independent Python of the sourced wheat programme
-    (x1 fixed, ``:LD_SLSQP``). ``x1 is None`` keeps the older 2N free
-    L-BFGS-B path for unit tests of the fraction map.
+    (x1 fixed, ``:LD_SLSQP``). The SLSQP start is the even split of
+    remaining grain over the free slots, not the previous plan.
+    ``x1 is None`` keeps the older 2N free L-BFGS-B path for unit tests
+    of the fraction map.
     """
     n = int(H.size)
     H = np.asarray(H, float)
@@ -335,6 +372,10 @@ def solve_supplier_plan(
             fd1, fi1 = 0.0, 0.0
         z0[0] = fd1
         z0[n] = fi1
+        xd_u, xi_u = uniform_remaining_sales(S0, H, xd1, xi1, loss)
+        fd_u, fi_u = sales_to_fractions(xd_u, xi_u, S0, H, loss, delta_hat)
+        z0[1:n] = fd_u[1:]
+        z0[n + 1:] = fi_u[1:]
 
     def fun_full(z):
         return _plan_objective_grad(
@@ -419,6 +460,7 @@ def solve_supplier_plan(
         "residual": residual,
         "method": method,
         "x1_fixed": bool(x1_fixed),
+        "x_init_uniform": bool(x1_fixed),
     }
 
 
