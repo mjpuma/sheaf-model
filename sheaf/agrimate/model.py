@@ -22,6 +22,7 @@ from .equations import (
     foreign_transaction_index,
     import_shares_of_others,
     inverse_of_inverse_demand,
+    monthly_transaction_index,
     prorate_two_market_sales,
     purchaser_demand,
     scale_baseline_shares,
@@ -135,11 +136,32 @@ class AgrimateResult:
     tx_quantity: np.ndarray | None = None
     tx_price: np.ndarray | None = None
 
-    def to_monthly_price(self) -> np.ndarray:
+    def to_monthly_index_equal(self) -> np.ndarray:
+        """Equal-weight mean of the two half-steps. Diagnostic only."""
+        p = np.asarray(self.price_index, float)
+        n = (p.size // 2) * 2
+        return p[:n].reshape(-1, 2).mean(axis=1)
+
+    def to_monthly_price_equal(self) -> np.ndarray:
+        """Equal-weight USD months. Diagnostic; not the live Bar A score."""
         p = np.asarray(self.price_usd, float)
         n = (p.size // 2) * 2
-        p = p[:n].reshape(-1, 2).mean(axis=1)
-        return p
+        return p[:n].reshape(-1, 2).mean(axis=1)
+
+    def to_monthly_index(self) -> np.ndarray:
+        """Volume-weighted off-diagonal basket when transactions exist."""
+        if self.tx_quantity is not None and self.tx_price is not None:
+            return monthly_transaction_index(
+                self.tx_quantity, self.tx_price, empty=1.0)
+        return self.to_monthly_index_equal()
+
+    def to_monthly_price(self) -> np.ndarray:
+        idx = self.to_monthly_index()
+        usd = np.asarray(self.price_usd, float)
+        step = np.asarray(self.price_index, float)
+        ok = np.isfinite(usd) & np.isfinite(step) & (np.abs(step) > 1e-15)
+        p0 = float(usd[ok][0] / step[ok][0]) if np.any(ok) else 1.0
+        return idx * p0
 
 
 def _purchaser_baseline(H_star, p_wld, C_star, Psi, A_c, params: AgrimateParams) -> dict:

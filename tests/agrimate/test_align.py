@@ -57,13 +57,15 @@ def test_brief_has_open_team_questions():
     assert "Do not need from the team" in text
 
 
-def test_dispatch_next_paste_after_xinit():
+def test_dispatch_next_paste_is_b2_after_b1():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: x-init" in text
-    assert "Next paste: B1" in text
-    assert "8.77" in text
+    assert "Last completed: B1" in text
+    assert "Next paste: B2" in text
+    assert "4.85" in text
     assert "G1/G2" in text
+    assert "copy Julia" in text
+    assert "Do not start G1" in text
     assert "copy Julia" in text
     assert "Do not start G1" in text
     assert (OUT_DEFAULT / "rt_solver.md").is_file()

@@ -21,6 +21,7 @@ from sheaf.agrimate.equations import (
     purchaser_demand,
     foreign_request_quantity,
     scale_baseline_shares,
+    monthly_transaction_index,
 )
 from sheaf.agrimate.harvest import step_profile_from_months
 from sheaf.agrimate.optimize import nash_ibr, solve_supplier_plan
@@ -222,3 +223,19 @@ def test_foreign_transaction_index_drops_the_diagonal():
     got = foreign_transaction_index(q, p, empty=1.0)
     assert abs(got - (10 * 2 + 5 * 4) / 15) < 1e-12
     assert foreign_transaction_index(np.eye(2), np.eye(2), empty=1.25) == 1.25
+
+
+def test_monthly_transaction_index_volume_weights_not_the_mean():
+    q = np.zeros((2, 2, 4))
+    p = np.ones((2, 2, 4))
+    q[0, 1, 0] = 100.0
+    p[0, 1, 0] = 1.0
+    q[0, 1, 1] = 1.0
+    p[0, 1, 1] = 21.0
+    # month 1 empty: keep previous basket
+    got = monthly_transaction_index(q, p, empty=1.5)
+    basket = (100.0 * 1.0 + 1.0 * 21.0) / 101.0
+    assert abs(got[0] - basket) < 1e-12
+    assert abs(got[1] - basket) < 1e-12
+    equal = (1.0 + 21.0) / 2.0
+    assert abs(got[0] - equal) > 5.0

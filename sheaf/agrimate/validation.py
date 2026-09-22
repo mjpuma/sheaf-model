@@ -142,11 +142,16 @@ def _rmse(a, b) -> float:
 
 def monthly_price(result: AgrimateResult, field: str = "price_usd") -> pd.Series:
     y0 = result.start_year
-    vals = result.to_monthly_price() if field == "price_usd" else None
-    if field == "price_index":
-        p = np.asarray(result.price_index, float)
-        n = (p.size // 2) * 2
-        vals = p[:n].reshape(-1, 2).mean(axis=1)
+    if field == "price_usd":
+        vals = result.to_monthly_price()
+    elif field == "price_index":
+        vals = result.to_monthly_index()
+    elif field == "price_usd_equal":
+        vals = result.to_monthly_price_equal()
+    elif field == "price_index_equal":
+        vals = result.to_monthly_index_equal()
+    else:
+        raise ValueError(f"unknown monthly field {field!r}")
     idx = pd.period_range(f"{y0}-01", periods=len(vals), freq="M")
     return pd.Series(vals, index=idx, name=field)
 
