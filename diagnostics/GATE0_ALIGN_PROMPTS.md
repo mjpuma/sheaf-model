@@ -45,10 +45,11 @@ Hard stops:
 
 Already done (do not re-do):
 - D.22 vector+shift live. x1-fixed scipy SLSQP live. rt-solver recorded.
-- Quiet-year last/first 0.812 vs Fig. 4 1.004; moy 2374× vs 1.32×.
-- Harvest+AMIS three-scenario CSVs are the S1 snapshot; do not clobber
-  them unless you re-run that experiment.
-- T1/T2 labelled D.22 and the solver algorithm. A1 is the rest of the loop.
+- Clearing loop live (prorata, posted prices, share update, tx index).
+- α_adj cap 1 live on prepare_wheat. D.9 stays on Fig. 4 apply_alpha_i.
+- Uniform remaining-grain x_init live. Pulse remains (Jan1 cheap / Jan2 empty).
+- Harvest+AMIS three-scenario CSVs are the S1 snapshot; do not clobber.
+- Do not raise plan_maxiter. Unconverged 5078/5832 is not a reason to.
 
 Exit: pytest tests/agrimate. One prompt, one PR-sized change.
 Rewrite diagnostics/GATE0_REPRO_DISPATCH.md from this run (≤20 lines).
@@ -146,3 +147,7 @@ End: rewrite GATE0_REPRO_DISPATCH.md. Do not start G1.
 
 A2 (team questions) lives in [`GATE0_AGRIMATE_BRIEF.md`](GATE0_AGRIMATE_BRIEF.md).
 That is a human paste to the Agrimate team, not an agent session.
+
+Post x-init Bar A queue: [`GATE0_B_PROMPTS.md`](GATE0_B_PROMPTS.md)
+(B1 months, B2 domestic others, B3 horizon, B4 leftovers). Do not
+paste A1–A4 again.

@@ -60,6 +60,7 @@ def test_dispatch_next_paste_after_xinit():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
     assert "Last completed: x-init" in text
+    assert "Next paste: B1" in text
     assert "G1/G2" in text
     assert "L1–L8" in text
     assert "R11" in text
