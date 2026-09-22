@@ -213,3 +213,45 @@ def test_x1_domestic_priority_when_demand_exceeds_availability():
     xd, xi = clip_demand_x1(8.0, 1.0, S0=0.0, H0=6.0, loss=0.0)
     assert abs(xd - 6.0) < 1e-12
     assert abs(xi - 0.0) < 1e-12
+
+
+def test_uniform_remaining_sales_splits_after_x1():
+    from sheaf.agrimate.optimize import uniform_remaining_sales
+
+    H = np.array([2.0, 4.0, 6.0])
+    xd, xi = uniform_remaining_sales(S0=1.0, H=H, xd1=1.0, xi1=0.5)
+    assert abs(xd[0] - 1.0) < 1e-12
+    assert abs(xi[0] - 0.5) < 1e-12
+    # remaining = (1+2-1-0.5) + 4+6 = 11.5; 4 free slots
+    assert abs(xd[1] - 11.5 / 4) < 1e-12
+    assert abs(xi[1] - 11.5 / 4) < 1e-12
+    assert abs(xd[2] - 11.5 / 4) < 1e-12
+    assert abs(xi[2] - 11.5 / 4) < 1e-12
+
+
+def test_x1_slsqp_starts_from_uniform_not_previous_plan():
+    """maxiter=0 returns the start. Previous-plan x0 must not be that start."""
+    p = AgrimateParams(plan_maxiter=0)
+    H = np.array([2.0, 4.0, 6.0, 8.0])
+    S0 = 1.0
+    x0_a = np.concatenate([np.full(4, 0.01), np.full(4, 3.0)])
+    x0_b = np.concatenate([np.full(4, 9.0), np.full(4, 0.01)])
+    a = solve_supplier_plan(
+        H, S0, np.ones(4) * 2.0, 2.0, 0.4, 3.2, 2.0, p,
+        x0=x0_a, x1=(0.5, 0.5),
+    )
+    b = solve_supplier_plan(
+        H, S0, np.ones(4) * 2.0, 2.0, 0.4, 3.2, 2.0, p,
+        x0=x0_b, x1=(0.5, 0.5),
+    )
+    assert a["x1_fixed"] is True and a["x_init_uniform"] is True
+    assert abs(a["xd"][0] - 0.5) < 1e-8
+    assert abs(a["xi"][0] - 0.5) < 1e-8
+    assert np.allclose(a["xd"], b["xd"])
+    assert np.allclose(a["xi"], b["xi"])
+    assert not np.allclose(a["xi"][1:], 3.0)
+    assert not np.allclose(a["xd"][1:], 9.0)
+    free = solve_supplier_plan(
+        H, S0, np.ones(4) * 2.0, 2.0, 0.4, 3.2, 2.0, p, x0=x0_a)
+    assert free["x_init_uniform"] is False
+    assert free["method"] == "L-BFGS-B"
