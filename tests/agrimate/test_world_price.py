@@ -97,6 +97,14 @@ def test_reported_pw_equals_foreign_transactions_not_lagged_offers():
     assert np.max(np.abs(res.price_index - replay)) > 0.05
     # Not a 2006 pin: year-mean index is not reset to 1.
     assert abs(float(res.price_index.mean()) - 1.0) > 0.05
+    vw = res.to_monthly_price()
+    eq = res.to_monthly_price_equal()
+    assert vw.shape == eq.shape
+    # Live months are the transaction basket, not the equal-weight mean.
+    assert np.max(np.abs(vw - eq)) > 1.0
+    from sheaf.agrimate.equations import monthly_transaction_index
+    expect = monthly_transaction_index(res.tx_quantity, res.tx_price) * data.p0
+    assert np.allclose(vw, expect, rtol=0.0, atol=1e-8)
 
 
 def test_author_plot_wm_price_timeseries_not_in_tree():

@@ -378,3 +378,41 @@ def foreign_transaction_index(quantity: np.ndarray, price: np.ndarray,
     if vol > 1e-12:
         return float(np.sum(q[off] * p[off]) / vol)
     return float(empty)
+
+
+def monthly_transaction_index(
+        quantity: np.ndarray,
+        price: np.ndarray,
+        empty: float = 1.0,
+        ) -> np.ndarray:
+    """Volume-weight two half-steps per calendar month (plot.jl basket).
+
+    Off-diagonal ``q·p`` only. A month with no foreign volume in either
+    half-step keeps the previous month (``empty`` at the first month).
+    Not the equal-weight mean of the two step indices.
+    """
+    q = np.asarray(quantity, float)
+    p = np.asarray(price, float)
+    if q.ndim != 3 or q.shape != p.shape:
+        raise ValueError("quantity and price must be (R, R, T) and aligned")
+    r, _, t = q.shape
+    n_m = t // 2
+    off = ~np.eye(r, dtype=bool)
+    out = np.empty(n_m, dtype=float)
+    prev = float(empty)
+    for m in range(n_m):
+        val = 0.0
+        vol = 0.0
+        for k in range(2 * m, 2 * m + 2):
+            qt = q[:, :, k]
+            pt = p[:, :, k]
+            v = float(qt[off].sum())
+            if v > 1e-12:
+                val += float(np.sum(qt[off] * pt[off]))
+                vol += v
+        if vol > 1e-12:
+            out[m] = val / vol
+        else:
+            out[m] = prev
+        prev = out[m]
+    return out
