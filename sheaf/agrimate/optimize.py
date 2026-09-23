@@ -215,6 +215,7 @@ def _plan_objective_grad(
         alpha_d: float,
         params: AgrimateParams,
         delta_hat: np.ndarray,
+        xd_others: np.ndarray | None = None,
         ) -> tuple[float, np.ndarray]:
     n = int(H.size)
     fd = z[:n]
@@ -222,6 +223,10 @@ def _plan_objective_grad(
     loss = params.delta_loss
     floor = params.demand_arg_floor
     one_m_d = 1.0 - delta_hat
+    if xd_others is None:
+        xd_others = np.zeros(n)
+    else:
+        xd_others = np.broadcast_to(np.asarray(xd_others, float), (n,))
 
     A = np.empty(n)
     xd = np.empty(n)
@@ -240,7 +245,7 @@ def _plan_objective_grad(
         s = S[t]
 
     q_i = (xi_ship + xi_others) / xi_star
-    q_d = xd / xd_star
+    q_d = (xd + xd_others) / xd_star
     p_i = np.asarray(inverse_demand(q_i, alpha_i, params.lam_demand, floor), float)
     p_d = np.asarray(inverse_demand(q_d, alpha_d, params.lam_demand, floor), float)
     rev = float(np.dot(p_i, xi_ship) + np.dot(p_d, xd))
@@ -319,6 +324,7 @@ def solve_supplier_plan(
         delta_hat: np.ndarray | None = None,
         x0: np.ndarray | None = None,
         x1: tuple[float, float] | None = None,
+        xd_others: np.ndarray | None = None,
         ) -> dict:
     """Maximise supplier profit over (XD, XI) subject to storage ≥ 0.
 
@@ -333,12 +339,21 @@ def solve_supplier_plan(
     remaining grain over the free slots, not the previous plan.
     ``x1 is None`` keeps the older 2N free L-BFGS-B path for unit tests
     of the fraction map.
+
+    ``xd_others`` is the D.7 domestic others path (import share of
+    rivals' expected foreign sales). Default zeros leaves unit tests on
+    ``q_d = xd / xd_star``. Live wheat passes ``C*`` as ``xd_star_step``.
+    Foreign D.7 stays ``(xi + xi_others) / XI*_world``.
     """
     n = int(H.size)
     H = np.asarray(H, float)
     xi_others = np.broadcast_to(np.asarray(xi_others, float), (n,)).copy()
     xi_star = np.maximum(np.broadcast_to(np.asarray(xi_star_step, float), (n,)), 1e-8)
     xd_star = np.maximum(np.broadcast_to(np.asarray(xd_star_step, float), (n,)), 1e-8)
+    if xd_others is None:
+        xd_others = np.zeros(n)
+    else:
+        xd_others = np.broadcast_to(np.asarray(xd_others, float), (n,)).copy()
     if delta_hat is None:
         delta_hat = np.zeros(n)
     delta_hat = np.clip(np.asarray(delta_hat, float), 0.0, 1.0)
@@ -380,7 +395,7 @@ def solve_supplier_plan(
     def fun_full(z):
         return _plan_objective_grad(
             z, H, S0, xi_others, xi_star, xd_star,
-            alpha_i, alpha_d, params, delta_hat,
+            alpha_i, alpha_d, params, delta_hat, xd_others=xd_others,
         )
 
     fallback = False
@@ -432,13 +447,13 @@ def solve_supplier_plan(
         feasible = finite and bool(np.min(S) >= -1e-8)
 
     q_i = (xi_ship + xi_others) / xi_star
-    q_d = xd / xd_star
+    q_d = (xd + xd_others) / xd_star
     floor = params.demand_arg_floor
     floor_binds = int(np.sum(q_i <= floor + 1e-12) + np.sum(q_d <= floor + 1e-12))
     residual = float(max(-np.min(S), 0.0)) if S.size else 0.0
     obj, grad = _plan_objective_grad(
         np.clip(z, 0.0, 1.0), H, S0, xi_others, xi_star, xd_star,
-        alpha_i, alpha_d, params, delta_hat,
+        alpha_i, alpha_d, params, delta_hat, xd_others=xd_others,
     )
     return {
         "xd": xd,
