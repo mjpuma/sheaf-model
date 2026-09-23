@@ -255,3 +255,97 @@ def test_x1_slsqp_starts_from_uniform_not_previous_plan():
         H, S0, np.ones(4) * 2.0, 2.0, 0.4, 3.2, 2.0, p, x0=x0_a)
     assert free["x_init_uniform"] is False
     assert free["method"] == "L-BFGS-B"
+
+
+def test_domestic_d7_defaults_to_own_sales_over_star():
+    """Omitting xd_others is q_d = xd / xd_star (unit-test path)."""
+    p = AgrimateParams(zeta_penalty=1.0, xmin_share=0.0)
+    n = 6
+    H = np.linspace(0.3, 0.9, n)
+    S0 = 0.2
+    others = np.full(n, 1.2)
+    xi_star = np.full(n, 0.5)
+    xd_star = np.full(n, 0.4)
+    delta = np.zeros(n)
+    rng = np.random.default_rng(4)
+    z = rng.random(2 * n) * 0.8 + 0.1
+    f0, g0 = _plan_objective_grad(
+        z, H, S0, others, xi_star, xd_star, 3.2, 1.0, p, delta)
+    f1, g1 = _plan_objective_grad(
+        z, H, S0, others, xi_star, xd_star, 3.2, 1.0, p, delta,
+        xd_others=np.zeros(n))
+    assert abs(f0 - f1) < 1e-12
+    assert np.allclose(g0, g1)
+
+
+def test_domestic_d7_uses_own_plus_others_over_star():
+    """Author p_d = P((x_dom + x_oth_dom) / X_star_domestic)."""
+    from sheaf.agrimate.equations import inverse_demand
+
+    p = AgrimateParams(zeta_penalty=1.0, xmin_share=0.0, lam_demand=0.0)
+    n = 4
+    H = np.ones(n) * 0.5
+    S0 = 0.0
+    xi_others = np.full(n, 1.0)
+    xi_star = np.full(n, 2.0)
+    c_star = np.full(n, 0.8)
+    xd_others = np.full(n, 0.3)
+    delta = np.zeros(n)
+    z = np.concatenate([np.full(n, 0.4), np.full(n, 0.3)])
+    obj, _grad = _plan_objective_grad(
+        z, H, S0, xi_others, xi_star, c_star, 3.2, 1.0, p, delta,
+        xd_others=xd_others)
+    xd, _xi_int, xi_ship, _S = fractions_to_sales(
+        z[:n], z[n:], S0, H, p.delta_loss, delta)
+    q_d = (xd + xd_others) / c_star
+    p_d = inverse_demand(q_d, 1.0, 0.0, p.demand_arg_floor)
+    q_i = (xi_ship + xi_others) / xi_star
+    p_i = inverse_demand(q_i, 3.2, 0.0, p.demand_arg_floor)
+    psto = p.p_sto_step
+    unit = -psto * (n - np.arange(n, dtype=float))
+    rev = float(np.dot(p_i, xi_ship) + np.dot(p_d, xd))
+    cost = float(np.dot(unit, xd + xi_ship - H))
+    assert abs(obj - (-(rev - cost))) < 1e-10
+    q_own = xd / c_star
+    assert float(np.max(np.abs(q_d - q_own))) > 0.1
+
+
+def test_domestic_others_analytic_grad_matches_finite_difference():
+    p = AgrimateParams(zeta_penalty=1.0, xmin_share=0.0)
+    n = 8
+    H = np.linspace(0.2, 0.8, n)
+    S0 = 0.4
+    others = np.full(n, 1.5)
+    xi_star = np.full(n, 0.3)
+    xd_star = np.full(n, 0.8)
+    xd_others = np.linspace(0.05, 0.4, n)
+    delta = np.zeros(n)
+    delta[1] = 0.4
+    rng = np.random.default_rng(5)
+    z = rng.random(2 * n) * 0.9 + 0.05
+    f0, g0 = _plan_objective_grad(
+        z, H, S0, others, xi_star, xd_star, 3.5, 1.0, p, delta,
+        xd_others=xd_others)
+    eps = 1e-6
+    g_fd = np.empty_like(z)
+    for i in range(z.size):
+        zp, zm = z.copy(), z.copy()
+        zp[i] += eps
+        zm[i] -= eps
+        fp, _ = _plan_objective_grad(
+            zp, H, S0, others, xi_star, xd_star, 3.5, 1.0, p, delta,
+            xd_others=xd_others)
+        fm, _ = _plan_objective_grad(
+            zm, H, S0, others, xi_star, xd_star, 3.5, 1.0, p, delta,
+            xd_others=xd_others)
+        g_fd[i] = (fp - fm) / (2.0 * eps)
+    rel = np.abs(g0 - g_fd) / np.maximum(np.abs(g_fd), 1e-6)
+    assert float(np.max(rel)) < 2e-4, (g0, g_fd, rel)
+
+
+def test_live_planner_uses_c_star_and_import_share_others():
+    model = (__import__("pathlib").Path("sheaf/agrimate/model.py")).read_text()
+    assert "d.C_star[r]" in model
+    assert "xd_others=share_imp[r] * others" in model
+    assert "d.XI_world, d.C_star[r]" in model
+    assert "d.XI_world, d.XD_star[r]" not in model

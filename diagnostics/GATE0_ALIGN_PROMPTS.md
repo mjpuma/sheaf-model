@@ -48,6 +48,7 @@ Already done (do not re-do):
 - Clearing loop live (prorata, posted prices, share update, tx index).
 - α_adj cap 1 live on prepare_wheat. D.9 stays on Fig. 4 apply_alpha_i.
 - Uniform remaining-grain x_init live. Pulse remains (Jan1 cheap / Jan2 empty).
+- B1 live months volume-weight the two half-steps (plot.jl basket).
 - Harvest+AMIS three-scenario CSVs are the S1 snapshot; do not clobber.
 - Do not raise plan_maxiter. Unconverged 5078/5832 is not a reason to.
 

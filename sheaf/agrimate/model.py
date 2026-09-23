@@ -348,7 +348,9 @@ class AgrimateSim:
                         H_star_roll[r], H_roll[r], n_y,
                         n_for=p.n_for, tau_for_steps=p.tau_for * n_y)
                     # D.7 international argument is world volume / world XI*
-                    # (scalar year-average per step). Domestic uses own XD*.
+                    # (scalar year-average per step). Domestic D.7 is
+                    # (own + import-share of others' foreign plans) / C*,
+                    # the same argument posted-price arg_d uses.
                     # Current x1 is demand (clipped), not a free choice.
                     # Author X_avg is mean baseline harvest per step
                     # (initialization.jl); XD*+XI* is that identity here.
@@ -358,10 +360,11 @@ class AgrimateSim:
                         p.iota, x_avg_r, p.delta_loss)
                     sol = solve_supplier_plan(
                         Hhat, float(S_p[r]), others,
-                        d.XI_world, d.XD_star[r],
+                        d.XI_world, d.C_star[r],
                         p.alpha_i, float(d.alpha_d[r]), p,
                         delta_hat=dhat, x0=np.concatenate([x0_d, x0_i]),
                         x1=x1,
+                        xd_others=share_imp[r] * others,
                     )
                     if not sol["success"]:
                         failed += 1
