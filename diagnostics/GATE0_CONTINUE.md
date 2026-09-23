@@ -13,8 +13,9 @@ and 3 fail on the S1 three-scenario CSVs. G1/G2 stay blocked. T1–T3
 vector+shift is **implemented**. Solver (x1-fixed scipy SLSQP) is
 **implemented**. Red-teamed: 0.812 is honest; last/first is a weak
 item-3 statistic (moy 2374× vs author 1.32×). **New strategy:** do not implement more NLP against Fig. 4 1.004.
-Clearing, α_adj, and uniform x_init are live. Pulse remains.
-Next paste is **B1** in [`GATE0_B_PROMPTS.md`](GATE0_B_PROMPTS.md).
+Clearing, α_adj, uniform x_init, B1 months, and B2 domestic D.7
+are live. Pulse remains (2006 Jan1 cheap dump / Jan2 empty).
+Next paste is **B3** in [`GATE0_B_PROMPTS.md`](GATE0_B_PROMPTS.md).
 Do not start G1.
 
 ## Adaptive rule
