@@ -50,8 +50,9 @@ Already done (do not re-do):
 - Uniform remaining-grain x_init live. Pulse remains (Jan1 cheap / Jan2 empty).
 - B1 live months volume-weight the two half-steps (plot.jl basket).
 - B2 domestic D.7 live (`(xd + share_imp·Q) / C*`). Pulse remains.
+- B3 harvest horizon live (raw now + N_year D.1 slots). Pulse remains.
 - Harvest+AMIS three-scenario CSVs are the S1 snapshot; do not clobber.
-- Do not raise plan_maxiter. Unconverged 4995/5832 is not a reason to.
+- Do not raise plan_maxiter. Unconverged 5125/5832 is not a reason to.
 
 Exit: pytest tests/agrimate. One prompt, one PR-sized change.
 Rewrite diagnostics/GATE0_REPRO_DISPATCH.md from this run (≤20 lines).
