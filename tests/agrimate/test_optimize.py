@@ -349,3 +349,38 @@ def test_live_planner_uses_c_star_and_import_share_others():
     assert "xd_others=share_imp[r] * others" in model
     assert "d.XI_world, d.C_star[r]" in model
     assert "d.XI_world, d.XD_star[r]" not in model
+    assert "supplier_harvest_horizon" in model
+    assert "n_h = n_y + 1" in model
+
+
+def test_x1_lock_on_n_year_plus_one_horizon():
+    """Free SLSQP block is N_year slots after x1 lock on length N_year+1."""
+    p = AgrimateParams(plan_maxiter=15)
+    n_y = 24
+    H = np.ones(n_y + 1) * 0.5
+    S0 = 0.4
+    d_dom, d_for = 0.2, 0.15
+    sol = solve_supplier_plan(
+        H, S0, np.ones(n_y + 1) * 2.0, 2.0, 0.8, 3.2, 1.0, p,
+        x1=(d_dom, d_for),
+    )
+    assert sol["success"]
+    assert sol["xd"].size == n_y + 1
+    assert sol["x1_fixed"] is True
+    assert abs(sol["xd"][0] - d_dom) < 1e-8
+    assert abs(sol["xi"][0] - d_for) < 1e-8
+    assert np.min(sol["S"]) >= -1e-8
+
+
+def test_uniform_start_on_n_year_plus_one_has_two_n_year_free_slots():
+    from sheaf.agrimate.optimize import uniform_remaining_sales
+
+    H = np.ones(25)
+    xd, xi = uniform_remaining_sales(S0=0.0, H=H, xd1=0.25, xi1=0.25)
+    remaining = (1.0 - 0.25 - 0.25) + 24.0
+    each = remaining / 48
+    assert xd.size == 25 and xi.size == 25
+    assert abs(xd[0] - 0.25) < 1e-12
+    assert abs(xi[0] - 0.25) < 1e-12
+    assert np.allclose(xd[1:], each)
+    assert np.allclose(xi[1:], each)
