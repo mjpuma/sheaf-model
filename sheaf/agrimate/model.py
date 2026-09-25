@@ -14,7 +14,6 @@ from .equations import (
     consumption_ces,
     consumer_price_mix,
     crop_budget_share,
-    expected_harvest,
     expected_restriction,
     expected_two_market_sales,
     extra_storage_demand,
@@ -26,6 +25,7 @@ from .equations import (
     prorate_two_market_sales,
     purchaser_demand,
     scale_baseline_shares,
+    supplier_harvest_horizon,
     update_producer_storage,
 )
 from .optimize import (
@@ -321,11 +321,13 @@ class AgrimateSim:
             # 1 harvest  2 policy
             H = self.harvest_at(t)
             delta = self.delta_at(t)
-            # Rolling forthcoming year [t, t+Nyear): D.1 weights from *now*,
-            # not from January of the calendar year. S0 is start-of-step stock
-            # (harvest of this step is H[0] of the horizon — no double count).
-            H_roll = np.stack([self.harvest_at(t + k) for k in range(n_y)], axis=1)
-            H_star_roll = np.stack([d.H_star[:, (t + k) % n_y] for k in range(n_y)], axis=1)
+            # Length N_year+1: raw harvest now, then D.1 on t+1 … t+N_year.
+            # Author vcat(harvest, expected_harvests). S0 is start-of-step
+            # stock (current harvest is H[0] — no double count).
+            n_h = n_y + 1
+            H_roll = np.stack([self.harvest_at(t + k) for k in range(n_h)], axis=1)
+            H_star_roll = np.stack(
+                [d.H_star[:, (t + k) % n_y] for k in range(n_h)], axis=1)
             # 4 plan then 3 sales: execute step 0 of the new programme.
             # Jacobi IBR: every region best-responds to last expected rivals
             # (D.22), not to 28 Gauss–Seidel replies inside the step.
@@ -336,15 +338,17 @@ class AgrimateSim:
             do_replan = (t % self.replan_stride) == 0
             if do_replan:
                 for r in range(n_r):
-                    others = Q[r]
-                    x0_d = np.empty(n_y)
-                    x0_i = np.empty(n_y)
-                    for k in range(n_y):
+                    others = np.asarray(Q[r], float)
+                    if others.size == n_y:
+                        others = np.concatenate([others, others[-1:]])
+                    x0_d = np.empty(n_h)
+                    x0_i = np.empty(n_h)
+                    for k in range(n_h):
                         tt = min(t + k, T - 1)
                         x0_d[k] = frozen_d[r, tt]
                         x0_i[k] = frozen_i[r, tt]
-                    dhat = expected_restriction(float(delta[r]), n_y)
-                    Hhat = expected_harvest(
+                    dhat = expected_restriction(float(delta[r]), n_h)
+                    Hhat = supplier_harvest_horizon(
                         H_star_roll[r], H_roll[r], n_y,
                         n_for=p.n_for, tau_for_steps=p.tau_for * n_y)
                     # D.7 international argument is world volume / world XI*
@@ -375,7 +379,7 @@ class AgrimateSim:
                     floor_binds_plan += int(sol["floor_binds"])
                     plan_residual = max(plan_residual, float(sol["residual"]))
                     if sol["success"]:
-                        for k in range(n_y):
+                        for k in range(n_h):
                             tt = t + k
                             if tt < T:
                                 new_d[r, tt] = sol["xd"][k]

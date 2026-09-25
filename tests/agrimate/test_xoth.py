@@ -12,7 +12,6 @@ from sheaf.agrimate.wheat_data import prepare_wheat
 from sheaf.agrimate.xi_split import n_julia_sources
 
 ROOT = Path(__file__).resolve().parents[2]
-DISPATCH = ROOT / "diagnostics" / "GATE0_REPRO_DISPATCH.md"
 
 
 def test_xoth_does_not_copy_julia_or_retune_or_open_g1():
@@ -58,13 +57,6 @@ def test_xoth_files_and_dispatch():
         "prices_undisturbed_xinit_vw.csv",
     ):
         assert (out / name).is_file(), name
-    text = DISPATCH.read_text()
-    assert text.count("\n") <= 20
-    assert "Last completed: B2" in text
-    assert "Next paste: B3" in text
-    assert "G1/G2" in text
-    assert "copy Julia" in text
-    assert "Do not start G1" in text
     note = (out / "xoth.md").read_text()
     assert "Jan1" in note and "Jan2" in note
     assert "plan_maxiter" in note

@@ -34,6 +34,32 @@ def expected_harvest(H_star_step: np.ndarray, H_realised: np.ndarray,
     return (1.0 - w) * H_star_step + w * H_realised
 
 
+def supplier_harvest_horizon(
+        H_star_step: np.ndarray,
+        H_realised: np.ndarray,
+        n_year: int,
+        n_for: int | None = None,
+        tau_for_steps: float | None = None,
+        ) -> np.ndarray:
+    """Current raw harvest plus N_year D.1 expected slots (length N_year+1).
+
+    Author ``H = vcat(harvest, expected_harvests)`` with the blend at
+    ``t+n``, ``n = 1:N_hor``. Slot 0 is realised harvest now (not
+    weighted). Slots 1:N_year use the existing ``expected_harvest`` /
+    ``harvest_weights`` on the forthcoming year starting at t+1.
+    ``n_for`` and ``tau_for`` are unchanged.
+    """
+    H_star_step = np.asarray(H_star_step, float).reshape(-1)
+    H_realised = np.asarray(H_realised, float).reshape(-1)
+    need = int(n_year) + 1
+    if H_star_step.size != need or H_realised.size != need:
+        raise ValueError("horizon inputs must have length N_year+1")
+    future = expected_harvest(
+        H_star_step[1:], H_realised[1:], int(n_year),
+        n_for=n_for, tau_for_steps=tau_for_steps)
+    return np.concatenate([np.asarray([H_realised[0]], float), future])
+
+
 def expected_restriction(delta_now: float, n_year: int) -> np.ndarray:
     """Eq. D.2: current phase known; future announcements not foreseen."""
     out = np.zeros(n_year)

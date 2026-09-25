@@ -115,9 +115,10 @@ def uniform_remaining_sales(
     70–74, 349–351) overwrites the previous plan with
 
     ``(s_beg + h[1] − x1) + sum(h[2:end])`` divided by the number of free
-    decision variables. Current x1 stays locked. Host free block is
-    ``N−1`` after the lock, so ``2(N−1)`` slots. Independent Python; not
-    a Julia copy. ``plan_maxiter`` is unchanged.
+    decision variables. Current x1 stays locked. After B3 the harvest
+    vector is length ``N_year+1``, so the free block is ``N_year``
+    (``2 N_year`` fractions). Independent Python; not a Julia copy.
+    ``plan_maxiter`` is unchanged.
     """
     H = np.asarray(H, float).reshape(-1)
     n = int(H.size)

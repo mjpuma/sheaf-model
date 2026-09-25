@@ -57,12 +57,12 @@ def test_brief_has_open_team_questions():
     assert "Do not need from the team" in text
 
 
-def test_dispatch_next_paste_is_b3_after_b2():
+def test_dispatch_next_paste_is_b4_after_b3():
     text = DISPATCH.read_text()
     assert text.count("\n") <= 20
-    assert "Last completed: B2" in text
-    assert "Next paste: B3" in text
-    assert "4.60" in text
+    assert "Last completed: B3" in text
+    assert "Next paste: B4" in text
+    assert "4.81" in text
     assert "G1/G2" in text
     assert "copy Julia" in text
     assert "Do not start G1" in text

@@ -22,6 +22,7 @@ from sheaf.agrimate.equations import (
     foreign_request_quantity,
     scale_baseline_shares,
     monthly_transaction_index,
+    supplier_harvest_horizon,
 )
 from sheaf.agrimate.harvest import step_profile_from_months
 from sheaf.agrimate.optimize import nash_ibr, solve_supplier_plan
@@ -33,6 +34,24 @@ def test_harvest_weights_d1a():
     assert w.shape == (24,)
     assert w[0] > w[-1]  # near-term realised (author expected_harvests.jl)
     assert np.all(w >= 0) and np.all(w <= 1)
+
+
+def test_supplier_harvest_horizon_is_raw_now_plus_d1_future():
+    """Author vcat(harvest, expected_harvests); weights start at t+1."""
+    n = 4
+    star = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+    real = np.array([10.0, 20.0, 30.0, 40.0, 50.0])
+    H = supplier_harvest_horizon(star, real, n, n_for=0, tau_for_steps=1.0)
+    assert H.shape == (n + 1,)
+    assert abs(H[0] - 10.0) < 1e-12
+    future = expected_harvest(
+        star[1:], real[1:], n, n_for=0, tau_for_steps=1.0)
+    assert np.allclose(H[1:], future)
+    w0 = harvest_weights(n, n_for=0, tau_for_steps=1.0)[0]
+    blended0 = (1.0 - w0) * star[0] + w0 * real[0]
+    assert abs(H[0] - blended0) > 1.0
+    w = harvest_weights(24)
+    assert w.shape == (24,)
 
 
 def test_harvest_profile_normalised():
