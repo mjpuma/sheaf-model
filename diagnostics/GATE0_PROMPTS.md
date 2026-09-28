@@ -1,12 +1,11 @@
-# Gate 0 prompt list
+# Gate 0 prompt list — paused Python rewrite
 
-Paste **exactly one** prompt per session. Do not skip. Do not open G1/G2.
-Living queue: [`DEVELOPMENT.md`](DEVELOPMENT.md). Contract:
-[`GATE0_CONTRACT.md`](GATE0_CONTRACT.md). Protocol:
-[`GATE0_VALIDATION.md`](GATE0_VALIDATION.md).
+This queue is paused. Do not paste P1. The active list is
+[`GATE0_JULIA_PROMPTS.md`](GATE0_JULIA_PROMPTS.md). Start at **J0**.
 
-**Now:** paste **P1**. Everything above P1 is done. Everything below P1
-is later.
+The prompts below belong to the independent Python copy in
+`sheaf/agrimate/`. That copy runs and does not reproduce the 2025
+Agrimate wheat results. Leave it until the Julia track says otherwise.
 
 ## Shared preamble (prepend to every prompt)
 
