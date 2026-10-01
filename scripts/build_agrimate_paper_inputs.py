@@ -70,6 +70,8 @@ SOUTH_REGIONS = {
 # AgrimateEU28 sum still equals the USDA European Union total.
 EU_CARRIER = "DEU"
 ANOMALY_YEARS = range(2000, 2017)  # columns "2000-1" .. "2016-365"
+# simulate() applies every row in the file, whatever its "source=2007-2011" name says.
+RESTRICT_WINDOW = (pd.Timestamp("2007-01-01"), pd.Timestamp("2011-12-31"))
 
 
 def parse_regions(const_name: str) -> dict[str, list[str]]:
@@ -216,11 +218,14 @@ def merge_restrictions(rows: list[tuple[str, pd.Timestamp, pd.Timestamp, float]]
     AMIS repeats a measure once per rate revision, so the raw rows overlap.
     The paper's aggregate_export_restrictions adds overlapping values (capped
     at 1), which would stack those repeats. sheaf/agrimate/restrictions.py
-    takes the max; this keeps that rule.
+    takes the max; this keeps that rule. Rows are clipped to RESTRICT_WINDOW
+    first and rows outside it are dropped.
     """
+    lo, hi = RESTRICT_WINDOW
+    clipped = [(i, max(s, lo), min(e, hi), v) for i, s, e, v in rows]
     out = []
-    for iso in sorted({r[0] for r in rows}):
-        spans = [(s, e, v) for i, s, e, v in rows if i == iso and e >= s]
+    for iso in sorted({r[0] for r in clipped}):
+        spans = [(s, e, v) for i, s, e, v in clipped if i == iso and e >= s]
         if not spans:
             continue
         days = pd.date_range(min(s for s, _, _ in spans), max(e for _, e, _ in spans), freq="D")

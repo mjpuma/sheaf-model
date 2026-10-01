@@ -3,8 +3,10 @@
 Paste **exactly one** prompt per session. Each block below already includes
 the preamble. Copy the whole fenced block. Do not skip. Do not open G1 or G2.
 
-**Now:** read `gate0_julia/J4.md` and decide whether to accept that
-score. J5 (Python launcher) can be pasted now. J6 needs your explicit
+**Now:** the harvest + restrictions run is being redone with the
+restriction file clipped to 2007–2011 (`gate0_julia/J3.md`, "Rerun"),
+about 16 h from 2026-10-01. Its J4 numbers are superseded until it is
+re-scored. J5 (Python launcher) can be pasted now. J6 needs your explicit
 acceptance of J4. J4 found a run of the published code on reconstructed
 inputs. It is **not** a reproduction of the published wheat run.
 
@@ -23,7 +25,8 @@ steps, about 17 h and 16 h). J4 scored them against the author NetCDF.
 The broad shape matches: May 2008 peak, price correlation 0.83–0.91.
 The levels do not: stocks +30 %, the 07/08 harvest spike 30 % too
 small, and a different set of restricting regions. The rebuilt
-restriction file also runs past 2011 (`gate0_julia/J4.md`).
+restriction file also ran past 2011 (`gate0_julia/J4.md`). It is now
+clipped to 2007–2011 and harvest + restrictions is being rerun.
 
 Gate 0 is finished only when a wheat run of this Julia code can be
 compared with the author NetCDF. A mismatch is allowed and must be
@@ -64,7 +67,7 @@ Invoke Julia as `arch -x86_64 <julia> --project=.`. Do not `brew install julia`.
 | J0b | Point `AgrimateModel` at the unpacked source and load it | **done** — loaded; `Pkg.develop` also resolved versions (`gate0_julia/J0b.md`) |
 | J2 | One wheat baseline `simulate()` | **done** — `t_max = 312`, exit 0, 11 h 40 m (`gate0_julia/J2.md`) |
 | J3 | Harvest, then harvest + restrictions | **done** — rerun after an input fix; both exit 0, 312 steps (`gate0_julia/J3.md`) |
-| J4 | Compare the three runs with the author NetCDF | **done** — not a reproduction; published code on reconstructed inputs, levels off (`gate0_julia/J4.md`) |
+| J4 | Compare the three runs with the author NetCDF | **done** — not a reproduction; published code on reconstructed inputs, levels off (`gate0_julia/J4.md`). Harvest + restrictions part superseded: rerun with clipped restrictions **in progress**, re-score pending |
 | **J5** | Python script that only launches that Julia run | **next** (J3 has three files) |
 | J6 | Point the Gate 0 docs at this host | only if you accept J4 |
 | J7 | GitHub cleanup | only after J6, and only when you ask |

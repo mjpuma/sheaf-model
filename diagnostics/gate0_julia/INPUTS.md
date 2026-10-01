@@ -22,9 +22,17 @@ to 131,311 (131 MMT).
 | `parameters_baseline=2007-2009_crop=wheat_source=empirical.csv` | STU = ending stocks / consumption; A_d from the import share; A_c from the income bands in `sheaf/agrimate/wheat_data.py` |
 | `harvest-anomalies_crop=wheat_source=FAOsince-2005.csv` | USDA production minus a LOWESS trend, zero before 2005, repeated on every day of the year. Columns `2000-1` through `2016-365`. Exact 0 wherever the trend is 0 |
 | `harvest-trends_crop=wheat_source=FAOsince-2005.csv` | That LOWESS trend, same columns, never negative. Forcing in the paper code is `1 + anomaly/trend` |
-| `export-restrictions_crop=wheat_source=2007-2011.csv` | AMIS wheat measures. Cuts match `sheaf/agrimate/restrictions.py`: prohibition 0.95, quota 0.70, tax 0.50. Licensing is left out. Merged per exporter into non-overlapping intervals at the daily maximum cut |
+| `export-restrictions_crop=wheat_source=2007-2011.csv` | AMIS wheat measures. Cuts match `sheaf/agrimate/restrictions.py`: prohibition 0.95, quota 0.70, tax 0.50. Licensing is left out. Clipped to 2007-01-01 … 2011-12-31, then merged per exporter into non-overlapping intervals at the daily maximum cut |
 
-49 restriction intervals, 17 of them overlapping 2007–2011. Exporters in that window: ARG, CHN, EGY, IND, KAZ, RUS, UKR.
+17 restriction intervals, all inside 2007–2011. Exporters: ARG, CHN, EGY, IND, KAZ, RUS, UKR.
+
+The window clip was added 2026-10-01 after J4 (`J4.md`, data problem 1).
+The earlier file held 49 intervals running to 2024, and `simulate()`
+applies every row, so ARG, CHN, EGY, IND and UKR stayed restricted to the
+end of the run (2012-12). The 17 new intervals are the old in-window ones
+with end dates cut at 2011-12-31 (ARG, CHN, EGY, IND, UKR). The other six
+input files and `README.txt` were byte-identical after the rebuild. The
+previous files are kept in `agrimate-2025/agrimate_input_backup_pre_j4window_20261001/`.
 
 Two rules the paper code forces on these files (fixed 2026-09-30 after J3
 failed; see `J3.md`):
