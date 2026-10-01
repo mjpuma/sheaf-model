@@ -58,8 +58,11 @@ piece, and is still off in this figure.
 Gate 0 is now run from the published Julia Agrimate code (Kuhla et al. 2025,
 Zenodo 14022004) with input CSVs that SHEAF rebuilt, because the author input
 tables were not published. The wheat baseline, harvest-shock and
-harvest + restrictions runs have all finished. The comparison with the
-author output has not been done yet, so Gate 0 is **not** accepted. The
+harvest + restrictions runs have all finished and have been scored against
+the author output (`diagnostics/gate0_julia/J4.md`). The result is **not a
+reproduction** of the published wheat run. It is the published code on
+reconstructed inputs: the shape matches, but stocks are 30 % high and the
+2007/08 price spike is too small. Gate 0 is **not** accepted. The
 steps are in [`diagnostics/GATE0_JULIA_PROMPTS.md`](diagnostics/GATE0_JULIA_PROMPTS.md)
 and the run notes are in [`diagnostics/gate0_julia/`](diagnostics/gate0_julia/).
 The Quick start below still points at the earlier Python host.
