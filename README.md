@@ -53,6 +53,17 @@ Characteristic government types (how much they care about domestic food)
 can be sticky; the decision is not. Substitution is the other missing
 piece, and is still off in this figure.
 
+## Gate 0 status
+
+Gate 0 is now run from the published Julia Agrimate code (Kuhla et al. 2025,
+Zenodo 14022004) with input CSVs that SHEAF rebuilt, because the author input
+tables were not published. The wheat baseline run is done. The harvest-shock
+and harvest + restrictions runs are in progress. The comparison with the
+author output has not been done yet, so Gate 0 is **not** accepted. The
+steps are in [`diagnostics/GATE0_JULIA_PROMPTS.md`](diagnostics/GATE0_JULIA_PROMPTS.md)
+and the run notes are in [`diagnostics/gate0_julia/`](diagnostics/gate0_julia/).
+The Quick start below still points at the earlier Python host.
+
 ## Mathematical formulation
 
 Crisis work uses the **24-step Gate 0 spine** (`sheaf/dynamic_crop.py`,

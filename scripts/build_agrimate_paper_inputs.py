@@ -210,6 +210,36 @@ def annual_production(psd: pd.DataFrame, code_to_iso: dict[str, str], region_iso
     return tab
 
 
+def merge_restrictions(rows: list[tuple[str, pd.Timestamp, pd.Timestamp, float]]) -> pd.DataFrame:
+    """One non-overlapping interval set per exporter, value = max cut that day.
+
+    AMIS repeats a measure once per rate revision, so the raw rows overlap.
+    The paper's aggregate_export_restrictions adds overlapping values (capped
+    at 1), which would stack those repeats. sheaf/agrimate/restrictions.py
+    takes the max; this keeps that rule.
+    """
+    out = []
+    for iso in sorted({r[0] for r in rows}):
+        spans = [(s, e, v) for i, s, e, v in rows if i == iso and e >= s]
+        if not spans:
+            continue
+        days = pd.date_range(min(s for s, _, _ in spans), max(e for _, e, _ in spans), freq="D")
+        cut = pd.Series(0.0, index=days)
+        for s, e, v in spans:
+            cut.loc[s:e] = np.maximum(cut.loc[s:e].values, v)
+        run_id = (cut != cut.shift()).cumsum()
+        for _, run in cut.groupby(run_id):
+            if run.iloc[0] <= 0:
+                continue
+            out.append({
+                "Exporter": iso,
+                "From": run.index[0].date().isoformat(),
+                "To": run.index[-1].date().isoformat(),
+                "Value": float(run.iloc[0]),
+            })
+    return pd.DataFrame(out, columns=["Exporter", "From", "To", "Value"])
+
+
 def main() -> None:
     regions = parse_regions("AgrimateEU28Regions")
     region_isos = {iso for isos in regions.values() for iso in isos}
@@ -303,9 +333,12 @@ def main() -> None:
     level = np.zeros((n_a, n_y, n_d))
     area_index = {iso: i for i, iso in enumerate(areas)}
     year_index = {year: i for i, year in enumerate(years)}
+    # simulate() sums these files over each region before forming
+    # 1 + anomaly/trend, so one blank or NaN cell voids the whole region.
+    # Non-producers must therefore carry exact zeros, never NaN.
     for iso in prod_annual.index:
         series = prod_annual.loc[iso].dropna()
-        if len(series) < 8 or iso not in area_index:
+        if len(series) < 8 or iso not in area_index or not (series > 0).any():
             continue
         fitted = detrend_anomalies(series, window_years=10)
         i = area_index[iso]
@@ -314,9 +347,13 @@ def main() -> None:
                 continue
             j = year_index[int(year)]
             trend_level = float(row["trend"])
+            if not np.isfinite(trend_level) or trend_level <= 0:
+                continue
             anomaly = 0.0 if int(year) < 2005 else float(row["anomaly"]) * trend_level
             resid[i, j, :] = anomaly
             level[i, j, :] = trend_level
+    if not (np.isfinite(resid).all() and np.isfinite(level).all()):
+        raise RuntimeError("non-finite harvest anomaly or trend")
     anom = pd.concat(
         [pd.Series(areas, name="Area"), pd.DataFrame(resid.reshape(n_a, n_y * n_d), columns=day_names)],
         axis=1,
@@ -362,13 +399,8 @@ def main() -> None:
             continue
         if pd.isna(end):
             end = start + pd.Timedelta(days=183)
-        restrictions.append({
-            "Exporter": iso,
-            "From": start.date().isoformat(),
-            "To": end.date().isoformat(),
-            "Value": cut,
-        })
-    restrict = pd.DataFrame(restrictions, columns=["Exporter", "From", "To", "Value"])
+        restrictions.append((iso, start.normalize(), end.normalize(), cut))
+    restrict = merge_restrictions(restrictions)
 
     OUT.mkdir(parents=True, exist_ok=True)
     food.drop(columns="_stocks").to_csv(OUT / FILES["food"], index=False)
