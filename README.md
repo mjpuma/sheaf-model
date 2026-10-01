@@ -57,8 +57,8 @@ piece, and is still off in this figure.
 
 Gate 0 is now run from the published Julia Agrimate code (Kuhla et al. 2025,
 Zenodo 14022004) with input CSVs that SHEAF rebuilt, because the author input
-tables were not published. The wheat baseline run is done. The harvest-shock
-and harvest + restrictions runs are in progress. The comparison with the
+tables were not published. The wheat baseline, harvest-shock and
+harvest + restrictions runs have all finished. The comparison with the
 author output has not been done yet, so Gate 0 is **not** accepted. The
 steps are in [`diagnostics/GATE0_JULIA_PROMPTS.md`](diagnostics/GATE0_JULIA_PROMPTS.md)
 and the run notes are in [`diagnostics/gate0_julia/`](diagnostics/gate0_julia/).
