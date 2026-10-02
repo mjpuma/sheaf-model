@@ -23,6 +23,9 @@ const SCEN = [
     ("harvest", STEM * "extra_regions=(Egypt=EGY)_production_anomalies=FAOsince-2005_" * TAIL),
     ("harvest+restr", STEM * "export_restrictions=2007-2011_extra_regions=(Egypt=EGY)_production_anomalies=FAOsince-2005_" * TAIL),
 ]
+# Optional: J4_RESTR_LOCAL=<filename in LOCAL> scores another local
+# harvest+restr file (e.g. the `_v1.nc` copy) against the same author file.
+const RESTR_LOCAL = get(ENV, "J4_RESTR_LOCAL", SCEN[3][2])
 const KEY = ["USA", "EU-28", "Russia", "Ukraine", "Kazakhstan", "Argentina", "Australia",
              "Canada", "India", "China", "Egypt"]
 
@@ -86,9 +89,10 @@ end
 
 # ---------------------------------------------------------------- structure
 header("File structure")
+println("local harvest+restr file: ", RESTR_LOCAL)
 D = Dict{Tuple{String,String},Any}()
 for (lab, fn) in SCEN
-    D[(lab, "local")] = load(LOCAL * fn)
+    D[(lab, "local")] = load(LOCAL * (lab == "harvest+restr" ? RESTR_LOCAL : fn))
     D[(lab, "author")] = load(AUTHOR * fn)
 end
 for (lab, _) in SCEN
