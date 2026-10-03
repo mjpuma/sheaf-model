@@ -3,12 +3,12 @@
 Paste **exactly one** prompt per session. Each block below already includes
 the preamble. Copy the whole fenced block. Do not skip. Do not open G1 or G2.
 
-**Now:** the harvest + restrictions rerun with the restriction file
-clipped to 2007–2011 finished (exit 0, 11 h 21 m) and J4 was re-scored
-(2026-10-02). The fix changed only 2012, and the gaps remain. J5 (Python
-launcher) can be pasted now. J6 needs your explicit acceptance of J4. J4
-found a run of the published code on reconstructed inputs. It is **not** a
-reproduction of the published wheat run.
+**Now:** J8 reran all three scenarios with the author's own region ψ,
+A_d* and A_c* (`gate0_julia/J8_authorparams.md`). That closed about a third
+of the stock gap (+30 % → +20 %) and almost none of the price-spike gap
+(07/08 harvest ×1.15 vs author ×1.23; combined peak 1.76 vs 2.22). It is
+still **not** a reproduction. J5 (Python launcher) can be pasted now. J6
+needs your explicit acceptance of J4/J8.
 
 ## Where this stands
 
@@ -69,6 +69,7 @@ Invoke Julia as `arch -x86_64 <julia> --project=.`. Do not `brew install julia`.
 | J2 | One wheat baseline `simulate()` | **done** — `t_max = 312`, exit 0, 11 h 40 m (`gate0_julia/J2.md`) |
 | J3 | Harvest, then harvest + restrictions | **done** — rerun after an input fix; both exit 0, 312 steps (`gate0_julia/J3.md`) |
 | J4 | Compare the three runs with the author NetCDF | **done** — not a reproduction; published code on reconstructed inputs, levels off (`gate0_julia/J4.md`). Harvest + restrictions re-scored 2026-10-02 after the clipped-restriction rerun; the gap remains |
+| J8 | Same three runs with the author's region ψ, A_d*, A_c* (added, not in the original list) | **done** — stocks gap +30 % → +20 %; price gap almost unchanged; not a reproduction (`gate0_julia/J8_authorparams.md`) |
 | **J5** | Python script that only launches that Julia run | **next** (J3 has three files) |
 | J6 | Point the Gate 0 docs at this host | only if you accept J4 |
 | J7 | GitHub cleanup | only after J6, and only when you ask |

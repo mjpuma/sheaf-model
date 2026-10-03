@@ -14,7 +14,11 @@
 
 using NCDatasets, Statistics, Dates, Printf
 
-const LOCAL = "/Users/mjp38/GitHub/agrimate-2025/agrimate-equal-sales-penalty/data/netcdf/"
+# Optional: J4_LOCAL_DIR=<dir> scores another set of local runs, e.g. J8's
+# `data_authorparams/netcdf/`.
+const LOCAL = let d = get(ENV, "J4_LOCAL_DIR", "/Users/mjp38/GitHub/agrimate-2025/agrimate-equal-sales-penalty/data/netcdf/")
+    endswith(d, "/") ? d : d * "/"
+end
 const AUTHOR = "/Users/mjp38/GitHub/agrimate-2025/data-v3/data/hindcasting_analysis/raw_data/"
 const STEM = "agrimate_baseline=2007-2009_"
 const TAIL = "regions=AgrimateEU28_start=2000-01-01.nc"

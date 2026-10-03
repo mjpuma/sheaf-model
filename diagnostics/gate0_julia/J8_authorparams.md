@@ -1,7 +1,8 @@
 # J8 — published Agrimate code with the author's region parameters
 
-Prepared 2026-10-02. **Startup check passed. The three long runs are
-pending.** No score is reported here.
+Prepared 2026-10-02, scored 2026-10-03. **Not a reproduction.** The author
+parameters close about a third of the J4 stock gap. They close almost none
+of the price-spike gap. See "Results" at the end.
 
 ## Purpose
 
@@ -119,9 +120,9 @@ annual mean.
   2), the Middle Africa producer (problem 3), code identity and wall time
   (problem 5).
 
-## Long runs (pending)
+## Long runs
 
-The parent session launches these. Each wrapper mirrors `run_j3b.sh`:
+Each wrapper mirrors `run_j3b.sh`:
 
 - `agrimate-2025/run_j8_baseline.sh` → `run_j8_authorparams_baseline.jl`
 - `agrimate-2025/run_j8_harvest.sh` → `run_j8_authorparams_harvest.jl`
@@ -133,5 +134,109 @@ Each `.jl` matches its J2/J3 runner except for `inputroot`
 The baseline run will overwrite the t_max = 0 NetCDF in
 `data_authorparams/netcdf/`. A copy is kept at
 `agrimate-2025/j8_author_params/tmax0_baseline.nc`. Generated output is
-not committed. Scoring against the author files, J4-style, follows once the
-runs finish.
+not committed.
+
+All three finished with `exit=0`, no `ERROR` lines, 13 chunks, 312 steps.
+
+| Run | Start (UTC) | End (UTC) | Wall |
+|---|---|---|---|
+| Baseline | 2026-10-02 22:12:11 | 2026-10-03 16:50:46 | 18 h 39 m |
+| Harvest | 2026-10-02 21:07:19 | 2026-10-03 16:48:25 | 19 h 41 m |
+| Harvest + restrictions | 2026-10-02 22:06:58 | 2026-10-03 14:52:32 | 16 h 46 m |
+
+There were launch problems. A blocked tool call still started a second
+baseline and a second harvest + restrictions process. Both baseline copies
+were killed, and one clean baseline was started at 22:12Z. The duplicate
+harvest + restrictions copy exited about 3 min in. Its wrapper wrote a stale
+`.end` stamp, later overwritten, and the first minutes of
+`j8_harvest_restrictions.log` are interleaved. The NetCDF is unaffected
+because `simulate()` rewrites the whole file after every 24-step chunk.
+
+## Results
+
+`scripts/compare_agrimate_julia_runs.jl` was run with
+`J4_LOCAL_DIR=…/data_authorparams/netcdf/`. Its output is in
+`agrimate-2025/j8_compare/j8_vs_author.md`, beside a fresh J4 run in
+`j4_vs_author.md`. The metrics and the world-price definition are the same
+as J4. The world price is the export-weighted monthly transaction price on
+cross-border flows.
+
+All three J8 files have 312 steps and 28 regions, the same region order and
+time axis as the author files, and finite key variables. ψ, A_d* and A_c*
+equal the author values exactly (max |ψ L−A| = 0.000). J8 harvests equal the
+J4 harvests, because the harvest inputs are the same.
+
+### Headline numbers
+
+L is local, A is author. Price ratios are against each run's own 2000–05 mean.
+
+| Quantity | J4 | J8 | Author | Share of the J4 gap closed |
+|---|---|---|---|---|
+| World stocks, baseline, 2007–09 mean (Mt) | 411.0 (+30.2 %) | 378.9 (+20.1 %) | 315.6 | about 1/3 |
+| World stocks, end 2008, harvest (Mt) | 419.0 (+35.1 %) | 385.1 (+24.2 %) | 310.1 | about 1/3 |
+| World stocks, end 2008, harvest + restr (Mt) | 425.9 (+33.4 %) | 391.0 (+22.4 %) | 319.3 | about 1/3 |
+| Stocks ÷ consumption, end 2012, baseline | 0.650 | 0.599 | 0.499 | 1/3 |
+| World consumption, baseline (Mt/yr) | 632.2 | 632.2 | 631.8 | no gap to close |
+| Price ratio 07/08, harvest | 1.148 | 1.154 | 1.232 | 7 % |
+| Price ratio 10/11, harvest | 1.020 | 1.022 | 1.086 | 3 % |
+| Price ratio 07/08, harvest + restr | 1.277 | 1.288 | 1.361 | 13 % |
+| Price ratio 10/11, harvest + restr | 1.149 | 1.155 | 1.219 | 9 % |
+| Peak price, harvest + restr (both 2008-05) | 1.736 | 1.764 | 2.223 | 6 % |
+| Harvest effect, 07/08 (harvest ÷ baseline) | 1.129 | 1.133 | 1.185 | 7 % |
+| Restriction add-on, 07/08 / 10/11 | +10.6 / +12.4 % | +10.9 / +12.8 % | +9.3 / +11.8 % | already close, moved slightly away |
+| Monthly price correlation with A, harvest + restr | 0.852 | 0.858 | — | unchanged |
+| Price level, 2000–05 mean | 0.999 | 0.998 | 1.059 | none |
+
+### Key regions, baseline run, 2007–09 means (stocks in kt)
+
+| Region | Stocks J4 | J8 | A | Consumption J8 vs A |
+|---|---|---|---|---|
+| USA | 41,592 (+38 %) | 33,115 (+10 %) | 30,225 | −6.8 % |
+| EU-28 | 81,214 (+34 %) | 78,334 (+30 %) | 60,431 | +3.9 % |
+| Russia | 35,717 (+25 %) | 30,139 (+5 %) | 28,694 | −11.3 % |
+| Ukraine | 11,924 (+20 %) | 11,472 (+15 %) | 9,973 | 0.0 % |
+| Argentina | 9,378 (+412 %) | 9,709 (+430 %) | 1,833 | +71.6 % |
+| India | 20,361 (+215 %) | 14,443 (+124 %) | 6,461 | −12.2 % |
+| China | 76,984 (+11 %) | 70,092 (+1 %) | 69,138 | −0.4 % |
+| Egypt | 6,749 (+16 %) | 5,406 (−7 %) | 5,807 | +4.5 % |
+
+### Verdict
+
+This is **not a reproduction** of the published wheat run. It is the
+published code run on the author's region parameters, with every other
+input reconstructed. The parameters explain:
+
+- **About a third of the stock gap.** World stocks fall from +30 % to +20 %
+  above the author. USA, Russia, China and Egypt stocks are now within 10 %.
+- **Almost none of the price gap.** The 2007/08 harvest spike is still about
+  a third smaller than the author's (×1.154 against ×1.232). There is still
+  almost no 2010/11 harvest spike (×1.022 against ×1.086). The peak with both
+  shocks is 1.76 against 2.22.
+- **None of the price-level drift.** The author baseline price rises from
+  0.99 to about 1.08 by 2003 and stays there. The local price stays near 1.0.
+  Their 2000–05 baseline harvest and consumption match ours to 0.1–2 %, so
+  the drift comes from something the parameters do not touch.
+
+Remaining gaps and likely causes. None is fitted here.
+
+1. **Food balance and trade.** Baseline international trade is 13 % above
+   the author's (130.7 against 115.7 Mt/yr). Argentina consumption is
+   +72 %, which gives +430 % Argentine stocks. India is −11 % in harvest and
+   −12 % in consumption. EU-28 producer storage is +27 % and Canada +44 %.
+   These come from the reconstructed food-balance, trade-flow and
+   harvest-calendar files (`INPUTS.md`). The author tables were not published.
+2. **The harvest shock itself.** The regional shock sizes differ from the
+   author's, even though world harvest per year matches to 0.7–3 %. For
+   2007–08, Australia is −13.5 % against −31.7 % and Kazakhstan +4.6 %
+   against +15.9 %. For 2010–11, Russia is −5.6 % against −11.7 % and
+   Argentina +23.1 % against −18.5 %. A smaller drop in key exporters fits
+   the smaller spikes. The anomaly file is ours (USDA minus a LOWESS trend).
+   The author's FAOsince-2005 file is not public.
+3. **The restricted-region set.** It is still 7 local against 10 author,
+   with 5 in common (J4 problem 2).
+4. **Code identity and package drift** (J4 problem 5). The author runs took
+   1–3 min each. These took 17–20 h.
+
+Gate 0 is not accepted. Whether a run of the published code on
+reconstructed inputs, with these gaps, is good enough is the user's
+decision.

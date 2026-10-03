@@ -63,8 +63,11 @@ the author output (`diagnostics/gate0_julia/J4.md`, re-scored 2026-10-02
 after the restriction window was clipped to 2007–2011). The result is **not a
 reproduction** of the published wheat run. It is the published code on
 reconstructed inputs: the shape matches, but stocks are 30 % high and the
-2007/08 price spike is too small. Gate 0 is **not** accepted; that needs the
-user's explicit acceptance of the J4 score. The
+2007/08 price spike is too small. A rerun with the author's own region
+stock and demand parameters (`diagnostics/gate0_julia/J8_authorparams.md`)
+cuts the stock gap to 20 % but leaves the price gap almost unchanged.
+Gate 0 is **not** accepted; that needs the user's explicit acceptance of
+the J4/J8 score. The
 steps are in [`diagnostics/GATE0_JULIA_PROMPTS.md`](diagnostics/GATE0_JULIA_PROMPTS.md)
 and the run notes are in [`diagnostics/gate0_julia/`](diagnostics/gate0_julia/).
 The Quick start below still points at the earlier Python host.
