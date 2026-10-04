@@ -3,12 +3,20 @@
 Paste **exactly one** prompt per session. Each block below already includes
 the preamble. Copy the whole fenced block. Do not skip. Do not open G1 or G2.
 
-**Now:** J8 reran all three scenarios with the author's own region ψ,
-A_d* and A_c* (`gate0_julia/J8_authorparams.md`). That closed about a third
-of the stock gap (+30 % → +20 %) and almost none of the price-spike gap
-(07/08 harvest ×1.15 vs author ×1.23; combined peak 1.76 vs 2.22). It is
-still **not** a reproduction. J5 (Python launcher) can be pasted now. J6
-needs your explicit acceptance of J4/J8.
+**Now:** J9 is **done**. It reran harvest + restrictions on J8's inputs
+plus the author's own per-region export-restriction series
+(`gate0_julia/J9_authorrestr.md`). The series reaches the simulation
+exactly — max abs diff 0 at all 312 steps for 9 of the author's 10
+regions, the tenth (Rest of Southern Asia) unmatched because our trade
+file gives it no extra-regional exports. It closes **none** of the stock
+gap (+22.4 % → +22.7 %) and widens the price ratios (07/08 1.288 → 1.253
+vs author 1.361; 10/11 1.155 → 1.105 vs 1.219). Still **not** a
+reproduction. Both alignment steps are now spent: the author's parameters
+bought a third of the stock gap, their restrictions bought nothing, and
+the residual sits in the reconstructed quantity inputs (harvest-shock
+channel ≈54 % of the price shortfall; EU-28, China, Argentina, India,
+Australia and Pakistan carry 85 % of the stock gap). J5 (Python launcher)
+can be pasted now. J6 needs your explicit acceptance of J4/J8/J9.
 
 ## Where this stands
 
@@ -70,8 +78,9 @@ Invoke Julia as `arch -x86_64 <julia> --project=.`. Do not `brew install julia`.
 | J3 | Harvest, then harvest + restrictions | **done** — rerun after an input fix; both exit 0, 312 steps (`gate0_julia/J3.md`) |
 | J4 | Compare the three runs with the author NetCDF | **done** — not a reproduction; published code on reconstructed inputs, levels off (`gate0_julia/J4.md`). Harvest + restrictions re-scored 2026-10-02 after the clipped-restriction rerun; the gap remains |
 | J8 | Same three runs with the author's region ψ, A_d*, A_c* (added, not in the original list) | **done** — stocks gap +30 % → +20 %; price gap almost unchanged; not a reproduction (`gate0_julia/J8_authorparams.md`) |
+| J9 | Harvest + restrictions on J8 inputs plus the author's own restriction series (added, not in the original list) | **done** — restrictions carried through exactly for 9 of 10 regions; closes none of the stock gap, widens the price ratios; not a reproduction (`gate0_julia/J9_authorrestr.md`) |
 | **J5** | Python script that only launches that Julia run | **next** (J3 has three files) |
-| J6 | Point the Gate 0 docs at this host | only if you accept J4 |
+| J6 | Point the Gate 0 docs at this host | only if you accept J4/J8/J9 |
 | J7 | GitHub cleanup | only after J6, and only when you ask |
 
 ---

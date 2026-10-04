@@ -63,11 +63,24 @@ the author output (`diagnostics/gate0_julia/J4.md`, re-scored 2026-10-02
 after the restriction window was clipped to 2007–2011). The result is **not a
 reproduction** of the published wheat run. It is the published code on
 reconstructed inputs: the shape matches, but stocks are 30 % high and the
-2007/08 price spike is too small. A rerun with the author's own region
-stock and demand parameters (`diagnostics/gate0_julia/J8_authorparams.md`)
-cuts the stock gap to 20 % but leaves the price gap almost unchanged.
+2007/08 price spike is too small.
+
+Two input-alignment reruns have since tested how much of that is the
+reconstruction. Using the author's own region stock and demand parameters
+(`diagnostics/gate0_julia/J8_authorparams.md`) cuts the stock gap from
++30 % to +20 % and leaves the price gap almost unchanged. Adding the
+author's own export-restriction series on top
+(`diagnostics/gate0_julia/J9_authorrestr.md`) carries into the simulation
+exactly for 9 of their 10 regions and closes nothing further: stocks stay
++23 %, the 2007/08 world-price ratio is 1.25 against the author's 1.36,
+2010/11 is 1.11 against 1.22, and the May-2008 peak is 1.77 against 2.22.
+The residual is in the reconstructed quantity inputs, which the authors
+did not publish — the harvest-shock channel accounts for about half the
+price shortfall, and six regions for 85 % of the stock gap. Nothing was
+retuned.
+
 Gate 0 is **not** accepted; that needs the user's explicit acceptance of
-the J4/J8 score. The
+the J4/J8/J9 score. The
 steps are in [`diagnostics/GATE0_JULIA_PROMPTS.md`](diagnostics/GATE0_JULIA_PROMPTS.md)
 and the run notes are in [`diagnostics/gate0_julia/`](diagnostics/gate0_julia/).
 The Quick start below still points at the earlier Python host.
