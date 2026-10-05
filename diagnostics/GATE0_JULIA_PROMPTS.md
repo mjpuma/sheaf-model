@@ -3,20 +3,21 @@
 Paste **exactly one** prompt per session. Each block below already includes
 the preamble. Copy the whole fenced block. Do not skip. Do not open G1 or G2.
 
-**Now:** J9 is **done**. It reran harvest + restrictions on J8's inputs
-plus the author's own per-region export-restriction series
-(`gate0_julia/J9_authorrestr.md`). The series reaches the simulation
-exactly — max abs diff 0 at all 312 steps for 9 of the author's 10
-regions, the tenth (Rest of Southern Asia) unmatched because our trade
-file gives it no extra-regional exports. It closes **none** of the stock
-gap (+22.4 % → +22.7 %) and widens the price ratios (07/08 1.288 → 1.253
-vs author 1.361; 10/11 1.155 → 1.105 vs 1.219). Still **not** a
-reproduction. Both alignment steps are now spent: the author's parameters
-bought a third of the stock gap, their restrictions bought nothing, and
-the residual sits in the reconstructed quantity inputs (harvest-shock
-channel ≈54 % of the price shortfall; EU-28, China, Argentina, India,
-Australia and Pakistan carry 85 % of the stock gap). J5 (Python launcher)
-can be pasted now. J6 needs your explicit acceptance of J4/J8/J9.
+**Now:** J10 is **running** (`gate0_julia/J10_authorbaseline.md`). J9
+showed the author's restrictions reach the simulation exactly — max abs
+diff 0 at all 312 steps for 9 of their 10 regions — yet close **none** of
+the stock gap (+22.4 % → +22.7 %) and widen the price ratios (07/08
+1.288 → 1.253 vs author 1.361). That put the residual in the reconstructed
+quantity inputs, so J10 inverts the author's published baseline arrays and
+their realized 312-step harvest back into the CSVs. At `t_max = 0` the
+model's baseline now matches theirs to solver tolerance (prices exact,
+sales/storage/demand/consumption ≤ 5e−8 relative, `baseline transaction
+quantity` 6.3e−3; the same comparison on the J9 inputs was 15–39 % off),
+the realized harvest matches to 2e−7 relative, and all **ten** restricted
+regions match at every step. The 312-step run will say whether the
+published code reproduces the published results once its own calibration
+is handed to it. J5 (Python launcher) can be pasted now. J6 needs your
+explicit acceptance of J4/J8/J9/J10.
 
 ## Where this stands
 
@@ -79,8 +80,9 @@ Invoke Julia as `arch -x86_64 <julia> --project=.`. Do not `brew install julia`.
 | J4 | Compare the three runs with the author NetCDF | **done** — not a reproduction; published code on reconstructed inputs, levels off (`gate0_julia/J4.md`). Harvest + restrictions re-scored 2026-10-02 after the clipped-restriction rerun; the gap remains |
 | J8 | Same three runs with the author's region ψ, A_d*, A_c* (added, not in the original list) | **done** — stocks gap +30 % → +20 %; price gap almost unchanged; not a reproduction (`gate0_julia/J8_authorparams.md`) |
 | J9 | Harvest + restrictions on J8 inputs plus the author's own restriction series (added, not in the original list) | **done** — restrictions carried through exactly for 9 of 10 regions; closes none of the stock gap, widens the price ratios; not a reproduction (`gate0_julia/J9_authorrestr.md`) |
+| J10 | Harvest + restrictions on the author's own calibrated baseline and realized harvest (added, not in the original list) | **running** — inputs verified at `t_max = 0`: baseline matches the author to solver tolerance, harvest to 2e−7, all ten restricted regions exact (`gate0_julia/J10_authorbaseline.md`) |
 | **J5** | Python script that only launches that Julia run | **next** (J3 has three files) |
-| J6 | Point the Gate 0 docs at this host | only if you accept J4/J8/J9 |
+| J6 | Point the Gate 0 docs at this host | only if you accept J4/J8/J9/J10 |
 | J7 | GitHub cleanup | only after J6, and only when you ask |
 
 ---

@@ -79,8 +79,16 @@ did not publish — the harvest-shock channel accounts for about half the
 price shortfall, and six regions for 85 % of the stock gap. Nothing was
 retuned.
 
+A third alignment run is under way
+(`diagnostics/gate0_julia/J10_authorbaseline.md`). The author NetCDF does
+publish their *calibrated baseline* and their realized harvest series, so
+J10 inverts those arrays back into the input CSVs. At `t_max = 0` the
+model's baseline now matches the author's to solver tolerance and all ten
+of their restricted regions match at every step, so the 312-step run tests
+the code path itself rather than SHEAF's input reconstruction.
+
 Gate 0 is **not** accepted; that needs the user's explicit acceptance of
-the J4/J8/J9 score. The
+the J4/J8/J9/J10 score. The
 steps are in [`diagnostics/GATE0_JULIA_PROMPTS.md`](diagnostics/GATE0_JULIA_PROMPTS.md)
 and the run notes are in [`diagnostics/gate0_julia/`](diagnostics/gate0_julia/).
 The Quick start below still points at the earlier Python host.
