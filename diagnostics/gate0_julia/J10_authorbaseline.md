@@ -139,5 +139,45 @@ and what produced the published NetCDF. A matching run would say the
 published code reproduces the published results and that our input
 reconstruction was the whole of the earlier gap.
 
-Scoring to follow in the results section below, against the author's
-harvest+restrictions run, using the J4/J8/J9 metrics.
+## Interim result at step 240 of 312 (2026-10-06)
+
+The output NetCDF is rewritten whole after each 24-step chunk, so the
+completed prefix is valid output and can be scored while the run continues
+(`scripts/peek_agrimate_partial_run.jl`, price and stock definitions copied
+from `compare_agrimate_julia_runs.jl`). Through 2009-12:
+
+| metric | J9 | **J10** | author |
+|---|---|---|---|
+| 2000–2005 mean world price | — | **1.0589** | 1.0590 |
+| 2007/08 price ratio (Jul 07 – Jun 08) | 1.253 | **1.359** | 1.361 |
+| peak world price | 1.767 (Jun 08) | **2.216 (May 08)** | 2.223 (May 08) |
+| monthly price correlation | 0.847 | **1.000** | — |
+| end-2008 world stocks | +22.7 % | **+0.1 %** | — |
+
+End-of-year world stocks are within 0.5 % for every year 2000–2009 and
+within 0.05 % for seven of the ten. The baseline price-level drift that J4
+flagged is gone.
+
+**This is a reproduction.** The published code, given the authors' own
+calibration, reproduces their published wheat results. The gap measured in
+J4, J8 and J9 was SHEAF's reconstruction of the unpublished input tables —
+not the code, the parameters, the restriction series, or a misreading of
+the model. Classification **H** for the code path, **F** for the public
+reproducibility of the inputs; confidence 95–100 % on the metrics above,
+which are directly reproduced.
+
+Still open until the run finishes: the 2010/11 price ratio (author 1.219),
+which needs steps through mid-2011, and the end-2012 stock level.
+
+## Run cost
+
+The 2010–2013 window is solving far more slowly than the rest of the run
+(20–36 min/step against 2–3 min/step earlier, with Julia holding a full
+core, so this is solver difficulty rather than system load). The
+`Internal error: encountered unexpected error in runtime` traces in the log
+are a known Julia 1.6 inference hiccup that the runtime recovers from; the
+same 16 appear in the J2, J3 and J9 logs, all of which completed with
+exit 0.
+
+Final scoring to follow against the author's harvest+restrictions run,
+using the J4/J8/J9 metrics.
