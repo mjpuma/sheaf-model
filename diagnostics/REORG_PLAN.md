@@ -2,8 +2,9 @@
 
 Agreed after J10 established that the published Julia Agrimate code
 reproduces the published wheat results on the authors' own calibration
-(`gate0_julia/J10_authorbaseline.md`). Not yet executed — awaiting the end
-of the J10 run and your sign-off on this plan.
+(`gate0_julia/J10_authorbaseline.md`). J10 is done. The Julia source is
+vendored at `agrimate_julia/` (no edits). **Nothing has been deleted.**
+The classification below needs your sign-off, then a tag, then the cut.
 
 ## Decisions taken
 
@@ -138,3 +139,91 @@ else can proceed now.
 - **Losing the provenance of the J-series numbers.** The reports in
   `diagnostics/gate0_julia/` cite paths that the reorganization changes;
   step 7 adds a path-mapping note rather than rewriting the reports.
+
+## Classification (sign-off needed before deletion)
+
+Tracked files today: ~870. After the cut the working tree should be on
+the order of 150 (data + vendored Julia + J-series evidence + drivers).
+Git history and the `pre-reorg` tag keep everything else.
+
+### Keep as-is
+
+| Path | Why |
+|---|---|
+| `data/` (39 files, with PROVENANCE) | raw USDA / FAOSTAT / AMIS / calendars |
+| `diagnostics/gate0_julia/` (10 files) | J-series evidence |
+| `diagnostics/GATE0_JULIA_PROMPTS.md` | how the verification was run |
+| `diagnostics/REORG_PLAN.md` | this document |
+| `diagnostics/GAME_CLOCK.md` | Gate 2 timing, still the destination |
+| `diagnostics/PAPER_STACK.md` | citations |
+| `diagnostics/POTSDAM_RESPONSE.md` | correspondence |
+| `diagnostics/GATE1_PLAN.md`, `GATE1_HANDOFF.md`, `GATE2_PLAN.md` | future work |
+| `diagnostics/DEVELOPMENT.md` | rewrite in place (stage G0-P) |
+| `figures/gate0_j10_vs_author.png` | Gate 0 verification figure |
+| `assets/` | logo |
+| `LICENSE`, `.gitignore` | ours |
+| `agrimate_julia/` | just vendored; no edits yet |
+| `requirements.txt` | trim later, keep the file |
+
+### Migrate (new path, same content)
+
+| From | To |
+|---|---|
+| `sheaf/data_usda.py` | `inputs/pipelines/data_usda.py` |
+| `sheaf/data_faostat.py` | `inputs/pipelines/data_faostat.py` |
+| `scripts/build_agrimate_paper_inputs.py` | `inputs/from_data.py` |
+| `scripts/build_agrimate_authorbase_inputs.py` | `inputs/from_paper.py` |
+| `scripts/agrimate_harvest_quadrature.py` | `inputs/harvest_quadrature.py` |
+| `scripts/export_agrimate_baseline_arrays.jl` | `inputs/export_baseline_arrays.jl` |
+| `scripts/build_agrimate_authorparams_inputs.py` | `inputs/from_paper_params.py` (J8, keep for provenance) |
+| `scripts/build_agrimate_authorrestr_inputs.jl` | `inputs/from_paper_restrictions.jl` (J9) |
+| `scripts/check_agrimate_*.jl`, `compare_agrimate_julia_runs.jl`, `diagnose_agrimate_j9_gaps.jl`, `export_agrimate_author_params.jl`, `peek_agrimate_partial_run.jl` | `drivers/` |
+| `scripts/plot_agrimate_j10.py` | `plots/j10_vs_author.py` |
+
+### Rewrite in place (same path, new content)
+
+`README.md`, `AGENTS.md`, `CLAUDE.md`, `ARCHITECTURE.md`, `VALIDATION.md`,
+`.cursor/rules/gate0-agrimate.mdc`, `diagnostics/GATE0_CONTRACT.md`.
+
+### Delete after the `pre-reorg` tag (~720 files)
+
+**Python hosts and their tests**
+
+- `sheaf/` except the two readers above (`agrimate/`, `annual/`, `legacy/`,
+  `dynamic_*.py`, `core.py`, `calendar24.py`, `calibration.py`,
+  `marketing_years.py`, `maps.py`, `seasonal.py`, `__init__.py`)
+- `tests/` (all 8 files: they test the Python hosts)
+- `demo.py`
+
+**Scripts that only drive those hosts** (19 files)
+
+`run_agrimate_validation.py`, `run_agrimate_wheat.py`,
+`run_subannual_wheat.py`, `score_subannual_*.py`, `score_legacy_crop.py`,
+`score_gate1*.py`, `score_gate2_beta.py`, `score_ukraine_war.py`,
+`score_country_balance.py`, `score_whitepaper_maps.py`,
+`validate_forcing.py`, `build_network.py`, `make_agrimate_comparison.py`,
+`render_gate0_flows.py`, `assemble_whitepaper.py`, `fetch_external_data.py`,
+`scripts/annual/`
+
+**Python-host diagnostics and figures**
+
+- `diagnostics/redteam/` (118), `diagnostics/gate0_prep/` (98),
+  `diagnostics/gate0_agrimate/` (22)
+- `diagnostics/gate0_{wheat,rice,maize,ukraine}_*` and the other
+  snapshot CSVs / Python-host reports at the diagnostics root
+- `diagnostics/GATE0_PROMPTS.md`, `GATE0_VALIDATION.md`,
+  `GATE0_PARAMETERIZATION.md`, `GATE0_PER_CROP_PLAN.md`,
+  `GATE0_SPEC_MATRIX.md`, `GATE0_FLOWS.md`, `GATE0_DEPARTURES.md`,
+  `GATE0_DISCUSSION.md`, `GATE0_EXTENSION_PLAN.md`,
+  `GATE0_CHANGE_CHECKLIST.md`, `GATE0_AGRIMATE_BRIEF.md`,
+  `LEVEL1_INTERROGATION.md`
+- `figures/` except `gate0_j10_vs_author.png` (110 files)
+- `overleaf/` entire (203)
+- `archive/` entire (88)
+- `audit_reports/`, `audit_prompts/`, `SHEAF_AUDIT_STATE.md`
+- `grist_results.csv`, `sheaf_results.csv`, `level1_hindcast.csv`
+
+`calendar24.py` / `marketing_years.py` / `calibration.py` are in the
+delete set because no J-series builder imports them. Harvest calendars
+for new scenarios go through Agrimate's own `preprocess.jl`.
+

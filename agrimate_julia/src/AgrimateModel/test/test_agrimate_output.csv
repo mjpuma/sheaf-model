@@ -1,0 +1,733 @@
+t,n,producer,consumer,variable,value
+,1,,,baseline price,0.97222
+,2,,,baseline price,0.98333
+,3,,,baseline price,0.99444
+,4,,,baseline price,1.00556
+,5,,,baseline price,1.01667
+,6,,,baseline price,1.02778
+,7,,,baseline price,0.97222
+,8,,,baseline price,0.98333
+,9,,,baseline price,0.99444
+,10,,,baseline price,1.00556
+,11,,,baseline price,1.01667
+,12,,,baseline price,1.02778
+,1,ARG,,baseline harvest,0.0
+,2,ARG,,baseline harvest,0.0
+,3,ARG,,baseline harvest,0.0
+,4,ARG,,baseline harvest,0.0
+,5,ARG,,baseline harvest,0.0
+,6,ARG,,baseline harvest,0.0
+,7,ARG,,baseline harvest,2.0
+,8,ARG,,baseline harvest,2.0
+,9,ARG,,baseline harvest,2.0
+,10,ARG,,baseline harvest,2.0
+,11,ARG,,baseline harvest,2.0
+,12,ARG,,baseline harvest,2.0
+,1,ARG,,baseline sales,0.96389
+,2,ARG,,baseline sales,0.95833
+,3,ARG,,baseline sales,0.95278
+,4,ARG,,baseline sales,0.94722
+,5,ARG,,baseline sales,0.94167
+,6,ARG,,baseline sales,0.93611
+,7,ARG,,baseline sales,1.06389
+,8,ARG,,baseline sales,1.05833
+,9,ARG,,baseline sales,1.05278
+,10,ARG,,baseline sales,1.04722
+,11,ARG,,baseline sales,1.04167
+,12,ARG,,baseline sales,1.03611
+,1,ARG,,baseline producer storage,4.73611
+,2,ARG,,baseline producer storage,3.77778
+,3,ARG,,baseline producer storage,2.825
+,4,ARG,,baseline producer storage,1.87778
+,5,ARG,,baseline producer storage,0.93611
+,6,ARG,,baseline producer storage,0.0
+,7,ARG,,baseline producer storage,0.93611
+,8,ARG,,baseline producer storage,1.87778
+,9,ARG,,baseline producer storage,2.825
+,10,ARG,,baseline producer storage,3.77778
+,11,ARG,,baseline producer storage,4.73611
+,12,ARG,,baseline producer storage,5.7
+,1,RUS,,baseline harvest,2.0
+,2,RUS,,baseline harvest,2.0
+,3,RUS,,baseline harvest,2.0
+,4,RUS,,baseline harvest,2.0
+,5,RUS,,baseline harvest,2.0
+,6,RUS,,baseline harvest,2.0
+,7,RUS,,baseline harvest,0.0
+,8,RUS,,baseline harvest,0.0
+,9,RUS,,baseline harvest,0.0
+,10,RUS,,baseline harvest,0.0
+,11,RUS,,baseline harvest,0.0
+,12,RUS,,baseline harvest,0.0
+,1,RUS,,baseline sales,1.06389
+,2,RUS,,baseline sales,1.05833
+,3,RUS,,baseline sales,1.05278
+,4,RUS,,baseline sales,1.04722
+,5,RUS,,baseline sales,1.04167
+,6,RUS,,baseline sales,1.03611
+,7,RUS,,baseline sales,0.96389
+,8,RUS,,baseline sales,0.95833
+,9,RUS,,baseline sales,0.95278
+,10,RUS,,baseline sales,0.94722
+,11,RUS,,baseline sales,0.94167
+,12,RUS,,baseline sales,0.93611
+,1,RUS,,baseline producer storage,0.93611
+,2,RUS,,baseline producer storage,1.87778
+,3,RUS,,baseline producer storage,2.825
+,4,RUS,,baseline producer storage,3.77778
+,5,RUS,,baseline producer storage,4.73611
+,6,RUS,,baseline producer storage,5.7
+,7,RUS,,baseline producer storage,4.73611
+,8,RUS,,baseline producer storage,3.77778
+,9,RUS,,baseline producer storage,2.825
+,10,RUS,,baseline producer storage,1.87778
+,11,RUS,,baseline producer storage,0.93611
+,12,RUS,,baseline producer storage,0.0
+,1,,EGY,baseline demand,1.00833
+,2,,EGY,baseline demand,1.00278
+,3,,EGY,baseline demand,0.99722
+,4,,EGY,baseline demand,0.99167
+,5,,EGY,baseline demand,0.98611
+,6,,EGY,baseline demand,1.01389
+,7,,EGY,baseline demand,1.00833
+,8,,EGY,baseline demand,1.00278
+,9,,EGY,baseline demand,0.99722
+,10,,EGY,baseline demand,0.99167
+,11,,EGY,baseline demand,0.98611
+,12,,EGY,baseline demand,1.01389
+,1,,EGY,baseline consumer storage,3.59942
+,2,,EGY,baseline consumer storage,3.60774
+,3,,EGY,baseline consumer storage,3.6092
+,4,,EGY,baseline consumer storage,3.60496
+,5,,EGY,baseline consumer storage,3.59592
+,6,,EGY,baseline consumer storage,3.58276
+,7,,EGY,baseline consumer storage,3.59942
+,8,,EGY,baseline consumer storage,3.60774
+,9,,EGY,baseline consumer storage,3.6092
+,10,,EGY,baseline consumer storage,3.60496
+,11,,EGY,baseline consumer storage,3.59592
+,12,,EGY,baseline consumer storage,3.58276
+,1,,EGY,baseline consumption,0.99723
+,2,,EGY,baseline consumption,1.00001
+,3,,EGY,baseline consumption,1.00132
+,4,,EGY,baseline consumption,1.00146
+,5,,EGY,baseline consumption,1.00071
+,6,,EGY,baseline consumption,0.99927
+,7,,EGY,baseline consumption,0.99723
+,8,,EGY,baseline consumption,1.00001
+,9,,EGY,baseline consumption,1.00132
+,10,,EGY,baseline consumption,1.00146
+,11,,EGY,baseline consumption,1.00071
+,12,,EGY,baseline consumption,0.99927
+,1,,EGY,baseline consumer price,1.0077
+,2,,EGY,baseline consumer price,0.99993
+,3,,EGY,baseline consumer price,0.99632
+,4,,EGY,baseline consumer price,0.99592
+,5,,EGY,baseline consumer price,0.998
+,6,,EGY,baseline consumer price,1.00201
+,7,,EGY,baseline consumer price,1.0077
+,8,,EGY,baseline consumer price,0.99993
+,9,,EGY,baseline consumer price,0.99632
+,10,,EGY,baseline consumer price,0.99592
+,11,,EGY,baseline consumer price,0.998
+,12,,EGY,baseline consumer price,1.00201
+,1,,IDN,baseline demand,1.00833
+,2,,IDN,baseline demand,1.00278
+,3,,IDN,baseline demand,0.99722
+,4,,IDN,baseline demand,0.99167
+,5,,IDN,baseline demand,0.98611
+,6,,IDN,baseline demand,1.01389
+,7,,IDN,baseline demand,1.00833
+,8,,IDN,baseline demand,1.00278
+,9,,IDN,baseline demand,0.99722
+,10,,IDN,baseline demand,0.99167
+,11,,IDN,baseline demand,0.98611
+,12,,IDN,baseline demand,1.01389
+,1,,IDN,baseline consumer storage,3.59942
+,2,,IDN,baseline consumer storage,3.60774
+,3,,IDN,baseline consumer storage,3.6092
+,4,,IDN,baseline consumer storage,3.60496
+,5,,IDN,baseline consumer storage,3.59592
+,6,,IDN,baseline consumer storage,3.58276
+,7,,IDN,baseline consumer storage,3.59942
+,8,,IDN,baseline consumer storage,3.60774
+,9,,IDN,baseline consumer storage,3.6092
+,10,,IDN,baseline consumer storage,3.60496
+,11,,IDN,baseline consumer storage,3.59592
+,12,,IDN,baseline consumer storage,3.58276
+,1,,IDN,baseline consumption,0.99723
+,2,,IDN,baseline consumption,1.00001
+,3,,IDN,baseline consumption,1.00132
+,4,,IDN,baseline consumption,1.00146
+,5,,IDN,baseline consumption,1.00071
+,6,,IDN,baseline consumption,0.99927
+,7,,IDN,baseline consumption,0.99723
+,8,,IDN,baseline consumption,1.00001
+,9,,IDN,baseline consumption,1.00132
+,10,,IDN,baseline consumption,1.00146
+,11,,IDN,baseline consumption,1.00071
+,12,,IDN,baseline consumption,0.99927
+,1,,IDN,baseline consumer price,1.0077
+,2,,IDN,baseline consumer price,0.99993
+,3,,IDN,baseline consumer price,0.99632
+,4,,IDN,baseline consumer price,0.99592
+,5,,IDN,baseline consumer price,0.998
+,6,,IDN,baseline consumer price,1.00201
+,7,,IDN,baseline consumer price,1.0077
+,8,,IDN,baseline consumer price,0.99993
+,9,,IDN,baseline consumer price,0.99632
+,10,,IDN,baseline consumer price,0.99592
+,11,,IDN,baseline consumer price,0.998
+,12,,IDN,baseline consumer price,1.00201
+,1,ARG,IDN,baseline transaction quantity,0.48194
+,2,ARG,IDN,baseline transaction quantity,0.47917
+,3,ARG,IDN,baseline transaction quantity,0.47639
+,4,ARG,IDN,baseline transaction quantity,0.47361
+,5,ARG,IDN,baseline transaction quantity,0.47083
+,6,ARG,IDN,baseline transaction quantity,0.46806
+,7,ARG,IDN,baseline transaction quantity,0.53194
+,8,ARG,IDN,baseline transaction quantity,0.52917
+,9,ARG,IDN,baseline transaction quantity,0.52639
+,10,ARG,IDN,baseline transaction quantity,0.52361
+,11,ARG,IDN,baseline transaction quantity,0.52083
+,12,ARG,IDN,baseline transaction quantity,0.51806
+,1,RUS,IDN,baseline transaction quantity,0.53194
+,2,RUS,IDN,baseline transaction quantity,0.52917
+,3,RUS,IDN,baseline transaction quantity,0.52639
+,4,RUS,IDN,baseline transaction quantity,0.52361
+,5,RUS,IDN,baseline transaction quantity,0.52083
+,6,RUS,IDN,baseline transaction quantity,0.51806
+,7,RUS,IDN,baseline transaction quantity,0.48194
+,8,RUS,IDN,baseline transaction quantity,0.47917
+,9,RUS,IDN,baseline transaction quantity,0.47639
+,10,RUS,IDN,baseline transaction quantity,0.47361
+,11,RUS,IDN,baseline transaction quantity,0.47083
+,12,RUS,IDN,baseline transaction quantity,0.46806
+,1,ARG,EGY,baseline transaction quantity,0.48194
+,2,ARG,EGY,baseline transaction quantity,0.47917
+,3,ARG,EGY,baseline transaction quantity,0.47639
+,4,ARG,EGY,baseline transaction quantity,0.47361
+,5,ARG,EGY,baseline transaction quantity,0.47083
+,6,ARG,EGY,baseline transaction quantity,0.46806
+,7,ARG,EGY,baseline transaction quantity,0.53194
+,8,ARG,EGY,baseline transaction quantity,0.52917
+,9,ARG,EGY,baseline transaction quantity,0.52639
+,10,ARG,EGY,baseline transaction quantity,0.52361
+,11,ARG,EGY,baseline transaction quantity,0.52083
+,12,ARG,EGY,baseline transaction quantity,0.51806
+,1,RUS,EGY,baseline transaction quantity,0.53194
+,2,RUS,EGY,baseline transaction quantity,0.52917
+,3,RUS,EGY,baseline transaction quantity,0.52639
+,4,RUS,EGY,baseline transaction quantity,0.52361
+,5,RUS,EGY,baseline transaction quantity,0.52083
+,6,RUS,EGY,baseline transaction quantity,0.51806
+,7,RUS,EGY,baseline transaction quantity,0.48194
+,8,RUS,EGY,baseline transaction quantity,0.47917
+,9,RUS,EGY,baseline transaction quantity,0.47639
+,10,RUS,EGY,baseline transaction quantity,0.47361
+,11,RUS,EGY,baseline transaction quantity,0.47083
+,12,RUS,EGY,baseline transaction quantity,0.46806
+1,,ARG,,harvest,0.0
+1,,ARG,,price adjustment factor,0.9999
+1,,ARG,,export tax factor,1.0
+1,,ARG,,sales,0.95833
+1,,RUS,,harvest,2.0
+1,,RUS,,price adjustment factor,0.99991
+1,,RUS,,export tax factor,1.0
+1,,RUS,,sales,1.05833
+1,,ARG,EGY,transaction quantity,0.47917
+1,,ARG,EGY,transaction price,0.97222
+1,,ARG,IDN,transaction quantity,0.47917
+1,,ARG,IDN,transaction price,0.97222
+1,,RUS,EGY,transaction quantity,0.52917
+1,,RUS,EGY,transaction price,0.97222
+1,,RUS,IDN,transaction quantity,0.52917
+1,,RUS,IDN,transaction price,0.97222
+1,,ARG,,producer storage,4.74167
+1,,ARG,,expected price,0.98213
+1,,ARG,,expected sales,0.95944
+1,,RUS,,producer storage,0.94167
+1,,RUS,,expected price,0.98274
+1,,RUS,,expected sales,1.05884
+1,,,EGY,delivery,1.01389
+1,,,EGY,consumer price,1.0077
+1,,,EGY,consumption,0.99723
+1,,,EGY,consumer storage,3.59942
+1,,,EGY,extra demand,-0.0
+1,,,EGY,demand,1.00888
+1,,,IDN,delivery,1.01389
+1,,,IDN,consumer price,1.0077
+1,,,IDN,consumption,0.99723
+1,,,IDN,consumer storage,3.59942
+1,,,IDN,extra demand,-0.0
+1,,,IDN,demand,1.00888
+1,,ARG,EGY,demanded quantity,0.47966
+1,,ARG,EGY,reservation price,0.98213
+1,,RUS,EGY,demanded quantity,0.52922
+1,,RUS,EGY,reservation price,0.98274
+1,,ARG,IDN,demanded quantity,0.47966
+1,,ARG,IDN,reservation price,0.98213
+1,,RUS,IDN,demanded quantity,0.52922
+1,,RUS,IDN,reservation price,0.98274
+2,,ARG,,harvest,0.0
+2,,ARG,,price adjustment factor,0.9999
+2,,ARG,,export tax factor,1.0
+2,,ARG,,sales,0.95932
+2,,RUS,,harvest,2.0
+2,,RUS,,price adjustment factor,0.99991
+2,,RUS,,export tax factor,1.0
+2,,RUS,,sales,1.05843
+2,,ARG,EGY,transaction quantity,0.47966
+2,,ARG,EGY,transaction price,0.98213
+2,,ARG,IDN,transaction quantity,0.47966
+2,,ARG,IDN,transaction price,0.98213
+2,,RUS,EGY,transaction quantity,0.52922
+2,,RUS,EGY,transaction price,0.98274
+2,,RUS,IDN,transaction quantity,0.52922
+2,,RUS,IDN,transaction price,0.98274
+2,,ARG,,producer storage,3.78235
+2,,ARG,,expected price,0.99299
+2,,ARG,,expected sales,0.95392
+2,,RUS,,producer storage,1.88323
+2,,RUS,,expected price,0.99348
+2,,RUS,,expected sales,1.05318
+2,,,EGY,delivery,1.00833
+2,,,EGY,consumer price,0.99993
+2,,,EGY,consumption,1.00001
+2,,,EGY,consumer storage,3.60774
+2,,,EGY,extra demand,-0.00201
+2,,,EGY,demand,1.00149
+2,,,IDN,delivery,1.00833
+2,,,IDN,consumer price,0.99993
+2,,,IDN,consumption,1.00001
+2,,,IDN,consumer storage,3.60774
+2,,,IDN,extra demand,-0.00201
+2,,,IDN,demand,1.00149
+2,,ARG,EGY,demanded quantity,0.47598
+2,,ARG,EGY,reservation price,0.99299
+2,,RUS,EGY,demanded quantity,0.52551
+2,,RUS,EGY,reservation price,0.99348
+2,,ARG,IDN,demanded quantity,0.47598
+2,,ARG,IDN,reservation price,0.99299
+2,,RUS,IDN,demanded quantity,0.52551
+2,,RUS,IDN,reservation price,0.99348
+3,,ARG,,harvest,0.0
+3,,ARG,,price adjustment factor,0.99987
+3,,ARG,,export tax factor,1.0
+3,,ARG,,sales,0.95195
+3,,RUS,,harvest,2.0
+3,,RUS,,price adjustment factor,0.99987
+3,,RUS,,export tax factor,1.0
+3,,RUS,,sales,1.05103
+3,,ARG,EGY,transaction quantity,0.47598
+3,,ARG,EGY,transaction price,0.99299
+3,,ARG,IDN,transaction quantity,0.47598
+3,,ARG,IDN,transaction price,0.99299
+3,,RUS,EGY,transaction quantity,0.52551
+3,,RUS,EGY,transaction price,0.99348
+3,,RUS,IDN,transaction quantity,0.52551
+3,,RUS,IDN,transaction price,0.99348
+3,,ARG,,producer storage,2.83039
+3,,ARG,,expected price,1.00333
+3,,ARG,,expected sales,0.94902
+3,,RUS,,producer storage,2.8322
+3,,RUS,,expected price,1.00413
+3,,RUS,,expected sales,1.04777
+3,,,EGY,delivery,1.00888
+3,,,EGY,consumer price,0.99611
+3,,,EGY,consumption,1.00139
+3,,,EGY,consumer storage,3.61522
+3,,,EGY,extra demand,-0.00338
+3,,,EGY,demand,0.99491
+3,,,IDN,delivery,1.00888
+3,,,IDN,consumer price,0.99611
+3,,,IDN,consumption,1.00139
+3,,,IDN,consumer storage,3.61522
+3,,,IDN,extra demand,-0.00338
+3,,,IDN,demand,0.99491
+3,,ARG,EGY,demanded quantity,0.47288
+3,,ARG,EGY,reservation price,1.00333
+3,,RUS,EGY,demanded quantity,0.52203
+3,,RUS,EGY,reservation price,1.00413
+3,,ARG,IDN,demanded quantity,0.47288
+3,,ARG,IDN,reservation price,1.00333
+3,,RUS,IDN,demanded quantity,0.52203
+3,,RUS,IDN,reservation price,1.00413
+4,,ARG,,harvest,0.0
+4,,ARG,,price adjustment factor,0.99981
+4,,ARG,,export tax factor,1.0
+4,,ARG,,sales,0.94577
+4,,RUS,,harvest,2.0
+4,,RUS,,price adjustment factor,0.99981
+4,,RUS,,export tax factor,1.0
+4,,RUS,,sales,1.04406
+4,,ARG,EGY,transaction quantity,0.47288
+4,,ARG,EGY,transaction price,1.00333
+4,,ARG,IDN,transaction quantity,0.47288
+4,,ARG,IDN,transaction price,1.00333
+4,,RUS,EGY,transaction quantity,0.52203
+4,,RUS,EGY,transaction price,1.00413
+4,,RUS,IDN,transaction quantity,0.52203
+4,,RUS,IDN,transaction price,1.00413
+4,,ARG,,producer storage,1.88463
+4,,ARG,,expected price,1.01265
+4,,ARG,,expected sales,0.94509
+4,,RUS,,producer storage,3.78814
+4,,RUS,,expected price,1.01445
+4,,RUS,,expected sales,1.04251
+4,,,EGY,delivery,1.00149
+4,,,EGY,consumer price,0.99549
+4,,,EGY,consumption,1.00162
+4,,,EGY,consumer storage,3.6151
+4,,,EGY,extra demand,-0.00437
+4,,,EGY,demand,0.98909
+4,,,IDN,delivery,1.00149
+4,,,IDN,consumer price,0.99549
+4,,,IDN,consumption,1.00162
+4,,,IDN,consumer storage,3.6151
+4,,,IDN,extra demand,-0.00437
+4,,,IDN,demand,0.98909
+4,,ARG,EGY,demanded quantity,0.47047
+4,,ARG,EGY,reservation price,1.01265
+4,,RUS,EGY,demanded quantity,0.51862
+4,,RUS,EGY,reservation price,1.01445
+4,,ARG,IDN,demanded quantity,0.47047
+4,,ARG,IDN,reservation price,1.01265
+4,,RUS,IDN,demanded quantity,0.51862
+4,,RUS,IDN,reservation price,1.01445
+5,,ARG,,harvest,0.0
+5,,ARG,,price adjustment factor,0.99974
+5,,ARG,,export tax factor,1.0
+5,,ARG,,sales,0.94094
+5,,RUS,,harvest,2.0
+5,,RUS,,price adjustment factor,0.99973
+5,,RUS,,export tax factor,1.0
+5,,RUS,,sales,1.03723
+5,,ARG,EGY,transaction quantity,0.47047
+5,,ARG,EGY,transaction price,1.01265
+5,,ARG,IDN,transaction quantity,0.47047
+5,,ARG,IDN,transaction price,1.01265
+5,,RUS,EGY,transaction quantity,0.51862
+5,,RUS,EGY,transaction price,1.01445
+5,,RUS,IDN,transaction quantity,0.51862
+5,,RUS,IDN,transaction price,1.01445
+5,,ARG,,producer storage,0.94369
+5,,ARG,,expected price,1.01935
+5,,ARG,,expected sales,0.94369
+5,,RUS,,producer storage,4.75091
+5,,RUS,,expected price,1.02421
+5,,RUS,,expected sales,1.03729
+5,,,EGY,delivery,0.99491
+5,,,EGY,consumer price,0.99727
+5,,,EGY,consumption,1.00097
+5,,,EGY,consumer storage,3.60904
+5,,,EGY,extra demand,-0.00522
+5,,,EGY,demand,0.98428
+5,,,IDN,delivery,0.99491
+5,,,IDN,consumer price,0.99727
+5,,,IDN,consumption,1.00097
+5,,,IDN,consumer storage,3.60904
+5,,,IDN,extra demand,-0.00522
+5,,,IDN,demand,0.98428
+5,,ARG,EGY,demanded quantity,0.46951
+5,,ARG,EGY,reservation price,1.01935
+5,,RUS,EGY,demanded quantity,0.51477
+5,,RUS,EGY,reservation price,1.02421
+5,,ARG,IDN,demanded quantity,0.46951
+5,,ARG,IDN,reservation price,1.01935
+5,,RUS,IDN,demanded quantity,0.51477
+5,,RUS,IDN,reservation price,1.02421
+6,,ARG,,harvest,0.0
+6,,ARG,,price adjustment factor,0.99965
+6,,ARG,,export tax factor,1.0
+6,,ARG,,sales,0.93902
+6,,RUS,,harvest,2.0
+6,,RUS,,price adjustment factor,0.9996
+6,,RUS,,export tax factor,1.0
+6,,RUS,,sales,1.02955
+6,,ARG,EGY,transaction quantity,0.46951
+6,,ARG,EGY,transaction price,1.01935
+6,,ARG,IDN,transaction quantity,0.46951
+6,,ARG,IDN,transaction price,1.01935
+6,,RUS,EGY,transaction quantity,0.51477
+6,,RUS,EGY,transaction price,1.02421
+6,,RUS,IDN,transaction quantity,0.51477
+6,,RUS,IDN,transaction price,1.02421
+6,,ARG,,producer storage,0.00466
+6,,ARG,,expected price,0.97037
+6,,ARG,,expected sales,1.0639
+6,,RUS,,producer storage,5.72137
+6,,RUS,,expected price,0.96841
+6,,RUS,,expected sales,0.96745
+6,,,EGY,delivery,0.98909
+6,,,EGY,consumer price,1.00079
+6,,,EGY,consumption,0.99971
+6,,,EGY,consumer storage,3.59842
+6,,,EGY,extra demand,0.00493
+6,,,EGY,demand,1.02057
+6,,,IDN,delivery,0.98909
+6,,,IDN,consumer price,1.00079
+6,,,IDN,consumption,0.99971
+6,,,IDN,consumer storage,3.59842
+6,,,IDN,extra demand,0.00493
+6,,,IDN,demand,1.02057
+6,,ARG,EGY,demanded quantity,0.53442
+6,,ARG,EGY,reservation price,0.97037
+6,,RUS,EGY,demanded quantity,0.48616
+6,,RUS,EGY,reservation price,0.96841
+6,,ARG,IDN,demanded quantity,0.53442
+6,,ARG,IDN,reservation price,0.97037
+6,,RUS,IDN,demanded quantity,0.48616
+6,,RUS,IDN,reservation price,0.96841
+7,,ARG,,harvest,2.0
+7,,ARG,,price adjustment factor,0.99973
+7,,ARG,,export tax factor,1.0
+7,,ARG,,sales,1.06884
+7,,RUS,,harvest,0.0
+7,,RUS,,price adjustment factor,0.99969
+7,,RUS,,export tax factor,1.0
+7,,RUS,,sales,0.97231
+7,,ARG,EGY,transaction quantity,0.53442
+7,,ARG,EGY,transaction price,0.97037
+7,,ARG,IDN,transaction quantity,0.53442
+7,,ARG,IDN,transaction price,0.97037
+7,,RUS,EGY,transaction quantity,0.48616
+7,,RUS,EGY,transaction price,0.96841
+7,,RUS,IDN,transaction quantity,0.48616
+7,,RUS,IDN,transaction price,0.96841
+7,,ARG,,producer storage,0.93583
+7,,ARG,,expected price,0.98138
+7,,ARG,,expected sales,1.05766
+7,,RUS,,producer storage,4.74905
+7,,RUS,,expected price,0.98051
+7,,RUS,,expected sales,0.96092
+7,,,EGY,delivery,0.98428
+7,,,EGY,consumer price,1.00532
+7,,,EGY,consumption,0.99808
+7,,,EGY,consumer storage,3.58462
+7,,,EGY,extra demand,0.00116
+7,,,EGY,demand,1.01095
+7,,,IDN,delivery,0.98428
+7,,,IDN,consumer price,1.00532
+7,,,IDN,consumption,0.99808
+7,,,IDN,consumer storage,3.58462
+7,,,IDN,extra demand,0.00116
+7,,,IDN,demand,1.01095
+7,,ARG,EGY,demanded quantity,0.53009
+7,,ARG,EGY,reservation price,0.98138
+7,,RUS,EGY,demanded quantity,0.48086
+7,,RUS,EGY,reservation price,0.98051
+7,,ARG,IDN,demanded quantity,0.53009
+7,,ARG,IDN,reservation price,0.98138
+7,,RUS,IDN,demanded quantity,0.48086
+7,,RUS,IDN,reservation price,0.98051
+8,,ARG,,harvest,2.0
+8,,ARG,,price adjustment factor,0.99977
+8,,ARG,,export tax factor,1.0
+8,,ARG,,sales,1.06019
+8,,RUS,,harvest,0.0
+8,,RUS,,price adjustment factor,0.9997
+8,,RUS,,export tax factor,1.0
+8,,RUS,,sales,0.96172
+8,,ARG,EGY,transaction quantity,0.53009
+8,,ARG,EGY,transaction price,0.98138
+8,,ARG,IDN,transaction quantity,0.53009
+8,,ARG,IDN,transaction price,0.98138
+8,,RUS,EGY,transaction quantity,0.48086
+8,,RUS,EGY,transaction price,0.98051
+8,,RUS,IDN,transaction quantity,0.48086
+8,,RUS,IDN,transaction price,0.98051
+8,,ARG,,producer storage,1.87564
+8,,ARG,,expected price,0.99271
+8,,ARG,,expected sales,1.05182
+8,,RUS,,producer storage,3.78733
+8,,RUS,,expected price,0.99208
+8,,RUS,,expected sales,0.95517
+8,,,EGY,delivery,1.02057
+8,,,EGY,consumer price,0.99737
+8,,,EGY,consumption,1.00094
+8,,,EGY,consumer storage,3.60426
+8,,,EGY,extra demand,-0.00126
+8,,,EGY,demand,1.00275
+8,,,IDN,delivery,1.02057
+8,,,IDN,consumer price,0.99737
+8,,,IDN,consumption,1.00094
+8,,,IDN,consumer storage,3.60426
+8,,,IDN,extra demand,-0.00126
+8,,,IDN,demand,1.00275
+8,,ARG,EGY,demanded quantity,0.52605
+8,,ARG,EGY,reservation price,0.99271
+8,,RUS,EGY,demanded quantity,0.4767
+8,,RUS,EGY,reservation price,0.99208
+8,,ARG,IDN,demanded quantity,0.52605
+8,,ARG,IDN,reservation price,0.99271
+8,,RUS,IDN,demanded quantity,0.4767
+8,,RUS,IDN,reservation price,0.99208
+9,,ARG,,harvest,2.0
+9,,ARG,,price adjustment factor,0.99978
+9,,ARG,,export tax factor,1.0
+9,,ARG,,sales,1.0521
+9,,RUS,,harvest,0.0
+9,,RUS,,price adjustment factor,0.99967
+9,,RUS,,export tax factor,1.0
+9,,RUS,,sales,0.95339
+9,,ARG,EGY,transaction quantity,0.52605
+9,,ARG,EGY,transaction price,0.99271
+9,,ARG,IDN,transaction quantity,0.52605
+9,,ARG,IDN,transaction price,0.99271
+9,,RUS,EGY,transaction quantity,0.4767
+9,,RUS,EGY,transaction price,0.99208
+9,,RUS,IDN,transaction quantity,0.4767
+9,,RUS,IDN,transaction price,0.99208
+9,,ARG,,producer storage,2.82354
+9,,ARG,,expected price,1.00388
+9,,ARG,,expected sales,1.04624
+9,,RUS,,producer storage,2.83394
+9,,RUS,,expected price,1.00283
+9,,RUS,,expected sales,0.9502
+9,,,EGY,delivery,1.01095
+9,,,EGY,consumer price,0.99377
+9,,,EGY,consumption,1.00224
+9,,,EGY,consumer storage,3.61297
+9,,,EGY,extra demand,-0.00281
+9,,,EGY,demand,0.99571
+9,,,IDN,delivery,1.01095
+9,,,IDN,consumer price,0.99377
+9,,,IDN,consumption,1.00224
+9,,,IDN,consumer storage,3.61297
+9,,,IDN,extra demand,-0.00281
+9,,,IDN,demand,0.99571
+9,,ARG,EGY,demanded quantity,0.52229
+9,,ARG,EGY,reservation price,1.00388
+9,,RUS,EGY,demanded quantity,0.47341
+9,,RUS,EGY,reservation price,1.00283
+9,,ARG,IDN,demanded quantity,0.52229
+9,,ARG,IDN,reservation price,1.00388
+9,,RUS,IDN,demanded quantity,0.47341
+9,,RUS,IDN,reservation price,1.00283
+10,,ARG,,harvest,2.0
+10,,ARG,,price adjustment factor,0.99975
+10,,ARG,,export tax factor,1.0
+10,,ARG,,sales,1.04459
+10,,RUS,,harvest,0.0
+10,,RUS,,price adjustment factor,0.99961
+10,,RUS,,export tax factor,1.0
+10,,RUS,,sales,0.94683
+10,,ARG,EGY,transaction quantity,0.52229
+10,,ARG,EGY,transaction price,1.00388
+10,,ARG,IDN,transaction quantity,0.52229
+10,,ARG,IDN,transaction price,1.00388
+10,,RUS,EGY,transaction quantity,0.47341
+10,,RUS,EGY,transaction price,1.00283
+10,,RUS,IDN,transaction quantity,0.47341
+10,,RUS,IDN,transaction price,1.00283
+10,,ARG,,producer storage,3.77895
+10,,ARG,,expected price,1.01462
+10,,ARG,,expected sales,1.0408
+10,,RUS,,producer storage,1.88711
+10,,RUS,,expected price,1.01236
+10,,RUS,,expected sales,0.94633
+10,,,EGY,delivery,1.00275
+10,,,EGY,consumer price,0.99348
+10,,,EGY,consumption,1.00235
+10,,,EGY,consumer storage,3.61338
+10,,,EGY,extra demand,-0.00387
+10,,,EGY,demand,0.98963
+10,,,IDN,delivery,1.00275
+10,,,IDN,consumer price,0.99348
+10,,,IDN,consumption,1.00235
+10,,,IDN,consumer storage,3.61338
+10,,,IDN,extra demand,-0.00387
+10,,,IDN,demand,0.98963
+10,,ARG,EGY,demanded quantity,0.51866
+10,,ARG,EGY,reservation price,1.01462
+10,,RUS,EGY,demanded quantity,0.47097
+10,,RUS,EGY,reservation price,1.01236
+10,,ARG,IDN,demanded quantity,0.51866
+10,,ARG,IDN,reservation price,1.01462
+10,,RUS,IDN,demanded quantity,0.47097
+10,,RUS,IDN,reservation price,1.01236
+11,,ARG,,harvest,2.0
+11,,ARG,,price adjustment factor,0.99969
+11,,ARG,,export tax factor,1.0
+11,,ARG,,sales,1.03732
+11,,RUS,,harvest,0.0
+11,,RUS,,price adjustment factor,0.99953
+11,,RUS,,export tax factor,1.0
+11,,RUS,,sales,0.94194
+11,,ARG,EGY,transaction quantity,0.51866
+11,,ARG,EGY,transaction price,1.01462
+11,,ARG,IDN,transaction quantity,0.51866
+11,,ARG,IDN,transaction price,1.01462
+11,,RUS,EGY,transaction quantity,0.47097
+11,,RUS,EGY,transaction price,1.01236
+11,,RUS,IDN,transaction quantity,0.47097
+11,,RUS,IDN,transaction price,1.01236
+11,,ARG,,producer storage,4.74163
+11,,ARG,,expected price,1.0247
+11,,ARG,,expected sales,1.03538
+11,,RUS,,producer storage,0.94517
+11,,RUS,,expected price,1.01904
+11,,RUS,,expected sales,0.94517
+11,,,EGY,delivery,0.99571
+11,,,EGY,consumer price,0.99562
+11,,,EGY,consumption,1.00157
+11,,,EGY,consumer storage,3.60751
+11,,,EGY,extra demand,-0.00473
+11,,,EGY,demand,0.98471
+11,,,IDN,delivery,0.99571
+11,,,IDN,consumer price,0.99562
+11,,,IDN,consumption,1.00157
+11,,,IDN,consumer storage,3.60751
+11,,,IDN,extra demand,-0.00473
+11,,,IDN,demand,0.98471
+11,,ARG,EGY,demanded quantity,0.5146
+11,,ARG,EGY,reservation price,1.0247
+11,,RUS,EGY,demanded quantity,0.47011
+11,,RUS,EGY,reservation price,1.01904
+11,,ARG,IDN,demanded quantity,0.5146
+11,,ARG,IDN,reservation price,1.0247
+11,,RUS,IDN,demanded quantity,0.47011
+11,,RUS,IDN,reservation price,1.01904
+12,,ARG,,harvest,2.0
+12,,ARG,,price adjustment factor,0.99959
+12,,ARG,,export tax factor,1.0
+12,,ARG,,sales,1.0292
+12,,RUS,,harvest,0.0
+12,,RUS,,price adjustment factor,0.99945
+12,,RUS,,export tax factor,1.0
+12,,RUS,,sales,0.94023
+12,,ARG,EGY,transaction quantity,0.5146
+12,,ARG,EGY,transaction price,1.0247
+12,,ARG,IDN,transaction quantity,0.5146
+12,,ARG,IDN,transaction price,1.0247
+12,,RUS,EGY,transaction quantity,0.47011
+12,,RUS,EGY,transaction price,1.01904
+12,,RUS,IDN,transaction quantity,0.47011
+12,,RUS,IDN,transaction price,1.01904
+12,,ARG,,producer storage,5.71243
+12,,ARG,,expected price,0.96983
+12,,ARG,,expected sales,0.96596
+12,,RUS,,producer storage,0.00495
+12,,RUS,,expected price,0.97077
+12,,RUS,,expected sales,1.06413
+12,,,EGY,delivery,0.98963
+12,,,EGY,consumer price,0.99948
+12,,,EGY,consumption,1.00018
+12,,,EGY,consumer storage,3.59696
+12,,,EGY,extra demand,0.00539
+12,,,EGY,demand,1.02048
+12,,,IDN,delivery,0.98963
+12,,,IDN,consumer price,0.99948
+12,,,IDN,consumption,1.00018
+12,,,IDN,consumer storage,3.59696
+12,,,IDN,extra demand,0.00539
+12,,,IDN,demand,1.02048
+12,,ARG,EGY,demanded quantity,0.48557
+12,,ARG,EGY,reservation price,0.96983
+12,,RUS,EGY,demanded quantity,0.53491
+12,,RUS,EGY,reservation price,0.97077
+12,,ARG,IDN,demanded quantity,0.48557
+12,,ARG,IDN,reservation price,0.96983
+12,,RUS,IDN,demanded quantity,0.53491
+12,,RUS,IDN,reservation price,0.97077
