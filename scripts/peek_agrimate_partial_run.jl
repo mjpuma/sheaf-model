@@ -82,6 +82,16 @@ T = written_steps(L)
 kl, pl = wm_price_monthly(L, T)
 ka, pa = wm_price_monthly(A, T)
 
+# monthly series for plotting; J10_CSV sets the destination
+if haskey(ENV, "J10_CSV")
+    open(ENV["J10_CSV"], "w") do io
+        println(io, "year,month,local,author")
+        for i in 1:min(length(pl), length(pa))
+            @printf(io, "%d,%d,%.6f,%.6f\n", kl[i][1], kl[i][2], pl[i], pa[i])
+        end
+    end
+end
+
 base_l = window(kl, pl, 2000, 1, 2005, 12)
 base_a = window(ka, pa, 2000, 1, 2005, 12)
 @printf("\n2000-2005 mean world price: local %.4f, author %.4f\n", base_l, base_a)
@@ -105,10 +115,21 @@ yrs_l = year.(L["time"][1:T])
 st_l = nz.(L["producer storage"]) .+ nz.(L["consumer storage"])
 st_a = nz.(A["producer storage"]) .+ nz.(A["consumer storage"])
 println("\nworld end-of-year stocks (Mt): year, local, author, gap %")
+stock_rows = Tuple{Int,Float64,Float64}[]
 for y in sort(unique(yrs_l))
     idx = findall(==(y), yrs_l)
     length(idx) == 24 || continue
     l = sum(st_l[idx[end], :]) / 1e3
     a = sum(st_a[idx[end], :]) / 1e3
+    push!(stock_rows, (y, l, a))
     @printf("  %d  %8.1f  %8.1f  %+6.1f %%\n", y, l, a, 100 * (l / a - 1))
+end
+
+if haskey(ENV, "J10_STOCK_CSV")
+    open(ENV["J10_STOCK_CSV"], "w") do io
+        println(io, "year,local,author")
+        for (y, l, a) in stock_rows
+            @printf(io, "%d,%.4f,%.4f\n", y, l, a)
+        end
+    end
 end
