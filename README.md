@@ -57,11 +57,11 @@ piece, and is still off in this figure.
 
 The published Julia Agrimate code (Kuhla et al. 2025, Zenodo 14022004),
 given the authors' own calibration, **reproduces their published wheat
-run**. Through 2010 the 2007/08 world-price ratio is 1.359 against their
-1.361, the May 2008 peak is 2.216 against 2.223, monthly prices correlate
-at 1.000, and end-of-year stocks are within 0.5 % every year
-([`diagnostics/gate0_julia/J10_authorbaseline.md`](diagnostics/gate0_julia/J10_authorbaseline.md);
-the last two years of the 312-step run are still writing).
+run**. The 2007/08 world-price ratio is 1.359 against their 1.361, 2010/11
+is 1.213 against 1.219, the May 2008 peak is 2.216 against 2.223, monthly
+prices correlate at 1.000, and end-of-year stocks are within 0.5 % every
+year 2000–2012
+([`diagnostics/gate0_julia/J10_authorbaseline.md`](diagnostics/gate0_julia/J10_authorbaseline.md)).
 
 ![J10: SHEAF run of the published code versus Kuhla et al. 2025](figures/gate0_j10_vs_author.png)
 
@@ -75,8 +75,8 @@ reconstruction (J4, J8, J9) ran the same code and did **not** reproduce
 the published magnitudes — stocks +23 %, 2007/08 ratio 1.25 versus 1.36 —
 so public-data reproducibility remains an open limitation.*
 
-Gate 0 is **not** accepted yet: the run has to finish, and acceptance is
-your call. The host is being moved to the Julia code driven directly
+Gate 0 is **not** accepted yet — that is your call. The host is being
+moved to the Julia code driven directly
 ([`diagnostics/REORG_PLAN.md`](diagnostics/REORG_PLAN.md)). The Quick start
 below still points at the earlier Python host until that lands.
 

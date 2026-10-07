@@ -1,6 +1,8 @@
 # J10 — the author's own calibrated baseline as input
 
-Status: inputs built and verified at `t_max = 0`; 312-step run in progress.
+Status: **done**. 312-step run finished 2026-10-07T11:19Z, exit 0. The
+published code, given the authors' own calibration, reproduces the
+published wheat results.
 
 ## Why
 
@@ -166,18 +168,43 @@ the model. Classification **H** for the code path, **F** for the public
 reproducibility of the inputs; confidence 95–100 % on the metrics above,
 which are directly reproduced.
 
-Still open until the run finishes: the 2010/11 price ratio (author 1.219),
-which needs steps through mid-2011, and the end-2012 stock level.
+## Final result (312 steps, exit 0)
+
+| metric | J4 | J8 | J9 | **J10** | author |
+|---|---|---|---|---|---|
+| 2000–2005 mean world price | ~1.00 | — | — | **1.0589** | 1.0590 |
+| 2007/08 price ratio | 1.277 | 1.288 | 1.253 | **1.359** | 1.361 |
+| 2010/11 price ratio | 1.149 | 1.155 | 1.105 | **1.213** | 1.219 |
+| peak world price | 1.736 (05/08) | 1.764 (05/08) | 1.767 (06/08) | **2.216 (05/08)** | 2.223 (05/08) |
+| monthly price correlation | 0.852 | 0.858 | 0.847 | **1.000** | — |
+| end-2008 world stocks | +33.4 % | +22.4 % | +22.7 % | **+0.1 %** | — |
+| end-2012 world stocks | — | — | — | **+0.1 %** | — |
+
+End-of-year world stocks stay within 0.5 % for every year 2000–2012.
+The 2010/11 ratio, the remaining open number at the interim check, lands
+at 1.213 against 1.219.
+
+**Verdict: this is a reproduction of the published wheat run.** The
+published code, given the authors' own calibration, reproduces their
+published magnitudes. The gap measured in J4, J8 and J9 was SHEAF's
+reconstruction of the unpublished input tables — not the code, the
+parameters, the restriction series, or a misreading of the model.
+
+| Conclusion | Class | Confidence |
+|---|---|---|
+| Code path reproduces the published wheat run on the authors' calibration | **H** | 95–100 % |
+| Public-data reconstruction of the unpublished inputs does not reproduce those magnitudes | **F** | 95–100 % |
+| Residual 0.2–0.5 % on prices and stocks is the 0.63 % baseline-trade-QP mismatch propagating | **C** | 80–95 % |
+
+Figure: [`figures/gate0_j10_vs_author.png`](../../figures/gate0_j10_vs_author.png).
 
 ## Run cost
 
-The 2010–2013 window is solving far more slowly than the rest of the run
-(20–36 min/step against 2–3 min/step earlier, with Julia holding a full
-core, so this is solver difficulty rather than system load). The
-`Internal error: encountered unexpected error in runtime` traces in the log
-are a known Julia 1.6 inference hiccup that the runtime recovers from; the
-same 16 appear in the J2, J3 and J9 logs, all of which completed with
-exit 0.
-
-Final scoring to follow against the author's harvest+restrictions run,
-using the J4/J8/J9 metrics.
+Wall time 2026-10-05T03:22Z to 2026-10-07T11:19Z (~56 h), inflated by
+machine sleep. The 2010–2013 window solved far more slowly than the rest
+of the run (20–36 min/step against 2–3 min/step earlier), with Julia
+holding a full core, so that is solver difficulty rather than system
+load. The `Internal error: encountered unexpected error in runtime`
+traces in the log are a known Julia 1.6 inference hiccup that the
+runtime recovers from; the same traces appear in the J2, J3 and J9 logs,
+all of which completed with exit 0.
