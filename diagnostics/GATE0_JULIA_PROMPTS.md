@@ -9,9 +9,9 @@ authors' own calibration, **reproduces their published wheat run**
 10/11 1.213 vs 1.219, May 2008 peak 2.216 vs 2.223, monthly correlation
 1.000, end-of-year stocks within 0.5 % every year 2000–2012. The J4/J8/J9
 gap was the unpublished input tables, not the code. Gate 0 is not
-accepted until you say so. The next work is the repository reorganization
-(`diagnostics/REORG_PLAN.md`): vendor the Julia code as the host, retire
-the Python hosts, rewrite the governance docs. J5/J6 wait on that.
+accepted until you say so. The repository reorganization is **done**:
+host is `agrimate_julia/`, Python hosts retired (tag `pre-reorg-20261007`).
+J5/J6 as originally written targeted the Python launcher and are obsolete.
 
 ## Where this stands
 

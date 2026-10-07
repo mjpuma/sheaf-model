@@ -1,5 +1,10 @@
 # Research questions (not a paper queue)
 
+> Overleaf drafts and Python-host writeups cited below live at git tag
+> `pre-reorg-20261007`. The working tree’s Gate 0 host is
+> `agrimate_julia/`.
+
+
 Kilian / Christian (and related) listed **uses** of SHEAF — hindcast,
 substitution, policy, tipping, endogenous network. Those are questions
 the model might answer. They are **not** five papers that must be

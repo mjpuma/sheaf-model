@@ -4,7 +4,9 @@ Agreed after J10 established that the published Julia Agrimate code
 reproduces the published wheat results on the authors' own calibration
 (`gate0_julia/J10_authorbaseline.md`). J10 is done. The Julia source is
 vendored at `agrimate_julia/` (no edits). **Nothing has been deleted.**
-The classification below needs your sign-off, then a tag, then the cut.
+**Executed 2026-10-07.** Tag `pre-reorg-20261007` marks the tree before
+the cut. Keepers were moved, governance docs rewritten, and the delete
+set removed in the following commit.
 
 ## Decisions taken
 
@@ -226,4 +228,16 @@ Git history and the `pre-reorg` tag keep everything else.
 `calendar24.py` / `marketing_years.py` / `calibration.py` are in the
 delete set because no J-series builder imports them. Harvest calendars
 for new scenarios go through Agrimate's own `preprocess.jl`.
+
+## Path mapping (J-series notes still use old names)
+
+| Old | New |
+|---|---|
+| `scripts/build_agrimate_paper_inputs.py` | `inputs/from_data.py` |
+| `scripts/build_agrimate_authorbase_inputs.py` | `inputs/from_paper.py` |
+| `scripts/plot_agrimate_j10.py` | `plots/j10_vs_author.py` |
+| `scripts/check_agrimate_*.jl`, `compare_agrimate_julia_runs.jl`, `peek_agrimate_partial_run.jl` | `drivers/` |
+| `sheaf/data_usda.py`, `sheaf/data_faostat.py` | `inputs/pipelines/` |
+| `sheaf/agrimate/`, `scripts/run_agrimate_*.py` | gone; tag `pre-reorg-20261007` |
+
 

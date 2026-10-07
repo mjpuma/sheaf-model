@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+title: SHEAF
+message: If you use this software, please cite both SHEAF and Agrimate.
+type: software
+authors:
+  - family-names: Puma
+    given-names: Michael J.
+license: MIT
+repository-code: https://github.com/mjpuma/sheaf-model
+references:
+  - type: article
+    title: "Agrimate: a process-based model of global annual and intra-annual agricultural market dynamics"
+    authors:
+      - family-names: Kuhla
+        given-names: Kilian
+      - family-names: Kubiczek
+        given-names: Patryk
+      - family-names: Puma
+        given-names: Michael J.
+      - family-names: Otto
+        given-names: Christian
+    year: 2025
+    journal: Ecological Economics
+    volume: "231"
+    doi: 10.1016/j.ecolecon.2025.108546
+  - type: software
+    title: Agrimate equal-sales-penalty source
+    year: 2024
+    doi: 10.5281/zenodo.14022004
+    license: CC-BY-4.0
+    notes: Vendored at agrimate_julia/; see agrimate_julia/UPSTREAM.md

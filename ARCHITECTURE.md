@@ -1,156 +1,43 @@
-# SHEAF architecture decision: Agrimate-aligned sub-annual dynamics
+# Architecture
 
-**Decision date:** 2026-08-23  
-**Status:** Locked — replaces annual SPE-as-heartbeat for crisis validation.
+**Status:** Gate 0 host is the vendored Julia Agrimate code
+(`agrimate_julia/`). Python hosts were removed at tag `pre-reorg-20261007`.
 
 ## Scientific goal
 
-Reproduce **crisis shock dynamics** (2007/08, 2010/11): sub-annual world
-price paths, stock drawdowns, restriction cascades, and (SHEAF’s addition)
-cross-commodity substitution + endogenous export restrictions.
-
-We are **not** optimizing for a once-per-year market equilibrium paper.
-Annual SPE remains useful as a *reference* or outer diagnostic, not the clock.
+Reproduce crisis shock dynamics (2007/08, 2010/11) on Agrimate’s own
+terms, then add SHEAF’s two extensions: cross-commodity substitution
+(Gate 1) and an endogenous restriction game (Gate 2). Those extensions
+are **not implemented** until Gate 0 wheat is accepted (stage G0-P).
 
 ## Locked choices
 
-| Axis | Choice | Notes |
-|---|---|---|
-| Time step | **24 steps / year** (~15.2 days) | Match Agrimate (Kuhla et al. 2025, §4.1) |
-| Dynamics | Out-of-equilibrium agent / stock–trade adjustment | Not full SPE clear every step |
-| Forcing | Production anomalies + AMIS restrictions (Level 1) | Then endogenous game (Level 2) |
-| Price target | **Monthly** Pink Sheet (deflated), not annual averages | Agrimate’s published bar |
-| Lineage | Agrimate / acclimate-style timing; SHEAF keeps multi-commodity + game | TWIST annual frame demoted |
-
-## Why 24 steps/year — and why not 26?
-
-Agrimate (§4.1): *“flexible regional and temporal resolution… we use 24 time
-steps per year, so about 15 days (roughly two weeks) per time step.”*
-
-They do **not** publish an explicit “why not 26 fortnights” argument. SHEAF
-adopts 24 for lineage alignment and documents the tradeoffs:
-
-### Why 24 is the right default (follow Agrimate)
-
-1. **Exact month tiling.** 24 = 2 × 12. Each calendar month is two equal
-   half-months. Validation targets are **monthly** world prices (Pink Sheet /
-   Agrimate Figs. 4–7). Mapping model output → month is trivial: average the
-   two steps in that month.
-2. **Harvest calendars are monthly.** SAGE / USDA FAS crop calendars used to
-   spread annual production into the year are month-resolution. 24 steps let
-   each month own two identical-length bins without fractional month weights.
-3. **Agricultural-year bookkeeping.** Agrimate’s storage narratives run on a
-   July–June crop year. 24 equal steps = 12 months × 2, clean spin-up
-   (Agrimate uses 4 years = 96 steps) and annually-periodic Nash baselines.
-4. **Equal step length.** Δt ≈ 365.25/24 ≈ 15.22 days. No leap-week or
-   52-vs-365 mismatch inside the year.
-
-### Why someone might want 26 (true fortnights) — and why we don’t (yet)
-
-1. **52 weeks / 2 = 26** is the literal fortnight calendar. Slightly closer to
-   “bi-weekly” in common speech.
-2. **Cost:** months no longer divide evenly (28–31 day months → some months
-   get two steps, some three, or you abandon month alignment). Monthly price
-   scores and AMIS start/end dates (often month-stamped) need a custom
-   calendar map.
-3. Agrimate’s published hindcasts and figures are monthly aggregates of a
-   24-step year. Matching **their** results means matching **their** clock.
-
-**SHEAF policy:** default `STEPS_PER_YEAR = 24`. If a sensitivity run ever
-uses 26, it must ship an explicit month↔step map and re-score monthly
-targets; it is not the Gate 0 clock.
-
-```text
-Δt_24 ≈ 15.22 d    month m ↔ steps {2m, 2m+1}   (0-based) or {2m-1, 2m}
-Δt_26 ≈ 14.05 d    month mapping: non-uniform — avoid for Gate 0
-```
-
-## What changes in the model (high level)
-
-### Demote
-
-- Period = calendar year as the sole dynamics.
-- Full spatial price equilibrium QP every period as the only market clear
-  (annual SPE may remain a diagnostic / slow outer loop).
-
-### Promote (Agrimate-aligned core)
-
-1. **Sub-annual state:** stocks, orders/shipments, offer prices, restriction
-   flags evolve each ~15-day step.
-2. **Seasonal baseline:** annually-periodic Nash (or SPE) baseline from
-   FAOSTAT/PSD + harvest calendars; crises = anomalies around that baseline.
-3. **Disequilibrium adjustment:** suppliers/purchasers with finite foresight
-   and adaptive expectations (Agrimate agents); SHEAF adds cross-grain
-   substitution in demand and an endogenous restriction layer for Level 2.
-4. **Level 1:** impose AMIS restrictions as quantity cuts (ban≈95%, tax≈50%)
-   or equivalent, not only mild annual $/t wedges.
-5. **Level 2:** endogenous restriction **actions** on the same sub-annual
-   clock. **Types** (food-security weights, who plays) are slow;
-   **actions** `τ_{i,t}` respond to conditions — Headey (2011), not an
-   annual Nash leftover. See `diagnostics/GAME_CLOCK.md`. Held-out
-   identification comes after Gate 0; Gate 0 and Gate 1 are **not**
-   re-run to host that game.
-
-### Keep from current SHEAF
-
-- Multi-commodity demand / substitution as the differentiator vs Agrimate.
-- Node set + USDA/AMIS/Pink Sheet data plumbing (re-timed to steps).
-- Export-restriction *idea*; re-host on sub-annual information sets.
-  `sheaf.annual` keeps the yearly prototype (`scripts/annual/demo.py`). It is not the
-  crisis game. Headey (2011) is the clock: India/Vietnam October,
-  Thailand-in-March *discussing* a ban, Japan-in-May announcing stocks.
-
-## Gate 0 (rewritten)
-
-| Gate | Criterion |
+| Axis | Choice |
 |---|---|
-| Hard | Monthly wheat world price path 2006–2011: sign and rough timing of
-| | 2007/08 and 2010/11 hikes vs Pink Sheet (and Agrimate published series) |
-| Soft | Annual regional supply / stock-to-use signs (Agrimate Fig. 4 style) |
-| Soft | Attribution: 2007 production/stock-led vs 2010 restriction-led |
-| Block | No Level-2 endogenous-game fitting until Hard gate is green |
+| Host | Published Agrimate Julia (`agrimate_julia/`, CC-BY 4.0) |
+| Time step | 24 steps / year (~15.2 days), exact month tiling |
+| Dynamics | Agrimate agents: supplier NLP, consumer storage, trade QP |
+| Forcing (Gate 0) | Harvest anomalies + prescribed AMIS-style restrictions |
+| World price | Monthly export-weighted cross-border transaction price |
+| Interpreter | Julia 1.6.5, Manifest pinned |
 
-Annual hike-ratio scoring (`scripts/score_level1.py` as of 2026-08-22) is
-**provisional / demoted** — useful for data plumbing checks only, not Gate 0.
+24 steps/year matches Agrimate §4.1. Validation targets are monthly, and
+harvest calendars are monthly, so 24 = 2 × 12 is the lineage default.
 
-## Implementation order
+## Layers
 
-**Per-crop 24-step markets first** (2026-08-24), then substitution, then
-the Headey-clock game. That order still holds. What changed: Gate 0 is
-**not frozen**. After coauthor consultation we return to the market
-([`diagnostics/DEVELOPMENT.md`](diagnostics/DEVELOPMENT.md)) before
-extending Gate 1 or Gate 2.
-
-1. Document + freeze clock (`STEPS_PER_YEAR=24`, 24-vs-26 note) — **done**.
-2. Sub-annual calendar helper — **done** (`sheaf/calendar24.py`).
-3. Seasonal production allocation — **done** (`sheaf/seasonal.py`).
-4. **Per-crop dynamic core** — **in use**, open to revision.
-   `sheaf/dynamic_crop.py`. Twin path = identity diagnostic only.
-   Current table: `diagnostics/GATE0_PARAMETERIZATION.md`.
-5. **Per-crop diagnostics** — snapshot scores exist
-   (`scripts/score_subannual_crop.py`). Re-score after any named change.
-6. Multi-commodity substitution — **paused** until we will stand behind
-   Gate 0. `dynamic_grains` remains a prototype only.
-7. Endogenous restriction **actions** — **paused**. `sheaf/dynamic_policy.py`
-   is a two-player mechanism check, not a 2008 score. Annual IBR stays in
-   `sheaf.annual`.
-
-Commands:
-```bash
-python scripts/fetch_external_data.py --prices-only
-python scripts/score_subannual_crop.py --crop wheat
-python scripts/score_subannual_crop.py --crop maize
-python scripts/score_subannual_crop.py --crop rice
-# (legacy) python scripts/score_subannual_wheat.py
+```
+inputs/from_paper.py  ─┐
+inputs/from_data.py   ─┴─► seven CSVs ─► agrimate_julia (simulate)
+                                              │
+                         drivers/score.py ◄───┘
+                         plots/j10_vs_author.py
 ```
 
-## References
+Parameterization of those CSVs into the model state is Agrimate’s
+`src/preprocess.jl`, not a Python rewrite.
 
-- Kuhla, K., Kubiczek, P., Otto, C. (2025). Understanding agricultural market
-  dynamics in times of crisis: the dynamic agent-based network model Agrimate.
-  *Ecological Economics* 231, 108546. §4.1 (24 steps/yr), §5 (monthly hindcast).
-- Headey, D. (2011). Rethinking the global food crisis: The role of trade
-  shocks. *Food Policy* 36(2), 136–146. Monthly export volumes, dated
-  restrictions, import surges, announcement effects — the crisis game clock.
-- Sacks et al. (2010) / SAGE crop calendars; USDA FAS crop calendar charts.
-- Otto et al. acclimate (disequilibrium network lineage).
+## What was parked
+
+The annual SPE (Takayama–Judge QP + year-Nash) and the Python 24-step
+hosts live at tag `pre-reorg-20261007`. They are not on the default path.

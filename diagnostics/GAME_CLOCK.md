@@ -1,5 +1,9 @@
 # Crisis game clock (Headey 2011)
 
+> The Python Gate 2 sketch (`sheaf/dynamic_policy.py`) was removed with
+> the Python hosts (tag `pre-reorg-20261007`). This note is still the
+> clock for a future Gate 2 on `agrimate_julia/`.
+
 **Locked 2026-08-27.** Guiding paper: Headey, D. (2011). Rethinking the
 global food crisis: The role of trade shocks. *Food Policy* 36: 136–146.
 
