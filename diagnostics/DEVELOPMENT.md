@@ -47,7 +47,6 @@ evidence, not the acceptance itself.
 - Do not implement Gate 1 or Gate 2 while G0-P is open.
 - Do not edit `agrimate_julia/` economics without an `UPSTREAM.md` line.
 - Do not `Pkg.update()` / `Pkg.resolve()`. Julia 1.6.5.
-- Do not restore the Python hosts except from tag `pre-reorg-20261007`.
 - Do not retune to the Pink Sheet or to close the J4/J8/J9 gap.
 
 ## Next after G0-P

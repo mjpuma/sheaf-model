@@ -11,7 +11,6 @@ run from the vendored source at `agrimate_julia/`.
 - Reference command: `python drivers/run.py --anomalies --restrictions --t-max 312`
 - Score: `python drivers/score.py`
 - Evidence: `diagnostics/gate0_julia/` (J0–J10)
-- Pre-cut Python hosts: tag `pre-reorg-20261007`
 
 1. Every baseline mechanism cites paper / supplement section, equation, or table.
 2. Do not edit Agrimate economics or `Params` defaults without an

@@ -43,5 +43,4 @@ Author file (harvest + restrictions):
 ## Later gates
 
 Gate 1 (substitution) and Gate 2 (endogenous restrictions) have no
-validation protocol in this tree until G0-P is accepted. Older Python-host
-scores live at tag `pre-reorg-20261007`.
+validation protocol in this tree until G0-P is accepted.

@@ -17,5 +17,3 @@ changing that tree, Gate 0 docs, or the default entry point.
 - **Do not** implement substitution or the policy game inside the baseline.
 - **Do not** start Gate 1 or Gate 2 until `diagnostics/DEVELOPMENT.md`
   stage **G0-P** is accepted.
-- The pre-cut tree (Python hosts, Overleaf drafts) is tag
-  `pre-reorg-20261007`.

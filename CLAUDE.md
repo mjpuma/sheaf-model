@@ -12,9 +12,7 @@ al. 2025; Zenodo 14022004; CC-BY 4.0). Python is drivers, input builders,
 scoring, and plots.
 
 Gate 1 substitution and Gate 2 endogenous restrictions are **blocked**
-until stage G0-P is accepted. Do not implement them. Do not restore the
-deleted Python hosts (`sheaf/agrimate/`, `sheaf/dynamic_crop.py`,
-`sheaf/annual/`) except from tag `pre-reorg-20261007` if you are asked to.
+until stage G0-P is accepted. Do not implement them.
 
 ## Gate 0 evidence
 

@@ -1,8 +1,7 @@
 # Crisis game clock (Headey 2011)
 
-> The Python Gate 2 sketch (`sheaf/dynamic_policy.py`) was removed with
-> the Python hosts (tag `pre-reorg-20261007`). This note is still the
-> clock for a future Gate 2 on `agrimate_julia/`.
+This is the clock for a future Gate 2 on `agrimate_julia/`. Gate 2 is
+blocked until stage G0-P.
 
 **Locked 2026-08-27.** Guiding paper: Headey, D. (2011). Rethinking the
 global food crisis: The role of trade shocks. *Food Policy* 36: 136–146.
@@ -24,9 +23,8 @@ the baseline is revised.
 | **Gate 0** | off | off (AMIS diary) | Not a reason to retune. Consultation on \(p\), storage, asks **is**. |
 | **Gate 1** | on (`σ ∈ {0, 0.3, 0.6}`) | off | Not a reason to densify `σ` or pick `σ*`. Paused until Gate 0 is one we will stand behind. |
 
-**What does not get a run right now:** Gate 2 beta. Pause until the
-Gate 0 baseline is settled. `use_amis=True` paths still do not call
-`sheaf/dynamic_policy.py`.
+**What does not get a run right now:** Gate 2. Pause until Gate 0 is
+accepted (stage G0-P).
 
 ## Two timescales
 
@@ -46,43 +44,20 @@ That is the object. Split it:
 | **Type** | years / regimes | How much a government cares about domestic food vs export revenue. Moves with elections, revolutions, fiscal crisis. `fs_weight`, `p_target`, open vs restrictive vs rice specialist, `gov_stu`. |
 | **Action** | fortnights / months | Whether to cut offers, lift a ban, announce a stock release, do a government-to-government deal. Responds to **state**: stocks relative to a normal year, price, what others just did, weeks to harvest. |
 
-Conflating them into one annual `τ_i` is what the leftover host does.
+Conflating them into one annual `τ_i` is the wrong object for 2007/08.
 
-## Where the leftover is
+## Where the game sits
 
-`sheaf.annual` `ExportRestrictionGame` + `scripts/annual/demo.py` is the
-**TWIST-era annual SPE prototype**: one tax per year, node prices from a
-Takayama–Judge QP, consumer surplus at `p_i`. It was the right game when
-the market itself was annual. Gate 0 retired that market for crisis work
-(`ARCHITECTURE.md`, `diagnostics/LEVEL1_INTERROGATION.md`). Agrimate
-never had an endogenous game — AMIS is a diary — so there was no
-template for “governments choose on the 24-step clock,” and the Nash
-layer stayed on the annual host. That is parked in `sheaf/annual/`, not
-the 2007/08 object.
-
-`python scripts/annual/demo.py` still runs that prototype. Crisis
-hindcasts and the crisis game do not.
-
-## Where the live game sits
-
-- **Market:** Gate 0 24-step spine (`sheaf/dynamic_crop.py`). One
-  ask-dominated world price per crop. A ban does not create a cheaper
-  domestic CPI; withheld grain stays as stock.
-- **Types:** slow, illustrative until a train/hold-out protocol exists.
-  Country archetypes in `sheaf/calibration.py` (`open` / `restrictive` /
-  `rice` / `none`) are the preference layer for the annual prototype;
-  the same *idea* (sticky type, not a fortnightly personality) applies
-  on the spine.
-- **Actions:** `sheaf/dynamic_policy.py` on that spine. The year-open-loop
-  grid BR is a **nested mechanism check** (one intensity for a shock
-  year). The Headey object is a **state-contingent** `τ_{i,t}` that can
-  turn on and off inside the year.
-- **Two players (in):** Russia (harvest shock) and Kazakhstan (neighbor,
-  no own harvest cut), same types. The cascade is harvest diversion
-  onto the leaner neighbor, not sequential ban-on-ban IBR. Ukraine is
-  on the market but does not play (too fat to fire). **Not yet:**
-  multi-country Nash, importer procurement, Japan-style reserve
-  *announcements*, club-of-the-willing / tipping variants.
+- **Market:** Gate 0 24-step Agrimate host (`agrimate_julia/`). AMIS is a
+  prescribed diary; Agrimate has no endogenous restriction game.
+- **Types:** slow (how much a government cares about domestic food vs
+  export revenue). Sticky across fortnights.
+- **Actions:** a future state-contingent `τ_{i,t}` on that same 24-step
+  clock, that can turn on and off inside the year.
+- **Two players (in, when Gate 2 opens):** Russia (harvest shock) and
+  Kazakhstan (neighbor, no own harvest cut). The cascade is harvest
+  diversion onto the leaner neighbor. **Not yet:** multi-country Nash,
+  importer procurement, reserve announcements, tipping variants.
 
 ## Trigger that does not fight the harvest calendar
 
@@ -106,7 +81,7 @@ fixed; the path of `τ_t` moves.
 3. Kazakhstan some `τ_t > 0` with **no** Kazakh harvest cut.
 4. Kazakhstan’s first on-step ≥ Russia’s (neighbor lags or ties).
 5. Russia’s cuts reduce Russia’s shipments vs the open shock path.
-6. `run_crop_dynamics` still defaults AMIS on when this module is not
-   called.
+6. With the game off, the AMIS diary is unchanged.
 
-Not scored against who banned in 2008. See `diagnostics/GATE2_PLAN.md`.
+Not scored against who banned in 2008. Blocked until G0-P
+(`diagnostics/DEVELOPMENT.md`).

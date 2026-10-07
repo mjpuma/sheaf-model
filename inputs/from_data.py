@@ -48,7 +48,7 @@ FILES = {
     "restrict": "export-restrictions_crop=wheat_source=2007-2011.csv",
 }
 
-# sheaf/agrimate/restrictions.py E.4-style cuts. Licensing is unused there.
+# Agrimate supplement E.4-style cuts. Licensing is unused.
 CUTS = (
     ("export prohibition", 0.95),
     ("export ban", 0.95),
@@ -215,9 +215,9 @@ def merge_restrictions(rows: list[tuple[str, pd.Timestamp, pd.Timestamp, float]]
 
     AMIS repeats a measure once per rate revision, so the raw rows overlap.
     The paper's aggregate_export_restrictions adds overlapping values (capped
-    at 1), which would stack those repeats. sheaf/agrimate/restrictions.py
-    takes the max; this keeps that rule. Rows are clipped to RESTRICT_WINDOW
-    first and rows outside it are dropped.
+    at 1), which would stack those repeats. This builder takes the daily
+    maximum instead. Rows are clipped to RESTRICT_WINDOW first and rows
+    outside it are dropped.
     """
     lo, hi = RESTRICT_WINDOW
     clipped = [(i, max(s, lo), min(e, hi), v) for i, s, e, v in rows]

@@ -14,5 +14,3 @@ data/usda_psd/psd_alldata.csv
 # Agrimate / DrWatson run products (inputs live under inputs/generated)
 agrimate_julia/data/
 inputs/generated/
-# Convenience Overleaf zips (the folders are the source of truth)
-overleaf/*.zip

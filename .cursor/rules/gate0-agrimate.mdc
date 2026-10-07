@@ -1,14 +1,11 @@
 ---
-description: Agrimate Julia is the Gate 0 host; no silent Python-host fallback
+description: Agrimate Julia is the Gate 0 host
 alwaysApply: true
 ---
 
 Gate 0 is the vendored Julia Agrimate host in `agrimate_julia/`
 (`diagnostics/GATE0_CONTRACT.md`). Cite Kuhla et al. 2025 / supplement §D
 for baseline mechanisms. Edits to that tree need an `agrimate_julia/UPSTREAM.md`
-entry. Do not restore `sheaf/agrimate/`, `sheaf/dynamic_crop.py`, or the
-fill-target ask, calm price pin, scarcity blend, or rival markup. Those
-live at tag `pre-reorg-20261007` only. Do not implement Gate 1
-substitution or Gate 2 policy until wheat Gate 0 is accepted
-(`diagnostics/DEVELOPMENT.md` stage G0-P). Julia 1.6.5; do not
-`Pkg.update()` or `Pkg.resolve()`.
+entry. Do not implement Gate 1 substitution or Gate 2 policy until wheat
+Gate 0 is accepted (`diagnostics/DEVELOPMENT.md` stage G0-P). Julia 1.6.5;
+do not `Pkg.update()` or `Pkg.resolve()`.

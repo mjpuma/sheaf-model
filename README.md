@@ -55,9 +55,6 @@ reproducibility remains an open limitation.*
 Gate 0 is **not** accepted yet — that is your call
 ([`diagnostics/DEVELOPMENT.md`](diagnostics/DEVELOPMENT.md) stage G0-P).
 
-The tree immediately before this layout is tagged
-[`pre-reorg-20261007`](https://github.com/mjpuma/sheaf-model/releases/tag/pre-reorg-20261007).
-
 ## Cite
 
 Kuhla, K., Kubiczek, P., Puma, M. J., & Otto, C. (2025). Agrimate: a
@@ -146,8 +143,6 @@ the 2010–11 window.
 
 ## What this is not
 
-- The Python rewrite formerly in `sheaf/agrimate/` is gone. Restore it from
-  tag `pre-reorg-20261007` if you need it.
 - Do not implement Gate 1 substitution or Gate 2 government games until
   stage G0-P is accepted.
 - Do not retune Agrimate economics or parameters to the Pink Sheet.

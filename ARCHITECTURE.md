@@ -1,7 +1,7 @@
 # Architecture
 
 **Status:** Gate 0 host is the vendored Julia Agrimate code
-(`agrimate_julia/`). Python hosts were removed at tag `pre-reorg-20261007`.
+(`agrimate_julia/`).
 
 ## Scientific goal
 
@@ -35,9 +35,4 @@ inputs/from_data.py   ─┴─► seven CSVs ─► agrimate_julia (simulate)
 ```
 
 Parameterization of those CSVs into the model state is Agrimate’s
-`src/preprocess.jl`, not a Python rewrite.
-
-## What was parked
-
-The annual SPE (Takayama–Judge QP + year-Nash) and the Python 24-step
-hosts live at tag `pre-reorg-20261007`. They are not on the default path.
+`src/preprocess.jl`.

@@ -1,7 +1,7 @@
 # Upstream Agrimate (vendored)
 
 This directory is a copy of the published Agrimate source from Kuhla,
-Kubiczek, Puma, and Otto (2025), **not** SHEAF's Python rewrite.
+Kubiczek, Puma, and Otto (2025).
 
 ## Attribution
 
