@@ -55,43 +55,30 @@ piece, and is still off in this figure.
 
 ## Gate 0 status
 
-Gate 0 is now run from the published Julia Agrimate code (Kuhla et al. 2025,
-Zenodo 14022004) with input CSVs that SHEAF rebuilt, because the author input
-tables were not published. The wheat baseline, harvest-shock and
-harvest + restrictions runs have all finished and have been scored against
-the author output (`diagnostics/gate0_julia/J4.md`, re-scored 2026-10-02
-after the restriction window was clipped to 2007–2011). The result is **not a
-reproduction** of the published wheat run. It is the published code on
-reconstructed inputs: the shape matches, but stocks are 30 % high and the
-2007/08 price spike is too small.
+The published Julia Agrimate code (Kuhla et al. 2025, Zenodo 14022004),
+given the authors' own calibration, **reproduces their published wheat
+run**. Through 2010 the 2007/08 world-price ratio is 1.359 against their
+1.361, the May 2008 peak is 2.216 against 2.223, monthly prices correlate
+at 1.000, and end-of-year stocks are within 0.5 % every year
+([`diagnostics/gate0_julia/J10_authorbaseline.md`](diagnostics/gate0_julia/J10_authorbaseline.md);
+the last two years of the 312-step run are still writing).
 
-Two input-alignment reruns have since tested how much of that is the
-reconstruction. Using the author's own region stock and demand parameters
-(`diagnostics/gate0_julia/J8_authorparams.md`) cuts the stock gap from
-+30 % to +20 % and leaves the price gap almost unchanged. Adding the
-author's own export-restriction series on top
-(`diagnostics/gate0_julia/J9_authorrestr.md`) carries into the simulation
-exactly for 9 of their 10 regions and closes nothing further: stocks stay
-+23 %, the 2007/08 world-price ratio is 1.25 against the author's 1.36,
-2010/11 is 1.11 against 1.22, and the May-2008 peak is 1.77 against 2.22.
-The residual is in the reconstructed quantity inputs, which the authors
-did not publish — the harvest-shock channel accounts for about half the
-price shortfall, and six regions for 85 % of the stock gap. Nothing was
-retuned.
+![J10: SHEAF run of the published code versus Kuhla et al. 2025](figures/gate0_j10_vs_author.png)
 
-A third alignment run is under way
-(`diagnostics/gate0_julia/J10_authorbaseline.md`). The author NetCDF does
-publish their *calibrated baseline* and their realized harvest series, so
-J10 inverts those arrays back into the input CSVs. At `t_max = 0` the
-model's baseline now matches the author's to solver tolerance and all ten
-of their restricted regions match at every step, so the 312-step run tests
-the code path itself rather than SHEAF's input reconstruction.
+*Wheat, harvest shocks plus export restrictions, on the authors' own
+calibration. Grey is the published NetCDF; red is our run of the published
+code. The middle panel is the percentage difference (never more than about
+1.4 %). The authors did not publish their input tables; J10 inverts their
+output arrays back into the CSVs the code reads. That is a verification of
+the code path, not a reconstruction from USDA / FAOSTAT / AMIS. The
+reconstruction (J4, J8, J9) ran the same code and did **not** reproduce
+the published magnitudes — stocks +23 %, 2007/08 ratio 1.25 versus 1.36 —
+so public-data reproducibility remains an open limitation.*
 
-Gate 0 is **not** accepted; that needs the user's explicit acceptance of
-the J4/J8/J9/J10 score. The
-steps are in [`diagnostics/GATE0_JULIA_PROMPTS.md`](diagnostics/GATE0_JULIA_PROMPTS.md)
-and the run notes are in [`diagnostics/gate0_julia/`](diagnostics/gate0_julia/).
-The Quick start below still points at the earlier Python host.
+Gate 0 is **not** accepted yet: the run has to finish, and acceptance is
+your call. The host is being moved to the Julia code driven directly
+([`diagnostics/REORG_PLAN.md`](diagnostics/REORG_PLAN.md)). The Quick start
+below still points at the earlier Python host until that lands.
 
 ## Mathematical formulation
 

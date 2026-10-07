@@ -59,12 +59,30 @@ tests/
 - `diagnostics/gate0_julia/` — the Gate 0 evidence base (J0–J10). Keep all.
 - `data/` — raw USDA/FAOSTAT/AMIS/calendar inputs with their PROVENANCE
   files. Keep as is.
-- From `sheaf/`, the **data pipelines are still used** by the input
-  builders and must survive the deletion, repackaged under
-  `inputs/pipelines/`: `data_usda.py` (12 importers), `data_faostat.py`,
-  `calendar24.py`, `marketing_years.py`, `calibration.py`. A dependency
-  check runs before anything is deleted; nothing goes until its importers
-  are either migrated or deleted too.
+- From `sheaf/`, two **source-data readers** are reused, not the hosts.
+  They already have no dependency on the Python model:
+
+  * `data_usda.py` — USDA PSD, AMIS restrictions, LOWESS detrend
+    (`load_psd_country`, `load_amis_restrictions`, `detrend_anomalies`)
+  * `data_faostat.py` — FAOSTAT bilateral trade (`load_trade_matrix`)
+
+  Those feed `scripts/build_agrimate_paper_inputs.py`, which is the
+  adapter that writes Agrimate-format CSVs. The Julia code already ran on
+  those CSVs (J2–J4), so they are format-compatible. They do **not**
+  reproduce the unpublished author tables — that is the J4/J8/J9 finding,
+  not a format problem.
+
+  The J10 builder (`build_agrimate_authorbase_inputs.py`) does **not**
+  use these readers at all: it inverts the author NetCDF. Keep both
+  adapters: `inputs/from_paper.py` (J10 inverse) and `inputs/from_data.py`
+  (reconstruction).
+
+  `calendar24.py`, `marketing_years.py` and `calibration.py` are **not**
+  used by any J-series builder. `calibration.py` imports the parked annual
+  host and should be deleted with it unless a later pass needs its
+  country-name table. Harvest calendars for new scenarios can use
+  Agrimate's own `aggregate_harvest_distributions` /
+  `generate_baseline_harvests` once the Julia source is vendored.
 - `scripts/` that belong to the J-series: the input builders, the
   verification scripts, the comparison scripts and the partial-run scorer.
   These move to `inputs/`, `drivers/` and `plots/`.
@@ -89,20 +107,25 @@ tests/
 
 ## Order of operations
 
-1. Finish the J10 run; score it; record the verdict.
+The run and the reorganization are independent. Destructive steps wait
+for the J10 finish and for your review of the file list; everything
+else can proceed now.
+
+1. Put the J10 figure on the README (done, partial-run series through 2010).
 2. Classify every tracked file as keep / migrate / delete, and write the
-   list into this document for your review.
-3. Tag the current tree (`pre-reorg-<date>`) and push the tag.
-4. Vendor `agrimate_julia/` with `UPSTREAM.md` and a recorded sha256; a
-   clean run from the vendored copy must reproduce J10 before anything is
-   deleted.
-5. Move the keepers into the new layout; run the dependency check; fix
-   imports.
-6. Delete the superseded set in one commit, so it is easy to read and to
+   list into this document for your review. *(can start now)*
+3. Vendor `agrimate_julia/` with `UPSTREAM.md` and a recorded sha256.
+   *(can start now; no deletion yet)*
+4. Finish the J10 run; score it; record the verdict; refresh the README
+   figure if the last two years change anything.
+5. Tag the current tree (`pre-reorg-<date>`) and push the tag.
+6. Move the keepers into the new layout; run the dependency check; fix
+   imports. Confirm a short run from the vendored copy still matches J10.
+7. Delete the superseded set in one commit, so it is easy to read and to
    revert.
-7. Rewrite `README.md` (model details, parameterization, run instructions,
+8. Rewrite `README.md` (model details, parameterization, run instructions,
    detailed Agrimate citations) and the governance docs.
-8. Only then open Gate 1 work against the vendored code.
+9. Only then open Gate 1 work against the vendored code.
 
 ## Risks
 
