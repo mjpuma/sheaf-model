@@ -11,6 +11,7 @@ data/usda_psd/psd_alldata.csv
 
 # Run products (not source)
 agrimate_julia/data/
+agrimate_julia/data_g1prep_*/
 inputs/generated/
 
 # Paper zips / Overleaf checkouts — not the model

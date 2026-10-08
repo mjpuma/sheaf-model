@@ -31,6 +31,9 @@ wheat run (`diagnostics/gate0_julia/J10_authorbaseline.md`).
 
 ## Our changes
 
-None yet. Every subsequent edit in this directory must be listed here,
-with the file and the reason, so the Gate 1 modifications stay
-distinguishable from the published code.
+- `src/preprocess.jl` `generate_baseline_harvest_timeseries` /
+  `generate_baseline_harvests`: if the harvest calendar has no mass
+  (0/0 after aggregating a region with zero food-balance production),
+  return zeros and **do not create that producer**. Wheat never hits
+  this; rice Canada and Rest of Oceania have production 0, which made
+  `X_star` NaN and Nash spin for 12 h. Not a substitution change.

@@ -3,8 +3,8 @@
 **Current phase:** wheat Gate 0 is **accepted** (G0-P, 2026-10-07). The
 code path reproduces the published wheat run on the authors’ calibration
 ([`gate0_julia/J10_authorbaseline.md`](gate0_julia/J10_authorbaseline.md)).
-Next: smoke rice and maize on the same host, then Gate 1 substitution.
-Gate 2 stays blocked until Gate 1 is accepted.
+Rice and maize `t_max=0` smoke is **met** (2026-10-08). Next: Gate 1
+substitution. Gate 2 stays blocked until Gate 1 is accepted.
 
 Canonical contract: [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md).
 This file is the living queue.
@@ -39,24 +39,24 @@ reconstruction remains a different experiment, not a retune target.
 | **G0-U** | Three scenarios on that source | **Met** (J2, J3, J10) |
 | **G0-H** | Match the author wheat NetCDF | **Met for the code path (J10).** Public-data reconstruction fails (J4/J8/J9) |
 | **G0-P** | You accept wheat Gate 0 as the SHEAF market baseline | **Accepted 2026-10-07** |
-| **G1-prep** | Rice and maize smoke on this host (`crops="rice"` / `"maize"`) | **Open** |
-| **G1** | Cross-crop substitution. Disabled G1 recovers G0 | Blocked until G1-prep |
+| **G1-prep** | Rice and maize smoke on this host (`crops="rice"` / `"maize"`) | **Met** (2026-10-08, `t_max=0`) |
+| **G1** | Cross-crop substitution. Disabled G1 recovers G0 | Open |
 | **G2** | Government restriction game. Disabled G2 recovers AMIS | Blocked |
 
 ## Hard stops
 
-- Do not implement substitution in `agrimate_julia/` until rice and maize
-  smoke (G1-prep). Do not start Gate 2 until Gate 1 is accepted.
+- G1-prep is met. Substitution goes in `agrimate_julia/` with an
+  `UPSTREAM.md` line. Do not start Gate 2 until Gate 1 is accepted.
 - Do not edit `agrimate_julia/` economics without an `UPSTREAM.md` line.
 - Do not `Pkg.update()` / `Pkg.resolve()`. Julia 1.6.5.
 - Do not retune to the Pink Sheet or to close the J4/J8/J9 gap.
 
 ## Next
 
-1. Smoke rice and maize (`python inputs/from_data.py --crop rice` / `--crop maize`,
-   then `python drivers/run.py --crop … --t-max 0`).
-2. Gate 1 substitution in `agrimate_julia/`, listed in `UPSTREAM.md`.
+1. Gate 1 substitution in `agrimate_julia/`, listed in `UPSTREAM.md`.
    Disabled Gate 1 must recover the three independent single-crop runs.
+   Rice smoke needed a 0/0 harvest guard (`G1prep_rice.md`); do not
+   invent production to hide empty regions.
 
 ## Exit criteria by gate
 

@@ -276,7 +276,15 @@ function generate_baseline_harvest_timeseries(
         end
         harvests[n] = integral
     end
-    harvests .*= production / sum(harvests)
+    s = sum(harvests)
+    # Zero-production regions (rice: Canada, Rest of Oceania) arrive here with
+    # an all-zero calendar: aggregate_harvest_distributions does 0/0, then
+    # simulation.jl maps NaN → 0. production / 0 makes every harvest NaN,
+    # X_star NaN, and Nash never converges. Wheat never hit this.
+    if !isfinite(s) || s <= 0 || !isfinite(production)
+        return zeros(Float64, N_year)
+    end
+    harvests .*= production / s
     return harvests
 end
 
@@ -373,16 +381,21 @@ function generate_baseline_harvests(baseline_production, harvest_distributions; 
 #         end
 #     ) for area in keys(baseline_production)
 # )
-    baseline_harvests = Dict(
-        String(area) => generate_baseline_harvest_timeseries(
+    baseline_harvests = Dict{String,Vector{Float64}}()
+    for area in filter(a -> haskey(baseline_production, a) && haskey(harvest_distributions, a), keys(baseline_production))
+        h = generate_baseline_harvest_timeseries(
             baseline_production[area] * N_year,
             harvest_distributions[area],
-            N_year = N_year
+            N_year = N_year,
         )
-        for area in filter(a -> haskey(baseline_production, a) && haskey(harvest_distributions, a), keys(baseline_production))
-    )
-
-
+        # A producer with X_avg = 0 still NaNs Nash (`./ X_avg`). Drop them;
+        # apply_filter_if_producer_not_exist removes their sales. They remain
+        # consumers if they import.
+        if any(!isfinite, h) || sum(h) <= 0
+            continue
+        end
+        baseline_harvests[String(area)] = h
+    end
     return baseline_harvests
 end
 
