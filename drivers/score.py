@@ -23,11 +23,11 @@ PEEK = ROOT / "drivers" / "peek_agrimate_partial_run.jl"
 def main() -> int:
     nc = sys.argv[1] if len(sys.argv) > 1 else ""
     exe = Path(os.environ.get("AGRIMATE_JULIA", DEFAULT_JULIA))
-    cmd = [str(exe), f"--project={PROJECT}", str(PEEK)]
-    if platform.machine() == "arm64":
+    cmd = [str(exe), f"--project={PROJECT.as_posix()}", Path(PEEK).as_posix()]
+    if sys.platform != "win32" and platform.machine() == "arm64":
         cmd = ["arch", "-x86_64", *cmd]
     if nc:
-        cmd.append(nc)
+        cmd.append(Path(nc).expanduser().resolve().as_posix())
     env = os.environ.copy()
     if "J10_CSV" not in env:
         env["J10_CSV"] = str(ROOT / "inputs" / "generated" / "price_monthly.csv")

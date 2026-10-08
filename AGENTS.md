@@ -8,12 +8,12 @@ changing that tree, Gate 0 docs, or the default entry point.
 - **Default run:** `python drivers/run.py --anomalies --restrictions --t-max 312`
 - **Score vs author:** `python drivers/score.py path/to/output.nc`
 - **Author inputs:** `python inputs/from_paper.py`
-- **Public-data inputs:** `PYTHONPATH=. python inputs/from_data.py`
+- **Public-data inputs:** `PYTHONPATH=. python inputs/from_data.py [--crop wheat|rice|maize]`
 - **Evidence:** [`diagnostics/gate0_julia/`](diagnostics/gate0_julia/)
 - **Julia:** 1.6.5 only (Intel / Rosetta). Do **not** `Pkg.update()` or
   `Pkg.resolve()`.
 - **Edits to `agrimate_julia/`** must be listed in
   [`agrimate_julia/UPSTREAM.md`](agrimate_julia/UPSTREAM.md).
-- **Do not** implement substitution or the policy game inside the baseline.
-- **Do not** start Gate 1 or Gate 2 until `diagnostics/DEVELOPMENT.md`
-  stage **G0-P** is accepted.
+- Wheat Gate 0 is **accepted** (G0-P). Do **not** implement substitution
+  until rice and maize smoke. Do **not** start Gate 2 until Gate 1 is
+  accepted.

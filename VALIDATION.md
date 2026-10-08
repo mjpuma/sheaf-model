@@ -42,5 +42,5 @@ Author file (harvest + restrictions):
 
 ## Later gates
 
-Gate 1 (substitution) and Gate 2 (endogenous restrictions) have no
-validation protocol in this tree until G0-P is accepted.
+Gate 1 (substitution) is next after rice/maize smoke. Gate 2 stays
+blocked until Gate 1 is accepted.

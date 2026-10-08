@@ -30,15 +30,22 @@ DEFAULT_OUTPUT = ROOT / "agrimate_julia" / "data"
 
 def julia_cmd() -> list[str]:
     exe = Path(os.environ.get("AGRIMATE_JULIA", DEFAULT_JULIA))
-    cmd = [str(exe), f"--project={PROJECT}"]
-    if platform.machine() == "arm64":
+    cmd = [str(exe), f"--project={PROJECT.as_posix()}"]
+    # Apple Silicon only: the pinned interpreter is the Intel 1.6.5 build.
+    if sys.platform != "win32" and platform.machine() == "arm64":
         cmd = ["arch", "-x86_64", *cmd]
     return cmd
+
+
+def julia_path(p: Path) -> str:
+    """Absolute path with forward slashes so Julia on Windows can open it."""
+    return p.expanduser().resolve().as_posix()
 
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--t-max", type=int, default=312)
+    p.add_argument("--crop", choices=("wheat", "rice", "maize"), default="wheat")
     p.add_argument("--anomalies", action="store_true", help='production_anomalies="FAOsince-2005"')
     p.add_argument("--restrictions", action="store_true", help='export_restrictions="2007-2011"')
     p.add_argument("--inputroot", type=Path, default=Path(os.environ.get("AGRIMATE_INPUT", DEFAULT_INPUT)))
@@ -48,13 +55,15 @@ def main() -> int:
 
     anomalies = 'production_anomalies = "FAOsince-2005",' if args.anomalies else ""
     restrictions = 'export_restrictions = "2007-2011",' if args.restrictions else ""
+    inputroot = julia_path(args.inputroot)
+    outputroot = julia_path(args.outputroot)
     wrapper = f"""
 using DrWatson
 @quickactivate "Agrimate"
 using Dates
 include(srcdir("simulation.jl"))
 params = Params(
-    crops = "wheat",
+    crops = "{args.crop}",
     baseline = "2007-2009",
     regions = "AgrimateEU28",
     extra_regions = Dict{{String,Any}}("Egypt" => "EGY"),
@@ -63,8 +72,8 @@ params = Params(
     {restrictions}
 )
 simulate(params; t_max = {args.t_max},
-         inputroot = "{args.inputroot}",
-         outputroot = "{args.outputroot}",
+         inputroot = "{inputroot}",
+         outputroot = "{outputroot}",
          verbose = {str(args.verbose).lower()})
 """
     cmd = julia_cmd() + ["-e", wrapper]

@@ -11,8 +11,9 @@ global grain trade, in the TWIST → Agrimate lineage. The Gate 0 host is the
 al. 2025; Zenodo 14022004; CC-BY 4.0). Python is drivers, input builders,
 scoring, and plots.
 
-Gate 1 substitution and Gate 2 endogenous restrictions are **blocked**
-until stage G0-P is accepted. Do not implement them.
+Wheat Gate 0 is **accepted** (G0-P, 2026-10-07). Do not implement
+substitution until rice and maize smoke on this host. Do not start Gate 2
+until Gate 1 is accepted.
 
 ## Gate 0 evidence
 

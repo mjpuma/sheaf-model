@@ -1,10 +1,10 @@
 # Development plan
 
-**Current phase:** Gate 0 wheat on the vendored Julia Agrimate host
-(`agrimate_julia/`). The code path **reproduces** the published wheat run
-when given the authors’ calibration
+**Current phase:** wheat Gate 0 is **accepted** (G0-P, 2026-10-07). The
+code path reproduces the published wheat run on the authors’ calibration
 ([`gate0_julia/J10_authorbaseline.md`](gate0_julia/J10_authorbaseline.md)).
-Gate 1 and Gate 2 stay **blocked** until you accept stage **G0-P**.
+Next: smoke rice and maize on the same host, then Gate 1 substitution.
+Gate 2 stays blocked until Gate 1 is accepted.
 
 Canonical contract: [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md).
 This file is the living queue.
@@ -27,8 +27,8 @@ the bar.
 6. **Historical performance vs Pink Sheet.** Not the J10 bar; optional
    later.
 
-**Pass rule for unlocking G1:** you accept G0-P. J10 is necessary
-evidence, not the acceptance itself.
+**G0-P:** accepted 2026-10-07. J10 is the evidence. Public-data
+reconstruction remains a different experiment, not a retune target.
 
 ## Sequence
 
@@ -38,19 +38,22 @@ evidence, not the acceptance itself.
 | **G0-S** | Source in hand (Zenodo 14022004), vendored | **Met** (`agrimate_julia/`) |
 | **G0-U** | Three scenarios on that source | **Met** (J2, J3, J10) |
 | **G0-H** | Match the author wheat NetCDF | **Met for the code path (J10).** Public-data reconstruction fails (J4/J8/J9) |
-| **G0-P** | You accept wheat Gate 0 as the SHEAF market baseline | **Open** |
-| **G1** | Cross-crop substitution. Disabled G1 recovers G0 | Blocked |
+| **G0-P** | You accept wheat Gate 0 as the SHEAF market baseline | **Accepted 2026-10-07** |
+| **G1-prep** | Rice and maize smoke on this host (`crops="rice"` / `"maize"`) | **Open** |
+| **G1** | Cross-crop substitution. Disabled G1 recovers G0 | Blocked until G1-prep |
 | **G2** | Government restriction game. Disabled G2 recovers AMIS | Blocked |
 
 ## Hard stops
 
-- Do not implement Gate 1 or Gate 2 while G0-P is open.
+- Do not implement substitution in `agrimate_julia/` until rice and maize
+  smoke (G1-prep). Do not start Gate 2 until Gate 1 is accepted.
 - Do not edit `agrimate_julia/` economics without an `UPSTREAM.md` line.
 - Do not `Pkg.update()` / `Pkg.resolve()`. Julia 1.6.5.
 - Do not retune to the Pink Sheet or to close the J4/J8/J9 gap.
 
-## Next after G0-P
+## Next
 
-Gate 1 adjustments to the cloned Agrimate code, marked in
-`agrimate_julia/UPSTREAM.md`. Input generation for new scenarios uses
-`inputs/from_data.py` plus Agrimate `preprocess.jl`.
+1. Smoke rice and maize (`python inputs/from_data.py --crop rice` / `--crop maize`,
+   then `python drivers/run.py --crop … --t-max 0`).
+2. Gate 1 substitution in `agrimate_julia/`, listed in `UPSTREAM.md`.
+   Disabled Gate 1 must recover the three independent single-crop runs.

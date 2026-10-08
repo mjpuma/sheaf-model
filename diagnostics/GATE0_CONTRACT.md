@@ -18,8 +18,9 @@ run from the vendored source at `agrimate_julia/`.
 3. Keep baseline (this host), reconstruction-from-public-data, and
    extension results labelled separately.
 4. Nash initialisation ≠ dynamic baseline (§D.5).
-5. **No Gate 1 or Gate 2 until Gate 0 wheat is accepted** (stage G0-P in
-   `diagnostics/DEVELOPMENT.md`).
+5. Wheat Gate 0 is **accepted** (G0-P, 2026-10-07). Do not implement
+   substitution until rice and maize smoke on this host. Do not start
+   Gate 2 until Gate 1 is accepted.
 
 ## What “reproduce Agrimate” means here
 

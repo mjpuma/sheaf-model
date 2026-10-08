@@ -1,7 +1,7 @@
 # Crisis game clock (Headey 2011)
 
-This is the clock for a future Gate 2 on `agrimate_julia/`. Gate 2 is
-blocked until stage G0-P.
+This is the clock for a future Gate 2 on `agrimate_julia/`. Wheat Gate 0
+is accepted (G0-P). Gate 2 stays blocked until Gate 1 is accepted.
 
 **Locked 2026-08-27.** Guiding paper: Headey, D. (2011). Rethinking the
 global food crisis: The role of trade shocks. *Food Policy* 36: 136–146.
@@ -23,8 +23,8 @@ the baseline is revised.
 | **Gate 0** | off | off (AMIS diary) | Not a reason to retune. Consultation on \(p\), storage, asks **is**. |
 | **Gate 1** | on (`σ ∈ {0, 0.3, 0.6}`) | off | Not a reason to densify `σ` or pick `σ*`. Paused until Gate 0 is one we will stand behind. |
 
-**What does not get a run right now:** Gate 2. Pause until Gate 0 is
-accepted (stage G0-P).
+**What does not get a run right now:** Gate 2. Pause until Gate 1 is
+accepted.
 
 ## Two timescales
 
@@ -83,5 +83,5 @@ fixed; the path of `τ_t` moves.
 5. Russia’s cuts reduce Russia’s shipments vs the open shock path.
 6. With the game off, the AMIS diary is unchanged.
 
-Not scored against who banned in 2008. Blocked until G0-P
+Not scored against who banned in 2008. Blocked until Gate 1 is accepted
 (`diagnostics/DEVELOPMENT.md`).

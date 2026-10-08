@@ -6,6 +6,6 @@ alwaysApply: true
 Gate 0 is the vendored Julia Agrimate host in `agrimate_julia/`
 (`diagnostics/GATE0_CONTRACT.md`). Cite Kuhla et al. 2025 / supplement §D
 for baseline mechanisms. Edits to that tree need an `agrimate_julia/UPSTREAM.md`
-entry. Do not implement Gate 1 substitution or Gate 2 policy until wheat
-Gate 0 is accepted (`diagnostics/DEVELOPMENT.md` stage G0-P). Julia 1.6.5;
-do not `Pkg.update()` or `Pkg.resolve()`.
+entry. Wheat Gate 0 is accepted (G0-P). Do not implement substitution until
+rice and maize smoke; do not start Gate 2 until Gate 1 is accepted.
+Julia 1.6.5; do not `Pkg.update()` or `Pkg.resolve()`.

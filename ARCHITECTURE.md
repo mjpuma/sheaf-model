@@ -8,7 +8,8 @@
 Reproduce crisis shock dynamics (2007/08, 2010/11) on Agrimate’s own
 terms, then add SHEAF’s two extensions: cross-commodity substitution
 (Gate 1) and an endogenous restriction game (Gate 2). Those extensions
-are **not implemented** until Gate 0 wheat is accepted (stage G0-P).
+are **not implemented** until rice and maize smoke on this host (Gate 1)
+and Gate 1 is accepted (Gate 2). Wheat Gate 0 is accepted (G0-P).
 
 ## Locked choices
 

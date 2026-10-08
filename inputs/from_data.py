@@ -35,18 +35,19 @@ from inputs.pipelines.data_usda import detrend_anomalies, load_amis_restrictions
 JULIA_REGIONS = ROOT / "agrimate_julia" / "src" / "regions.jl"
 OUT = ROOT / "inputs" / "generated" / "agrimate_input"
 CONV = ROOT / "data/faostat_network/country_conversion_table.csv"
-CAL = ROOT / "data/crop_calendars/wheat_harvest_months.csv"
+CROPS = ("wheat", "rice", "maize")
 
-# Author scenario names (DrWatson savename, keys sorted, connector "_").
-FILES = {
-    "food": "food-balance_baseline=2007-2009_crop=wheat.csv",
-    "trade": "trade-flows_baseline=2007-2009_crop=wheat.csv",
-    "harvest": "harvest-distributions_crop=wheat.csv",
-    "params": "parameters_baseline=2007-2009_crop=wheat_source=empirical.csv",
-    "anom": "harvest-anomalies_crop=wheat_source=FAOsince-2005.csv",
-    "trend": "harvest-trends_crop=wheat_source=FAOsince-2005.csv",
-    "restrict": "export-restrictions_crop=wheat_source=2007-2011.csv",
-}
+
+def files_for(crop: str) -> dict[str, str]:
+    return {
+        "food": f"food-balance_baseline=2007-2009_crop={crop}.csv",
+        "trade": f"trade-flows_baseline=2007-2009_crop={crop}.csv",
+        "harvest": f"harvest-distributions_crop={crop}.csv",
+        "params": f"parameters_baseline=2007-2009_crop={crop}_source=empirical.csv",
+        "anom": f"harvest-anomalies_crop={crop}_source=FAOsince-2005.csv",
+        "trend": f"harvest-trends_crop={crop}_source=FAOsince-2005.csv",
+        "restrict": f"export-restrictions_crop={crop}_source=2007-2011.csv",
+    }
 
 # Agrimate supplement E.4-style cuts. Licensing is unused.
 CUTS = (
@@ -160,8 +161,8 @@ def raised_cosine(days: list[int]) -> np.ndarray:
     return out
 
 
-def calendar_by_iso(regions: dict[str, list[str]]) -> dict[str, np.ndarray]:
-    cal = pd.read_csv(CAL)
+def calendar_by_iso(regions: dict[str, list[str]], cal_path: Path) -> dict[str, np.ndarray]:
+    cal = pd.read_csv(cal_path)
     by_name = {
         str(r.country): (int(r.harvest_start_month), int(r.harvest_end_month))
         for r in cal.itertuples()
@@ -243,14 +244,18 @@ def merge_restrictions(rows: list[tuple[str, pd.Timestamp, pd.Timestamp, float]]
     return pd.DataFrame(out, columns=["Exporter", "From", "To", "Value"])
 
 
-def main() -> None:
+def main(crop: str = "wheat") -> None:
+    if crop not in CROPS:
+        raise ValueError(f"crop must be one of {CROPS}, got {crop!r}")
+    names = files_for(crop)
+    cal_path = ROOT / "data" / "crop_calendars" / f"{crop}_harvest_months.csv"
     regions = parse_regions("AgrimateEU28Regions")
     region_isos = {iso for isos in regions.values() for iso in isos}
     iso_region = {iso: name for name, isos in regions.items() for iso in isos}
     if EU_CARRIER not in region_isos:
         raise RuntimeError(f"{EU_CARRIER} is not in AgrimateEU28")
 
-    psd = load_psd_country("wheat")
+    psd = load_psd_country(crop)
     code_to_iso = iso_lookup(psd)
     base = baseline_by_iso(psd, code_to_iso, region_isos)
 
@@ -275,7 +280,7 @@ def main() -> None:
         })
     food = pd.DataFrame(food_rows)
 
-    e0 = load_trade_matrix("wheat", window=(2006, 2007))
+    e0 = load_trade_matrix(crop, window=(2006, 2007))
     e0 = e0.reindex(index=sorted(region_isos), columns=sorted(region_isos)).fillna(0.0)
     eu = set(regions["EU-28"])
     flows = []
@@ -301,7 +306,7 @@ def main() -> None:
                 flows.append((EU_CARRIER, dest, float(val)))
     trade = pd.DataFrame(flows, columns=["Origin", "Destination", "Trade Flow"])
 
-    profiles = calendar_by_iso(regions)
+    profiles = calendar_by_iso(regions, cal_path)
     day_cols = [str(i) for i in range(1, 366)]
     harvest = pd.DataFrame(
         [dict(Area=iso, **{str(i + 1): profiles[iso][i] for i in range(365)}) for iso in sorted(region_isos)]
@@ -367,7 +372,9 @@ def main() -> None:
     )
 
     amis = load_amis_restrictions()
-    amis = amis[amis["CommodityClass_Name"].astype(str).str.contains("Wheat", case=False, na=False)]
+    needle = {"wheat": "wheat", "rice": "rice", "maize": "maize"}[crop]
+    cls = amis["CommodityClass_Name"].astype(str).str.strip().str.lower()
+    amis = amis[cls == needle]
     name_to_iso = {}
     conv = pd.read_csv(CONV, encoding="utf-8-sig")
     for _, r in conv.iterrows():
@@ -406,13 +413,13 @@ def main() -> None:
     restrict = merge_restrictions(restrictions)
 
     OUT.mkdir(parents=True, exist_ok=True)
-    food.drop(columns="_stocks").to_csv(OUT / FILES["food"], index=False)
-    trade.to_csv(OUT / FILES["trade"], index=False)
-    harvest.to_csv(OUT / FILES["harvest"], index=False)
-    params.to_csv(OUT / FILES["params"], index=False)
-    anom.to_csv(OUT / FILES["anom"], index=False)
-    trend.to_csv(OUT / FILES["trend"], index=False)
-    restrict.to_csv(OUT / FILES["restrict"], index=False)
+    food.drop(columns="_stocks").to_csv(OUT / names["food"], index=False)
+    trade.to_csv(OUT / names["trade"], index=False)
+    harvest.to_csv(OUT / names["harvest"], index=False)
+    params.to_csv(OUT / names["params"], index=False)
+    anom.to_csv(OUT / names["anom"], index=False)
+    trend.to_csv(OUT / names["trend"], index=False)
+    restrict.to_csv(OUT / names["restrict"], index=False)
 
     readme = OUT / "README.txt"
     readme.write_text(
@@ -430,4 +437,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    p = argparse.ArgumentParser()
+    p.add_argument("--crop", choices=CROPS, default="wheat")
+    main(p.parse_args().crop)
