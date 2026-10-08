@@ -1,14 +1,10 @@
 # Reconstructed simulate() inputs
 
-Built by `scripts/build_agrimate_paper_inputs.py`. These are not the author
-input files. Zenodo data v3 has model output only, and the 2025 filenames
-are not on the authors' GitHub.
+Built by `inputs/from_data.py --crop wheat`. These are not the author
+input files. Zenodo data v3 has model output only.
 
-Written to
-
-`/Users/mjp38/GitHub/agrimate-2025/agrimate-equal-sales-penalty/data/agrimate_input/`
-
-which is the default `simulate()` input directory.
+Written to `inputs/generated/agrimate_input/` (gitignored). `drivers/run.py`
+passes that directory to `simulate()` as `inputroot`.
 
 Quantities are thousand tonnes. World wheat production in the food-balance
 file is 661,168 (661 MMT) for the 2007–2009 mean. International trade sums

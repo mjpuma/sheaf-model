@@ -1,16 +1,28 @@
 __pycache__/
 *.pyc
-sheaf_results.csv
-level1_hindcast.csv
 .ipynb_checkpoints/
 .DS_Store
 *.egg-info/
 .venv/
+.pytest_cache/
+
 # Full PSD dump is regenerable from the vendored zip (~193 MB)
 data/usda_psd/psd_alldata.csv
-# Local copies of Kuhla et al. 2025 PDFs (copyrighted; do not commit).
-# Anchored at repo root. The vendored Julia source is agrimate_julia/.
-/agrimate/
-# Agrimate / DrWatson run products (inputs live under inputs/generated)
+
+# Run products (not source)
 agrimate_julia/data/
 inputs/generated/
+
+# Paper zips / Overleaf checkouts — not the model
+/overleaf/
+
+# Retired Python-host leftovers (tag pre-reorg-20261007). Not in git.
+# The model is agrimate_julia/. Do not resurrect these.
+/agrimate/
+/sheaf/
+/archive/
+/scripts/
+/tests/
+/diagnostics/gate0_agrimate/
+sheaf_results.csv
+level1_hindcast.csv

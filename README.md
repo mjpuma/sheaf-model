@@ -71,26 +71,43 @@ to that source is listed there.
 
 ## Layout
 
+This repository **is** the working tree. Clone it and you have the model.
+We build from `agrimate_julia/` — that is the published Agrimate source,
+and that is where Gate 1 edits will go. There is no second copy to
+download.
+
 ```
-agrimate_julia/     vendored Agrimate (do not Pkg.update)
-drivers/            launch, score, J-series checkers
-inputs/             input builders and USDA/FAOSTAT/AMIS readers
-  from_paper.py     invert the author NetCDF (J10)
-  from_data.py      reconstruct from public data (J4)
-  pipelines/        data_usda.py, data_faostat.py
-  generated/        written CSVs (gitignored)
-plots/              figure scripts
-data/               raw USDA / FAOSTAT / AMIS / calendars
-diagnostics/gate0_julia/   J0–J10 evidence
+agrimate_julia/        THE MODEL (edit here; list changes in UPSTREAM.md)
+  src/simulation.jl    entry: simulate(params; …)
+  src/preprocess.jl    CSVs → baseline
+  src/AgrimateModel/   agents, Nash, dynamics
+drivers/run.py         launch (wheat / rice / maize)
+drivers/score.py       score a wheat NetCDF vs the author file
+inputs/from_data.py    write the seven CSVs from USDA / FAOSTAT / AMIS
+inputs/from_paper.py   J10 invert of the author wheat NetCDF (not portable)
+inputs/pipelines/      readers those builders call
+data/                  raw tables (PSD, E0, calendars, AMIS)
+diagnostics/           contract, development queue, J0–J10 evidence
+plots/  figures/       J10 figure
 ```
+
+Generated CSVs (`inputs/generated/`) and Julia NetCDFs
+(`agrimate_julia/data/`) are gitignored. They are products, not source.
 
 ## Requirements (Mac and Windows)
 
-Python **3.10+** and Julia **1.6.5** only. Do not install a current Julia.
-Do not run `Pkg.update()` or `Pkg.resolve()` — `agrimate_julia/Manifest.toml`
-pins the package versions that produced the J10 match.
+The Agrimate **source** is already in this repo: [`agrimate_julia/`](agrimate_julia/)
+(Zenodo 14022004, CC-BY 4.0). Clone SHEAF and you have it. Do not download
+that tree again from Zenodo or GitLab. Gate 1 edits (substitution) go in
+this copy; list each one in [`agrimate_julia/UPSTREAM.md`](agrimate_julia/UPSTREAM.md).
 
-**Julia 1.6.5** (old releases: [julialang.org/downloads/oldreleases](https://julialang.org/downloads/oldreleases/))
+What you still install locally is the **Julia 1.6.5 interpreter** — the
+language binary, like `python` itself. That is not in GitHub (a Mac `.dmg`
+does not run on Windows). Do not install a current Julia. Do not run
+`Pkg.update()` or `Pkg.resolve()` — `agrimate_julia/Manifest.toml` pins
+the package versions that produced the J10 match.
+
+**Julia 1.6.5 interpreter** (old releases: [julialang.org/downloads/oldreleases](https://julialang.org/downloads/oldreleases/))
 
 | Platform | Installer | How `drivers/run.py` invokes it |
 |---|---|---|

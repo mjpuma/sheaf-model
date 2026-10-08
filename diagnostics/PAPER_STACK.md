@@ -5,9 +5,10 @@ substitution, policy, tipping, endogenous network. Those are questions
 the model might answer. They are **not** five papers that must be
 written in order, and they are not a license to skip the market.
 
-**Current work:** Gate 0 wheat on `agrimate_julia/`. Living queue:
-[`diagnostics/DEVELOPMENT.md`](DEVELOPMENT.md).
-**Do not** treat Gate 1 / Gate 2 as the next coding task.
+**Current work:** wheat Gate 0 is accepted (G0-P). Living queue:
+[`diagnostics/DEVELOPMENT.md`](DEVELOPMENT.md). Next is rice/maize
+smoke, then Gate 1 substitution **in** `agrimate_julia/`. Do not start
+Gate 2 until Gate 1 is accepted.
 
 | Question | What it is | What it is not |
 |---|---|---|
