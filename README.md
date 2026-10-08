@@ -26,8 +26,13 @@ restriction game (types slow, actions on that same clock;
 [`diagnostics/GAME_CLOCK.md`](diagnostics/GAME_CLOCK.md)). Wheat Gate 0 is
 **accepted** (G0-P). Rice/maize smoke is next; then substitution.
 
+Gate 2's decision rule blends a reactive (threshold and cascade) term with
+a myopic best-response term, with Nash equilibrium as a nested limit and
+no new stockholder: Agrimate's purchaser already holds strategic stocks.
+See [`diagnostics/GATE2_FOUNDATIONS.md`](diagnostics/GATE2_FOUNDATIONS.md).
+
 The Gate 0 host is the **published Julia Agrimate code**, vendored at
-[`agrimate_julia/`](agrimate_julia/) (Kuhla, Kubiczek, Puma, and Otto 2025;
+[`agrimate_julia/`](agrimate_julia/) (Kuhla, Kubiczek, and Otto 2025;
 Zenodo [10.5281/zenodo.14022004](https://doi.org/10.5281/zenodo.14022004);
 CC-BY 4.0). Python here is drivers, input generation, scoring, and plots.
 
@@ -58,12 +63,12 @@ and maize smoke on this host, then Gate 1 substitution.
 
 ## Cite
 
-Kuhla, K., Kubiczek, P., Puma, M. J., & Otto, C. (2025). Agrimate: a
-process-based model of global annual and intra-annual agricultural market
-dynamics. *Ecological Economics*, 231, 108546.
+Kuhla, K., Kubiczek, P., & Otto, C. (2025). Understanding agricultural
+market dynamics in times of crisis: The dynamic agent-based network model
+Agrimate. *Ecological Economics*, 231, 108546.
 https://doi.org/10.1016/j.ecolecon.2025.108546
 
-Source snapshot used here: Kubiczek et al., Zenodo
+Source snapshot used here: Kuhla, K., & Kubiczek, P. (2024), Zenodo
 [10.5281/zenodo.14022004](https://doi.org/10.5281/zenodo.14022004), folder
 `agrimate-equal-sales-penalty`, CC-BY 4.0. SHA-256 of the zip is in
 [`agrimate_julia/UPSTREAM.md`](agrimate_julia/UPSTREAM.md). Every SHEAF edit

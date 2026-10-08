@@ -3,7 +3,7 @@
 Canonical scientific contract. `CLAUDE.md`, `AGENTS.md`, and
 `.cursor/rules/gate0-agrimate.mdc` point here.
 
-Gate 0 is the published Agrimate model (Kuhla, Kubiczek, Puma, and Otto,
+Gate 0 is the published Agrimate model (Kuhla, Kubiczek, and Otto,
 *Ecological Economics* 231 (2025) 108546; ODD supplement §D; wheat §E),
 run from the vendored source at `agrimate_julia/`.
 

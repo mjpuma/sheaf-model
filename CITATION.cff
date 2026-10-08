@@ -9,14 +9,12 @@ license: MIT
 repository-code: https://github.com/mjpuma/sheaf-model
 references:
   - type: article
-    title: "Agrimate: a process-based model of global annual and intra-annual agricultural market dynamics"
+    title: "Understanding agricultural market dynamics in times of crisis: The dynamic agent-based network model Agrimate"
     authors:
       - family-names: Kuhla
         given-names: Kilian
       - family-names: Kubiczek
         given-names: Patryk
-      - family-names: Puma
-        given-names: Michael J.
       - family-names: Otto
         given-names: Christian
     year: 2025
@@ -24,7 +22,13 @@ references:
     volume: "231"
     doi: 10.1016/j.ecolecon.2025.108546
   - type: software
-    title: Agrimate equal-sales-penalty source
+    title: "Agrimate model for study \"Understanding agricultural market dynamics in times of crisis: the dynamic agent-based model Agrimate\""
+    authors:
+      - family-names: Kuhla
+        given-names: Kilian
+      - family-names: Kubiczek
+        given-names: Patryk
+    version: v2
     year: 2024
     doi: 10.5281/zenodo.14022004
     license: CC-BY-4.0

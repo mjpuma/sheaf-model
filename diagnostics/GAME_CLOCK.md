@@ -2,6 +2,9 @@
 
 This is the clock for a future Gate 2 on `agrimate_julia/`. Wheat Gate 0
 is accepted (G0-P). Gate 2 stays blocked until Gate 1 is accepted.
+Why the decision rule has its form (reactive and strategic terms, Nash as
+a nested limit, fit with the storage layer):
+[`GATE2_FOUNDATIONS.md`](GATE2_FOUNDATIONS.md).
 
 **Locked 2026-08-27.** Guiding paper: Headey, D. (2011). Rethinking the
 global food crisis: The role of trade shocks. *Food Policy* 36: 136–146.
