@@ -1,30 +1,30 @@
-# SHEAF
+# Agrimate-SHEAF
 
 <p align="center">
-  <img src="assets/SHEAF_Model_logo.png" width="260" alt="SHEAF Model logo — a wheat ear, rice panicle, and corn cob bound together in a green ring">
+  <img src="assets/SHEAF_Model_logo.png" width="260" alt="Agrimate-SHEAF logo — a wheat ear, rice panicle, and corn cob bound together in a green ring">
 </p>
 
-> **sheaf** &nbsp;/ʃiːf/&nbsp;
-> — *(agriculture)* a bundle of cereal stalks bound together after the harvest;
-> — *(mathematics)* a structure that consistently glues locally defined data into a coherent global whole.
+The **Agrimate-SHEAF** model is the published Agrimate market
+(Kuhla, Kubiczek, Puma, and Otto 2025) plus two extensions built **in
+that code**. Agrimate already does storage and the trade network. SHEAF
+adds what a single-crop model still omits:
 
-**S**ubstitution, **H**eterogeneous agents, **E**quilibrium, **A**nd **F**ragility:
-a country-level, multi-commodity, game-theoretic network model of global grain
-trade. It sits in the TWIST → Agrimate lineage. Those models already do storage
-(and Agrimate already does a trade network). SHEAF exists because two
-first-order pieces of crisis dynamics are still missing:
+1. **Substitution (Gate 1).** Wheat, rice, and maize linked on the demand
+   side. Design: [`diagnostics/GATE1_DESIGN.md`](diagnostics/GATE1_DESIGN.md).
+2. **Strategy (Gate 2).** An endogenous export-restriction game among
+   governments, on Agrimate’s 24-step clock
+   ([`diagnostics/GAME_CLOCK.md`](diagnostics/GAME_CLOCK.md)). Blocked
+   until Gate 1 is accepted.
 
-1. **Strategy.** Exporters restrict in a crisis, and those restrictions move
-   world prices. Agrimate takes the restriction schedule as given. SHEAF’s
-   destination is an *endogenous* export-restriction game among governments.
-2. **Substitution.** Wheat, rice, and maize are linked on the demand side.
-   Single-commodity models wall each grain off.
+> **sheaf** &nbsp;/ʃiːf/&nbsp; — a bundle of cereal stalks; in mathematics,
+> locally defined data glued into a coherent whole.
+> **S**ubstitution, **H**eterogeneous agents, **E**quilibrium, **A**nd
+> **F**ragility.
 
-Both sit on Agrimate’s **24-step-per-year** market. Gate 0 is both switches
-off (AMIS diary, one crop). Gate 1 is substitution on. Gate 2 is the
-restriction game (types slow, actions on that same clock;
-[`diagnostics/GAME_CLOCK.md`](diagnostics/GAME_CLOCK.md)). Wheat Gate 0 is
-**accepted** (G0-P). Rice/maize smoke is next; then substitution.
+Gate 0 is both switches off (AMIS diary, one crop). Wheat Gate 0 is
+**accepted** (G0-P). Rice and maize `t_max=0` smoke is **met**. Gate 1
+is not coded yet: the design asks coauthors the questions in
+`GATE1_DESIGN.md` §8 first.
 
 Gate 2's decision rule blends a reactive (threshold and cascade) term with
 a myopic best-response term, with Nash equilibrium as a nested limit and
@@ -57,9 +57,10 @@ J8, J9) ran the same code and did **not** reproduce the published
 magnitudes — stocks +23 %, 2007/08 ratio 1.25 versus 1.36 — so public-data
 reproducibility remains an open limitation.*
 
-Wheat Gate 0 is **accepted** (G0-P, 2026-10-07;
-[`diagnostics/DEVELOPMENT.md`](diagnostics/DEVELOPMENT.md)). Next is a rice
-and maize smoke on this host, then Gate 1 substitution.
+Wheat Gate 0 is **accepted** (G0-P, 2026-10-07). Rice and maize smoke is
+**met**. Next is Gate 1 substitution in this host, per
+[`diagnostics/GATE1_DESIGN.md`](diagnostics/GATE1_DESIGN.md)
+([`diagnostics/DEVELOPMENT.md`](diagnostics/DEVELOPMENT.md)).
 
 ## Cite
 
@@ -71,14 +72,14 @@ https://doi.org/10.1016/j.ecolecon.2025.108546
 Source snapshot used here: Kuhla, K., & Kubiczek, P. (2024), Zenodo
 [10.5281/zenodo.14022004](https://doi.org/10.5281/zenodo.14022004), folder
 `agrimate-equal-sales-penalty`, CC-BY 4.0. SHA-256 of the zip is in
-[`agrimate_julia/UPSTREAM.md`](agrimate_julia/UPSTREAM.md). Every SHEAF edit
+[`agrimate_julia/UPSTREAM.md`](agrimate_julia/UPSTREAM.md). Every Agrimate-SHEAF edit
 to that source is listed there.
 
 ## Layout
 
-This repository **is** the working tree. Clone it and you have the model.
-We build from `agrimate_julia/` — that is the published Agrimate source,
-and that is where Gate 1 edits will go. There is no second copy to
+This repository **is** the working tree: Agrimate-SHEAF. Clone it and you
+have the model. We build from `agrimate_julia/` — the published Agrimate
+source, and the file Gate 1 will edit. There is no second copy to
 download.
 
 ```
@@ -92,7 +93,7 @@ inputs/from_data.py    write the seven CSVs from USDA / FAOSTAT / AMIS
 inputs/from_paper.py   J10 invert of the author wheat NetCDF (not portable)
 inputs/pipelines/      readers those builders call
 data/                  raw tables (PSD, E0, calendars, AMIS)
-diagnostics/           contract, development queue, J0–J10 evidence
+diagnostics/           contract, GATE1_DESIGN.md, J0–J10 evidence
 plots/  figures/       J10 figure
 ```
 
@@ -309,6 +310,9 @@ NetCDF). It also needs `AGRIMATE_JULIA` on Windows.
 
 ## What this is not
 
-- Do not implement Gate 1 substitution until rice and maize smoke.
-  Do not start Gate 2 until Gate 1 is accepted.
+- Gate 1 follows [`diagnostics/GATE1_DESIGN.md`](diagnostics/GATE1_DESIGN.md)
+  (\(\xi\), not Agrimate’s Armington \(\sigma\)). Do not code it until the
+  §8 coauthor questions are in. Do not start Gate 2 until Gate 1 is
+  accepted.
 - Do not retune Agrimate economics or parameters to the Pink Sheet.
+- Do not invent production to hide empty regions.

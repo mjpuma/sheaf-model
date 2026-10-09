@@ -24,7 +24,7 @@ the baseline is revised.
 | Layer | Substitution | Game | Headey alone |
 |---|---|---|---|
 | **Gate 0** | off | off (AMIS diary) | Not a reason to retune. Consultation on \(p\), storage, asks **is**. |
-| **Gate 1** | on (`σ ∈ {0, 0.3, 0.6}`) | off | Not a reason to densify `σ` or pick `σ*`. Paused until Gate 0 is one we will stand behind. |
+| **Gate 1** | on (`ξ ∈ {0, 0.3, 0.6}`) | off | Not a reason to densify `ξ` or pick `ξ*`. Spec: `GATE1_DESIGN.md`. |
 
 **What does not get a run right now:** Gate 2. Pause until Gate 1 is
 accepted.

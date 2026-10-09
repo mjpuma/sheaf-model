@@ -42,5 +42,5 @@ Author file (harvest + restrictions):
 
 ## Later gates
 
-Gate 1 (substitution) is next after rice/maize smoke. Gate 2 stays
-blocked until Gate 1 is accepted.
+Gate 1 design: [`diagnostics/GATE1_DESIGN.md`](diagnostics/GATE1_DESIGN.md).
+Rice/maize smoke is met. Gate 2 stays blocked until Gate 1 is accepted.

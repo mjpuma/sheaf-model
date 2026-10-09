@@ -3,8 +3,10 @@
 **Current phase:** wheat Gate 0 is **accepted** (G0-P, 2026-10-07). The
 code path reproduces the published wheat run on the authors’ calibration
 ([`gate0_julia/J10_authorbaseline.md`](gate0_julia/J10_authorbaseline.md)).
-Rice and maize `t_max=0` smoke is **met** (2026-10-08). Next: Gate 1
-substitution. Gate 2 stays blocked until Gate 1 is accepted.
+Rice and maize `t_max=0` smoke is **met** (2026-10-08). Gate 1 design:
+[`GATE1_DESIGN.md`](GATE1_DESIGN.md) (\(\xi \in \{0, 0.3, 0.6\}\); scale
+both purchase and consumption shares). Coauthor questions in that note
+§8 before coding. Gate 2 stays blocked until Gate 1 is accepted.
 
 Canonical contract: [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md).
 This file is the living queue.
@@ -40,12 +42,13 @@ reconstruction remains a different experiment, not a retune target.
 | **G0-H** | Match the author wheat NetCDF | **Met for the code path (J10).** Public-data reconstruction fails (J4/J8/J9) |
 | **G0-P** | You accept wheat Gate 0 as the SHEAF market baseline | **Accepted 2026-10-07** |
 | **G1-prep** | Rice and maize smoke on this host (`crops="rice"` / `"maize"`) | **Met** (2026-10-08, `t_max=0`) |
-| **G1** | Cross-crop substitution. Disabled G1 recovers G0 | Open |
+| **G1** | Cross-crop substitution in Agrimate (`GATE1_DESIGN.md`). \(\xi=0\) recovers G0 | Design in; coding after §8 |
 | **G2** | Government restriction game. Disabled G2 recovers AMIS | Blocked |
 
 ## Hard stops
 
-- G1-prep is met. Substitution goes in `agrimate_julia/` with an
+- G1-prep is met. Spec: [`GATE1_DESIGN.md`](GATE1_DESIGN.md). Coauthor
+  questions §8 before coding. Then edits in `agrimate_julia/` with an
   `UPSTREAM.md` line. Do not start Gate 2 until Gate 1 is accepted.
 - Do not edit `agrimate_julia/` economics without an `UPSTREAM.md` line.
 - Do not `Pkg.update()` / `Pkg.resolve()`. Julia 1.6.5.
@@ -53,10 +56,12 @@ reconstruction remains a different experiment, not a retune target.
 
 ## Next
 
-1. Gate 1 substitution in `agrimate_julia/`, listed in `UPSTREAM.md`.
-   Disabled Gate 1 must recover the three independent single-crop runs.
-   Rice smoke needed a 0/0 harvest guard (`G1prep_rice.md`); do not
-   invent production to hide empty regions.
+1. Coauthor questions in [`GATE1_DESIGN.md`](GATE1_DESIGN.md) §8 (where
+   to attach the factor; rice/maize author inputs; region sets; scale
+   with \(\varepsilon_d\); storage). Then the listed edits in
+   `agrimate_julia/`, each in `UPSTREAM.md`. \(\xi=0\) must recover the
+   three independent single-crop runs (0.5% monthly price). Do not invent
+   production (`G1prep_rice.md`).
 
 ## Exit criteria by gate
 
@@ -67,14 +72,18 @@ paper's argument.
 **Gate 0.** See [`GATE0_CONTRACT.md`](GATE0_CONTRACT.md). Wheat accepted
 (G0-P) on the J10 reproduction.
 
-**Gate 1 (cross-crop substitution).**
-- Substitution off (σ = 0) recovers the three independent single-crop runs
-  to solver tolerance.
-- A wheat shock moves rice and maize prices with plausible sign and
-  magnitude.
-- Results reported at σ ∈ {0, 0.3, 0.6}; elasticity sources logged.
-- Notation: Agrimate already uses σ for substitution between suppliers.
-  Rename one of the two before coding.
+**Gate 1 (cross-crop substitution).** Full spec:
+[`GATE1_DESIGN.md`](GATE1_DESIGN.md).
+- Factor \(M^g_s(t)=\prod_{h\neq g}(P^h_s(t)/\bar P^h_s(t))^{\xi\rho_{gh}\varepsilon_d^g}\)
+  multiplies both \(A_d\) (this step) and \(A_c^*\) (previous step).
+  \(\bar P\) is the undisturbed run, not `baseline_price`.
+- Notation: \(\xi\), not Agrimate’s Armington \(\sigma\). \(\rho\) frozen
+  (wheat–maize 0.40, wheat–rice 0.30, rice–maize 0.20).
+- \(\xi\in\{0,0.3,0.6\}\) is a pre-declared band, not a fit.
+- \(\xi=0\) recovers the three independent single-crop runs (0.5% monthly
+  price bar). A 2007/08 wheat rise must not lower rice or maize prices.
+  Wheat’s Gate 0 story and rice’s own bans still hold.
+- Prefer rice/maize author inputs over coupling public-data baselines.
 
 **Gate 2 (endogenous export restrictions).** Design:
 [`GATE2_FOUNDATIONS.md`](GATE2_FOUNDATIONS.md). Clock:
@@ -144,3 +153,4 @@ convergence); all other countries keep the Gate 2 rule.
 | 2026-10 | Government layer sets restrictions; no second strategic stockholder | Agrimate's purchaser already is the strategic storage holder, continuing TWIST's consumer-side holder |
 | 2026-10 | Prior for ω from regional strategic versus commercial stock balance, tested on AMIS histories | Uses observed stockholding policy already in the model |
 | 2026-10 | Development in Cursor, one gate at a time; Claude chat for theory, review and writing | Token and attention budget |
+| 2026-10-08 | Gate 1: scale both \(A_d\) and \(A_c^*\) by \(\xi\)-factor vs undisturbed indices | Smallest change inside Agrimate; \(\xi=0\) is identity; \(\sigma\) already Armington |

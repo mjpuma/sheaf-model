@@ -1,6 +1,6 @@
 cff-version: 1.2.0
-title: SHEAF
-message: If you use this software, please cite both SHEAF and Agrimate.
+title: Agrimate-SHEAF
+message: If you use this software, please cite both Agrimate-SHEAF and Agrimate.
 type: software
 authors:
   - family-names: Puma

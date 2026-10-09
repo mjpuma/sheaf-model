@@ -1,19 +1,20 @@
 # CLAUDE.md
 
-Constitution for work on SHEAF after the Gate 0 host cut. This does not
-override [`diagnostics/GATE0_CONTRACT.md`](diagnostics/GATE0_CONTRACT.md).
+Constitution for work on Agrimate-SHEAF after the Gate 0 host cut. This
+does not override [`diagnostics/GATE0_CONTRACT.md`](diagnostics/GATE0_CONTRACT.md).
 
-## What SHEAF is
+## What Agrimate-SHEAF is
 
-SHEAF is a country-level, multi-commodity, game-theoretic network model of
-global grain trade, in the TWIST → Agrimate lineage. The Gate 0 host is the
-**published Julia Agrimate code** vendored at `agrimate_julia/` (Kuhla et
-al. 2025; Zenodo 14022004; CC-BY 4.0). Python is drivers, input builders,
+The published Julia Agrimate market, vendored at `agrimate_julia/`
+(Kuhla et al. 2025; Zenodo 14022004; CC-BY 4.0), plus SHEAF’s two
+extensions built in that code. Python is drivers, input builders,
 scoring, and plots.
 
-Wheat Gate 0 is **accepted** (G0-P, 2026-10-07). Do not implement
-substitution until rice and maize smoke on this host. Do not start Gate 2
-until Gate 1 is accepted.
+Wheat Gate 0 is **accepted** (G0-P, 2026-10-07). Rice and maize
+`t_max=0` smoke is **met**. Gate 1 spec:
+[`diagnostics/GATE1_DESIGN.md`](diagnostics/GATE1_DESIGN.md) (scale
+\(\xi\), not Armington \(\sigma\)). Coauthor questions in that note §8
+before coding. Do not start Gate 2 until Gate 1 is accepted.
 
 ## Gate 0 evidence
 

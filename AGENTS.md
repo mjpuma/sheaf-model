@@ -1,9 +1,10 @@
-# Agent instructions — SHEAF
+# Agent instructions — Agrimate-SHEAF
 
 Gate 0 drives the **vendored Julia Agrimate code** in
 [`agrimate_julia/`](agrimate_julia/). Read
 [`diagnostics/GATE0_CONTRACT.md`](diagnostics/GATE0_CONTRACT.md) before
-changing that tree, Gate 0 docs, or the default entry point.
+changing that tree, Gate 0 docs, or the default entry point. Gate 1:
+[`diagnostics/GATE1_DESIGN.md`](diagnostics/GATE1_DESIGN.md).
 
 - **Default run:** `python drivers/run.py --anomalies --restrictions --t-max 312`
 - **Score vs author:** `python drivers/score.py path/to/output.nc`
@@ -14,6 +15,6 @@ changing that tree, Gate 0 docs, or the default entry point.
   `Pkg.resolve()`.
 - **Edits to `agrimate_julia/`** must be listed in
   [`agrimate_julia/UPSTREAM.md`](agrimate_julia/UPSTREAM.md).
-- Wheat Gate 0 is **accepted** (G0-P). Do **not** implement substitution
-  until rice and maize smoke. Do **not** start Gate 2 until Gate 1 is
-  accepted.
+- Wheat Gate 0 is **accepted** (G0-P). Rice/maize smoke is **met**.
+  Gate 1 follows `GATE1_DESIGN.md` (\(\xi\)); coauthor questions §8
+  before coding. Do **not** start Gate 2 until Gate 1 is accepted.

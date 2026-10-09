@@ -1,15 +1,17 @@
 # Architecture
 
-**Status:** Gate 0 host is the vendored Julia Agrimate code
+**Status:** Agrimate-SHEAF. Host is the vendored Julia Agrimate code
 (`agrimate_julia/`).
 
 ## Scientific goal
 
 Reproduce crisis shock dynamics (2007/08, 2010/11) on Agrimate’s own
-terms, then add SHEAF’s two extensions: cross-commodity substitution
-(Gate 1) and an endogenous restriction game (Gate 2). Those extensions
-are **not implemented** until rice and maize smoke on this host (Gate 1)
-and Gate 1 is accepted (Gate 2). Wheat Gate 0 is accepted (G0-P).
+terms, then add two extensions **in that code**: cross-commodity
+substitution (Gate 1,
+[`diagnostics/GATE1_DESIGN.md`](diagnostics/GATE1_DESIGN.md)) and an
+endogenous restriction game (Gate 2). Wheat Gate 0 is accepted (G0-P).
+Rice/maize smoke is met. Gate 1 is designed, not coded. Gate 2 stays off
+until Gate 1 is accepted.
 
 ## Locked choices
 
