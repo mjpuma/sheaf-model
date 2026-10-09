@@ -5,7 +5,7 @@
 </p>
 
 The **Agrimate-SHEAF** model is the published Agrimate market
-(Kuhla, Kubiczek, Puma, and Otto 2025) plus two extensions built **in
+(Kuhla, Kubiczek, and Otto 2025) plus two extensions built **in
 that code**. Agrimate already does storage and the trade network. SHEAF
 adds what a single-crop model still omits:
 
