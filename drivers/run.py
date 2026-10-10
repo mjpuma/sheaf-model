@@ -51,12 +51,25 @@ def main() -> int:
     p.add_argument("--inputroot", type=Path, default=Path(os.environ.get("AGRIMATE_INPUT", DEFAULT_INPUT)))
     p.add_argument("--outputroot", type=Path, default=Path(os.environ.get("AGRIMATE_OUTPUT", DEFAULT_OUTPUT)))
     p.add_argument("--verbose", action="store_true", default=True)
+    p.add_argument("--coupled", action="store_true", help="Gate 1: wheat+rice+maize (GATE1_DESIGN.md)")
+    p.add_argument("--xi", type=float, default=0.0, help="Gate 1 substitution scale ξ (0, 0.3, 0.6)")
     args = p.parse_args()
 
     anomalies = 'production_anomalies = "FAOsince-2005",' if args.anomalies else ""
     restrictions = 'export_restrictions = "2007-2011",' if args.restrictions else ""
     inputroot = julia_path(args.inputroot)
     outputroot = julia_path(args.outputroot)
+    call = (
+        f'simulate_coupled(params; crops = ("wheat", "rice", "maize"), ξ = {args.xi}, '
+        f't_max = {args.t_max}, inputroot = "{inputroot}", outputroot = "{outputroot}", '
+        f'verbose = {str(args.verbose).lower()})'
+        if args.coupled
+        else (
+            f"simulate(params; t_max = {args.t_max}, "
+            f'inputroot = "{inputroot}", outputroot = "{outputroot}", '
+            f"verbose = {str(args.verbose).lower()})"
+        )
+    )
     wrapper = f"""
 using DrWatson
 @quickactivate "Agrimate"
@@ -68,13 +81,11 @@ params = Params(
     regions = "AgrimateEU28",
     extra_regions = Dict{{String,Any}}("Egypt" => "EGY"),
     start = Date(2000, 1, 1),
+    ξ = {args.xi},
     {anomalies}
     {restrictions}
 )
-simulate(params; t_max = {args.t_max},
-         inputroot = "{inputroot}",
-         outputroot = "{outputroot}",
-         verbose = {str(args.verbose).lower()})
+{call}
 """
     cmd = julia_cmd() + ["-e", wrapper]
     print(" ".join(cmd[:4]), "...", file=sys.stderr)

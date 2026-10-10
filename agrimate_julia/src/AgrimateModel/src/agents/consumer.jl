@@ -1,6 +1,6 @@
 module ConsumerModule
 
-export delivery_step!, consumption_step!, accounting_step!, procurement_step!
+export delivery_step!, consumption_step!, accounting_step!, procurement_step!, price_index_step!
 
 using Parameters
 using Statistics: mean
@@ -31,7 +31,7 @@ function consumption_step!(consumer)
         # (1. - pipeline_stock) * consumer.storage + consumer.delivery,
         consumer.household_budget;
         ε_c,
-        A_c_star,
+        A_c_star = A_c_star * consumer.substitution_factor_prev,
     )
 
     consumer.consumption = consumption
@@ -57,13 +57,12 @@ function accounting_step!(consumer)
     return consumer.expected_storage = determine_expected_storage(consumer)
 end
 
-function procurement_step!(consumer, t, producers::Dict{String,Producer};)
-    @unpack C_star, σ, ε_d, ε_d_domestic, ε_d_foreign = consumer.local_params
-    @unpack ι, two_markets, ε_d_adjust = consumer.global_params
+function price_index_step!(consumer, t, producers::Dict{String,Producer};)
+    @unpack σ = consumer.local_params
+    @unpack two_markets = consumer.global_params
 
     empty!(consumer.demand_requests)
 
-    # Update communicated producers' prices
     update_offer_prices!(consumer, producers)
     update_demand_shares!(consumer, t, producers)
 
@@ -80,8 +79,15 @@ function procurement_step!(consumer, t, producers::Dict{String,Producer};)
             demand_shares = consumer.demand_shares,
             offer_prices = consumer.offer_prices,
             σ,
-        )        
+        )
     end
+    return consumer
+end
+
+function procurement_step!(consumer, t, producers::Dict{String,Producer};)
+    @unpack C_star, σ, ε_d, ε_d_domestic, ε_d_foreign = consumer.local_params
+    @unpack ι, two_markets, ε_d_adjust = consumer.global_params
+
     consumer.extra_demand = determine_extra_demand(consumer, t)
     consumer.crop_budget_share =
     determine_crop_budget_share(consumer, t; ΔD = consumer.extra_demand)
@@ -316,7 +322,7 @@ function determine_crop_budget_share(consumer, t; ΔD = 0)
     B = consumer.budget
     p = consumer.crop_price_index
     A_d_star = consumer.baseline_crop_budget_share[mod(t, 1:N_year)]
-    A_d = A_d_star + p * ΔD / B
+    A_d = A_d_star * consumer.substitution_factor + p * ΔD / B
     A_d = max(0, min(A_d, 1))
     return A_d
 end

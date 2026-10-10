@@ -18,3 +18,7 @@ end
 @time @testset "AgrimateModel" begin
     include("AgrimateModel.jl")
 end
+
+@time @testset "CouplingModule" begin
+    include("coupling.jl")
+end

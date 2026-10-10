@@ -2,7 +2,7 @@ module AgentsModule
 
 export Producer, Consumer, Transaction, Delivery
 export harvest_step!, sales_step!, communication_step!, export_restriction_step!, policy_implementation_step!, get_storage_timeseries
-export delivery_step!, consumption_step!, accounting_step!, procurement_step!
+export delivery_step!, consumption_step!, accounting_step!, procurement_step!, price_index_step!
 
 using DataStructures: Deque, DefaultDict
 
@@ -108,6 +108,8 @@ mutable struct Consumer <: Agent
     crop_price_index_domestic::Float64
     crop_price_index_foreign::Float64
     transactions::Vector{Transaction}
+    substitution_factor::Float64
+    substitution_factor_prev::Float64
     # Global paramaters
     global_params::DefaultDict{Symbol,Any,Nothing}
     # Agent parameters
@@ -120,6 +122,8 @@ mutable struct Consumer <: Agent
         consumer.demand_requests = Transaction[]
         consumer.transactions = Transaction[]
         consumer.delivery_queue = Deque{Delivery}()
+        consumer.substitution_factor = 1.0
+        consumer.substitution_factor_prev = 1.0
         return consumer
     end
 end

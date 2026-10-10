@@ -1,6 +1,6 @@
 module RunModule
 
-export Run, run_model!, initialize_model_run
+export Run, run_model!, run_model_coupled!, initialize_model_run
 
 using DataFrames: DataFrame, allowmissing!
 using ..ModelModule
@@ -49,6 +49,28 @@ function observe!(run)
         # observe_extra_data!
     ]
         observe_function!(run.output_data, run.model, run.timestep)
+    end
+end
+
+function run_model_coupled!(
+    runs::Dict{String,Run},
+    timesteps;
+    ξ::Float64 = 0.0,
+    reference_index = Dict(),
+    verbose::Bool = true,
+    progressbar_name = "COUPLED",
+)
+    progressshower = Progress(timesteps; desc=progressbar_name, barglyphs=BarGlyphs("[=> ]"), color=:white, showspeed=true)
+    for i in 1:timesteps
+        t = first(values(runs)).timestep
+        models = Dict(crop => run.model for (crop, run) in runs)
+        input_data = Dict(crop => run.input_data for (crop, run) in runs)
+        step_coupled!(models, t, input_data, ξ, reference_index; verbose)
+        for run in values(runs)
+            observe!(run)
+            run.timestep += 1
+        end
+        next!(progressshower)
     end
 end
 

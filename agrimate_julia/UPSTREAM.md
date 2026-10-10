@@ -37,3 +37,12 @@ wheat run (`diagnostics/gate0_julia/J10_authorbaseline.md`).
   return zeros and **do not create that producer**. Wheat never hits
   this; rice Canada and Rest of Oceania have production 0, which made
   `X_star` NaN and Nash spin for 12 h. Not a substitution change.
+- Gate 1 start (`diagnostics/GATE1_DESIGN.md`). `ξ::Float64 = 0.0` on
+  `AgrimateParams` (not Armington `σ`). Consumer fields
+  `substitution_factor` / `_prev` default 1. `A_d` and `A_c*` scaled
+  by those factors. `procurement_step!` split into `price_index_step!`
+  then `procurement_step!` (same statements, same order). New
+  `coupling.jl` (`ρ` matrix, `substitution_factor`). `step_coupled!` /
+  `run_model_coupled!`. `simulate_coupled` at `ξ=0` is three independent
+  `simulate` calls; `ξ≠0` and `t_max>0` still needs the three-Run
+  wrapper and undisturbed reference indices.

@@ -2,7 +2,8 @@ module AgrimateModel
 
 export AgrimateParams, InitializationData, InputData
 export @AgrimateParamsMix
-export initialize_model, initialize_model_run, run_model!
+export initialize_model, initialize_model_run, run_model!, run_model_coupled!
+export step_coupled!, substitution_factor, RHO_SUBST, COUPLED_CROPS
 
 using DataFrames: DataFrame, allowmissing!
 using Mixers
@@ -34,6 +35,7 @@ using .AgentsModule, .ModelModule, .RunModule
     τ_exp::Float64 = 0.5                            # timescale (in yearly unit) of updating expectations on other producers' sales
     τ_P::Float64 = 0.2                              # timescale (in yearly unit) of local price adjustment
     σ::Float64 = 2.                                 # supplier substitution elasticity
+    ξ::Float64 = 0.0                                # Gate 1 cross-crop scale (not Armington σ)
     τ::Float64 = 0.1                                # timescale (in yearly unit) of balancing consumer inventory
     ψ::Union{Float64,Symbol} = :empirical                  # target stock-to-use ratio (annual)
     # ψ::Union{Float64,Symbol} = 0.3                  # target stock-to-use ratio (annual)
@@ -97,8 +99,8 @@ function initialize_model(
     # TODO: unique market constraint does not take deterioration correctly into account
 
     # Global params    
-    @unpack N_year, N_hor, N_del, ι, ζ, x_minimum, optimization_tol, initialization_tol, baseline_tol, pl_opt, pol_opt,pol_exp_p,pol_sales, α_adj, ε_d_adjust, pol_hor,foreign_market, two_markets, pipeline_stock  = agrimate_params
-    global_params = (; N_year, N_hor, N_del, ι, ζ, x_minimum, optimization_tol, initialization_tol, baseline_tol, pl_opt, pol_opt, α_adj,ε_d_adjust, pol_exp_p,pol_sales, pol_hor,foreign_market,two_markets, pipeline_stock)
+    @unpack N_year, N_hor, N_del, ι, ζ, x_minimum, optimization_tol, initialization_tol, baseline_tol, pl_opt, pol_opt,pol_exp_p,pol_sales, α_adj, ε_d_adjust, pol_hor,foreign_market, two_markets, pipeline_stock, ξ  = agrimate_params
+    global_params = (; N_year, N_hor, N_del, ι, ζ, x_minimum, optimization_tol, initialization_tol, baseline_tol, pl_opt, pol_opt, α_adj,ε_d_adjust, pol_exp_p,pol_sales, pol_hor,foreign_market,two_markets, pipeline_stock, ξ)
 
     # Producer params
     @unpack α,α_domestic,α_foreign, λ, β, σ, δ, ρ, p_sto, τ_exp, τ_P, N_for, τ_for, storage_hold_back= agrimate_params

@@ -23,8 +23,8 @@ adds what a single-crop model still omits:
 
 Gate 0 is both switches off (AMIS diary, one crop). Wheat Gate 0 is
 **accepted** (G0-P). Rice and maize `t_max=0` smoke is **met**. Gate 1
-is not coded yet: the design asks coauthors the questions in
-`GATE1_DESIGN.md` §8 first.
+coding has started (`ξ` default 0). Coauthor questions in
+`GATE1_DESIGN.md` §8 stay open.
 
 Gate 2's decision rule blends a reactive (threshold and cascade) term with
 a myopic best-response term, with Nash equilibrium as a nested limit and
@@ -311,8 +311,9 @@ NetCDF). It also needs `AGRIMATE_JULIA` on Windows.
 ## What this is not
 
 - Gate 1 follows [`diagnostics/GATE1_DESIGN.md`](diagnostics/GATE1_DESIGN.md)
-  (\(\xi\), not Agrimate’s Armington \(\sigma\)). Do not code it until the
-  §8 coauthor questions are in. Do not start Gate 2 until Gate 1 is
-  accepted.
+  (\(\xi\), not Agrimate’s Armington \(\sigma\)). Do not start Gate 2
+  until Gate 1 is accepted. Export-restriction typology is
+  [`diagnostics/GATE2_TYPOLOGY.md`](diagnostics/GATE2_TYPOLOGY.md)
+  (discuss next week; do not code).
 - Do not retune Agrimate economics or parameters to the Pink Sheet.
 - Do not invent production to hide empty regions.

@@ -6,8 +6,12 @@ Source: `SHEAF_Gate1_design_note.docx`. This file is the Gate 1 spec on
 `GATE1_PLAN.md`.
 
 **Status.** Wheat Gate 0 is accepted (G0-P). Rice and maize `t_max=0`
-smoke is met (2026-10-08). Coauthor questions are in §8; the note asks
-for those views **before any of this is coded**.
+smoke is met (2026-10-08). Coding **started** 2026-10-09 at the user’s
+request; §8 questions stay open with colleagues. In the host: `ξ`
+default 0, both shares scaled, `price_index_step!` split,
+`coupling.jl`, `step_coupled!`. `simulate_coupled` at `ξ=0` is three
+independent runs (identity). Wiring three Runs plus undisturbed
+reference indices for `ξ≠0` is the next edit. List: `UPSTREAM.md`.
 
 ## 1. What this does
 

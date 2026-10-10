@@ -311,3 +311,40 @@ function simulate(params::Params = Params();
     end
 end
 
+
+"""Three-crop run (`GATE1_DESIGN.md`).
+
+At `ξ = 0` (or `t_max = 0`) this is three independent `simulate` calls —
+the identity. Coupled stepping (`step_coupled!` / `run_model_coupled!`)
+is used only when `ξ ≠ 0` and `t_max > 0`, and then `reference_index`
+must hold each purchaser's undisturbed price index: keys
+`(crop, region, t)`.
+"""
+function simulate_coupled(
+    params::Params = Params();
+    crops = ("wheat", "rice", "maize"),
+    ξ = nothing,
+    t_max = 0,
+    reference_index = Dict(),
+    kwargs...,
+)
+    ξ_use = ξ === nothing ? params.ξ : Float64(ξ)
+    @info "$(now()) | AGRIMATE-SHEAF COUPLED" crops ξ = ξ_use t_max
+    if ξ_use != 0 && t_max > 0
+        isempty(reference_index) && error(
+            "simulate_coupled with ξ≠0 needs reference_index from undisturbed " *
+            "single-crop runs (GATE1_DESIGN.md §3). Keys: (crop, region, t).",
+        )
+        error(
+            "Coupled stepping is in step_coupled! / run_model_coupled!; " *
+            "wiring three Runs into this wrapper is the next Gate 1 edit.",
+        )
+    end
+    for crop in crops
+        p = deepcopy(params)
+        p.crops = String(crop)
+        p.ξ = ξ_use
+        simulate(p; t_max = t_max, kwargs...)
+    end
+end
+

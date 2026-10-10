@@ -1,7 +1,8 @@
 module ModelModule
 
 export InitializationData, InputData, Model
-export create_agents!, initialize_agents!, step!
+export create_agents!, initialize_agents!, step!, step_coupled!
+export substitution_factor, RHO_SUBST, COUPLED_CROPS
 
 using DataStructures: DefaultDict
 using Parameters
@@ -78,7 +79,64 @@ function step!(model, t, input_data::InputData; verbose::Bool = true)
         delivery_step!(consumer)
         consumption_step!(consumer)
         accounting_step!(consumer)
+        price_index_step!(consumer, t, model.producers)
         procurement_step!(consumer, t, model.producers)
+    end
+end
+
+include("coupling.jl")
+using .CouplingModule
+
+function step_coupled!(
+    models::Dict{String,Model},
+    t::Int,
+    input_data::Dict{String,InputData},
+    ξ::Float64,
+    reference_index;
+    verbose::Bool = true,
+)
+    verbose && println("Timestep $t (coupled)...")
+    for (crop, model) in models
+        inp = input_data[crop]
+        for producer in collect(values(model.producers))
+            harvest = inp.harvests[producer.id][t]
+            expected_harvests = inp.expected_harvests[producer.id][t, :]
+            harvest_step!(producer, harvest, expected_harvests)
+            export_restriction_step!(producer, t, inp.export_restriction_dict)
+            sales_step!(producer, t, model.consumers; verbose)
+        end
+        for producer in values(model.producers)
+            policy_implementation_step!(producer, t, model.consumers)
+        end
+        for producer in values(model.producers)
+            communication_step!(producer, t, model.producers)
+        end
+        for consumer in values(model.consumers)
+            delivery_step!(consumer)
+            consumption_step!(consumer)
+            accounting_step!(consumer)
+            price_index_step!(consumer, t, model.producers)
+        end
+    end
+    current_index = Dict{Tuple{String,String},Float64}()
+    for (crop, model) in models
+        for consumer in values(model.consumers)
+            current_index[(crop, consumer.id)] = consumer.crop_price_index
+        end
+    end
+    for (crop, model) in models
+        for consumer in values(model.consumers)
+            ε_d = consumer.local_params[:ε_d]
+            consumer.substitution_factor = substitution_factor(
+                crop, consumer.id, t, ξ, ε_d, current_index, reference_index,
+            )
+        end
+    end
+    for (crop, model) in models
+        for consumer in values(model.consumers)
+            procurement_step!(consumer, t, model.producers)
+            consumer.substitution_factor_prev = consumer.substitution_factor
+        end
     end
 end
 
