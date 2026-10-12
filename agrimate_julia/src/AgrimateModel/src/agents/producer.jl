@@ -8,6 +8,17 @@ using Statistics: mean
 
 using ..AgentsModule
 
+# Read-only Gate 1 monitor. `nothing` records nothing. The callback must
+# not mutate agents. The threshold test and the price formula are unchanged.
+const diag_log = Ref{Any}(nothing)
+
+function _diag(kind::Symbol, producer, t, value, threshold)
+    f = diag_log[]
+    f === nothing && return nothing
+    f(kind, producer, Int(t), Float64(value), Float64(threshold))
+    return nothing
+end
+
 # Producers' actions
 
 function harvest_step!(producer, harvest::Float64, expected_harvests::Vector{Float64})
@@ -380,9 +391,11 @@ function communication_step!(producer, t, producers::Dict{String,Producer})
     if two_markets
         # If expected sale is beneath threshold set it to zero
         if producer.expected_sales_domestic < ι * X_avg
+            _diag(:zeroed_domestic, producer, t, producer.expected_sales_domestic, ι * X_avg)
             producer.expected_sales_domestic = 0.
         end
         if producer.expected_sales_foreign < ι * X_avg
+            _diag(:zeroed_foreign, producer, t, producer.expected_sales_foreign, ι * X_avg)
             producer.expected_sales_foreign = 0.
         end
 
@@ -406,6 +419,7 @@ function communication_step!(producer, t, producers::Dict{String,Producer})
         )
 
         if producer.expected_price_domestic > 1000 || isinf(producer.expected_price_domestic) 
+            _diag(:cap_domestic, producer, t, producer.expected_price_domestic, 1000.0)
             producer.expected_price_domestic = 1000
         end          
         producer.expected_price_foreign = 
@@ -417,6 +431,7 @@ function communication_step!(producer, t, producers::Dict{String,Producer})
         ) 
 
         if producer.expected_price_foreign > 1000 || isinf(producer.expected_price_foreign) 
+            _diag(:cap_foreign, producer, t, producer.expected_price_foreign, 1000.0)
             producer.expected_price_foreign = 1000
         end        
 

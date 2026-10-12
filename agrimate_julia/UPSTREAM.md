@@ -52,3 +52,7 @@ wheat run (`diagnostics/gate0_julia/J10_authorbaseline.md`).
   only for `ξ≠0`. Undisturbed single-crop runs write
   `reference/crop_price_index_<crop>.csv`. Coupled NetCDF goes under
   `netcdf/coupled/`. Published observation variables are unchanged.
+- `communication_step!` calls `_diag` only inside the existing `ι`
+  zeroing branch and the existing 1000 price-cap branch. `diag_log`
+  defaults to `nothing`, and the callback must not mutate agents.
+  The threshold test, the price formula, and `Params` are unchanged.
