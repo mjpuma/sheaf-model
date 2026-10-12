@@ -36,17 +36,15 @@ def load(path: Path):
             crop = line.split()[1]
             continue
         if line.startswith("order "):
-            parts = line.split()
-            # order T producer IDS   or  order 0 CROP producer IDS
-            rows.append(("order", parts, crop))
+            # Region names contain spaces; keep the raw line.
+            rows.append(("order", line, crop))
             continue
-        if line.startswith("val "):
-            _, t, name, region, hx = line.split()
-            rows.append(("val", int(t), name, region, [struct_unpack(hx)], [hx], crop))
-        elif line.startswith("vec "):
-            _, t, name, region, rest = line.split(maxsplit=4)
-            hexs = rest.split(",") if rest else []
-            rows.append(("vec", int(t), name, region, [struct_unpack(h) for h in hexs], hexs, crop))
+        if line.startswith("val ") or line.startswith("vec "):
+            kind = "val" if line.startswith("val ") else "vec"
+            left, rest = line[4:].rsplit(" ", 1)
+            t_s, name, region = left.split(" ", 2)
+            hexs = [rest] if kind == "val" else ([h for h in rest.split(",") if h])
+            rows.append((kind, int(t_s), name, region, [struct_unpack(h) for h in hexs], hexs, crop))
     return header, rows
 
 
@@ -69,14 +67,16 @@ def orders(rows, crop_filter):
     for rec in rows:
         if rec[0] != "order":
             continue
-        parts = rec[1]
-        # parts: order, T, producer|consumer, ids   OR order, 0, crop, producer, ids
+        line = rec[1]
+        parts = line.split(" ", 4)
+        # order T producer|consumer IDS
+        # order 0 CROP producer|consumer IDS
         if len(parts) >= 5 and parts[2] in ("wheat", "rice", "maize"):
             if crop_filter and parts[2] != crop_filter:
                 continue
-            found.append(" ".join(parts))
+            found.append(line)
         elif crop_filter is None or rec[2] in (None, crop_filter):
-            found.append(" ".join(parts))
+            found.append(line)
     return found
 
 
