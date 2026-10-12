@@ -356,9 +356,14 @@ function optimize_sales_NLopt_two_markets(;
     f_opt = nothing
     v_opt = nothing
     return_code = nothing
+    # Diagnostic only. Off unless AGRIMATE_NLOPT_LOG=1. Does not change the solve.
+    _nlopt_log = get(ENV, "AGRIMATE_NLOPT_LOG", "") == "1"
+    _nlopt_caught = false
+    _nlopt_t0 = time()
     try
         (f_opt, x_opt, return_code) = optimize(opt, x_init)
     catch
+        _nlopt_caught = true
         x_init_new_new = opt.upper_bounds
         (f_opt, x_opt, return_code) = optimize(opt, x_init_new_new)
     end
@@ -411,6 +416,9 @@ function optimize_sales_NLopt_two_markets(;
     end
     x_opt = vcat(x_opt_domestic,x_opt_foreign) # Actually I do not need this one. I leave it in just in case for later usage 
 
+    if _nlopt_log
+        println(stderr, "nlopt\t", producer_id, "\t", return_code, "\t", opt.numevals, "\t", time() - _nlopt_t0, "\t", _nlopt_caught)
+    end
     if verbose
         fixed_x1 = (N == N_hor ? "yes" : "no")
         println("OPTIMIZATION RESULTS (fixed x1: $fixed_x1, return string: $return_code)")
