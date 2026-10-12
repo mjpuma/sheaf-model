@@ -9,6 +9,11 @@ optimizer = :NLopt_LineSearch
 periodic_optimizer = :NLopt
 @assert periodic_optimizer ∈ [:NLopt]
 
+# 2 × 58267, the largest XTOL_REACHED evaluation count in the t_max=4
+# wheat/rice/maize survey (rice, Australia, step 3, call 2). The published
+# stop was maxtime = 60 s, which is not a function of the model.
+const SLSQP_MAXEVAL = 116534
+
 function _nlopt_record(region, step, call, code, evals, seconds, xhex::String)
     crop = nlopt_log_crop[]
     sec = string(round(seconds; digits = 6))
@@ -77,6 +82,7 @@ function optimize_sales_NLopt_two_markets(;
     producer_id = nothing,
     x_minimum = 0.,
     log_step::Int = 0,
+    log_producer = nothing,
 )
     
     # only single L_matrix because same shape is used for domestic and foreign sales.
@@ -370,7 +376,7 @@ function optimize_sales_NLopt_two_markets(;
     x_init = max.(opt.lower_bounds, min.(x_init_new, opt.upper_bounds))
     opt.xtol_abs = tol
     
-    opt.maxtime = 60
+    opt.maxeval = SLSQP_MAXEVAL
     f_opt = nothing
     v_opt = nothing
     return_code = nothing
@@ -379,25 +385,36 @@ function optimize_sales_NLopt_two_markets(;
     _nlopt_log = get(ENV, "AGRIMATE_NLOPT_LOG", "") == "1"
     _nlopt_call = Ref(0)
     function _invoke(x0)
-        if !_nlopt_log
-            return optimize(opt, x0)
+        ncall = 0
+        t0 = 0.0
+        if _nlopt_log
+            _nlopt_call[] += 1
+            ncall = _nlopt_call[]
+            t0 = time()
         end
-        _nlopt_call[] += 1
-        ncall = _nlopt_call[]
-        t0 = time()
         local out
         try
             out = optimize(opt, x0)
         catch
-            ne = try
-                opt.numevals
-            catch
-                -1
+            if _nlopt_log
+                ne = try
+                    opt.numevals
+                catch
+                    -1
+                end
+                _nlopt_record(producer_id, log_step, ncall, "ERROR", ne, time() - t0, "")
             end
-            _nlopt_record(producer_id, log_step, ncall, "ERROR", ne, time() - t0, "")
             rethrow()
         end
-        _nlopt_record(producer_id, log_step, ncall, out[3], opt.numevals, time() - t0, _nlopt_xhex(out[2]))
+        if _nlopt_log
+            _nlopt_record(producer_id, log_step, ncall, out[3], opt.numevals, time() - t0, _nlopt_xhex(out[2]))
+        end
+        if out[3] == :MAXEVAL_REACHED && log_producer !== nothing
+            budget_cb = diag_log[]
+            if budget_cb !== nothing
+                budget_cb(:not_converged, log_producer, log_step, Float64(opt.numevals), Float64(SLSQP_MAXEVAL))
+            end
+        end
         return out
     end
     try
@@ -599,7 +616,7 @@ function optimize_sales_NLopt(;
 
     opt = Opt(:LD_SLSQP, N)
     opt.xtol_abs = tol
-    opt.maxtime = 60
+    opt.maxeval = SLSQP_MAXEVAL
     if N == N_hor + 1
         opt.max_objective = objective_function!
     elseif N == N_hor
@@ -866,7 +883,7 @@ function optimize_periodic_sales_NLopt(;
 
     opt = Opt(:LD_SLSQP, N_year + 1)
     opt.xtol_abs = tol
-    opt.maxtime = 60
+    opt.maxeval = SLSQP_MAXEVAL
     opt.max_objective = objective_function!
 
     inequality_constraint!(opt, availability_constraints!, fill(tol, N_year))

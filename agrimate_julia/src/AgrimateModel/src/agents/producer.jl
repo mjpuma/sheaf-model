@@ -208,6 +208,7 @@ function sales_step!(producer, t, consumers::Dict{String,Consumer}; verbose::Boo
                 # domestic_profit_factor = domestic_profit_factor,
                 producer_id = producer.id,
                 log_step = Int(t),
+                log_producer = producer,
                 )
 
 

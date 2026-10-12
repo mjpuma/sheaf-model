@@ -60,4 +60,14 @@ wheat run (`diagnostics/gate0_julia/J10_authorbaseline.md`).
   (crop, region, step, call number, return code, evaluations, seconds,
   and the bit pattern of the returned vector) when
   `AGRIMATE_NLOPT_LOG=1`. The file is `AGRIMATE_NLOPT_LOG_PATH`. The
-  start points, `xtol_abs`, `maxtime`, and the retry tests are unchanged.
+  start points, `xtol_abs`, and the retry tests are unchanged.
+- Reproducibility fix to the published SLSQP stop. The three setups
+  `optimize_sales_NLopt_two_markets`, `optimize_sales_NLopt`, and
+  `optimize_periodic_sales_NLopt` no longer set `maxtime = 60`. They set
+  `maxeval = 116534`, which is twice the largest `XTOL_REACHED` count in
+  the t_max = 4 wheat/rice/maize survey under the old clock (rice,
+  Australia, step 3, call 2, 58267 evaluations). Retries still run only
+  when the return code is not `XTOL_REACHED`. A call that stops on
+  `MAXEVAL_REACHED` appends a monitor row `not_converged` through
+  `diag_log` from the two-market solver. The objective, `xtol_abs`, ι,
+  the 1000 cap, and `Params` defaults are unchanged.
