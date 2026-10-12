@@ -11,6 +11,8 @@ using ..AgentsModule
 # Read-only Gate 1 monitor. `nothing` records nothing. The callback must
 # not mutate agents. The threshold test and the price formula are unchanged.
 const diag_log = Ref{Any}(nothing)
+# Crop name for the per-call SLSQP log. Empty unless a driver sets it.
+const nlopt_log_crop = Ref{String}("")
 
 function _diag(kind::Symbol, producer, t, value, threshold)
     f = diag_log[]
@@ -205,6 +207,7 @@ function sales_step!(producer, t, consumers::Dict{String,Consumer}; verbose::Boo
                 domestic_profit_factor = 1.,
                 # domestic_profit_factor = domestic_profit_factor,
                 producer_id = producer.id,
+                log_step = Int(t),
                 )
 
 

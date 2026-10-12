@@ -56,7 +56,8 @@ wheat run (`diagnostics/gate0_julia/J10_authorbaseline.md`).
   zeroing branch and the existing 1000 price-cap branch. `diag_log`
   defaults to `nothing`, and the callback must not mutate agents.
   The threshold test, the price formula, and `Params` are unchanged.
-- `optimize_sales_NLopt_two_markets` writes the NLopt return code,
-  evaluation count, elapsed seconds, and whether the first `optimize`
-  threw, to stderr only when `AGRIMATE_NLOPT_LOG=1`. The start point,
-  algorithm, tolerances, and `maxtime` are unchanged.
+- `optimize_sales_NLopt_two_markets` records every SLSQP call
+  (crop, region, step, call number, return code, evaluations, seconds,
+  and the bit pattern of the returned vector) when
+  `AGRIMATE_NLOPT_LOG=1`. The file is `AGRIMATE_NLOPT_LOG_PATH`. The
+  start points, `xtol_abs`, `maxtime`, and the retry tests are unchanged.

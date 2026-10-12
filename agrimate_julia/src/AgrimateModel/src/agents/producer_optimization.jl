@@ -9,6 +9,23 @@ optimizer = :NLopt_LineSearch
 periodic_optimizer = :NLopt
 @assert periodic_optimizer ∈ [:NLopt]
 
+function _nlopt_record(region, step, call, code, evals, seconds, xhex::String)
+    crop = nlopt_log_crop[]
+    sec = string(round(seconds; digits = 6))
+    println(stderr, "nlopt\t", crop, "\t", region, "\t", step, "\t", call, "\t", code, "\t", evals, "\t", sec)
+    path = get(ENV, "AGRIMATE_NLOPT_LOG_PATH", "")
+    if !isempty(path)
+        open(path, "a") do io
+            println(io, join((crop, region, step, call, code, evals, sec, xhex), ","))
+        end
+    end
+    return nothing
+end
+
+function _nlopt_xhex(x)
+    join((string(reinterpret(UInt64, Float64(v)), base = 16, pad = 16) for v in x), "|")
+end
+
 function optimize_sales(;kwargs...)
     if optimizer == :NLopt
         return optimize_sales_NLopt(;kwargs...)
@@ -58,7 +75,8 @@ function optimize_sales_NLopt_two_markets(;
     verbose = true,
     domestic_profit_factor = 1.,
     producer_id = nothing,
-    x_minimum = 0.
+    x_minimum = 0.,
+    log_step::Int = 0,
 )
     
     # only single L_matrix because same shape is used for domestic and foreign sales.
@@ -356,38 +374,59 @@ function optimize_sales_NLopt_two_markets(;
     f_opt = nothing
     v_opt = nothing
     return_code = nothing
-    # Diagnostic only. Off unless AGRIMATE_NLOPT_LOG=1. Does not change the solve.
+    # Per-call log. Off unless AGRIMATE_NLOPT_LOG=1. The solve, the start
+    # points, and the retry tests are unchanged.
     _nlopt_log = get(ENV, "AGRIMATE_NLOPT_LOG", "") == "1"
-    _nlopt_caught = false
-    _nlopt_t0 = time()
+    _nlopt_call = Ref(0)
+    function _invoke(x0)
+        if !_nlopt_log
+            return optimize(opt, x0)
+        end
+        _nlopt_call[] += 1
+        ncall = _nlopt_call[]
+        t0 = time()
+        local out
+        try
+            out = optimize(opt, x0)
+        catch
+            ne = try
+                opt.numevals
+            catch
+                -1
+            end
+            _nlopt_record(producer_id, log_step, ncall, "ERROR", ne, time() - t0, "")
+            rethrow()
+        end
+        _nlopt_record(producer_id, log_step, ncall, out[3], opt.numevals, time() - t0, _nlopt_xhex(out[2]))
+        return out
+    end
     try
-        (f_opt, x_opt, return_code) = optimize(opt, x_init)
+        (f_opt, x_opt, return_code) = _invoke(x_init)
     catch
-        _nlopt_caught = true
         x_init_new_new = opt.upper_bounds
-        (f_opt, x_opt, return_code) = optimize(opt, x_init_new_new)
+        (f_opt, x_opt, return_code) = _invoke(x_init_new_new)
     end
     # (f_opt, x_opt, return_code) = optimize(opt, x_init)
 
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (1/3) [return string: $return_code] ", producer_id)
         x_init_new = max.(x_init .- 0.01, opt.lower_bounds)
-        (f_opt, x_opt, return_code) = optimize(opt, x_init_new)
+        (f_opt, x_opt, return_code) = _invoke(x_init_new)
     end
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (2/3) [return string: $return_code] ", producer_id)
         x_init_new = min.(x_init .+ 0.01, opt.upper_bounds)
-        (f_opt, x_opt, return_code) = optimize(opt, x_init_new)
+        (f_opt, x_opt, return_code) = _invoke(x_init_new)
     end
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (3/3) [return string: $return_code] ", producer_id)
         x_init_new = fill((stock_begin + sum(h[n])) / length(x_init), length(x_init))
         x_init_new = max.(opt.lower_bounds, min.(x_init, opt.upper_bounds))
-        (f_opt, x_opt, return_code) = optimize(opt, x_init_new)
+        (f_opt, x_opt, return_code) = _invoke(x_init_new)
     end
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (4/3) [return string: $return_code] ", producer_id)
-        (f_opt, x_opt, return_code) = optimize(opt, x_init)
+        (f_opt, x_opt, return_code) = _invoke(x_init)
     end
     
     if !isnothing(equal_domestic_sales)
@@ -416,9 +455,6 @@ function optimize_sales_NLopt_two_markets(;
     end
     x_opt = vcat(x_opt_domestic,x_opt_foreign) # Actually I do not need this one. I leave it in just in case for later usage 
 
-    if _nlopt_log
-        println(stderr, "nlopt\t", producer_id, "\t", return_code, "\t", opt.numevals, "\t", time() - _nlopt_t0, "\t", _nlopt_caught)
-    end
     if verbose
         fixed_x1 = (N == N_hor ? "yes" : "no")
         println("OPTIMIZATION RESULTS (fixed x1: $fixed_x1, return string: $return_code)")

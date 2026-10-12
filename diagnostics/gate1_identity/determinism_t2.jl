@@ -149,6 +149,7 @@ function dump_state(io, run, t)
 end
 
 function load_and_step(crop; t_max, dump, focus)
+    AgrimateModel.AgentsModule.ProducerModule.nlopt_log_crop[] = crop
     p = base_params(crop = crop)
     path = cache_path(p)
     isfile(path) || error("missing Nash cache $path")
@@ -166,7 +167,12 @@ function load_and_step(crop; t_max, dump, focus)
     for step in 1:t_max
         println("step $crop t=$step")
         flush(stdout)
+        t0 = time()
         run_model!(run, 1; verbose = false, progressbar_name = crop)
+        dt = time() - t0
+        println("steptime $crop $step $dt")
+        println(dump, "steptime $step $dt")
+        flush(stdout)
         if focus
             dump_state(dump, run, step)
         end
@@ -205,13 +211,24 @@ function run_coupled(dump)
 end
 
 function main()
-    length(ARGS) == 3 || error("usage: determinism_t2.jl {cold|after|coupled} CROP LABEL")
+    length(ARGS) == 3 || length(ARGS) == 4 || error("usage: determinism_t2.jl {cold|after|coupled} CROP LABEL [T_MAX]")
     mode = ARGS[1]
     crop = ARGS[2]
     label = ARGS[3]
+    t_max = length(ARGS) == 4 ? parse(Int, ARGS[4]) : 2
+    t_max >= 1 || error("t_max must be positive")
     mode in ("cold", "after", "coupled") || error("unknown mode $mode")
     commit = git_commit_or_refuse()
     dump, mon, dump_path, mon_path = open_outputs(label, commit)
+    if get(ENV, "AGRIMATE_NLOPT_LOG", "") == "1"
+        nlopt_path = joinpath(OUTDIR, "nlopt_$(label).csv")
+        ENV["AGRIMATE_NLOPT_LOG_PATH"] = nlopt_path
+        open(nlopt_path, "w") do io
+            println(io, "# commit $(commit)")
+            println(io, "crop,region,step,call,code,evals,seconds,xhex")
+        end
+        println("nlopt log $nlopt_path")
+    end
     write_header(dump, commit, label, mode, crop)
     install_monitor!(mon, label, commit)
     println("commit $commit")
@@ -219,7 +236,7 @@ function main()
     println("writing $dump_path")
     flush(stdout)
     if mode == "cold"
-        load_and_step(crop; t_max = 2, dump = dump, focus = true)
+        load_and_step(crop; t_max = t_max, dump = dump, focus = true)
     elseif mode == "after"
         for prior in ("wheat", "rice")
             println("prior $prior")
