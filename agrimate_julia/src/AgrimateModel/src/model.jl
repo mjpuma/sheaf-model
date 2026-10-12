@@ -3,6 +3,8 @@ module ModelModule
 export InitializationData, InputData, Model
 export create_agents!, initialize_agents!, step!, step_coupled!
 export substitution_factor, RHO_SUBST, COUPLED_CROPS
+export reference_index_path, save_reference_index, load_reference_index
+export assert_coupled_clocks, assert_reference_coverage
 
 using DataStructures: DefaultDict
 using Parameters
@@ -95,6 +97,16 @@ function step_coupled!(
     reference_index;
     verbose::Bool = true,
 )
+    # ξ=0 must be three independent step! calls. The split below posts
+    # every crop's demand only after every price index, which is not the
+    # published purchaser order and failed the 0.5% monthly bar
+    # (rice 1.2%, maize thin-month 96%; wheat 0.11%).
+    if ξ == 0
+        for (crop, model) in models
+            step!(model, t, input_data[crop]; verbose)
+        end
+        return
+    end
     verbose && println("Timestep $t (coupled)...")
     for (crop, model) in models
         inp = input_data[crop]

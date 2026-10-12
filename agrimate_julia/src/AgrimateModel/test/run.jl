@@ -75,6 +75,13 @@ end
 nrows = nrow(run.output_data)
 
 @test begin
+    run_w = Run(deepcopy(model), InputData(harvests, expected_harvests))
+    run_r = Run(deepcopy(model), InputData(harvests, expected_harvests))
+    run_model_coupled!(Dict("wheat" => run_w, "rice" => run_r), 1; ξ = 0.0, verbose = false)
+    run_w.timestep == 2 && run_r.timestep == 2 && nrow(run_w.price_index_data) > 0
+end
+
+@test begin
     run_model!(run, 4)
     nrow(run.output_data) > nrows
 end

@@ -42,7 +42,7 @@ reconstruction remains a different experiment, not a retune target.
 | **G0-H** | Match the author wheat NetCDF | **Met for the code path (J10).** Public-data reconstruction fails (J4/J8/J9) |
 | **G0-P** | You accept wheat Gate 0 as the SHEAF market baseline | **Accepted 2026-10-07** |
 | **G1-prep** | Rice and maize smoke on this host (`crops="rice"` / `"maize"`) | **Met** (2026-10-08, `t_max=0`) |
-| **G1** | Cross-crop substitution in Agrimate (`GATE1_DESIGN.md`). \(\xi=0\) recovers G0 | Coding started 2026-10-09 |
+| **G1** | Cross-crop substitution in Agrimate (`GATE1_DESIGN.md`). \(\xi=0\) recovers G0 | Wiring in; identity bar next |
 | **G2** | Government restriction game. Disabled G2 recovers AMIS | Blocked |
 
 ## Hard stops
@@ -56,12 +56,12 @@ reconstruction remains a different experiment, not a retune target.
 
 ## Next
 
-1. Finish Gate 1 wiring: three `Run`s into `run_model_coupled!`, load
-   undisturbed purchaser indices as \(\bar P\). Unit test for \(M\) is
-   in. \(\xi=0\) identity vs single-crop (0.5% monthly price) is the
-   first bar. §8 questions stay open. Do not invent production.
-   Typology for Gate 2: [`GATE2_TYPOLOGY.md`](GATE2_TYPOLOGY.md) (discuss
-   next week; do not code).
+1. Gate 1 \(\xi=0\) identity still **misses** after routing coupled
+   through `step!` (2026-10-11 rerun vs 2026-10-10 singles): wheat
+   0.04% (pass), rice 1.49% (fail), maize 95.9% (fail; same October
+   thin-month spike). Purchaser-loop split is not the whole cause.
+   Do not start \(\xi>0\). Output: `data_g1prep_identity/`. §8 stays
+   open. Typology: [`GATE2_TYPOLOGY.md`](GATE2_TYPOLOGY.md) (do not code).
 
 ## Exit criteria by gate
 

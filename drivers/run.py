@@ -53,20 +53,34 @@ def main() -> int:
     p.add_argument("--verbose", action="store_true", default=True)
     p.add_argument("--coupled", action="store_true", help="Gate 1: wheat+rice+maize (GATE1_DESIGN.md)")
     p.add_argument("--xi", type=float, default=0.0, help="Gate 1 substitution scale ξ (0, 0.3, 0.6)")
+    p.add_argument(
+        "--refroot",
+        type=Path,
+        default=None,
+        help="Root with reference/crop_price_index_<crop>.csv from undisturbed runs (default: --outputroot)",
+    )
+    p.add_argument(
+        "--use-cache",
+        action="store_true",
+        help="Reuse agrimate_cache (Nash init). Default is a fresh init.",
+    )
     args = p.parse_args()
 
     anomalies = 'production_anomalies = "FAOsince-2005",' if args.anomalies else ""
     restrictions = 'export_restrictions = "2007-2011",' if args.restrictions else ""
     inputroot = julia_path(args.inputroot)
     outputroot = julia_path(args.outputroot)
+    refroot = julia_path(args.refroot) if args.refroot is not None else outputroot
     call = (
         f'simulate_coupled(params; crops = ("wheat", "rice", "maize"), ξ = {args.xi}, '
         f't_max = {args.t_max}, inputroot = "{inputroot}", outputroot = "{outputroot}", '
+        f'reference_root = "{refroot}", use_cache = {str(args.use_cache).lower()}, '
         f'verbose = {str(args.verbose).lower()})'
         if args.coupled
         else (
             f"simulate(params; t_max = {args.t_max}, "
             f'inputroot = "{inputroot}", outputroot = "{outputroot}", '
+            f'use_cache = {str(args.use_cache).lower()}, '
             f"verbose = {str(args.verbose).lower()})"
         )
     )

@@ -293,6 +293,22 @@ Optional overrides: `AGRIMATE_INPUT` (CSV directory; default
 `inputs/generated/agrimate_input`), `AGRIMATE_OUTPUT` (NetCDF root; default
 `agrimate_julia/data`), or `--inputroot` / `--outputroot`.
 
+Gate 1 (`--coupled`) steps wheat, rice, and maize together. \(\bar P\)
+is each purchaser’s index from an **undisturbed** single-crop run (no
+`--anomalies`, no `--restrictions`). Those runs write
+`reference/crop_price_index_<crop>.csv` under `--outputroot`. Coupled
+output goes under `netcdf/coupled/` so it does not overwrite a
+single-crop file. \(\xi=0\) does not need the reference files;
+\(\xi\neq 0\) does (`--refroot` if they are not under `--outputroot`).
+
+```bash
+python drivers/run.py --crop wheat --t-max 312
+python drivers/run.py --crop rice --t-max 312
+python drivers/run.py --crop maize --t-max 312
+python drivers/run.py --coupled --xi 0 --anomalies --restrictions --t-max 312
+python drivers/run.py --coupled --xi 0.3 --anomalies --restrictions --t-max 312
+```
+
 A full 312-step wheat run is serial (one NLopt solve per producer per
 step) and takes on the order of 12–20 hours of awake time, longer through
 the 2010–11 window. Keep the machine from sleeping.

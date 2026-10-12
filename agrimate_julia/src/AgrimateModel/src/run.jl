@@ -17,6 +17,8 @@ mutable struct Run
     t_max::Int
     # Output data
     output_data::DataFrame
+    # Purchaser crop_price_index at each t (Gate 1 P̄ sidecar)
+    price_index_data::DataFrame
     # Constructor
     function Run(model, input_data)
         run = new()
@@ -32,6 +34,8 @@ mutable struct Run
             value = Float64[],
         )
         allowmissing!(run.output_data)
+        # Purchaser index P_s(t); sidecar for Gate 1 P̄, not a published NetCDF variable.
+        run.price_index_data = DataFrame(t = Int[], consumer = String[], value = Float64[])
         return run
     end
 end
@@ -50,6 +54,14 @@ function observe!(run)
     ]
         observe_function!(run.output_data, run.model, run.timestep)
     end
+    record_price_index!(run)
+end
+
+function record_price_index!(run)
+    for (id, consumer) in run.model.consumers
+        isdefined(consumer, :crop_price_index) || continue
+        push!(run.price_index_data, (run.timestep, id, consumer.crop_price_index))
+    end
 end
 
 function run_model_coupled!(
@@ -62,7 +74,9 @@ function run_model_coupled!(
 )
     progressshower = Progress(timesteps; desc=progressbar_name, barglyphs=BarGlyphs("[=> ]"), color=:white, showspeed=true)
     for i in 1:timesteps
-        t = first(values(runs)).timestep
+        ts = [run.timestep for run in values(runs)]
+        all(==(ts[1]), ts) || error("coupled Runs have different timesteps: $ts")
+        t = ts[1]
         models = Dict(crop => run.model for (crop, run) in runs)
         input_data = Dict(crop => run.input_data for (crop, run) in runs)
         step_coupled!(models, t, input_data, ξ, reference_index; verbose)

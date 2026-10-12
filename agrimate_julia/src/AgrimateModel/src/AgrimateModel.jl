@@ -2,8 +2,10 @@ module AgrimateModel
 
 export AgrimateParams, InitializationData, InputData
 export @AgrimateParamsMix
-export initialize_model, initialize_model_run, run_model!, run_model_coupled!
+export initialize_model, initialize_model_run, run_model!, run_model_coupled!, Run
 export step_coupled!, substitution_factor, RHO_SUBST, COUPLED_CROPS
+export reference_index_path, save_reference_index, load_reference_index
+export assert_coupled_clocks, assert_reference_coverage
 
 using DataFrames: DataFrame, allowmissing!
 using Mixers

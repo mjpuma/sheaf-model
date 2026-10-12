@@ -43,6 +43,12 @@ wheat run (`diagnostics/gate0_julia/J10_authorbaseline.md`).
   by those factors. `procurement_step!` split into `price_index_step!`
   then `procurement_step!` (same statements, same order). New
   `coupling.jl` (`ρ` matrix, `substitution_factor`). `step_coupled!` /
-  `run_model_coupled!`. `simulate_coupled` at `ξ=0` is three independent
-  `simulate` calls; `ξ≠0` and `t_max>0` still needs the three-Run
-  wrapper and undisturbed reference indices.
+  `run_model_coupled!`. `initialize_crop` / `prepare_crop_run` hold the
+  per-crop setup. `simulate_coupled` at `t_max=0` is three independent
+  smokes; at `t_max>0` it builds three `Run`s, checks `start`/`N_year`,
+  loads undisturbed purchaser `crop_price_index` as \(\bar P\), and
+  steps with `run_model_coupled!`. At `ξ=0`, `step_coupled!` calls
+  `step!` on each crop (published purchaser order). The split path is
+  only for `ξ≠0`. Undisturbed single-crop runs write
+  `reference/crop_price_index_<crop>.csv`. Coupled NetCDF goes under
+  `netcdf/coupled/`. Published observation variables are unchanged.

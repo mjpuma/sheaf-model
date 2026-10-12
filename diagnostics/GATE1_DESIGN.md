@@ -7,11 +7,10 @@ Source: `SHEAF_Gate1_design_note.docx`. This file is the Gate 1 spec on
 
 **Status.** Wheat Gate 0 is accepted (G0-P). Rice and maize `t_max=0`
 smoke is met (2026-10-08). Coding **started** 2026-10-09 at the user’s
-request; §8 questions stay open with colleagues. In the host: `ξ`
-default 0, both shares scaled, `price_index_step!` split,
-`coupling.jl`, `step_coupled!`. `simulate_coupled` at `ξ=0` is three
-independent runs (identity). Wiring three Runs plus undisturbed
-reference indices for `ξ≠0` is the next edit. List: `UPSTREAM.md`.
+request; §8 questions stay open with colleagues. First \(\xi=0\)
+identity (`t_max=24`) missed the 0.5% bar on the split purchaser loop.
+`step_coupled!` now uses `step!` at \(\xi=0\); the split is only for
+\(\xi\neq 0\). Re-score against the existing singles. List: `UPSTREAM.md`.
 
 ## 1. What this does
 
