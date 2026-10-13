@@ -54,6 +54,7 @@ function equilibrate_producers!(model; κ = 0.25, tol = 1e-9, max_iter = 500, ve
                 tol = 0.001 * tol / X_avg,
                 verbose = false,
                 storage_hold_back,
+                maxeval = producer.global_params[:maxeval],
             )
             producer.optimal_sales[:] = x_opt .* X_avg
             producer.storage = s_beg_opt * X_avg

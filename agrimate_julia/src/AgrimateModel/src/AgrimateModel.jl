@@ -61,6 +61,7 @@ using .AgentsModule, .ModelModule, .RunModule
     # x_minimum::Float64 = 0.02                                 # Penalty parameter for profit optimization. If set to 1., there is no penalty  in the profit optimization 
     x_minimum::Float64 = 0.2                                 # total sales / (time_steps of horizon) = to_distribute, than x_minimum says how much of to_distribute shall be used for the minimum sales penalty
     optimization_tol::Union{Nothing,Float64} = 1e-4                # tolerance for optimization problem. If nothing: tolerances implemented in Dec' 22
+    maxeval::Int = 116534                                          # SLSQP evaluation budget (replaces maxtime = 60 s)
     initialization_tol::Union{Nothing,Float64} = 1e-2                # tolerance for initialization of model. If nothing: tolerances implemented in Dec' 22
     baseline_tol::Union{Nothing,Float64} = 1e-4                # tolerance for baseline initialization of model. If nothing: tolerances implemented in Dec' 22
     pipeline_stock::Float64 = 0.02                              # share of stock, supplier and consumer, that is regarded for optimization to have some backup
@@ -101,8 +102,8 @@ function initialize_model(
     # TODO: unique market constraint does not take deterioration correctly into account
 
     # Global params    
-    @unpack N_year, N_hor, N_del, ι, ζ, x_minimum, optimization_tol, initialization_tol, baseline_tol, pl_opt, pol_opt,pol_exp_p,pol_sales, α_adj, ε_d_adjust, pol_hor,foreign_market, two_markets, pipeline_stock, ξ  = agrimate_params
-    global_params = (; N_year, N_hor, N_del, ι, ζ, x_minimum, optimization_tol, initialization_tol, baseline_tol, pl_opt, pol_opt, α_adj,ε_d_adjust, pol_exp_p,pol_sales, pol_hor,foreign_market,two_markets, pipeline_stock, ξ)
+    @unpack N_year, N_hor, N_del, ι, ζ, x_minimum, optimization_tol, initialization_tol, baseline_tol, pl_opt, pol_opt,pol_exp_p,pol_sales, α_adj, ε_d_adjust, pol_hor,foreign_market, two_markets, pipeline_stock, ξ, maxeval  = agrimate_params
+    global_params = (; N_year, N_hor, N_del, ι, ζ, x_minimum, optimization_tol, initialization_tol, baseline_tol, pl_opt, pol_opt, α_adj,ε_d_adjust, pol_exp_p,pol_sales, pol_hor,foreign_market,two_markets, pipeline_stock, ξ, maxeval)
 
     # Producer params
     @unpack α,α_domestic,α_foreign, λ, β, σ, δ, ρ, p_sto, τ_exp, τ_P, N_for, τ_for, storage_hold_back= agrimate_params

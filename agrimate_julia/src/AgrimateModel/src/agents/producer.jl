@@ -69,6 +69,7 @@ end
 function sales_step!(producer, t, consumers::Dict{String,Consumer}; verbose::Bool = true)
 
     @unpack N_year, N_hor, ι, optimization_tol,pol_sales,foreign_market, two_markets, ζ, x_minimum, pipeline_stock = producer.global_params
+    maxeval = haskey(producer.global_params, :maxeval) ? producer.global_params[:maxeval] : 116534
     @unpack X_star,X_only_foreign, pl_opt, pol_opt = producer.global_params
     @unpack α, α_domestic, α_foreign, β, λ, δ, ρ, p_sto, τ_P, σ, storage_hold_back,equal_constraint = producer.local_params
     @unpack X_avg, X_avg_foreign, X_avg_domestic, domestic_profit_factor,  X_star_foreign,annual_self_supply, equal_domestic_sales, X_foreign, X_star_domestic, sales_share_foreign_baseline, share_imports_foreign_sales_other_producers = producer.local_params
@@ -209,6 +210,7 @@ function sales_step!(producer, t, consumers::Dict{String,Consumer}; verbose::Boo
                 producer_id = producer.id,
                 log_step = Int(t),
                 log_producer = producer,
+                maxeval = maxeval,
                 )
 
 
@@ -246,6 +248,7 @@ function sales_step!(producer, t, consumers::Dict{String,Consumer}; verbose::Boo
                 # tol = 1e-8 / X_avg,
                 verbose = false,
                 storage_hold_back,
+                maxeval = maxeval,
             )
         producer.optimal_sales[:] = producer.optimal_sales[:] / opt_factor
     else
@@ -276,6 +279,7 @@ function sales_step!(producer, t, consumers::Dict{String,Consumer}; verbose::Boo
                 # tol = 1e-8 / X_avg,
                 verbose = false,
                 storage_hold_back,
+                maxeval = maxeval,
             )
         producer.optimal_sales[:] = X_avg .* producer.optimal_sales[:]
         producer.expected_profit = X_avg * producer.expected_profit

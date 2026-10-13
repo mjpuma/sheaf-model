@@ -83,6 +83,7 @@ function optimize_sales_NLopt_two_markets(;
     x_minimum = 0.,
     log_step::Int = 0,
     log_producer = nothing,
+    maxeval::Int = SLSQP_MAXEVAL,
 )
     
     # only single L_matrix because same shape is used for domestic and foreign sales.
@@ -376,7 +377,7 @@ function optimize_sales_NLopt_two_markets(;
     x_init = max.(opt.lower_bounds, min.(x_init_new, opt.upper_bounds))
     opt.xtol_abs = tol
     
-    opt.maxeval = SLSQP_MAXEVAL
+    opt.maxeval = maxeval
     f_opt = nothing
     v_opt = nothing
     return_code = nothing
@@ -412,7 +413,13 @@ function optimize_sales_NLopt_two_markets(;
         if out[3] == :MAXEVAL_REACHED && log_producer !== nothing
             budget_cb = diag_log[]
             if budget_cb !== nothing
-                budget_cb(:not_converged, log_producer, log_step, Float64(opt.numevals), Float64(SLSQP_MAXEVAL))
+                budget_cb(:not_converged, log_producer, log_step, Float64(opt.numevals), Float64(maxeval))
+            end
+        end
+        if out[3] == :FAILURE && log_producer !== nothing
+            budget_cb = diag_log[]
+            if budget_cb !== nothing
+                budget_cb(:FAILURE, log_producer, log_step, Float64(opt.numevals), Float64(maxeval))
             end
         end
         return out
@@ -526,6 +533,7 @@ function optimize_sales_NLopt(;
     tol = 1e-8,
     verbose = true,
     storage_hold_back,
+    maxeval::Int = SLSQP_MAXEVAL,
 )
 
     L = get_L_matrix(N_hor + 1; δ)
@@ -616,7 +624,7 @@ function optimize_sales_NLopt(;
 
     opt = Opt(:LD_SLSQP, N)
     opt.xtol_abs = tol
-    opt.maxeval = SLSQP_MAXEVAL
+    opt.maxeval = maxeval
     if N == N_hor + 1
         opt.max_objective = objective_function!
     elseif N == N_hor
@@ -729,6 +737,7 @@ function optimize_sales_NLopt_LineSearch(;
     tol = 1e-8,
     verbose = true,
     storage_hold_back,
+    maxeval::Int = SLSQP_MAXEVAL,
 
 )
     function get_optimized_sales_and_profit(x1_min, x1_max, x_init)
@@ -759,6 +768,7 @@ function optimize_sales_NLopt_LineSearch(;
             tol,
             verbose,
             storage_hold_back,
+            maxeval,
 
         )
         return (x_opt, f_opt)
@@ -835,6 +845,7 @@ function optimize_periodic_sales_NLopt(;
     tol = 1e-8,
     verbose = true,
     storage_hold_back,
+    maxeval::Int = SLSQP_MAXEVAL,
 
 )
 
@@ -883,7 +894,7 @@ function optimize_periodic_sales_NLopt(;
 
     opt = Opt(:LD_SLSQP, N_year + 1)
     opt.xtol_abs = tol
-    opt.maxeval = SLSQP_MAXEVAL
+    opt.maxeval = maxeval
     opt.max_objective = objective_function!
 
     inequality_constraint!(opt, availability_constraints!, fill(tol, N_year))
