@@ -14,6 +14,26 @@ periodic_optimizer = :NLopt
 # stop was maxtime = 60 s, which is not a function of the model.
 const SLSQP_MAXEVAL = 116534
 
+# Retries 3 and 4 hand back the first call's x0. nlopt_optimize sets
+# numevals back to 0 and SLSQP allocates a zeroed local state, so that
+# call repeats the first one. Keep the stored vector. The ±0.01 retries
+# are different starts and still run. A retry after any code other than
+# MAXEVAL_REACHED still runs.
+function _slsqp_invoke(invoke, x0, prev_code, replay)
+    if prev_code == :MAXEVAL_REACHED
+        for (xprev, fprev, xkept) in replay
+            if xprev == x0
+                return (fprev, copy(xkept), :MAXEVAL_REACHED)
+            end
+        end
+    end
+    out = invoke(x0)
+    if out[3] == :MAXEVAL_REACHED
+        push!(replay, (copy(x0), Float64(out[1]), copy(out[2])))
+    end
+    return out
+end
+
 function _nlopt_record(region, step, call, code, evals, seconds, xhex::String)
     crop = nlopt_log_crop[]
     sec = string(round(seconds; digits = 6))
@@ -424,33 +444,35 @@ function optimize_sales_NLopt_two_markets(;
         end
         return out
     end
+    _replay = Tuple{Vector{Float64},Float64,Vector{Float64}}[]
+    _go(x0, prev) = _slsqp_invoke(_invoke, x0, prev, _replay)
     try
-        (f_opt, x_opt, return_code) = _invoke(x_init)
+        (f_opt, x_opt, return_code) = _go(x_init, nothing)
     catch
         x_init_new_new = opt.upper_bounds
-        (f_opt, x_opt, return_code) = _invoke(x_init_new_new)
+        (f_opt, x_opt, return_code) = _go(x_init_new_new, nothing)
     end
     # (f_opt, x_opt, return_code) = optimize(opt, x_init)
 
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (1/3) [return string: $return_code] ", producer_id)
         x_init_new = max.(x_init .- 0.01, opt.lower_bounds)
-        (f_opt, x_opt, return_code) = _invoke(x_init_new)
+        (f_opt, x_opt, return_code) = _go(x_init_new, return_code)
     end
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (2/3) [return string: $return_code] ", producer_id)
         x_init_new = min.(x_init .+ 0.01, opt.upper_bounds)
-        (f_opt, x_opt, return_code) = _invoke(x_init_new)
+        (f_opt, x_opt, return_code) = _go(x_init_new, return_code)
     end
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (3/3) [return string: $return_code] ", producer_id)
         x_init_new = fill((stock_begin + sum(h[n])) / length(x_init), length(x_init))
         x_init_new = max.(opt.lower_bounds, min.(x_init, opt.upper_bounds))
-        (f_opt, x_opt, return_code) = _invoke(x_init_new)
+        (f_opt, x_opt, return_code) = _go(x_init_new, return_code)
     end
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (4/3) [return string: $return_code] ", producer_id)
-        (f_opt, x_opt, return_code) = _invoke(x_init)
+        (f_opt, x_opt, return_code) = _go(x_init, return_code)
     end
     
     if !isnothing(equal_domestic_sales)
@@ -669,27 +691,29 @@ function optimize_sales_NLopt(;
     # Initial vector has to obey the bounds
     x_init = max.(opt.lower_bounds, min.(x_init[n], opt.upper_bounds))
 
-    (f_opt, x_opt, return_code) = optimize(opt, x_init)
+    _replay = Tuple{Vector{Float64},Float64,Vector{Float64}}[]
+    _go(x0, prev) = _slsqp_invoke(x0 -> optimize(opt, x0), x0, prev, _replay)
+    (f_opt, x_opt, return_code) = _go(x_init, nothing)
 
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (1/3) [return string: $return_code]")
         x_init_new = max.(x_init .- 0.01, opt.lower_bounds)
-        (f_opt, x_opt, return_code) = optimize(opt, x_init_new)
+        (f_opt, x_opt, return_code) = _go(x_init_new, return_code)
     end
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (2/3) [return string: $return_code]")
         x_init_new = min.(x_init .+ 0.01, opt.upper_bounds)
-        (f_opt, x_opt, return_code) = optimize(opt, x_init_new)
+        (f_opt, x_opt, return_code) = _go(x_init_new, return_code)
     end
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (3/3) [return string: $return_code]")
         x_init_new = fill((s_beg + sum(h)) / length(x_init), length(x_init))
         x_init_new = max.(opt.lower_bounds, min.(x_init, opt.upper_bounds))
-        (f_opt, x_opt, return_code) = optimize(opt, x_init_new)
+        (f_opt, x_opt, return_code) = _go(x_init_new, return_code)
     end
     if return_code ≠ :XTOL_REACHED
         verbose && println("Repeated optimization (4/3) [return string: $return_code]")
-        (f_opt, x_opt, return_code) = optimize(opt, x_init)
+        (f_opt, x_opt, return_code) = _go(x_init, return_code)
     end
 
     if N == N_hor

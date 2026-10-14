@@ -69,3 +69,15 @@ wheat run (`diagnostics/gate0_julia/J10_authorbaseline.md`).
   event `FAILURE` and the last returned vector is kept, as before.
   The objective, `xtol_abs`, ι, the 1000 cap, and the other `Params`
   defaults are unchanged.
+- Performance: after `MAXEVAL_REACHED`, a retry whose start equals an
+  earlier `MAXEVAL_REACHED` start is not run. NLopt's `nlopt_optimize`
+  (2.7.1 `optimize.c`) zeroes `numevals` and passes that start into
+  `nlopt_slsqp`, which builds a zeroed local SLSQP state, so the call
+  would repeat. The stored vector is kept. The ±0.01 retries are
+  different starts and still run. Retries after `FAILURE`,
+  `ROUNDOFF_LIMITED`, and any other non-`XTOL` code still run. The
+  periodic solver has no return-code retries. Maize `t_max=4` on
+  `44694b6` with this skip was bitwise identical to the unskipped run
+  (51.5 s of stepping versus 37.1 s). Objective, `xtol_abs`, ι, the
+  cap, and `Params` defaults are unchanged. B_small, B_mid, and B_large
+  loaded `44694b6` and were not restarted.
