@@ -81,3 +81,18 @@ wheat run (`diagnostics/gate0_julia/J10_authorbaseline.md`).
   (51.5 s of stepping versus 37.1 s). Objective, `xtol_abs`, ι, the
   cap, and `Params` defaults are unchanged. B_small, B_mid, and B_large
   loaded `44694b6` and were not restarted.
+- Event rows. `diag_crop` records the crop of each producer inside
+  `step_coupled!`. `start_event_monitor!` writes
+  `monitor/events_<tag>.csv` with columns
+  `commit,run,xi,crop,region,step,event,value,threshold` when the
+  driver has not already set `diag_log`. A coupled run with `ξ ≠ 0`
+  then writes `monitor/spillover_xi<ξ>_coupled.csv` beside
+  `events_xi0_coupled.csv`: cap and ι-threshold events from both runs,
+  with `spillover = 1` when the ξ > 0 run has an event the ξ = 0 run
+  does not and another crop is capped at that region and step. The
+  cap, ι, and the objective are unchanged. Undisturbed single-crop
+  runs already save `reference/crop_price_index_<crop>.csv` keyed
+  `(crop, region, t)`, and `simulate_coupled` already loads it when
+  `ξ ≠ 0`. The unit test checks that a missing file raises, that
+  `ξ = 0` returns `M = 1` for a wheat index 20% above its reference,
+  and that the same index gives `M > 1` for rice and maize.

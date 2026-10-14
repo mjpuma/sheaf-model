@@ -9,8 +9,13 @@ using .CouplingModule
     @test substitution_factor("rice", "USA", 1, 0.0, 1 / 3, empty_cur, empty_ref) == 1.0
     @test substitution_factor("maize", "CHN", 10, 0.6, 0.33, empty_cur, empty_ref) == 1.0
 
+    # Wheat purchaser index 1.2 against reference 1.0 is 20% above.
+    # ξ = 0 ignores that reference. The same index with ξ > 0 raises M
+    # for the other two crops. No model step; t_max is not involved.
     current = Dict(("wheat", "USA") => 1.2)
     refs = Dict(("wheat", "USA", 1) => 1.0)
+    @test substitution_factor("rice", "USA", 1, 0.0, 1 / 3, current, refs) == 1.0
+    @test substitution_factor("maize", "USA", 1, 0.0, 1 / 3, current, refs) == 1.0
     M_rice = substitution_factor("rice", "USA", 1, 0.6, 1 / 3, current, refs)
     M_maize = substitution_factor("maize", "USA", 1, 0.6, 1 / 3, current, refs)
     @test M_rice > 1.0

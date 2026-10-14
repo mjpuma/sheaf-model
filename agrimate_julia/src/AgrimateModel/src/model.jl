@@ -97,6 +97,11 @@ function step_coupled!(
     reference_index;
     verbose::Bool = true,
 )
+    for (crop, model) in models
+        for producer in values(model.producers)
+            AgentsModule.ProducerModule.diag_crop[objectid(producer)] = String(crop)
+        end
+    end
     # ξ=0 must be three independent step! calls. The split below posts
     # every crop's demand only after every price index, which is not the
     # published purchaser order and failed the 0.5% monthly bar

@@ -9,6 +9,7 @@ using AgrimateModel
 
 
 include(srcdir("params.jl"))
+include(joinpath(@__DIR__, "event_monitor.jl"))
 include(srcdir("regions.jl"))
 include(srcdir("io.jl"))
 include(srcdir("preprocess.jl"))
@@ -373,6 +374,8 @@ function simulate(params::Params = Params();
         init;
         t_max, inputroot, anomaly_name, compare_name,
     )
+    mon_tag = params.ξ == 0 ? "xi0_$(crop)" : "xi$(params.ξ)_$(crop)"
+    mon_path = start_event_monitor!(outputroot, mon_tag, params.ξ; crop = crop)
 
     N_chunk = ceil(Int, t_max / N_save)
     for chunk = 1:N_chunk
@@ -386,6 +389,7 @@ function simulate(params::Params = Params();
         )
     end
     maybe_save_reference_index(init, run, outputroot)
+    mon_path === nothing || close_event_monitor!()
 end
 
 
@@ -496,6 +500,8 @@ function simulate_coupled(
 
     @info "$(now()) | RUN COUPLED" ξ = ξ_use
     flush(stderr)
+    mon_tag = ξ_use == 0 ? "xi0_coupled" : "xi$(ξ_use)_coupled"
+    mon_path = start_event_monitor!(outputroot, mon_tag, ξ_use)
     N_chunk = ceil(Int, t_max / N_save)
     for chunk = 1:N_chunk
         t_start = (chunk - 1) * N_save + 1
@@ -514,6 +520,16 @@ function simulate_coupled(
                 output_filename_nc = nc_path,
                 save_in_csv, save_in_netcf,
             )
+        end
+    end
+    if mon_path !== nothing
+        close_event_monitor!()
+        if ξ_use != 0
+            xi0 = joinpath(outputroot, "monitor", "events_xi0_coupled.csv")
+            side = joinpath(outputroot, "monitor", "spillover_$(mon_tag).csv")
+            if isfile(xi0)
+                write_cap_spillover(xi0, mon_path, side)
+            end
         end
     end
 end

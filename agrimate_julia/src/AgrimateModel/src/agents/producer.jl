@@ -11,6 +11,9 @@ using ..AgentsModule
 # Read-only Gate 1 monitor. `nothing` records nothing. The callback must
 # not mutate agents. The threshold test and the price formula are unchanged.
 const diag_log = Ref{Any}(nothing)
+# objectid(producer) => crop, set by step_coupled! so a three-crop process
+# can label cap and threshold rows. Empty for a single-crop run.
+const diag_crop = Dict{UInt,String}()
 # Crop name for the per-call SLSQP log. Empty unless a driver sets it.
 const nlopt_log_crop = Ref{String}("")
 
