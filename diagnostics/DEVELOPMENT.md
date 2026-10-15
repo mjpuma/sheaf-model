@@ -32,6 +32,15 @@ the bar.
 **G0-P:** accepted 2026-10-07. J10 is the evidence. Public-data
 reconstruction remains a different experiment, not a retune target.
 
+**G0 re-acceptance provisional (2026-10-15).** For Gate 1 work the
+SLSQP stop is `maxeval = 116534`. It passes the J10 price bars
+(2007/08 ratio 1.360 against 1.359, 2010/11 ratio 1.214 against 1.213,
+May 2008 peak 2.222 against 2.216). The largest end-of-year stock gap
+is +0.59% in 2011, mostly Argentina, India and Brazil, where solves do
+not converge under any budget tried. `maxeval = 500000` was worse
+(+1.01% in 2006). The bars are unchanged. Final acceptance waits on
+the clock-rule noise floor and on the Agrimate authors' reply.
+
 ## Sequence
 
 | Stage | Work | Status |
@@ -154,3 +163,4 @@ convergence); all other countries keep the Gate 2 rule.
 | 2026-10 | Prior for ω from regional strategic versus commercial stock balance, tested on AMIS histories | Uses observed stockholding policy already in the model |
 | 2026-10 | Development in Cursor, one gate at a time; Claude chat for theory, review and writing | Token and attention budget |
 | 2026-10-08 | Gate 1: scale both \(A_d\) and \(A_c^*\) by \(\xi\)-factor vs undisturbed indices | Smallest change inside Agrimate; \(\xi=0\) is identity; \(\sigma\) already Armington |
+| 2026-10-15 | G0 re-acceptance provisional: `maxeval = 116534` for Gate 1 | Passes the J10 price bars. Stock gap max +0.59% (2011), mostly Argentina, India, Brazil, where solves do not converge under any budget tried. `maxeval = 500000` was worse (+1.01%, 2006). Bars unchanged. Final acceptance waits on the clock-rule noise floor and the Agrimate authors' reply |
