@@ -52,6 +52,9 @@ function main()
         start = Date(2000, 1, 1),
         production_anomalies = "FAOsince-2005",
         export_restrictions = "2007-2011",
+        consumer_A_c_source = nothing,
+        consumer_share_source = nothing,
+        A_c_star = :empirical,
     )
     println("agrimate_commit $agrimate_commit")
     println("sheaf_commit $sheaf_commit")
@@ -59,7 +62,8 @@ function main()
     flush(stdout)
     t0 = time()
     simulate(params; t_max = t_max, inputroot = INPUTROOT, outputroot = outputroot,
-             verbose = true, use_cache = false, progressbar_name = crop)
+             verbose = true, use_cache = false, use_netcdf_input = false,
+             progressbar_name = crop)
     dt = time() - t0
     open(joinpath(outputroot, "walltime.txt"), "w") do io
         println(io, "agrimate_commit $agrimate_commit")
