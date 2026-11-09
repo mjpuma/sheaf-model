@@ -21,7 +21,7 @@ include(srcdir("simulation.jl"))
 const AGRIMATE = "/Users/mjp38/GitHub/agrimate"
 const SHEAF = dirname(dirname(dirname(@__FILE__)))
 const PUBLISHED = "/Users/mjp38/GitHub/agrimate-2025/agrimate-equal-sales-penalty/data/agrimate_input_authorbase"
-const CONSUMER_INPUTS = joinpath(AGRIMATE, "data", "agrimate_input_published_consumers")
+const CONSUMER_INPUTS = joinpath(AGRIMATE, "data", "gate0_v2", "inputs_published_consumers")
 const INPUTROOTS = Dict(
     "kilian" => joinpath(AGRIMATE, "data", "agrimate_input"),
     "published" => PUBLISHED,
