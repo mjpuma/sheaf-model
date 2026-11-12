@@ -9,6 +9,8 @@
 #           published (wheat only; the J10 set that reproduced the 2025 hindcast)
 #           published_one / published_two (published wheat plus consumer files that
 #           describe one consumer, or two identical half-size consumers, per region)
+#           kilian_placeholder_ac (his package with A_c_star = 0.2 in every region, because
+#           his A_c column is empty; plumbing check only, not a Gate 0 result)
 # SCENARIO  crisis (default; FAOsince-2005 anomalies, 2007-2011 restrictions) or undisturbed
 # LABEL     optional suffix so parallel copies write to separate folders
 using DrWatson
@@ -24,11 +26,13 @@ const PUBLISHED = "/Users/mjp38/GitHub/agrimate-2025/agrimate-equal-sales-penalt
 const CONSUMER_INPUTS = joinpath(AGRIMATE, "data", "gate0_v2", "inputs_published_consumers")
 const INPUTROOTS = Dict(
     "kilian" => joinpath(AGRIMATE, "data", "agrimate_input"),
+    "kilian_placeholder_ac" => joinpath(AGRIMATE, "data", "agrimate_input"),
     "published" => PUBLISHED,
     "published_one" => CONSUMER_INPUTS,
     "published_two" => CONSUMER_INPUTS,
 )
 const CONSUMER_SOURCE = Dict("published_one" => :one, "published_two" => :two)
+const PLACEHOLDER_AC = 0.2
 const OUTPARENT = joinpath(AGRIMATE, "data", "gate0_v2")
 
 function head_or_refuse(repo; untracked = "all")
@@ -47,7 +51,7 @@ function main()
     crop in ("wheat", "rice", "maize", "soybean") || error("unknown crop $crop")
     haskey(INPUTROOTS, inputs) || error("unknown input set $inputs")
     scenario in ("crisis", "undisturbed") || error("unknown scenario $scenario")
-    inputs != "kilian" && crop != "wheat" && error("published inputs exist for wheat only")
+    startswith(inputs, "published") && crop != "wheat" && error("published inputs exist for wheat only")
     inputroot = INPUTROOTS[inputs]
     agrimate_commit = head_or_refuse(AGRIMATE)
     sheaf_commit = head_or_refuse(SHEAF; untracked = "no")
@@ -61,6 +65,7 @@ function main()
     mkpath(outputroot)
     inputs_sha = read(pipeline(`find $inputroot -name "*crop=$(crop)*" -type f`, `sort`, `xargs shasum -a 256`), String)
     consumer_source = get(CONSUMER_SOURCE, inputs, nothing)
+    A_c_star = inputs == "kilian_placeholder_ac" ? PLACEHOLDER_AC : :empirical
     open(joinpath(outputroot, "provenance.txt"), "w") do io
         println(io, "agrimate_commit $agrimate_commit")
         println(io, "agrimate_note develop-substitution-claude snapshot of PIK develop-consumers f492df9")
@@ -70,6 +75,8 @@ function main()
         println(io, "inputs $inputs")
         println(io, "scenario $scenario")
         println(io, "consumer_source $(something(consumer_source, "nothing"))")
+        println(io, "A_c_star $A_c_star")
+        A_c_star isa Symbol || println(io, "WARNING placeholder A_c_star in every region; not a Gate 0 result")
         println(io, "stop_rule SLSQP maxtime = 60 (published)")
         println(io, "inputroot $inputroot")
         print(io, inputs_sha)
@@ -86,7 +93,7 @@ function main()
         shocks...,
         consumer_A_c_source = consumer_source,
         consumer_share_source = consumer_source,
-        A_c_star = :empirical,
+        A_c_star = A_c_star,
     )
     println("agrimate_commit $agrimate_commit")
     println("sheaf_commit $sheaf_commit")
