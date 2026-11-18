@@ -61,7 +61,8 @@ pic = doc.add_paragraph()
 pic.alignment = WD_ALIGN_PARAGRAPH.CENTER
 pic.paragraph_format.space_after = Pt(0)
 pic.add_run().add_picture(str(FIG), width=Inches(6.6))
-cap = para("Monthly world price (quantity-weighted cross-border price, 1 = baseline). Shaded: July–June "
+cap = para("World market price index as in plot_wm_price_timeseries (src/plot.jl): monthly mean "
+           "cross-border transaction price weighted by export volume, same for all crops. Shaded: July–June "
            "2007/08 and 2010/11. Red ticks: half-month steps where cross-border trade is below 10% of its "
            "2000–05 level. Rice and maize are clipped at 3.", size=8, after=5)
 cap.runs[0].italic = True
@@ -79,7 +80,6 @@ qs = [
     "Rice: have you seen this in your runs? With India, Vietnam and Thailand restricted in 2008 I "
     "expected a spike. Is the Thailand restriction (May 2008 – Oct 2009) intended? And is rice on a "
     "paddy basis (world consumption comes out at 664 Mt)?",
-    "Which world price index do you use for rice and maize? Mine breaks down when trade is thin.",
     "Do you have runs for rice, maize or soybean on these inputs that I could compare against?",
     "Besides A_c, a few STU and A_d values changed from the earlier package (e.g. Egypt wheat STU "
     "0.276 → 0.229, Paraguay rice STU 1.22 → 0.23). Did any of the other input files change too?",
@@ -95,7 +95,8 @@ heading("Next steps")
 steps = [
     "Rice first: rerun with export restrictions off, and with harvest anomalies off, to see which one "
     "causes the trade collapse and the missing 2008 spike.",
-    "Rescore rice and maize with the price index you use.",
+    "Compare each crop with the observed deflated prices your plot code uses (US HRW wheat, US maize, "
+    "Thai 5% rice; World Bank soybeans for soybean).",
     "Agree Gate 0 pass rules that allow for run-to-run spread (several equivalent runs, report the range).",
     "Then start Gate 1, substitution between wheat, rice and maize, on this branch. I'll send the design "
     "questions separately.",

@@ -135,6 +135,11 @@ These are not judged against any bar. Observations:
   step (2001-10, 116 kt). The index starts above 1 (2000 mean 1.36). Stocks
   fall 25 % over the run.
 - Soybean has no thin steps; its 2009 peak is set by large flows.
-- The world index used here (monthly quantity-weighted cross-border
-  price) was built for wheat. For thin markets it should be checked against
-  whatever index the Agrimate team uses for rice and maize.
+- Price index decision (2026-11-18): keep the one used here for all crops.
+  It is the branch's own `plot_wm_price_timeseries` (`src/plot.jl`,
+  "WM price index": monthly Σ(quantity × price) / Σ quantity over
+  cross-border flows), which PIK's plot code applies to wheat, maize and rice
+  alike. Thin-trade spikes are therefore model output, not a scoring
+  artefact. Observed comparison series in that code: World Bank deflated US
+  HRW wheat, US maize, Thai 5% rice (`data/clean/prices/commodity_prices.csv`,
+  not in the snapshot); soybean has no entry.
