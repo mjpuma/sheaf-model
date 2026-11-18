@@ -152,3 +152,35 @@ the model's 2000–2012 mean, as `plot_wm_price_timeseries` does. July–June
 mean over 2000–05 mean, model (observed): wheat 1.36 (1.98), 1.21 (1.61);
 rice 0.99 (1.89), 0.29 (1.77); maize 1.24 (1.64), 1.07 (1.96); soybean 1.14
 (1.68), 0.98 (1.64). PIK's own deflated series not on disk; MUV used for now.
+
+### Rice and maize by scenario (2026-11-18, driver `6fda0f9`)
+
+Each crop run four ways on `kilian_v2`: no shocks, harvest anomalies only,
+export restrictions only, both (crisis).
+
+| crop, scenario | 07/08 | 10/11 | peak (month) | thin steps | trade Mt/yr 2000 → 2012 |
+|---|---:|---:|---|---:|---|
+| rice, no shocks | 0.92 | 0.42 | 11.2 (2002-03) | 11 | 43 → 85 |
+| rice, anomalies only | 0.82 | 0.46 | 12.2 (2010-05) | 8 | 45 → 71 |
+| rice, restrictions only | 1.15 | 0.24 | 67.7 (2011-09) | 11 | 43 → 51 |
+| rice, both | 0.99 | 0.29 | 12.9 (2010-06) | 15 | 45 → 55 |
+| maize, no shocks | 1.02 | 1.04 | 1.63 (2000-07) | 0 | 86 → 97 |
+| maize, anomalies only | 1.17 | 1.05 | 1.88 (2003-10) | 1 | 84 → 90 |
+| maize, restrictions only | 1.05 | 1.04 | 1.83 (2008-07) | 0 | 86 → 95 |
+| maize, both | 1.24 | 1.07 | 4.20 (2011-10) | 1 | 84 → 92 |
+
+Rice is unstable with no shocks at all (95 %): a 2002 spike to 11.2, 11 thin
+steps, cross-border trade doubling against a baseline of 37.7 Mt/yr. The
+export bans are not the cause. The instability centres on Southeast Asia (top
+seller, 187 Mt/yr harvest, ψ 0.139, A_d* 0.194): its supplier storage is
+empty in most steps (median 0.6 Mt, max 14.9 Mt), it alternates between
+exporting almost nothing and 10.8 Mt in one step, and its export price
+swings from 0.6 to 48× (31 steps above 5×). Why, unknown (inputs, harvest
+distribution or the 0.001 baseline-trade fit): F/D, 40–60 %. Rice Gate 0
+cannot be judged until the no-shock run is stable.
+
+Maize is stable with no shocks (index flat at 1.2–1.3, stocks settle at
+≈ 395 Mt after spin-up, like wheat). Each shock alone moves it little; the
+October 2011 4.2 peak appears only with both. The maize index sits at
+≈ 1.23 rather than 1 in the no-shock run (cross-border baseline prices
+above 1); not investigated.
