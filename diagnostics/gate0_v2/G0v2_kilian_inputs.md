@@ -1,6 +1,6 @@
 # Gate 0 v2 — Kilian's 2026 input package (four crops)
 
-## Open issue before anything is final: A_c is missing
+## A_c (resolved 2026-11-18 by `kilian_v2`; placeholder runs stay non-results)
 
 Kilian's `parameters_baseline=2007-2009_crop=*_source=empirical.csv` files
 have an empty `A_c` column for wheat, rice, maize and soybean. With
@@ -82,3 +82,55 @@ Questions for Kilian, not fixed here (F, 60–80 %):
 
 These are input-consistency observations; A_c does not enter them, so they
 should survive the rerun with his values.
+
+## Four-crop runs on `kilian_v2` (2026-11-18)
+
+`gate0_4crop.jl CROP {0,312} kilian_v2`, crisis scenario, four crops in
+parallel; sheaf commit `a3fee26`. Startup warnings are identical to the
+placeholder runs (A_c does not enter them); the full runs add none. Full
+runs 185–265 s.
+
+Bookkeeping, all four crops: supplier and consumer storage balance to 1e-4
+kt, sales equal summed transactions, deliveries equal purchases two steps
+earlier, no negative quantities, no infinite values.
+
+### Wheat against the published run (Kuhla et al. 2025)
+
+| measure | kilian_v2 | published | J10 bar |
+|---|---:|---:|---|
+| 2007/08 ratio | 1.3607 | 1.3607 | 1.359 ± 0.01: pass |
+| 2010/11 ratio | 1.2125 | 1.2187 | 1.213 ± 0.01: pass |
+| peak (May 2008) | 2.2148 | 2.2227 | 2.216 ± 0.01: pass |
+| year-end stocks | within 0.05 % for 2000–2010, −0.19 % 2011 | | ±0.5 %: **2012 +0.81 %** (Argentina +0.89 pp) |
+
+Much closer to the published run than the J10 author-parameter set on this
+host (2000–2010 stocks within 0.05 % against up to 0.33 %). The only miss is
+2012 stocks, driven by Argentina, which is also the largest contributor to
+the 2011 gaps in every earlier run. Given the run-to-run spread in
+`G0v2_code_checks.md` §4 (0.75 pp on 2011 stocks), a single 2012 miss is
+weak evidence either way.
+
+### Rice, maize, soybean (no published reference on disk)
+
+| crop | 2000–05 mean price | 2007/08 ratio | 2010/11 ratio | peak (month) | stocks 2000 → 2012 (Mt) |
+|---|---:|---:|---:|---:|---|
+| rice | 1.043 | 0.987 | 0.293 | 12.87 (2010-06) | 295 → 325 |
+| maize | 1.244 | 1.243 | 1.067 | 4.20 (2011-10) | 463 → 351 |
+| soybean | 1.154 | 1.136 | 0.976 | 2.13 (2009-06) | 150 → 128 |
+
+These are not judged against any bar. Observations:
+
+- Rice cross-border trade nearly stops in 15 steps (below 10 % of its
+  2000–05 median of 1287 kt/step; as low as 1 kt), all in 2006–2012. In
+  those steps a few small trades at extreme prices set the world index
+  (June 2010 peak: 46 kt traded, mostly at 96.7× baseline). The rice price
+  ratios therefore say little until the collapse is understood. Possibly
+  the 2007–2011 restriction file for rice (large exporters banning), or the
+  thin-market fit (baseline trade tolerance 0.001). Not investigated. C/F,
+  40–60 %.
+- Maize has one thin step (2001-10, 116 kt), which sets its 4.2 peak; the
+  index starts above 1 (2000 mean 1.36). Stocks fall 25 % over the run.
+- Soybean has no thin steps; its 2009 peak is set by large flows.
+- The world index used here (monthly quantity-weighted cross-border
+  price) was built for wheat. For thin markets it should be checked against
+  whatever index the Agrimate team uses for rice and maize.
