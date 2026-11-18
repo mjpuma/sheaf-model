@@ -4,7 +4,7 @@
 `f492df93` with no code changes (local commit `2807556`). One consumer per region
 (`consumer_A_c_source = nothing`, `consumer_share_source = nothing`,
 `A_c_star = :empirical`). Published SLSQP stop, `maxtime = 60`. Inputs: the J10
-wheat set that reproduced the 2025 hindcast on the old host
+wheat set that reproduced the Kuhla et al. (2025) 2000–2012 hindcast on the old host
 (`agrimate_input_authorbase`). Driver `diagnostics/gate0_v2/gate0_4crop.jl wheat 312
 published`, scorer `diagnostics/gate0_v2/score_gate0.py` (reproduces the B_small
 J10 numbers exactly). Kilian's 2026 inputs cannot run yet: their `A_c` column is

@@ -45,6 +45,12 @@ The earlier package in `agrimate/data/agrimate_input/` is unchanged.
 
 Open: whether the other 24 files were also revised on their side.
 
+Scope, per Kilian (2026-11-18): these inputs are for reproducing the
+2007/08 and 2010/11 crisis peaks. A 2007–2009 trade network is not expected
+to reproduce later prices (2022 Ukraine, 2025). Gate 0 uses them only for
+2000–2012. Any later-episode work (e.g. the 2022 and 2023 cases in
+`GATE2_TYPOLOGY.md`) needs a later baseline network.
+
 ## Startup check with placeholder A_c
 
 `gate0_4crop.jl CROP 0 kilian_placeholder_ac`, sheaf commit `7113680`,
