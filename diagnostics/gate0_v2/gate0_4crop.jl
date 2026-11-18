@@ -12,7 +12,8 @@
 #           kilian_v2 (his package with the parameter files received 2026-11-18, A_c filled)
 #           kilian_placeholder_ac (his package with A_c_star = 0.2 in every region, because
 #           his A_c column is empty; plumbing check only, not a Gate 0 result)
-# SCENARIO  crisis (default; FAOsince-2005 anomalies, 2007-2011 restrictions) or undisturbed
+# SCENARIO  crisis (default; FAOsince-2005 anomalies, 2007-2011 restrictions), undisturbed,
+#           anomalies_only, or restrictions_only
 # LABEL     optional suffix so parallel copies write to separate folders
 using DrWatson
 @quickactivate "Agrimate"
@@ -35,6 +36,12 @@ const INPUTROOTS = Dict(
 )
 const CONSUMER_SOURCE = Dict("published_one" => :one, "published_two" => :two)
 const PLACEHOLDER_AC = 0.2
+const SCENARIOS = Dict(
+    "crisis" => (production_anomalies = "FAOsince-2005", export_restrictions = "2007-2011"),
+    "undisturbed" => (production_anomalies = nothing, export_restrictions = nothing),
+    "anomalies_only" => (production_anomalies = "FAOsince-2005", export_restrictions = nothing),
+    "restrictions_only" => (production_anomalies = nothing, export_restrictions = "2007-2011"),
+)
 const OUTPARENT = joinpath(AGRIMATE, "data", "gate0_v2")
 
 function head_or_refuse(repo; untracked = "all")
@@ -52,7 +59,7 @@ function main()
     label = length(ARGS) >= 5 ? ARGS[5] : ""
     crop in ("wheat", "rice", "maize", "soybean") || error("unknown crop $crop")
     haskey(INPUTROOTS, inputs) || error("unknown input set $inputs")
-    scenario in ("crisis", "undisturbed") || error("unknown scenario $scenario")
+    haskey(SCENARIOS, scenario) || error("unknown scenario $scenario")
     startswith(inputs, "published") && crop != "wheat" && error("published inputs exist for wheat only")
     inputroot = INPUTROOTS[inputs]
     agrimate_commit = head_or_refuse(AGRIMATE)
@@ -83,9 +90,7 @@ function main()
         println(io, "inputroot $inputroot")
         print(io, inputs_sha)
     end
-    shocks = scenario == "crisis" ?
-        (production_anomalies = "FAOsince-2005", export_restrictions = "2007-2011") :
-        (production_anomalies = nothing, export_restrictions = nothing)
+    shocks = SCENARIOS[scenario]
     params = Params(;
         crops = crop,
         baseline = "2007-2009",
