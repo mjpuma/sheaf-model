@@ -19,6 +19,32 @@ results.** Do not score them against bars, quote their prices or stocks, or
 use them as references. Rerun everything with his A_c before any finding is
 final.
 
+## Parameter files received 2026-11-18
+
+Four `parameters_baseline=2007-2009_crop=*_source=empirical.csv`, received
+in `~/Agrimate/Agrimate parameters/` (originals left there). sha256:
+wheat `e44434d3…`, rice `d0c88dab…`, maize `e8026b48…`, soybean `a575525e…`.
+Input set `kilian_v2` = these four plus the other 24 files of the earlier
+package, in `agrimate/data/gate0_v2/inputs_kilian_2026-11-18/` (git-ignored).
+The earlier package in `agrimate/data/agrimate_input/` is unchanged.
+
+- A_c is filled: wheat 193/196 areas, rice 193/194, maize 181/181, soybean
+  173/174; range 0.064–0.590, none ≤ 0. Missing areas (ANT, COK, NIU) are
+  imputed by the code from regional medians.
+- A_c is per country, not per crop: the 167 areas present in all four files
+  have the same value in every crop.
+- Wheat A_c differs from the published 2025 regional values (equal in 12 of
+  193 areas, correlation 0.71).
+- These are a revision, not just the old files with A_c added. STU and A_d
+  change for a few countries per crop (e.g. wheat Egypt STU 0.276 → 0.229,
+  Turkmenistan A_d 0.075 → 0.105; rice Paraguay STU 1.222 → 0.229, Colombia
+  0.114 → 0.049), a few values go blank, and small islands are dropped
+  (wheat FSM, MHL, PLW; rice MHL, PLW; soybean FSM, MHL). The dropped areas
+  are still in the food-balance files, so they just leave the regional
+  averages.
+
+Open: whether the other 24 files were also revised on their side.
+
 ## Startup check with placeholder A_c
 
 `gate0_4crop.jl CROP 0 kilian_placeholder_ac`, sheaf commit `7113680`,

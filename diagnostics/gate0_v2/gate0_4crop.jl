@@ -9,6 +9,7 @@
 #           published (wheat only; the J10 set that reproduced the 2025 hindcast)
 #           published_one / published_two (published wheat plus consumer files that
 #           describe one consumer, or two identical half-size consumers, per region)
+#           kilian_v2 (his package with the parameter files received 2026-11-18, A_c filled)
 #           kilian_placeholder_ac (his package with A_c_star = 0.2 in every region, because
 #           his A_c column is empty; plumbing check only, not a Gate 0 result)
 # SCENARIO  crisis (default; FAOsince-2005 anomalies, 2007-2011 restrictions) or undisturbed
@@ -27,6 +28,7 @@ const CONSUMER_INPUTS = joinpath(AGRIMATE, "data", "gate0_v2", "inputs_published
 const INPUTROOTS = Dict(
     "kilian" => joinpath(AGRIMATE, "data", "agrimate_input"),
     "kilian_placeholder_ac" => joinpath(AGRIMATE, "data", "agrimate_input"),
+    "kilian_v2" => joinpath(AGRIMATE, "data", "gate0_v2", "inputs_kilian_2026-11-18"),
     "published" => PUBLISHED,
     "published_one" => CONSUMER_INPUTS,
     "published_two" => CONSUMER_INPUTS,
