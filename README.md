@@ -265,6 +265,10 @@ seven CSVs and leave those functions alone.
 
 ## 3. Run
 
+The commands in this section drive the vendored host in `agrimate_julia/`.
+The four-crop runs on PIK `develop-substitution-claude`, including the rice
+shock experiments, use `diagnostics/gate0_v2/gate0_4crop.jl` (next section).
+
 Default scenario: wheat, baseline 2007–2009, regions AgrimateEU28 + Egypt,
 `t_max = 312` (2000–2012). Add `--anomalies` and/or `--restrictions` for
 the paper’s harvest-shock and harvest+AMIS runs. `--t-max 0` stops after
@@ -323,6 +327,78 @@ python plots/j10_vs_author.py
 
 `drivers/score.py` is wheat-only (it compares to the published wheat
 NetCDF). It also needs `AGRIMATE_JULIA` on Windows.
+
+## 4. Four crops on `develop-substitution-claude`
+
+These runs use a separate checkout of PIK `develop-substitution-claude`
+(a snapshot of `develop-consumers` at `f492df9`, no code edits), at
+`/Users/mjp38/GitHub/agrimate`. They do not go through `drivers/run.py`.
+One consumer per region, baseline 2007–2009, AgrimateEU28 + Egypt, start
+2000-01-01, SLSQP `maxtime = 60`. Both repos must be clean or the driver
+refuses to write (`diagnostics/.Rhistory` is ignored).
+
+From this repo root, with the Intel Julia 1.6.5 binary:
+
+```bash
+JULIA=/Users/mjp38/GitHub/agrimate-2025/julia/julia-1.6.5/bin/julia
+arch -x86_64 "$JULIA" --project=/Users/mjp38/GitHub/agrimate \
+  diagnostics/gate0_v2/gate0_4crop.jl CROP T_MAX [INPUTS] [SCENARIO] [LABEL]
+```
+
+| Argument | Values |
+|---|---|
+| `CROP` | `wheat`, `rice`, `maize`, `soybean` |
+| `T_MAX` | `0` startup only; `312` is 2000–2012 |
+| `INPUTS` | `kilian_v2` (default for current work). Also `kilian`, `kilian_placeholder_ac`, and wheat-only `published`, `published_one`, `published_two` |
+| `SCENARIO` | `crisis` (default), `undisturbed`, `anomalies_only`, `restrictions_only` |
+| `LABEL` | optional suffix so parallel copies write separate folders |
+
+`kilian_v2` is Kilian's package plus the parameter files received
+2026-11-18 (`A_c` filled), in
+`agrimate/data/gate0_v2/inputs_kilian_2026-11-18/` (not in this repo).
+`kilian` is the earlier package and fails at startup because `A_c` is
+empty. `kilian_placeholder_ac` sets `A_c = 0.2` everywhere so the other
+files can be checked; those runs are not Gate 0 results. `published` is
+the wheat set that reproduced the Kuhla et al. (2025) 2000–2012 hindcast.
+
+| `SCENARIO` | Harvest anomalies | Export restrictions |
+|---|---|---|
+| `crisis` | FAOsince-2005 | 2007–2011 |
+| `anomalies_only` | FAOsince-2005 | off |
+| `restrictions_only` | off | 2007–2011 |
+| `undisturbed` | off | off |
+
+Output goes to `agrimate/data/gate0_v2/<name>/`, with `provenance.txt` and
+`walltime.txt`. The folder name drops `kilian` and drops `crisis`, so
+`rice 312 kilian_v2 crisis` writes `rice_t312_kilian_v2`, and
+`rice 312 kilian_v2 undisturbed` writes `rice_t312_kilian_v2_undisturbed`.
+A full run is about 3–5 minutes.
+
+Score a NetCDF (world price and year-end stocks; optional reference):
+
+```bash
+python diagnostics/gate0_v2/score_gate0.py LOCAL.nc [REFERENCE.nc]
+```
+
+### Rice shock experiments
+
+Same inputs, four scenarios. The no-shock run is already unstable
+(Southeast Asia's supplier stock stays near empty), so the export bans
+are not what breaks rice. Notes:
+[`diagnostics/gate0_v2/G0v2_kilian_inputs.md`](diagnostics/gate0_v2/G0v2_kilian_inputs.md).
+Figure: `python plots/gate0_v2_rice_scenarios.py`.
+
+```bash
+JULIA=/Users/mjp38/GitHub/agrimate-2025/julia/julia-1.6.5/bin/julia
+for s in undisturbed anomalies_only restrictions_only crisis; do
+  arch -x86_64 "$JULIA" --project=/Users/mjp38/GitHub/agrimate \
+    diagnostics/gate0_v2/gate0_4crop.jl rice 312 kilian_v2 "$s"
+done
+```
+
+The same four commands with `maize` in place of `rice` are the maize
+check. Maize is steady with no shocks; its October 2011 peak appears only
+when both shocks are on.
 
 ## What this is not
 
