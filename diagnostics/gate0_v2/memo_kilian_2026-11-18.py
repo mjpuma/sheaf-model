@@ -81,9 +81,11 @@ para("Observed prices rose 64–96% in both windows for all three. The model giv
 
 heading("Questions")
 qs = [
-    "Rice: have you seen this in your runs? With India, Vietnam and Thailand restricted in 2008 I "
-    "expected a spike. Is the Thailand restriction (May 2008 – Oct 2009) intended? And is rice on a "
-    "paddy basis (world consumption comes out at 664 Mt)?",
+    "Rice is unstable even with no shocks: a 2002 spike to 11, trade nearly stopping in 11 steps, and "
+    "trade doubling by 2012. It centres on Southeast Asia, whose supplier stock is empty most of the "
+    "time (median 0.6 Mt on a 187 Mt harvest); it swings between exporting almost nothing and 10.8 Mt in "
+    "a half-month, at 0.6–48× baseline. Have you seen this? Is rice on a paddy basis (664 Mt world use)? "
+    "Is the Thailand restriction (May 2008 – Oct 2009) intended?",
     "Do you have runs for rice, maize or soybean on these inputs that I could compare against?",
     "Besides A_c, a few STU and A_d values changed from the earlier package (e.g. Egypt wheat STU "
     "0.276 → 0.229, Paraguay rice STU 1.22 → 0.23). Did any of the other input files change too?",
@@ -97,8 +99,9 @@ for q in qs:
 
 heading("Next steps")
 steps = [
-    "Rice first: rerun with export restrictions off, and with harvest anomalies off, to see which one "
-    "causes the trade collapse and the missing 2008 spike.",
+    "Rice first: find why Southeast Asia's stock runs empty in the no-shock run, since rice can't be "
+    "judged until that is stable. (Maize is stable without shocks; its October 2011 peak needs both "
+    "harvest shocks and restrictions.)",
     "Swap in your data/clean/prices/commodity_prices.csv if you can share it, so the observed lines "
     "use your deflator rather than MUV.",
     "Agree Gate 0 pass rules that allow for run-to-run spread (several equivalent runs, report the range).",
