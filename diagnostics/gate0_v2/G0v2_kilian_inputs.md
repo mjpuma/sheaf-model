@@ -143,3 +143,12 @@ These are not judged against any bar. Observations:
   artefact. Observed comparison series in that code: World Bank deflated US
   HRW wheat, US maize, Thai 5% rice (`data/clean/prices/commodity_prices.csv`,
   not in the snapshot); soybean has no entry.
+
+### Observed prices (World Bank Pink Sheet, MUV-deflated)
+
+`data/world_prices/` (US HRW wheat, Thai 5% rice, US maize; soybeans read
+from the monthly workbook and deflated by the same per-year ratio). Scaled to
+the model's 2000–2012 mean, as `plot_wm_price_timeseries` does. July–June
+mean over 2000–05 mean, model (observed): wheat 1.36 (1.98), 1.21 (1.61);
+rice 0.99 (1.89), 0.29 (1.77); maize 1.24 (1.64), 1.07 (1.96); soybean 1.14
+(1.68), 0.98 (1.64). PIK's own deflated series not on disk; MUV used for now.

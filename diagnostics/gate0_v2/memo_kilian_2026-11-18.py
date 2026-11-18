@@ -61,16 +61,20 @@ pic = doc.add_paragraph()
 pic.alignment = WD_ALIGN_PARAGRAPH.CENTER
 pic.paragraph_format.space_after = Pt(0)
 pic.add_run().add_picture(str(FIG), width=Inches(6.6))
-cap = para("World market price index as in plot_wm_price_timeseries (src/plot.jl): monthly mean "
-           "cross-border transaction price weighted by export volume, same for all crops. Shaded: July–June "
-           "2007/08 and 2010/11. Red ticks: half-month steps where cross-border trade is below 10% of its "
-           "2000–05 level. Rice and maize are clipped at 3.", size=8, after=5)
+cap = para("Blue: world market price index as in plot_wm_price_timeseries (src/plot.jl), same for all "
+           "crops. Orange: World Bank Pink Sheet price (US HRW wheat, Thai 5% rice, US maize, soybeans), "
+           "deflated by MUV and scaled to the model's 2000–2012 mean as in your plot code. Titles: July–June "
+           "mean over the 2000–05 mean, model (observed). Red ticks: half-month steps where cross-border "
+           "trade is below 10% of its 2000–05 level. Clipped at 3.", size=8, after=5)
 cap.runs[0].italic = True
 
 para("2007/08 1.361 (published 1.361), 2010/11 1.213 (1.219), May 2008 peak 2.21 (2.22). World stocks "
-     "within 0.05% of your run through 2010; 2012 is 0.8% high, mostly Argentina.", bold_lead="Wheat matches your published run closely. ")
-para("There is nothing to compare against yet. Soybean looks reasonable. Maize peaks in October 2011 "
-     "with the US almost the only seller. Rice is the problem: no 2008 spike, and cross-border trade "
+     "within 0.05% of your run through 2010; 2012 is 0.8% high, mostly Argentina. Like your run, it "
+     "gives less of a rise than observed (1.36 vs 1.98 in 2007/08).",
+     bold_lead="Wheat matches your published run closely. ")
+para("Observed prices rose 64–96% in both windows for all three. The model gives 1.24 and 1.07 for "
+     "maize and 1.14 and 0.98 for soybean. Maize peaks in October 2011 with the US almost the only "
+     "seller. Rice is the problem: no 2008 spike, and cross-border trade "
      "nearly stops in 15 half-month steps between 2006 and 2012. Then a few small trades set the world "
      "price (June 2010: Southeast Asia almost the only seller, at 12–69× baseline).",
      bold_lead="Rice, maize, soybean. ")
@@ -95,8 +99,8 @@ heading("Next steps")
 steps = [
     "Rice first: rerun with export restrictions off, and with harvest anomalies off, to see which one "
     "causes the trade collapse and the missing 2008 spike.",
-    "Compare each crop with the observed deflated prices your plot code uses (US HRW wheat, US maize, "
-    "Thai 5% rice; World Bank soybeans for soybean).",
+    "Swap in your data/clean/prices/commodity_prices.csv if you can share it, so the observed lines "
+    "use your deflator rather than MUV.",
     "Agree Gate 0 pass rules that allow for run-to-run spread (several equivalent runs, report the range).",
     "Then start Gate 1, substitution between wheat, rice and maize, on this branch. I'll send the design "
     "questions separately.",
