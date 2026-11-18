@@ -122,14 +122,18 @@ These are not judged against any bar. Observations:
 
 - Rice cross-border trade nearly stops in 15 steps (below 10 % of its
   2000–05 median of 1287 kt/step; as low as 1 kt), all in 2006–2012. In
-  those steps a few small trades at extreme prices set the world index
-  (June 2010 peak: 46 kt traded, mostly at 96.7× baseline). The rice price
-  ratios therefore say little until the collapse is understood. Possibly
-  the 2007–2011 restriction file for rice (large exporters banning), or the
-  thin-market fit (baseline trade tolerance 0.001). Not investigated. C/F,
+  those steps a few small trades at extreme prices set the world index.
+  The June 2010 monthly peak (12.9) is Southeast Asia as almost the only
+  seller: 18 kt at 69× baseline, then 817 kt at 12.2×. There is no 2008
+  spike (2007/08 ratio 0.99), although the rice restriction file has India
+  at 0.95 from 2007-10 to 2011-09, Vietnam 2007-07 to 2009-04 and Thailand
+  2008-05 to 2009-10. Gate 1 hard bar 4 (rice bans carry the 2008 rice
+  spike) cannot be tested until this is understood. Not investigated. C/F,
   40–60 %.
-- Maize has one thin step (2001-10, 116 kt), which sets its 4.2 peak; the
-  index starts above 1 (2000 mean 1.36). Stocks fall 25 % over the run.
+- Maize: the 4.2 monthly peak is October 2011, with the USA almost the only
+  seller (trade about 25 % of normal, 3.8–4.7× baseline). One separate thin
+  step (2001-10, 116 kt). The index starts above 1 (2000 mean 1.36). Stocks
+  fall 25 % over the run.
 - Soybean has no thin steps; its 2009 peak is set by large flows.
 - The world index used here (monthly quantity-weighted cross-border
   price) was built for wheat. For thin markets it should be checked against
